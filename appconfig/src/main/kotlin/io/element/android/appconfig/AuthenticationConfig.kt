@@ -7,13 +7,15 @@
 
 package io.element.android.appconfig
 
+import io.element.android.support.zero.config.ZeroConfig
+
 object AuthenticationConfig {
-    const val MATRIX_ORG_URL = "https://matrix.org"
+    val MATRIX_ORG_URL = ZeroConfig.environment.matrixHomeServerUrl
 
     /**
      * Default homeserver url to sign in with, unless the user selects a different one.
      */
-    const val DEFAULT_HOMESERVER_URL = MATRIX_ORG_URL
+    val DEFAULT_HOMESERVER_URL = MATRIX_ORG_URL
 
     /**
      * URL with some docs that explain what's sliding sync and how to add it to your home server.

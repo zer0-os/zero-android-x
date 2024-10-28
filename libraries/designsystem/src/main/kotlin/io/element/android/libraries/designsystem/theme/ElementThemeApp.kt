@@ -31,10 +31,11 @@ fun ElementThemeApp(
     appPreferencesStore: AppPreferencesStore,
     content: @Composable () -> Unit,
 ) {
-    val theme by remember {
+    /*val theme by remember {
         appPreferencesStore.getThemeFlow().mapToTheme()
     }
-        .collectAsState(initial = Theme.System)
+        .collectAsState(initial = Theme.System)*/
+    val theme = Theme.Dark
     LaunchedEffect(theme) {
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {

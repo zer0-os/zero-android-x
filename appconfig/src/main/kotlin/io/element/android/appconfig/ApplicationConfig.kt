@@ -7,6 +7,8 @@
 
 package io.element.android.appconfig
 
+import io.element.android.support.zero.config.ZeroConfig
+
 object ApplicationConfig {
     /**
      * Application name used in the UI for string. If empty, the value is taken from the resources `R.string.app_name`.
@@ -23,7 +25,7 @@ object ApplicationConfig {
      * Cannot be empty.
      * For Element, the value is "Element".
      */
-    const val PRODUCTION_APPLICATION_NAME: String = "Element"
+    val PRODUCTION_APPLICATION_NAME: String = ZeroConfig.environment.appName
 
     /**
      * Used in the strings to reference the Element Desktop client, for instance Element Web.

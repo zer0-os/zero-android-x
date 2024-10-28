@@ -29,7 +29,10 @@ class LoginPasswordNode @AssistedInject constructor(
         LoginPasswordView(
             state = state,
             modifier = modifier,
-            onBackClick = ::navigateUp,
+            onBackClick = {
+                navigateUp()
+                navigateUp()
+            },
         )
     }
 }

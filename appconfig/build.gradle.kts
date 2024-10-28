@@ -15,4 +15,5 @@ android {
 dependencies {
     implementation(libs.androidx.annotationjvm)
     implementation(projects.libraries.matrix.api)
+    implementation(projects.zero)
 }

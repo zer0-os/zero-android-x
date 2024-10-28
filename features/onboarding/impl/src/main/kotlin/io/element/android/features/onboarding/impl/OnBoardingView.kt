@@ -44,6 +44,7 @@ import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.screens.onboarding.ZeroOnboardingView
 
 // Refs:
 // FTUE:
@@ -60,7 +61,7 @@ fun OnBoardingView(
     onReportProblem: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    OnBoardingPage(
+    /*OnBoardingPage(
         modifier = modifier,
         content = {
             OnBoardingContent(
@@ -77,6 +78,11 @@ fun OnBoardingView(
                 onReportProblem = onReportProblem,
             )
         }
+    )*/
+
+    ZeroOnboardingView(
+        modifier = modifier,
+        onSignIn = onSignIn
     )
 }
 
