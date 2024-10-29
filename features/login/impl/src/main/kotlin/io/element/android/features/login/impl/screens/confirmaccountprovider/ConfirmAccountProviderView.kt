@@ -88,6 +88,7 @@ fun ConfirmAccountProviderView(
         }
     )*/
     ZeroConfirmAccountProviderView(
+        modifier = modifier,
         isLoading = isLoading,
         onInvoked = { eventSink.invoke(ConfirmAccountProviderEvents.Continue) }
     ) {

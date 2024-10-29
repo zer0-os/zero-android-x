@@ -80,10 +80,7 @@ fun OnBoardingView(
         }
     )*/
 
-    ZeroOnboardingView(
-        modifier = modifier,
-        onSignIn = onSignIn
-    )
+    ZeroOnboardingView(onSignIn = onSignIn)
 }
 
 @Composable
