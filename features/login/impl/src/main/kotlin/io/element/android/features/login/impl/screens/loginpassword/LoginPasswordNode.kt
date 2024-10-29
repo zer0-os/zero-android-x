@@ -26,7 +26,12 @@ class LoginPasswordNode @AssistedInject constructor(
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
-        LoginPasswordView(
+        /*LoginPasswordView(
+            state = state,
+            modifier = modifier,
+            onBackClick = ::navigateUp,
+        )*/
+        ZeroLoginPasswordView(
             state = state,
             modifier = modifier,
             onBackClick = ::navigateUp,
