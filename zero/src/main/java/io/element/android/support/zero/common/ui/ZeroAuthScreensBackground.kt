@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.support.zero.R
-import io.element.android.support.zero.common.ui.components.BlurredBackground
-import io.element.android.support.zero.common.ui.components.OverlappingLoadingContainer
+import io.element.android.support.zero.common.ui.component.BlurredBackground
+import io.element.android.support.zero.common.ui.component.OverlappingLoadingContainer
 
 @Composable
 fun ZeroAuthScreensBackground(

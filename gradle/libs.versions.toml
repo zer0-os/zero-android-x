@@ -55,6 +55,7 @@ dependencyAnalysis = "2.4.2"
 # DI
 dagger = "2.52"
 anvil = "0.4.0"
+hilt = "2.52"
 
 # Auto service
 autoservice = "1.1.1"
@@ -209,6 +210,8 @@ dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger_compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 anvil_compiler_api = { module = "dev.zacsweers.anvil:compiler-api", version.ref = "anvil" }
 anvil_compiler_utils = { module = "dev.zacsweers.anvil:compiler-utils", version.ref = "anvil" }
+hilt_android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt_android_compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 
 # Auto services
 google_autoservice = { module = "com.google.auto.service:auto-service", version.ref = "autoservice" }

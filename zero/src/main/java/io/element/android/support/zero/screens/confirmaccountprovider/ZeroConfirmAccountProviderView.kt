@@ -20,12 +20,12 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.support.zero.R
-import io.element.android.support.zero.common.extensions.getActivity
+import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.common.ui.ZeroLogoSmall
 import io.element.android.support.zero.common.ui.ZeroOnboardingViewBackground
-import io.element.android.support.zero.common.ui.components.ElevatedStrip
-import io.element.android.support.zero.common.ui.components.OverlappingLoadingContainer
-import io.element.android.support.zero.common.ui.components.ZImageButton
+import io.element.android.support.zero.common.ui.component.ElevatedStrip
+import io.element.android.support.zero.common.ui.component.OverlappingLoadingContainer
+import io.element.android.support.zero.common.ui.component.ZImageButton
 import io.element.android.support.zero.common.ui.theme.PADDING_2X
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_10X

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.support.zero.common.ui.components.ElevatedButton
+import io.element.android.support.zero.common.ui.component.ElevatedButton
 
 @Composable
 fun LoginTypeSegmentedControl(

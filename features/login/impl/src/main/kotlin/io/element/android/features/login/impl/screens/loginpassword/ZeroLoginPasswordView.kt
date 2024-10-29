@@ -55,16 +55,15 @@ import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.ui.ZeroAuthScreensBackground
-import io.element.android.support.zero.common.ui.animations.FadeExpandAnimation
-import io.element.android.support.zero.common.ui.components.SimpleInputField
-import io.element.android.support.zero.common.ui.components.ZImageButton
-import io.element.android.support.zero.common.ui.components.passwordinput.PasswordTextField
+import io.element.android.support.zero.common.ui.animation.FadeExpandAnimation
+import io.element.android.support.zero.common.ui.component.SimpleInputField
+import io.element.android.support.zero.common.ui.component.ZImageButton
+import io.element.android.support.zero.common.ui.component.passwordinput.PasswordTextField
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_10X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_5X
 import io.element.android.support.zero.common.ui.theme.SPACING_6X
-import io.element.android.support.zero.common.ui.theme.SPACING_8X
 import io.element.android.support.zero.screens.login.LoginTypeSegmentedControl
 import io.element.android.support.zero.screens.login.util.LoginFlowType
 
