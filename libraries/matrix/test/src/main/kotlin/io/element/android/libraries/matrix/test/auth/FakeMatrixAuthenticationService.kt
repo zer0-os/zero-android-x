@@ -83,6 +83,10 @@ class FakeMatrixAuthenticationService(
         }
     }
 
+    override suspend fun loginWithZero(username: String, password: String): Result<SessionId> = simulateLongTask {
+        loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
+
     override suspend fun importCreatedSession(externalSession: ExternalSession): Result<SessionId> = simulateLongTask {
         return importCreatedSessionLambda(externalSession)
     }

@@ -1,16 +1,25 @@
 package io.element.android.support.zero.data.di
 
-import dagger.Binds
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.Provides
+import io.element.android.libraries.di.AppScope
+import io.element.android.libraries.di.SingleIn
+import io.element.android.support.zero.data.delegate.DataCleaner
+import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.AuthRepositoryImpl
+import io.element.android.support.zero.network.service.ZeroAuthService
 
 @Module
-@InstallIn(SingletonComponent::class)
-interface RepositoryModule {
+@ContributesTo(AppScope::class)
+object RepositoryModule {
 
-    @Binds
-    fun bindAuthRepository(authRepository: AuthRepositoryImpl): AuthRepository
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindAuthRepository(
+        preferences: Preferences,
+        zeroAuthService: ZeroAuthService,
+        dataCleaner: DataCleaner
+    ): AuthRepository = AuthRepositoryImpl(preferences, zeroAuthService, dataCleaner)
 }

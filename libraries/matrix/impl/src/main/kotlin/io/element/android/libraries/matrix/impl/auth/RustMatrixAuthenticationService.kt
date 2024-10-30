@@ -36,11 +36,13 @@ import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.sessionstorage.api.LoggedInState
 import io.element.android.libraries.sessionstorage.api.LoginType
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.support.zero.data.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.Client
 import org.matrix.rustcomponents.sdk.ClientBuildException
@@ -65,6 +67,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     private val passphraseGenerator: PassphraseGenerator,
     private val oidcConfigurationProvider: OidcConfigurationProvider,
     private val appPreferencesStore: AppPreferencesStore,
+    private val authRepository: AuthRepository,
 ) : MatrixAuthenticationService {
     // Passphrase which will be used for new sessions. Existing sessions will use the passphrase
     // stored in the SessionData.
@@ -160,6 +163,35 @@ class RustMatrixAuthenticationService @Inject constructor(
                         sessionPaths = currentSessionPaths,
                     )
                 newMatrixClientObserver?.invoke(rustMatrixClientFactory.create(client))
+                sessionStore.storeData(sessionData)
+                authRepository.saveMatrixLoginInfo(
+                    token = sessionData.accessToken,
+                    userId = sessionData.userId
+                )
+                SessionId(sessionData.userId)
+            }.mapFailure { failure ->
+                failure.mapAuthenticationException()
+            }
+        }
+
+    override suspend fun loginWithZero(username: String, password: String): Result<SessionId> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                val client = currentClient ?: error("You need to call `setHomeserver()` first")
+                val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
+
+                val authSsoToken = authRepository.login(username, password).firstOrNull()
+                val ssoToken = authSsoToken?.token
+                    ?: throw IllegalStateException("SSO Token from zos is null or blank")
+                client.customLoginWithJwt(ssoToken, "Element X Android", null)
+                val sessionData = client.session()
+                    .toSessionData(
+                        isTokenValid = true,
+                        loginType = LoginType.PASSWORD,
+                        passphrase = pendingPassphrase,
+                        sessionPaths = currentSessionPaths,
+                    )
+                clear()
                 sessionStore.storeData(sessionData)
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->

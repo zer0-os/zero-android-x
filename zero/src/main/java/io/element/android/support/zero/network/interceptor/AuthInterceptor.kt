@@ -7,11 +7,8 @@ import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
 import retrofit2.Invocation
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-internal class AuthInterceptor @Inject constructor(private val preferences: AppPreferences) : Interceptor {
+class AuthInterceptor(private val preferences: AppPreferences) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {

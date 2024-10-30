@@ -7,10 +7,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import io.element.android.support.zero.common.extension.runBlockingWithTimeOut
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import javax.inject.Singleton
 
-@Singleton
-internal class AppPreferences(private val dataStore: DataStore<Preferences>) {
+class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setZeroToken(token: String) {
         dataStore.edit { preferences -> preferences[ZOS_TOKEN] = token }

@@ -251,6 +251,7 @@ dependencies {
     implementation(projects.appconfig)
     implementation(projects.libraries.uiStrings)
     implementation(projects.services.analytics.compose)
+    implementation(projects.zero)
 
     if (ModulesConfig.pushProvidersConfig.includeFirebase) {
         "gplayImplementation"(projects.libraries.pushproviders.firebase)
@@ -268,10 +269,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.startup)
     implementation(libs.androidx.preference)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil)
 
     implementation(platform(libs.network.okhttp.bom))
     implementation(libs.network.okhttp.logging)
+    implementation(libs.network.retrofit.converter.serialization)
     implementation(libs.serialization.json)
 
     implementation(libs.matrix.emojibase.bindings)

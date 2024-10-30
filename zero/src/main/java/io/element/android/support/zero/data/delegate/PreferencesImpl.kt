@@ -1,9 +1,8 @@
 package io.element.android.support.zero.data.delegate
 
 import io.element.android.support.zero.datastore.AppPreferences
-import javax.inject.Inject
 
-internal class PreferencesImpl @Inject constructor(private val appPreferences: AppPreferences) :
+class PreferencesImpl(private val appPreferences: AppPreferences) :
     Preferences {
     override fun zosToken() = appPreferences.zosToken()
 

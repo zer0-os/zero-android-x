@@ -8,11 +8,8 @@ import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
-import javax.inject.Inject
 
-class AuthRepositoryImpl
-@Inject
-constructor(
+class AuthRepositoryImpl(
     private val preferences: Preferences,
     private val zeroAuthService: ZeroAuthService,
     private val dataCleaner: DataCleaner,
@@ -30,6 +27,11 @@ constructor(
         preferences.setZeroToken(authCredentials.accessToken)
         val ssoRequest = zeroAuthService.getSSOToken()
         return ssoRequest.toModel()
+    }
+
+    override suspend fun saveMatrixLoginInfo(token: String, userId: String) {
+        preferences.setMatrixToken(token)
+        preferences.setUserId(userId)
     }
 
     override suspend fun logout() {

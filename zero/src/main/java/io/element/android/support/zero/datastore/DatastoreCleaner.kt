@@ -3,9 +3,8 @@ package io.element.android.support.zero.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import javax.inject.Inject
 
-internal class DatastoreCleaner @Inject constructor(private val dataStore: DataStore<Preferences>) {
+class DatastoreCleaner(private val dataStore: DataStore<Preferences>) {
 
     suspend fun clean() {
         dataStore.edit { mPrefs ->

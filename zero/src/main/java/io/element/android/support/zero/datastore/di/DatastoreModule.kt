@@ -7,24 +7,25 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import io.element.android.libraries.di.AppScope
+import io.element.android.libraries.di.ApplicationContext
+import io.element.android.libraries.di.SingleIn
 import io.element.android.support.zero.datastore.AppPreferences
 import io.element.android.support.zero.datastore.DatastoreCleaner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
-internal object DatastoreModule {
+@ContributesTo(AppScope::class)
+object DatastoreModule {
 
     @Provides
-    @Singleton
-    fun provideDataStore(@dagger.hilt.android.qualifiers.ApplicationContext context: Context): DataStore<Preferences> {
+    @SingleIn(AppScope::class)
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
             corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
@@ -33,10 +34,10 @@ internal object DatastoreModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideDatastoreCleaner(dataStore: DataStore<Preferences>) = DatastoreCleaner(dataStore)
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideAppPreferences(dataStore: DataStore<Preferences>) = AppPreferences(dataStore)
 }

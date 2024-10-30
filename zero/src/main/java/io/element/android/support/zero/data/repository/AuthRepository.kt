@@ -6,5 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
     suspend fun login(email: String, password: String): Flow<AuthSSOToken>
 
+    suspend fun saveMatrixLoginInfo(token: String, userId: String)
+
     suspend fun logout()
 }

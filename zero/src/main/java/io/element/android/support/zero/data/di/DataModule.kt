@@ -1,20 +1,28 @@
 package io.element.android.support.zero.data.di
 
-import dagger.Binds
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.Provides
+import io.element.android.libraries.di.AppScope
+import io.element.android.libraries.di.SingleIn
 import io.element.android.support.zero.data.delegate.DataCleaner
 import io.element.android.support.zero.data.delegate.DataCleanerImpl
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.delegate.PreferencesImpl
+import io.element.android.support.zero.datastore.AppPreferences
+import io.element.android.support.zero.datastore.DatastoreCleaner
 
 @Module
-@InstallIn(SingletonComponent::class)
-internal interface DataModule {
-    @Binds
-    fun providePreferences(preferences: PreferencesImpl): Preferences
+@ContributesTo(AppScope::class)
+object DataModule {
 
-    @Binds
-    fun provideDataCleaner(dataCleaner: DataCleanerImpl): DataCleaner
+    @Provides
+    @SingleIn(AppScope::class)
+    fun providePreferences(appPreferences: AppPreferences): Preferences =
+        PreferencesImpl(appPreferences)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideDataCleaner(datastoreCleaner: DatastoreCleaner): DataCleaner =
+        DataCleanerImpl(datastoreCleaner)
 }
