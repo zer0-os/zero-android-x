@@ -24,6 +24,11 @@ import extension.setupAnvil
 import extension.setupKover
 import java.util.Locale
 
+val APP_TIER_ZERO = "ZERO"
+val APP_TIER_ELEMENT = "ELEMENT"
+//TODO: Change the tier here only to `APP_TIER_ELEMENT` to show app element app name and icon
+val CURRENT_APP_TIER = APP_TIER_ZERO
+
 plugins {
     id("io.element.android-compose-application")
     alias(libs.plugins.kotlin.android)
@@ -43,7 +48,9 @@ android {
     namespace = "io.element.android.x"
 
     defaultConfig {
-        applicationId = if (isEnterpriseBuild) {
+        applicationId = if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+            "com.zero.android.messenger"
+        } else if (isEnterpriseBuild) {
             "io.element.enterprise"
         } else {
             "io.element.android.x"
@@ -106,13 +113,21 @@ android {
 
     buildTypes {
         getByName("debug") {
-            resValue("string", "app_name", "$baseAppName dbg")
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                resValue("string", "app_name", "ZERO")
+            } else {
+                resValue("string", "app_name", "$baseAppName dbg")
+            }
             applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
 
         getByName("release") {
-            resValue("string", "app_name", baseAppName)
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                resValue("string", "app_name", "ZERO")
+            } else {
+                resValue("string", "app_name", baseAppName)
+            }
             signingConfig = signingConfigs.getByName("debug")
 
             postprocessing {
@@ -172,11 +187,27 @@ android {
             isDefault = true
             buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"G\"")
             buildConfigField("String", "FLAVOR_DESCRIPTION", "\"GooglePlay\"")
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                // Zero app icons and themes
+                manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher_zero"
+                manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round_zero"
+                manifestPlaceholders["app_theme"] = "@style/Theme.ElementX" //keeping Element theme for now
+                manifestPlaceholders["app_theme_splash"] = "@style/Theme.ZERO.Splash"
+            } else {
+                manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher"
+                manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round"
+                manifestPlaceholders["app_theme"] = "@style/Theme.ElementX"
+                manifestPlaceholders["app_theme_splash"] = "@style/Theme.ElementX.Splash"
+            }
         }
         create("fdroid") {
             dimension = "store"
             buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"F\"")
             buildConfigField("String", "FLAVOR_DESCRIPTION", "\"FDroid\"")
+            manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher"
+            manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round"
+            manifestPlaceholders["app_theme"] = "@style/Theme.ElementX"
+            manifestPlaceholders["app_theme_splash"] = "@style/Theme.ElementX.Splash"
         }
     }
 }
