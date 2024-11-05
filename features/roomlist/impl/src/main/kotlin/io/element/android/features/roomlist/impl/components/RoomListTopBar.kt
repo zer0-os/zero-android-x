@@ -190,7 +190,7 @@ private fun DefaultRoomListTopBar(
                         scrolledContainerColor = Color.Transparent,
                     ),
                     title = {
-                        Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+                        // Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
                     },
                     navigationIcon = {
                         NavigationIcon(

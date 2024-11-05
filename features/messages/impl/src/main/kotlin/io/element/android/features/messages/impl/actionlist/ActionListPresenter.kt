@@ -143,11 +143,12 @@ class DefaultActionListPresenter @AssistedInject constructor(
         val canRedact = timelineItem.isMine && usersEventPermissions.canRedactOwn || !timelineItem.isMine && usersEventPermissions.canRedactOther
         return buildList {
             if (timelineItem.canBeRepliedTo && usersEventPermissions.canSendMessage) {
-                if (timelineItem.isThreaded) {
+                /*if (timelineItem.isThreaded) {
                     add(TimelineItemAction.ReplyInThread)
                 } else {
                     add(TimelineItemAction.Reply)
-                }
+                }*/
+                add(TimelineItemAction.Reply)
             }
             if (timelineItem.isRemote && timelineItem.content.canBeForwarded()) {
                 add(TimelineItemAction.Forward)
@@ -155,21 +156,21 @@ class DefaultActionListPresenter @AssistedInject constructor(
             if (timelineItem.isEditable) {
                 add(TimelineItemAction.Edit)
             }
-            if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
+            /*if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
                 add(TimelineItemAction.EndPoll)
-            }
-            val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
+            }*/
+            /*val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
             if (canPinUnpin) {
                 if (isEventPinned) {
                     add(TimelineItemAction.Unpin)
                 } else {
                     add(TimelineItemAction.Pin)
                 }
-            }
+            }*/
             if (timelineItem.content.canBeCopied()) {
                 add(TimelineItemAction.Copy)
             }
-            if (timelineItem.isRemote) {
+            /*if (timelineItem.isRemote) {
                 add(TimelineItemAction.CopyLink)
             }
             if (isDeveloperModeEnabled) {
@@ -177,7 +178,7 @@ class DefaultActionListPresenter @AssistedInject constructor(
             }
             if (!timelineItem.isMine) {
                 add(TimelineItemAction.ReportContent)
-            }
+            }*/
             if (canRedact) {
                 add(TimelineItemAction.Redact)
             }

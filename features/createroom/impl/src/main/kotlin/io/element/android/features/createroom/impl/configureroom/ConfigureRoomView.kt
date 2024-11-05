@@ -104,11 +104,11 @@ fun ConfigureRoomView(
                 onAvatarClick = ::onAvatarClick,
                 onChangeRoomName = { state.eventSink(ConfigureRoomEvents.RoomNameChanged(it)) },
             )
-            RoomTopic(
+            /*RoomTopic(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 topic = state.config.topic.orEmpty(),
                 onTopicChange = { state.eventSink(ConfigureRoomEvents.TopicChanged(it)) },
-            )
+            )*/
             if (state.config.invites.isNotEmpty()) {
                 SelectedUsersRowList(
                     contentPadding = PaddingValues(horizontal = 24.dp),

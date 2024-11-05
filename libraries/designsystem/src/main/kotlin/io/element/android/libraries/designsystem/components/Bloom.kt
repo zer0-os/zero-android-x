@@ -351,7 +351,7 @@ fun Modifier.avatarBloom(
             }
         }
 
-        bloom(
+        /*bloom(
             hash = blurHash,
             background = background,
             blurSize = blurSize,
@@ -361,7 +361,8 @@ fun Modifier.avatarBloom(
             bottomSoftEdgeHeight = bottomSoftEdgeHeight,
             bottomSoftEdgeAlpha = bottomSoftEdgeAlpha,
             alpha = alpha,
-        )
+        )*/
+        Modifier
     } else {
         // There is no URL so we'll generate an avatar with the initials and use that as the bloom source
         val avatarColors = AvatarColorsProvider.provide(avatarData.id)
@@ -379,7 +380,7 @@ fun Modifier.avatarBloom(
                 componentY = BloomDefaults.HASH_COMPONENTS,
             )
         }
-        bloom(
+        /*bloom(
             hash = hash,
             background = background,
             blurSize = blurSize,
@@ -389,7 +390,8 @@ fun Modifier.avatarBloom(
             bottomSoftEdgeHeight = bottomSoftEdgeHeight,
             bottomSoftEdgeAlpha = bottomSoftEdgeAlpha,
             alpha = alpha,
-        )
+        )*/
+        Modifier
     }
 }
 

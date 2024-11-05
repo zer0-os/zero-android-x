@@ -54,7 +54,8 @@ fun SuggestionsPickerView(
         modifier = modifier.fillMaxWidth(),
     ) {
         items(
-            suggestions,
+            suggestions
+                .filter { it !is ResolvedSuggestion.AtRoom },
             key = { suggestion ->
                 when (suggestion) {
                     is ResolvedSuggestion.AtRoom -> "@room"
@@ -124,13 +125,13 @@ private fun SuggestionItemView(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Text(
+            /*Text(
                 text = subtitle,
                 style = ElementTheme.typography.fontBodySmRegular,
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-            )
+            )*/
         }
     }
 }

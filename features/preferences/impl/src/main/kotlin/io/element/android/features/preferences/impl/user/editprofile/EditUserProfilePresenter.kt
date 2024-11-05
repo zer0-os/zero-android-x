@@ -82,7 +82,7 @@ class EditUserProfilePresenter @AssistedInject constructor(
                 listOfNotNull(
                     AvatarAction.TakePhoto,
                     AvatarAction.ChoosePhoto,
-                    AvatarAction.Remove.takeIf { userAvatarUri != null },
+                    //AvatarAction.Remove.takeIf { userAvatarUri != null },
                 ).toImmutableList()
             }
         }

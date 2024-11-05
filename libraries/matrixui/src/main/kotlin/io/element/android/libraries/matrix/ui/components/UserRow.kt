@@ -54,7 +54,7 @@ internal fun UserRow(
                 color = MaterialTheme.colorScheme.primary,
                 style = ElementTheme.typography.fontBodyLgRegular,
             )
-            // Id
+            /*// Id
             subtext?.let {
                 Text(
                     text = subtext,
@@ -63,7 +63,7 @@ internal fun UserRow(
                     overflow = TextOverflow.Ellipsis,
                     style = ElementTheme.typography.fontBodySmRegular,
                 )
-            }
+            }*/
         }
         trailingContent?.invoke()
     }

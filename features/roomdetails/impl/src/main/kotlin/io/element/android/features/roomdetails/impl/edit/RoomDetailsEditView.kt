@@ -119,7 +119,7 @@ fun RoomDetailsEditView(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            TextField(
+            /*TextField(
                 label = stringResource(CommonStrings.common_topic),
                 value = state.roomTopic,
                 placeholder = stringResource(CommonStrings.common_topic_placeholder),
@@ -129,7 +129,7 @@ fun RoomDetailsEditView(
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                 ),
-            )
+            )*/
         }
     }
 

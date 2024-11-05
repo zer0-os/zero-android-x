@@ -82,11 +82,18 @@ private fun AddPeopleViewTopBar(
         },
         navigationIcon = { BackButton(onClick = onBackClick) },
         actions = {
-            val textActionResId = if (hasSelectedUsers) CommonStrings.action_next else CommonStrings.action_skip
+            if (hasSelectedUsers) {
+                val textActionResId = CommonStrings.action_next
+                TextButton(
+                    text = stringResource(id = textActionResId),
+                    onClick = onNextClick,
+                )
+            }
+            /*val textActionResId = if (hasSelectedUsers) CommonStrings.action_next else CommonStrings.action_skip
             TextButton(
                 text = stringResource(id = textActionResId),
                 onClick = onNextClick,
-            )
+            )*/
         }
     )
 }

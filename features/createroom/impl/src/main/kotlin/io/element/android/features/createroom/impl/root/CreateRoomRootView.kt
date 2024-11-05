@@ -149,13 +149,13 @@ private fun CreateRoomActionButtonsList(
                 onClick = onNewRoomClick,
             )
         }
-        item {
+        /*item {
             CreateRoomActionButton(
                 iconRes = CompoundDrawables.ic_compound_share_android,
                 text = stringResource(id = CommonStrings.action_invite_friends_to_app, state.applicationName),
                 onClick = onInvitePeopleClick,
             )
-        }
+        }*/
         if (state.userListState.recentDirectRooms.isNotEmpty()) {
             item {
                 ListSectionHeader(

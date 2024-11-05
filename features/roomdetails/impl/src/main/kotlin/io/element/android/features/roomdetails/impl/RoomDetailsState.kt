@@ -51,9 +51,9 @@ data class RoomDetailsState(
                 add(RoomBadge.NOT_ENCRYPTED)
             }
         }
-        if (isPublic) {
+        /*if (isPublic) {
             add(RoomBadge.PUBLIC)
-        }
+        }*/
     }.toPersistentList()
 }
 

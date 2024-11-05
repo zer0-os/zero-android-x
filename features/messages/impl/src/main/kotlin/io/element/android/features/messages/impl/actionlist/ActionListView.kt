@@ -181,7 +181,7 @@ private fun ActionListViewContent(
             LazyColumn(
                 modifier = modifier.fillMaxWidth()
             ) {
-                item {
+                /*item {
                     Column {
                         MessageSummary(
                             event = target.event,
@@ -199,7 +199,7 @@ private fun ActionListViewContent(
                         }
                         HorizontalDivider()
                     }
-                }
+                }*/
                 if (target.verifiedUserSendFailure != None) {
                     item {
                         VerifiedUserSendFailureView(

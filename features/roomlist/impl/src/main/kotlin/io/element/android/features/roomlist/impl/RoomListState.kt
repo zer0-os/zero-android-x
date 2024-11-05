@@ -35,7 +35,8 @@ data class RoomListState(
     val directLogoutState: DirectLogoutState,
     val eventSink: (RoomListEvents) -> Unit,
 ) {
-    val displayFilters = contentState is RoomListContentState.Rooms
+    //val displayFilters = contentState is RoomListContentState.Rooms
+    val displayFilters = false //Hiding room list filters for now
     val displayActions = true
 
     sealed interface ContextMenu {

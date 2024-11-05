@@ -161,12 +161,12 @@ fun RoomDetailsView(
             )
             Spacer(Modifier.height(12.dp))
 
-            if (state.roomTopic !is RoomTopicState.Hidden) {
+            /*if (state.roomTopic !is RoomTopicState.Hidden) {
                 TopicSection(
                     roomTopic = state.roomTopic,
                     onActionClick = onActionClick,
                 )
-            }
+            }*/
 
             PreferenceCategory {
                 if (state.canShowNotificationSettings && state.roomNotificationSettings != null) {
@@ -176,7 +176,7 @@ fun RoomDetailsView(
                     )
                 }
 
-                FavoriteItem(
+                /*FavoriteItem(
                     isFavorite = state.isFavorite,
                     onFavoriteChanges = {
                         state.eventSink(RoomDetailsEvent.SetFavorite(it))
@@ -196,7 +196,7 @@ fun RoomDetailsView(
                         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
                         onClick = openAdminSettings,
                     )
-                }
+                }*/
             }
 
             val displayMemberListItem = state.roomType is RoomDetailsType.Room
@@ -209,19 +209,19 @@ fun RoomDetailsView(
                 }
             }
 
-            PollsSection(
+            /*PollsSection(
                 openPollHistory = openPollHistory
-            )
+            )*/
 
             if (state.isEncrypted) {
                 SecuritySection()
             }
 
-            if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
+            /*if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
                 val roomMemberState = state.roomMemberDetailsState
                 BlockUserSection(roomMemberState)
                 BlockUserDialogs(roomMemberState)
-            }
+            }*/
 
             OtherActionsSection(
                 isDm = state.roomType is RoomDetailsType.Dm,
@@ -300,7 +300,7 @@ private fun MainActionsSection(
                 )
             }
         }
-        if (state.roomCallState.hasPermissionToJoin()) {
+        /*if (state.roomCallState.hasPermissionToJoin()) {
             // TODO Improve the view depending on all the cases here?
             MainActionButton(
                 title = stringResource(CommonStrings.action_call),
@@ -322,7 +322,7 @@ private fun MainActionsSection(
                 imageVector = CompoundIcons.ShareAndroid(),
                 onClick = onShareRoom
             )
-        }
+        }*/
     }
 }
 
@@ -392,7 +392,7 @@ private fun ColumnScope.TitleAndSubtitle(
         style = ElementTheme.typography.fontHeadingLgBold,
         textAlign = TextAlign.Center,
     )
-    if (subtitle != null) {
+    /*if (subtitle != null) {
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = subtitle,
@@ -400,7 +400,7 @@ private fun ColumnScope.TitleAndSubtitle(
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
         )
-    }
+    }*/
 }
 
 @Composable

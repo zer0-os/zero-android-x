@@ -394,7 +394,7 @@ private fun MessagesViewContent(
                         onJoinCallClick = onJoinCallClick,
                         nestedScrollConnection = scrollBehavior.nestedScrollConnection,
                     )
-                    AnimatedVisibility(
+                    /*AnimatedVisibility(
                         visible = state.pinnedMessagesBannerState is PinnedMessagesBannerState.Visible && scrollBehavior.isVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
@@ -409,7 +409,7 @@ private fun MessagesViewContent(
                             onClick = ::focusOnPinnedEvent,
                             onViewAllClick = onViewAllPinnedMessagesClick,
                         )
-                    }
+                    }*/
                 }
             },
             sheetContent = { subcomposing: Boolean ->
@@ -507,11 +507,11 @@ private fun MessagesViewTopBar(
             }
         },
         actions = {
-            CallMenuItem(
+            /*CallMenuItem(
                 roomCallState = roomCallState,
                 onJoinCallClick = onJoinCallClick,
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))*/
         },
         windowInsets = WindowInsets(0.dp)
     )
