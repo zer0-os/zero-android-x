@@ -45,7 +45,8 @@ fun TimelineEventTimestampView(
     val hasError = event.localSendState is LocalEventSendState.Failed
     val hasEncryptionCritical = event.messageShield?.isCritical.orFalse()
     val isMessageEdited = event.content.isEdited()
-    val tint = if (hasError || hasEncryptionCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    // val tint = if (hasError || hasEncryptionCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    val tint = MaterialTheme.colorScheme.secondary
     Row(
         modifier = Modifier
                 .padding(PaddingValues(start = TimelineEventTimestampViewDefaults.spacing))
@@ -79,7 +80,7 @@ fun TimelineEventTimestampView(
                         },
             )
         }
-        event.messageShield?.let { shield ->
+        /*event.messageShield?.let { shield ->
             Spacer(modifier = Modifier.width(2.dp))
             Icon(
                 imageVector = shield.toIcon(),
@@ -92,7 +93,7 @@ fun TimelineEventTimestampView(
                 tint = shield.toIconColor(),
             )
             Spacer(modifier = Modifier.width(4.dp))
-        }
+        }*/
     }
 }
 

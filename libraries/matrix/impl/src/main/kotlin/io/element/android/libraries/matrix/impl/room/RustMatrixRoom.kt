@@ -59,6 +59,7 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.widget.RustWidgetDriver
 import io.element.android.libraries.matrix.impl.widget.generateWidgetWebViewUrl
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.data.repository.ConversationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -107,6 +108,7 @@ class RustMatrixRoom(
     private val roomSyncSubscriber: RoomSyncSubscriber,
     private val matrixRoomInfoMapper: MatrixRoomInfoMapper,
     private val featureFlagService: FeatureFlagService,
+    private val zeroConversationRepository: ConversationRepository?,
 ) : MatrixRoom {
     override val roomId = RoomId(innerRoom.id())
 
@@ -370,7 +372,11 @@ class RustMatrixRoom(
     }
 
     override suspend fun sendMessage(body: String, htmlBody: String?, intentionalMentions: List<IntentionalMention>): Result<Unit> {
-        return liveTimeline.sendMessage(body, htmlBody, intentionalMentions)
+        val result = liveTimeline.sendMessage(body, htmlBody, intentionalMentions)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun leave(): Result<Unit> = withContext(roomDispatcher) {
@@ -453,7 +459,11 @@ class RustMatrixRoom(
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
     ): Result<MediaUploadHandler> {
-        return liveTimeline.sendImage(file, thumbnailFile, imageInfo, caption, formattedCaption, progressCallback)
+        val result = liveTimeline.sendImage(file, thumbnailFile, imageInfo, caption, formattedCaption, progressCallback)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun sendVideo(
@@ -464,15 +474,27 @@ class RustMatrixRoom(
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
     ): Result<MediaUploadHandler> {
-        return liveTimeline.sendVideo(file, thumbnailFile, videoInfo, caption, formattedCaption, progressCallback)
+        val result = liveTimeline.sendVideo(file, thumbnailFile, videoInfo, caption, formattedCaption, progressCallback)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun sendAudio(file: File, audioInfo: AudioInfo, progressCallback: ProgressCallback?): Result<MediaUploadHandler> {
-        return liveTimeline.sendAudio(file, audioInfo, progressCallback)
+        val result = liveTimeline.sendAudio(file, audioInfo, progressCallback)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun sendFile(file: File, fileInfo: FileInfo, progressCallback: ProgressCallback?): Result<MediaUploadHandler> {
-        return liveTimeline.sendFile(file, fileInfo, progressCallback)
+        val result = liveTimeline.sendFile(file, fileInfo, progressCallback)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun toggleReaction(emoji: String, eventOrTransactionId: EventOrTransactionId): Result<Unit> {
@@ -480,7 +502,11 @@ class RustMatrixRoom(
     }
 
     override suspend fun forwardEvent(eventId: EventId, roomIds: List<RoomId>): Result<Unit> {
-        return liveTimeline.forwardEvent(eventId, roomIds)
+        val result = liveTimeline.forwardEvent(eventId, roomIds)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun cancelSend(transactionId: TransactionId): Result<Unit> {
@@ -605,7 +631,11 @@ class RustMatrixRoom(
         waveform: List<Float>,
         progressCallback: ProgressCallback?,
     ): Result<MediaUploadHandler> {
-        return liveTimeline.sendVoiceMessage(file, audioInfo, waveform, progressCallback)
+        val result = liveTimeline.sendVoiceMessage(file, audioInfo, waveform, progressCallback)
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
+        }
+        return result
     }
 
     override suspend fun typingNotice(isTyping: Boolean) = runCatching {
@@ -701,6 +731,7 @@ class RustMatrixRoom(
             roomContentForwarder = roomContentForwarder,
             onNewSyncedEvent = onNewSyncedEvent,
             featureFlagsService = featureFlagService,
+            zeroConversationRepository = zeroConversationRepository
         )
     }
 }

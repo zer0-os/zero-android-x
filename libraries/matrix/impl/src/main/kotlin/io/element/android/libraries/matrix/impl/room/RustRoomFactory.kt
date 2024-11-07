@@ -22,6 +22,7 @@ import io.element.android.libraries.matrix.api.roomlist.awaitLoaded
 import io.element.android.libraries.matrix.impl.roomlist.fullRoomWithTimeline
 import io.element.android.libraries.matrix.impl.roomlist.roomOrNull
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.data.repository.ConversationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
@@ -51,6 +52,7 @@ class RustRoomFactory(
     private val roomSyncSubscriber: RoomSyncSubscriber,
     private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val featureFlagService: FeatureFlagService,
+    private val zeroConversationRepository: ConversationRepository?,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = dispatchers.io.limitedParallelism(1)
@@ -120,6 +122,7 @@ class RustRoomFactory(
                 roomSyncSubscriber = roomSyncSubscriber,
                 matrixRoomInfoMapper = matrixRoomInfoMapper,
                 featureFlagService = featureFlagService,
+                zeroConversationRepository = zeroConversationRepository
             )
         }
     }
