@@ -80,12 +80,12 @@ fun UserProfileView(
                 onStartDM = { state.eventSink(UserProfileEvents.StartDM) },
                 onCall = { state.dmRoomId?.let { onStartCall(it) } }
             )
-            Spacer(modifier = Modifier.height(26.dp))
+            /*Spacer(modifier = Modifier.height(26.dp))
             if (!state.isCurrentUser) {
                 VerifyUserSection(state)
                 BlockUserSection(state)
                 BlockUserDialogs(state)
-            }
+            }*/
             AsyncActionView(
                 async = state.startDmActionState,
                 progressDialog = {

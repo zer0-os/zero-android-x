@@ -100,7 +100,14 @@ class MarkdownTextEditorState(
                         when (mention.type) {
                             MentionSpan.Type.USER -> {
                                 permalinkBuilder.permalinkForUser(UserId(mention.rawValue)).getOrNull()?.let { link ->
-                                    replace(start, end, "[${mention.rawValue}]($link)")
+                                    val mentionUserName = mention.text.substringAfter("@").trim()
+                                    val mentionUserCleanId = mention.rawValue
+                                        .substringAfter("@")
+                                        .substringBefore(":")
+                                        .trim()
+                                    val zeroReplacementString = "@[$mentionUserName](user:$mentionUserCleanId)"
+                                    replace(start, end, zeroReplacementString)
+                                    //replace(start, end, "[${mention.rawValue}]($link)")
                                 }
                             }
                             MentionSpan.Type.EVERYONE -> {

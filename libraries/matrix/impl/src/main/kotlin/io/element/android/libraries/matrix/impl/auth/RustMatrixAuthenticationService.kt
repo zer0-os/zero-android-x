@@ -27,6 +27,7 @@ import io.element.android.libraries.matrix.impl.RustMatrixClientFactory
 import io.element.android.libraries.matrix.impl.auth.qrlogin.QrErrorMapper
 import io.element.android.libraries.matrix.impl.auth.qrlogin.SdkQrCodeLoginData
 import io.element.android.libraries.matrix.impl.auth.qrlogin.toStep
+import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.exception.mapClientException
 import io.element.android.libraries.matrix.impl.keys.PassphraseGenerator
 import io.element.android.libraries.matrix.impl.mapper.toSessionData
@@ -35,6 +36,7 @@ import io.element.android.libraries.matrix.impl.paths.SessionPathsFactory
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.sessionstorage.api.LoggedInState
 import io.element.android.libraries.sessionstorage.api.LoginType
+import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.data.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
@@ -109,6 +111,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                     } else {
                         Timber.w("Restoring a session with a passphrase")
                     }
+                    MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
                     rustMatrixClientFactory.create(sessionData)
                 } else {
                     error("Token is not valid")
@@ -189,6 +192,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                         sessionPaths = currentSessionPaths,
                     )
                 clear()
+                MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
                 sessionStore.storeData(sessionData)
                 authRepository.saveMatrixLoginInfo(
                     token = sessionData.accessToken,
@@ -395,5 +399,11 @@ class RustMatrixAuthenticationService @Inject constructor(
     private fun clear() {
         currentClient?.close()
         currentClient = null
+    }
+
+    private fun getHomeServerPostfix(sessionData: SessionData): String {
+        return sessionData.userId
+            .substringAfter(":")
+            .trim()
     }
 }

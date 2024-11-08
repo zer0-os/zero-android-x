@@ -37,10 +37,11 @@ fun DeveloperSettingsView(
     PreferencePage(
         modifier = modifier,
         onBackClick = onBackClick,
-        title = stringResource(id = CommonStrings.common_developer_options)
+        //title = stringResource(id = CommonStrings.common_developer_options)
+        title = stringResource(id = CommonStrings.common_advanced_settings)
     ) {
         // Note: this is OK to hardcode strings in this debug screen.
-        SettingsCategory(state)
+        /*SettingsCategory(state)
         PreferenceCategory(
             title = "Feature flags",
             showTopDivider = true,
@@ -76,7 +77,7 @@ fun DeveloperSettingsView(
                 title = "Crash the app 💥",
                 onClick = { error("This crash is a test.") }
             )
-        }
+        }*/
         val cache = state.cacheSize
         PreferenceCategory(title = "Cache", showTopDivider = false) {
             PreferenceText(

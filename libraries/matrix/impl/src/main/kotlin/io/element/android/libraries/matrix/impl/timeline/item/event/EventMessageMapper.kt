@@ -21,6 +21,7 @@ import io.element.android.libraries.matrix.api.timeline.item.event.OtherMessageT
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VideoMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageType
+import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
 import org.matrix.rustcomponents.sdk.MessageType
@@ -52,7 +53,8 @@ class EventMessageMapper {
                     AudioMessageType(
                         filename = type.content.filename,
                         caption = type.content.caption,
-                        formattedCaption = type.content.formattedCaption?.map(),
+                        //formattedCaption = type.content.formattedCaption?.map(),
+                        formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                         source = type.content.source.map(),
                         info = type.content.info?.map(),
                     )
@@ -61,7 +63,8 @@ class EventMessageMapper {
                     VoiceMessageType(
                         filename = type.content.filename,
                         caption = type.content.caption,
-                        formattedCaption = type.content.formattedCaption?.map(),
+                        //formattedCaption = type.content.formattedCaption?.map(),
+                        formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                         source = type.content.source.map(),
                         info = type.content.info?.map(),
                         details = type.content.audio?.map(),
@@ -73,7 +76,8 @@ class EventMessageMapper {
             FileMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
@@ -82,25 +86,39 @@ class EventMessageMapper {
             ImageMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
         }
         is RustMessageType.Notice -> {
-            NoticeMessageType(type.content.body, type.content.formatted?.map())
+            NoticeMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                type.content.formatted?.map(type.content.body)
+            )
         }
         is RustMessageType.Text -> {
-            TextMessageType(type.content.body, type.content.formatted?.map())
+            TextMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                type.content.formatted?.map(type.content.body)
+            )
         }
         is RustMessageType.Emote -> {
-            EmoteMessageType(type.content.body, type.content.formatted?.map())
+            EmoteMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                type.content.formatted?.map(type.content.body)
+            )
         }
         is RustMessageType.Video -> {
             VideoMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
@@ -118,6 +136,36 @@ private fun RustFormattedBody.map(): FormattedBody = FormattedBody(
     format = format.map(),
     body = body
 )
+
+private fun RustFormattedBody.map(actualText: String?): FormattedBody = FormattedBody(
+    format = format.map(),
+    body = correctlyFormattedHtmlBody(actualText)
+)
+
+private fun RustFormattedBody.correctlyFormattedHtmlBody(text: String?): String {
+    val baseUrl = "https://matrix.to/#/@"
+    val domain = MatrixSessionCommon.getHomeServerPostfix()
+    val htmlBody: String = body
+    val actualText: String = text ?: ""
+
+    // Use a regular expression to find user mentions in the format @[Name](user:UUID)
+    val regexPattern = """@\[(.+?)\]\(user:(.+?)\)""".toRegex()
+    if (htmlBody.isNotBlank()) {
+        val actualMentionRegex = """\[@([a-f0-9\-]+:[a-zA-Z0-9\.\-]+)\]\(https:\/\/matrix\.to\/#\/@\1\)""".toRegex()
+        val matches = actualMentionRegex.findAll(actualText).toList()
+        if (matches.isNotEmpty() && htmlBody.contains("<a href=")) {
+            return htmlBody
+        } else {
+            // Replace matches with the appropriate HTML anchor tags
+            val modifiedBody = regexPattern.replace(actualText) {
+                "<a href=\"$baseUrl${it.groupValues[2]}:$domain\">@${it.groupValues[2]}:$domain</a>"
+            }
+            return modifiedBody
+        }
+    } else {
+        return htmlBody
+    }
+}
 
 private fun RustMessageFormat.map(): MessageFormat {
     return when (this) {

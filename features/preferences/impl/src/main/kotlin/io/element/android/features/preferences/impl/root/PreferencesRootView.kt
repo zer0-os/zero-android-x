@@ -219,10 +219,10 @@ private fun ColumnScope.GeneralSection(
         headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Settings())),
         onClick = onOpenAdvancedSettings,
-    )
+    )*/
     if (state.showDeveloperSettings) {
         DeveloperPreferencesView(onOpenDeveloperSettings)
-    }*/
+    }
     ListItem(
         headlineContent = { Text(stringResource(id = CommonStrings.action_signout)) },
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.SignOut())),
@@ -270,7 +270,8 @@ private fun ColumnScope.Footer(
 @Composable
 private fun DeveloperPreferencesView(onOpenDeveloperSettings: () -> Unit) {
     ListItem(
-        headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
+        //headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
+        headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
         leadingContent = ListItemContent.Icon(IconSource.Resource(CommonDrawables.ic_developer_options)),
         onClick = onOpenDeveloperSettings
     )

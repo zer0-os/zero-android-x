@@ -66,6 +66,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
+import io.element.android.libraries.matrix.ui.model.getBestName
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -190,7 +191,8 @@ private fun DefaultRoomListTopBar(
                         scrolledContainerColor = Color.Transparent,
                     ),
                     title = {
-                        // Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+                         //Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+                         Text(text = matrixUser.getBestName())
                     },
                     navigationIcon = {
                         NavigationIcon(

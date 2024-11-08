@@ -39,7 +39,7 @@ fun UserProfileMainActionsSection(
                 onClick = onStartDM,
             )
         }
-        if (canCall) {
+        /*if (canCall) {
             MainActionButton(
                 title = stringResource(CommonStrings.action_call),
                 imageVector = CompoundIcons.VideoCall(),
@@ -50,6 +50,6 @@ fun UserProfileMainActionsSection(
             title = stringResource(CommonStrings.action_share),
             imageVector = CompoundIcons.ShareAndroid(),
             onClick = onShareUser
-        )
+        )*/
     }
 }

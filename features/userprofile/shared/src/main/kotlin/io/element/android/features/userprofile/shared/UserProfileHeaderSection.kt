@@ -69,7 +69,7 @@ fun UserProfileHeaderSection(
             )
             Spacer(modifier = Modifier.height(6.dp))
         }
-        Text(
+        /*Text(
             text = userId.value,
             style = ElementTheme.typography.fontBodyLgRegular,
             color = MaterialTheme.colorScheme.secondary,
@@ -85,7 +85,7 @@ fun UserProfileHeaderSection(
                     )
                 ).toImmutableList(),
             )
-        }
+        }*/
         Spacer(Modifier.height(40.dp))
     }
 }

@@ -23,7 +23,8 @@ import org.jsoup.select.NodeVisitor
  */
 fun TextMessageType.toPlainText(
     permalinkParser: PermalinkParser,
-) = formatted?.toPlainText(permalinkParser) ?: body
+//) = formatted?.toPlainText(permalinkParser) ?: body
+) = simplyFormattedBody()
 
 /**
  * Converts the HTML string in [FormattedBody.body] to a plain text representation by parsing it and removing all formatting.
@@ -48,6 +49,14 @@ fun Document.toPlainText(): String {
     val visitor = PlainTextNodeVisitor()
     traverse(visitor)
     return visitor.build()
+}
+
+private fun TextMessageType.simplyFormattedBody(): String {
+    val actualText = body
+    val regexPattern = """@\[(.+?)\]\(user:(.+?)\)""".toRegex()
+    return regexPattern.replace(actualText) { matchResult ->
+        "@${matchResult.groupValues[1]}"
+    }
 }
 
 private class PlainTextNodeVisitor : NodeVisitor {
