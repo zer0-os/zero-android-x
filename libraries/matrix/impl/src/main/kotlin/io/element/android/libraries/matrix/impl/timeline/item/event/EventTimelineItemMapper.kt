@@ -40,6 +40,7 @@ class EventTimelineItemMapper(
     private val contentMapper: TimelineEventContentMapper = TimelineEventContentMapper(),
 ) {
     fun map(eventTimelineItem: RustEventTimelineItem): EventTimelineItem = eventTimelineItem.run {
+        val debugInfo = lazyProvider.debugInfo().map()
         EventTimelineItem(
             eventId = eventOrTransactionId.eventId(),
             transactionId = eventOrTransactionId.transactionId(),
@@ -53,9 +54,9 @@ class EventTimelineItemMapper(
             sender = UserId(sender),
             senderProfile = senderProfile.map(),
             timestamp = timestamp.toLong(),
-            content = contentMapper.map(content),
+            content = contentMapper.map(content, debugInfo),
             origin = origin?.map(),
-            timelineItemDebugInfoProvider = { lazyProvider.debugInfo().map() },
+            timelineItemDebugInfoProvider = { debugInfo },
             messageShieldProvider = { strict -> lazyProvider.getShields(strict)?.map() },
             sendHandleProvider = { lazyProvider.getSendHandle()?.let(::RustSendHandle) }
         )

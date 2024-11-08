@@ -7,6 +7,8 @@
 
 package io.element.android.libraries.matrix.impl.timeline.item.event
 
+import io.element.android.libraries.matrix.api.media.ImageInfo
+import io.element.android.libraries.matrix.api.media.MediaSource
 import io.element.android.libraries.matrix.api.timeline.item.event.AudioMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.EmoteMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.FileMessageType
@@ -24,6 +26,9 @@ import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageT
 import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
+import io.element.android.support.zero.data.model.helper.EventMessageContent
+import io.element.android.support.zero.data.model.helper.isRemoteGif
+import io.element.android.support.zero.datastore.converter.AppJson.toJson
 import org.matrix.rustcomponents.sdk.MessageType
 import org.matrix.rustcomponents.sdk.use
 import org.matrix.rustcomponents.sdk.FormattedBody as RustFormattedBody
@@ -44,6 +49,35 @@ class EventMessageMapper {
             isThreaded = it.threadRoot != null,
             type = type
         )
+    }
+
+    fun mapToCustomEvent(messageContent: EventMessageContent): MessageContent? {
+        val content = messageContent.content
+        return if (content.isRemoteGif) {
+            val source = MediaSource(url = content.url ?: "", content.toJson())
+            val height = (content.info?.height ?: content.info?.h)?.toLong()
+            val width = (content.info?.width ?: content.info?.w)?.toLong()
+            val mimeType = content.info?.mimeType
+            val size = content.info?.size?.toLong()
+            val type = ImageMessageType(
+                filename = content.info?.name ?: "",
+                caption = null,
+                formattedCaption = null,
+                source = source,
+                info = ImageInfo(
+                    height, width, mimeType, size, null, null, null
+                ),
+            )
+            MessageContent(
+                body = content.body ?: "",
+                inReplyTo = null,
+                isEdited = false,
+                isThreaded = false,
+                type = type
+            )
+        } else {
+            null
+        }
     }
 
     fun mapMessageType(type: RustMessageType) = when (type) {

@@ -192,7 +192,10 @@ private fun DefaultRoomListTopBar(
                     ),
                     title = {
                          //Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
-                         Text(text = matrixUser.getBestName())
+                         Text(
+                             text = matrixUser.getBestName(),
+                             maxLines = 1
+                         )
                     },
                     navigationIcon = {
                         NavigationIcon(

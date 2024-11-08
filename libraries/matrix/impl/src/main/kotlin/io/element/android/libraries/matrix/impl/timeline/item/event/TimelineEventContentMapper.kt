@@ -8,6 +8,7 @@
 package io.element.android.libraries.matrix.impl.timeline.item.event
 
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.matrix.api.timeline.item.event.CallNotifyContent
 import io.element.android.libraries.matrix.api.timeline.item.event.EventContent
 import io.element.android.libraries.matrix.api.timeline.item.event.FailedToParseMessageLikeContent
@@ -26,6 +27,8 @@ import io.element.android.libraries.matrix.api.timeline.item.event.UnknownConten
 import io.element.android.libraries.matrix.api.timeline.item.event.UtdCause
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.poll.map
+import io.element.android.support.zero.data.model.helper.EventMessageContent
+import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import org.matrix.rustcomponents.sdk.TimelineItemContent
@@ -39,11 +42,20 @@ import uniffi.matrix_sdk_crypto.UtdCause as RustUtdCause
 class TimelineEventContentMapper(
     private val eventMessageMapper: EventMessageMapper = EventMessageMapper(),
 ) {
-    fun map(content: TimelineItemContent): EventContent {
+    fun map(content: TimelineItemContent, debugInfo: TimelineItemDebugInfo? = null): EventContent {
         return content.use {
             when (it) {
                 is TimelineItemContent.FailedToParseMessageLike -> {
-                    FailedToParseMessageLikeContent(
+                    // If message content parsing is failed (GIPHY case in this), we need to handle the content ourself rather than returning unsupportedTimelineItem
+                    debugInfo?.originalJson?.let { eventJsonString ->
+                        val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
+                        customEventContent?.let { customEvent ->
+                            eventMessageMapper.mapToCustomEvent(customEvent)
+                        } ?: FailedToParseMessageLikeContent(
+                            eventType = it.eventType,
+                            error = it.error
+                        )
+                    } ?: FailedToParseMessageLikeContent(
                         eventType = it.eventType,
                         error = it.error
                     )
@@ -56,7 +68,13 @@ class TimelineEventContentMapper(
                     )
                 }
                 is TimelineItemContent.Message -> {
-                    eventMessageMapper.map(it.content)
+                    // Need to handle GIPHY case in un-encrypted chats
+                    debugInfo?.originalJson?.let { eventJsonString ->
+                        val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
+                        customEventContent?.let { customEvent ->
+                            eventMessageMapper.mapToCustomEvent(customEvent)
+                        } ?: eventMessageMapper.map(it.content)
+                    } ?: eventMessageMapper.map(it.content)
                 }
                 is TimelineItemContent.ProfileChange -> {
                     ProfileChangeContent(

@@ -48,6 +48,8 @@ import io.element.android.features.messages.impl.timeline.model.TimelineItemGrou
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemImageContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemImageContentProvider
 import io.element.android.features.messages.impl.timeline.model.event.aTimelineItemImageContent
+import io.element.android.features.messages.impl.timeline.model.event.giphySourceUrl
+import io.element.android.features.messages.impl.timeline.model.event.isGiphySource
 import io.element.android.features.messages.impl.timeline.protection.ProtectedView
 import io.element.android.libraries.designsystem.components.blurhash.blurHashBackground
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -91,7 +93,11 @@ fun TimelineItemImageView(
                         .fillMaxWidth()
                         .then(if (isLoaded) Modifier.background(Color.White) else Modifier)
                         .then(if (onContentClick != null) Modifier.combinedClickable(onClick = onContentClick, onLongClick = onLongClick) else Modifier),
-                    model = content.thumbnailMediaRequestData,
+                    model = if (content.isGiphySource) {
+                        content.giphySourceUrl
+                    } else {
+                        content.thumbnailMediaRequestData
+                    },
                     contentScale = ContentScale.Fit,
                     alignment = Alignment.Center,
                     contentDescription = description,

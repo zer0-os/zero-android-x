@@ -54,3 +54,9 @@ data class TimelineItemImageContent(
         }
     }
 }
+
+val TimelineItemImageContent.giphySourceUrl: String
+    get() = mediaSource.url
+
+val TimelineItemImageContent.isGiphySource: Boolean
+    get() = mediaSource.url.contains("media4.giphy.com")
