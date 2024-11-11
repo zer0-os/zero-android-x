@@ -24,6 +24,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * Compound component that displays a big icon, a title, an optional subtitle and an optional call to action component.
@@ -54,7 +55,7 @@ fun PageTitle(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
-                style = ElementTheme.typography.fontHeadingMdBold,
+                style = ElementTheme.zeroTypography.fontHeadingMdBold,
                 color = ElementTheme.colors.textPrimary,
                 textAlign = TextAlign.Center,
             )
@@ -63,7 +64,7 @@ fun PageTitle(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = it,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = ElementTheme.colors.textSecondary,
                     textAlign = TextAlign.Center,
                 )

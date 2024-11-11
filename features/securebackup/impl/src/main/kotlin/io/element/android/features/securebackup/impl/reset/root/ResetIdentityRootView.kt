@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -121,7 +122,7 @@ private fun Content() {
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.screen_encryption_reset_footer),
-            style = ElementTheme.typography.fontBodyMdMedium,
+            style = ElementTheme.zeroTypography.fontBodyMdMedium,
             color = ElementTheme.colors.textActionPrimary,
             textAlign = TextAlign.Center,
         )

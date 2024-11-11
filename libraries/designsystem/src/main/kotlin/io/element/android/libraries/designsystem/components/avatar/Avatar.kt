@@ -42,6 +42,7 @@ import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.preview.debugPlaceholderAvatar
 import io.element.android.libraries.designsystem.text.toSp
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import timber.log.Timber
 
 @Composable
@@ -125,7 +126,7 @@ private fun InitialsAvatar(
         modifier.background(color = avatarColors.background)
     ) {
         val fontSize = (forcedAvatarSize ?: avatarData.size.dp).toSp() / 2
-        val originalFont = ElementTheme.typography.fontHeadingMdBold
+        val originalFont = ElementTheme.zeroTypography.fontHeadingMdBold
         val ratio = fontSize.value / originalFont.fontSize.value
         val lineHeight = originalFont.lineHeight * ratio
         Text(

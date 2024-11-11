@@ -42,6 +42,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.EditableAvatarView
 import io.element.android.libraries.permissions.api.PermissionsView
@@ -70,7 +71,7 @@ fun EditUserProfileView(
                 title = {
                     Text(
                         text = stringResource(R.string.screen_edit_profile_title),
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 navigationIcon = { BackButton(onClick = onBackClick) },
@@ -108,7 +109,7 @@ fun EditUserProfileView(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = state.userId.value,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(40.dp))

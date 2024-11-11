@@ -38,6 +38,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.withColoredPeriod
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun SunsetPage(
@@ -51,6 +52,7 @@ fun SunsetPage(
         // Always use the opposite value of the current theme
         darkTheme = ElementTheme.isLightTheme,
         applySystemBarsUpdate = false,
+        typography = zeroTypography
     ) {
         Box(
             modifier = modifier.fillMaxSize()
@@ -84,7 +86,7 @@ fun SunsetPage(
                         Spacer(modifier = Modifier.height(18.dp))
                         Text(
                             text = withColoredPeriod(title),
-                            style = ElementTheme.typography.fontHeadingXlBold,
+                            style = ElementTheme.zeroTypography.fontHeadingXlBold,
                             textAlign = TextAlign.Center,
                             color = ElementTheme.colors.textPrimary,
                         )
@@ -92,7 +94,7 @@ fun SunsetPage(
                         Text(
                             modifier = Modifier.widthIn(max = 360.dp),
                             text = subtitle,
-                            style = ElementTheme.typography.fontBodyLgRegular,
+                            style = ElementTheme.zeroTypography.fontBodyLgRegular,
                             textAlign = TextAlign.Center,
                             color = ElementTheme.colors.textPrimary,
                         )

@@ -20,6 +20,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreviewLight
 import io.element.android.libraries.designsystem.preview.WithFontScale
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * Return the maximum value between the receiver value and the value with fontScale applied.
@@ -52,15 +53,15 @@ internal fun DpScale_0_75f_Preview() = WithFontScale(0.75f) {
         ) {
             Text(
                 text = "Text with size of 16.sp",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
             )
             Text(
                 text = "Text with the same size (applyScaleUp)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
             )
             Text(
                 text = "Text with a smaller size (applyScaleDown)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
             )
         }
     }
@@ -77,15 +78,15 @@ internal fun DpScale_1_0f_Preview() = WithFontScale(1f) {
         ) {
             Text(
                 text = "Text with size of 16.sp",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
             )
             Text(
                 text = "Text with the same size (applyScaleUp)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
             )
             Text(
                 text = "Text with the same size (applyScaleDown)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
             )
         }
     }
@@ -102,15 +103,15 @@ internal fun DpScale_1_5f_Preview() = WithFontScale(1.5f) {
         ) {
             Text(
                 text = "Text with size of 16.sp",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.toSp())
             )
             Text(
                 text = "Text with a bigger size (applyScaleUp)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleUp().toSp())
             )
             Text(
                 text = "Text with the same size (applyScaleDown)",
-                style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
+                style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = fontSizeInDp.applyScaleDown().toSp())
             )
         }
     }

@@ -27,6 +27,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.model.getBestName
@@ -74,7 +75,7 @@ private fun MatrixUserHeaderContent(
                 modifier = Modifier.clipToBounds(),
                 text = matrixUser.getBestName(),
                 maxLines = 1,
-                style = ElementTheme.typography.fontHeadingSmMedium,
+                style = ElementTheme.zeroTypography.fontHeadingSmMedium,
                 overflow = TextOverflow.Ellipsis,
                 color = ElementTheme.materialColors.primary,
             )
@@ -82,7 +83,7 @@ private fun MatrixUserHeaderContent(
             if (matrixUser.displayName.isNullOrEmpty().not()) {
                 Text(
                     text = matrixUser.userId.value,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = ElementTheme.materialColors.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

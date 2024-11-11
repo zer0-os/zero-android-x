@@ -54,6 +54,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.SelectedUsersRowList
@@ -188,7 +189,7 @@ private fun ConfigureRoomToolbar(
         title = {
             Text(
                 text = stringResource(R.string.screen_create_room_title),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },
@@ -260,7 +261,7 @@ private fun ConfigureRoomOptions(
     ) {
         Text(
             text = title,
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             color = ElementTheme.colors.textPrimary,
             modifier = Modifier.padding(horizontal = 16.dp),
         )

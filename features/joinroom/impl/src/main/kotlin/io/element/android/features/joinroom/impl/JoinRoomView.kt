@@ -63,6 +63,7 @@ import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
 import io.element.android.libraries.matrix.api.room.RoomType
 import io.element.android.libraries.matrix.ui.components.InviteSenderView
@@ -379,13 +380,13 @@ private fun DefaultLoadedContent(
                     Text(
                         text = stringResource(R.string.screen_join_room_space_not_supported_title),
                         textAlign = TextAlign.Center,
-                        style = ElementTheme.typography.fontBodyLgMedium,
+                        style = ElementTheme.zeroTypography.fontBodyLgMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Text(
                         text = stringResource(R.string.screen_join_room_space_not_supported_description, applicationName),
                         textAlign = TextAlign.Center,
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         color = MaterialTheme.colorScheme.secondary,
                     )
                 } else if (contentState.joinAuthorisationStatus is JoinAuthorisationStatus.CanKnock) {
@@ -433,7 +434,7 @@ private fun JoinRoomTopBar(
                         Text(
                             modifier = Modifier.padding(horizontal = 8.dp),
                             text = contentState.name,
-                            style = ElementTheme.typography.fontBodyLgMedium,
+                            style = ElementTheme.zeroTypography.fontBodyLgMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

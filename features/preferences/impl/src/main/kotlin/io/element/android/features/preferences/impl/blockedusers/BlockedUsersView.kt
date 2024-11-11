@@ -33,6 +33,7 @@ import io.element.android.libraries.designsystem.theme.aliasScreenTitle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.components.MatrixUserRow
@@ -52,7 +53,7 @@ fun BlockedUsersView(
                     title = {
                         Text(
                             text = stringResource(CommonStrings.common_blocked_users),
-                            style = ElementTheme.typography.aliasScreenTitle,
+                            style = ElementTheme.zeroTypography.aliasScreenTitle,
                         )
                     },
                     navigationIcon = {

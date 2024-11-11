@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.powerlevels.MatrixRoomPowerLevels
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -58,7 +59,7 @@ fun ChangeRoomPermissionsView(
                 ChangeRoomPermissionsSection.MembershipModeration -> stringResource(R.string.screen_room_change_permissions_member_moderation)
             }
             TopAppBar(
-                title = { Text(text = title, style = ElementTheme.typography.aliasScreenTitle) },
+                title = { Text(text = title, style = ElementTheme.zeroTypography.aliasScreenTitle) },
                 navigationIcon = {
                     BackButton(onClick = { state.eventSink(ChangeRoomPermissionsEvent.Exit) })
                 },

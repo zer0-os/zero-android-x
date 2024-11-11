@@ -47,6 +47,7 @@ import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.auth.qrlogin.MatrixQrCodeLoginData
 import io.element.android.libraries.matrix.api.auth.qrlogin.QrLoginException
 import io.element.android.libraries.qrcode.QrCodeCameraView
@@ -152,7 +153,7 @@ private fun ColumnScope.Buttons(
                             },
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.error,
-                            style = ElementTheme.typography.fontBodySmMedium,
+                            style = ElementTheme.zeroTypography.fontBodySmMedium,
                         )
                     }
                     Text(
@@ -163,7 +164,7 @@ private fun ColumnScope.Buttons(
                             else -> stringResource(R.string.screen_qr_code_login_invalid_scan_state_description)
                         },
                         textAlign = TextAlign.Center,
-                        style = ElementTheme.typography.fontBodySmRegular,
+                        style = ElementTheme.zeroTypography.fontBodySmRegular,
                         color = ElementTheme.colors.textSecondary,
                     )
                 }
@@ -183,7 +184,7 @@ private fun ColumnScope.Buttons(
                     Text(
                         text = stringResource(R.string.screen_qr_code_login_connecting_subtitle),
                         textAlign = TextAlign.Center,
-                        style = ElementTheme.typography.fontBodySmRegular,
+                        style = ElementTheme.zeroTypography.fontBodySmRegular,
                         color = ElementTheme.colors.textSecondary,
                     )
                 }

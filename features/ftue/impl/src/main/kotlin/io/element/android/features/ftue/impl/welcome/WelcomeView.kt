@@ -34,6 +34,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -63,14 +64,14 @@ fun WelcomeView(
                 Text(
                     modifier = Modifier.testTag(TestTags.welcomeScreenTitle),
                     text = stringResource(R.string.screen_welcome_title, applicationName),
-                    style = ElementTheme.typography.fontHeadingMdBold,
+                    style = ElementTheme.zeroTypography.fontHeadingMdBold,
                     color = ElementTheme.colors.textPrimary,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(80.dp))
                 InfoListOrganism(
                     items = listItems(),
-                    textStyle = ElementTheme.typography.fontBodyMdMedium,
+                    textStyle = ElementTheme.zeroTypography.fontBodyMdMedium,
                     iconTint = ElementTheme.colors.iconSecondary,
                     backgroundColor = ElementTheme.colors.bgCanvasDefault.copy(alpha = 0.7f),
                 )

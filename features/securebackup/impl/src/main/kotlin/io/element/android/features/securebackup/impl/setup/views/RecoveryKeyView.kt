@@ -44,6 +44,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextField
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -62,7 +63,7 @@ internal fun RecoveryKeyView(
     ) {
         Text(
             text = stringResource(id = CommonStrings.common_recovery_key),
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
         )
         RecoveryKeyContent(state, onClick, onChange, onSubmit)
         RecoveryKeyFooter(state)
@@ -137,7 +138,7 @@ private fun RecoveryKeyStaticContent(
                         }
                     ),
                     textAlign = TextAlign.Center,
-                    style = ElementTheme.typography.fontBodyLgMedium,
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 )
             }
         }
@@ -197,13 +198,13 @@ private fun RecoveryKeyFooter(state: RecoveryKeyViewState) {
                         }
                     ),
                     color = ElementTheme.colors.textSecondary,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
             } else {
                 Text(
                     text = stringResource(id = R.string.screen_recovery_key_save_key_description),
                     color = ElementTheme.colors.textSecondary,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
             }
         }
@@ -211,7 +212,7 @@ private fun RecoveryKeyFooter(state: RecoveryKeyViewState) {
             Text(
                 text = stringResource(id = R.string.screen_recovery_key_confirm_key_description),
                 color = ElementTheme.colors.textSecondary,
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
             )
         }
     }

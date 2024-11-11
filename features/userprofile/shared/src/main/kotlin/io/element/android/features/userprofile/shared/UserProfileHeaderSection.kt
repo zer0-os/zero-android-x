@@ -32,6 +32,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -64,14 +65,14 @@ fun UserProfileHeaderSection(
             Text(
                 modifier = Modifier.clipToBounds(),
                 text = userName,
-                style = ElementTheme.typography.fontHeadingLgBold,
+                style = ElementTheme.zeroTypography.fontHeadingLgBold,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(6.dp))
         }
         /*Text(
             text = userId.value,
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
         )

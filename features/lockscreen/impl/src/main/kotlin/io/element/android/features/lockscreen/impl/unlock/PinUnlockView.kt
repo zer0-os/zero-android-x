@@ -61,6 +61,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -315,7 +316,7 @@ private fun PinUnlockHeader(
             modifier = Modifier
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = ElementTheme.typography.fontHeadingMdBold,
+            style = ElementTheme.zeroTypography.fontHeadingMdBold,
             color = MaterialTheme.colorScheme.primary,
         )
         Spacer(Modifier.height(8.dp))
@@ -338,7 +339,7 @@ private fun PinUnlockHeader(
             text = subtitle,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = subtitleColor,
         )
         if (!isInAppUnlock && state.pinEntry is AsyncData.Success) {

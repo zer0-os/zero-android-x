@@ -23,6 +23,7 @@ import io.element.android.libraries.designsystem.components.BigIcon
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * IconTitleSubtitleMolecule is a molecule which displays an icon, a title and a subtitle.
@@ -50,7 +51,7 @@ fun IconTitleSubtitleMolecule(
             modifier = Modifier
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = ElementTheme.typography.fontHeadingMdBold,
+            style = ElementTheme.zeroTypography.fontHeadingMdBold,
             color = MaterialTheme.colorScheme.primary,
         )
         if (subTitle != null) {
@@ -59,7 +60,7 @@ fun IconTitleSubtitleMolecule(
                 text = subTitle,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 color = MaterialTheme.colorScheme.secondary,
             )
         }

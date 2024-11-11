@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ui.theme.PADDING_5X
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
@@ -88,7 +89,7 @@ fun ElevatedButton(
                     if (text.isNotBlank()) {
                         Text(
                             text = text,
-                            style = ElementTheme.typography.fontBodyLgMedium,
+                            style = ElementTheme.zeroTypography.fontBodyLgMedium,
                             color = contentColor
                         )
                     }
@@ -107,7 +108,7 @@ fun ElevatedButton(
             }
         }
     } else {
-        Text(text = text, style = ElementTheme.typography.fontBodyLgMedium, color = contentColor)
+        Text(text = text, style = ElementTheme.zeroTypography.fontBodyLgMedium, color = contentColor)
     }
 }
 

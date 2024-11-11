@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.persistentListOf
 
@@ -87,7 +88,7 @@ private fun ColumnScope.InsecureChannelDetectedError() {
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
         text = stringResource(R.string.screen_qr_code_login_connection_note_secure_state_list_header),
-        style = ElementTheme.typography.fontBodyLgMedium,
+        style = ElementTheme.zeroTypography.fontBodyLgMedium,
         textAlign = TextAlign.Center,
     )
     NumberedListOrganism(

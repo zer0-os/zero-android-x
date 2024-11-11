@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -59,7 +60,7 @@ fun UnresolvedUserRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.primary,
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
             )
 
             // Warning
@@ -81,7 +82,7 @@ fun UnresolvedUserRow(
                 Text(
                     text = stringResource(CommonStrings.common_invite_unknown_profile),
                     color = MaterialTheme.colorScheme.secondary,
-                    style = ElementTheme.typography.fontBodySmRegular.copy(lineHeight = 16.sp),
+                    style = ElementTheme.zeroTypography.fontBodySmRegular.copy(lineHeight = 16.sp),
                 )
             }
         }

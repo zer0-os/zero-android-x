@@ -29,6 +29,7 @@ import io.element.android.libraries.designsystem.components.blurhash.blurHashBac
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.components.A_BLUR_HASH
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -68,7 +69,7 @@ fun ProtectedView(
                         ),
                     text = stringResource(CommonStrings.action_show),
                     color = ElementTheme.colors.textOnSolidPrimary,
-                    style = ElementTheme.typography.fontBodyLgMedium,
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 )
             }
         }

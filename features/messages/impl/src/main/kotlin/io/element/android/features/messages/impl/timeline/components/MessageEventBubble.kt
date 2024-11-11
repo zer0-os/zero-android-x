@@ -47,6 +47,7 @@ import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 
@@ -175,7 +176,7 @@ internal fun MessageEventBubblePreview(@PreviewParameter(BubbleStateProvider::cl
             ) {
                 Text(
                     text = "${state.groupPosition.javaClass.simpleName} m:${state.isMine.to01()} h:${state.isHighlighted.to01()}",
-                    style = ElementTheme.typography.fontBodyXsRegular,
+                    style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 )
             }
         }

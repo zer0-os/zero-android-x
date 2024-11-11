@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 // Designs: https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&node-id=425%3A24208&mode=design&t=G5hCfkLB6GgXDuWe-1
 
@@ -48,11 +49,11 @@ fun ListSectionHeader(
         ) {
             Text(
                 text = title,
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 color = ElementTheme.colors.textPrimary,
             )
             CompositionLocalProvider(
-                LocalTextStyle provides ElementTheme.typography.fontBodySmRegular,
+                LocalTextStyle provides ElementTheme.zeroTypography.fontBodySmRegular,
                 LocalContentColor provides ElementTheme.colors.textSecondary,
             ) {
                 description()

@@ -28,6 +28,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -77,7 +78,7 @@ private fun AddPeopleViewTopBar(
         title = {
             Text(
                 text = stringResource(id = R.string.screen_create_room_add_people_title),
-                style = ElementTheme.typography.aliasScreenTitle
+                style = ElementTheme.zeroTypography.aliasScreenTitle
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },

@@ -38,6 +38,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +58,7 @@ fun ViewFolderView(
                 title = {
                     Text(
                         text = state.path,
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 }
             )
@@ -109,7 +110,7 @@ private fun ItemRow(
                     Text(
                         text = "..",
                         modifier = Modifier.padding(16.dp),
-                        style = ElementTheme.typography.fontBodyMdMedium,
+                        style = ElementTheme.zeroTypography.fontBodyMdMedium,
                     )
                 },
                 onClick = onItemClick,
@@ -122,7 +123,7 @@ private fun ItemRow(
                     Text(
                         text = item.name,
                         modifier = Modifier.padding(16.dp),
-                        style = ElementTheme.typography.fontBodyMdMedium,
+                        style = ElementTheme.zeroTypography.fontBodyMdMedium,
                     )
                 },
                 onClick = onItemClick,
@@ -135,7 +136,7 @@ private fun ItemRow(
                     Text(
                         text = item.name,
                         modifier = Modifier.padding(16.dp),
-                        style = ElementTheme.typography.fontBodyMdMedium,
+                        style = ElementTheme.zeroTypography.fontBodyMdMedium,
                     )
                 },
                 trailingContent = ListItemContent.Text(item.formattedSize),

@@ -46,6 +46,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.getBestName
@@ -214,7 +215,7 @@ private fun RoomMemberActionsBottomSheet(
             roomMember.displayName?.let {
                 Text(
                     text = it,
-                    style = ElementTheme.typography.fontHeadingLgBold,
+                    style = ElementTheme.zeroTypography.fontHeadingLgBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
@@ -225,7 +226,7 @@ private fun RoomMemberActionsBottomSheet(
             }
             Text(
                 text = roomMember.userId.toString(),
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

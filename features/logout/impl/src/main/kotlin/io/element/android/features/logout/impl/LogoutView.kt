@@ -32,6 +32,7 @@ import io.element.android.libraries.designsystem.theme.components.LinearProgress
 import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.progressIndicatorTrackColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.encryption.BackupState
 import io.element.android.libraries.matrix.api.encryption.BackupUploadState
 import io.element.android.libraries.matrix.api.encryption.RecoveryState
@@ -163,7 +164,7 @@ private fun Content(
             Text(
                 modifier = Modifier.align(Alignment.End),
                 text = "${state.backupUploadState.backedUpCount} / ${state.backupUploadState.totalCount}",
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
             )
         }
     }

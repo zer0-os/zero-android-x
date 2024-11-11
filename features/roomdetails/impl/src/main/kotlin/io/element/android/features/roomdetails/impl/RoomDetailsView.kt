@@ -73,6 +73,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -389,14 +390,14 @@ private fun ColumnScope.TitleAndSubtitle(
     Spacer(modifier = Modifier.height(24.dp))
     Text(
         text = title,
-        style = ElementTheme.typography.fontHeadingLgBold,
+        style = ElementTheme.zeroTypography.fontHeadingLgBold,
         textAlign = TextAlign.Center,
     )
     /*if (subtitle != null) {
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = subtitle,
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
         )

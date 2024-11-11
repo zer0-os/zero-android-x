@@ -96,6 +96,7 @@ import io.element.android.libraries.designsystem.theme.components.BottomSheetDra
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
@@ -535,7 +536,7 @@ private fun RoomAvatarAndNameRow(
         Text(
             modifier = Modifier.padding(horizontal = 8.dp),
             text = roomName,
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

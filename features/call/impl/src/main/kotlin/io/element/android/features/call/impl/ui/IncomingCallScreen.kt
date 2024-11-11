@@ -43,6 +43,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.SessionId
@@ -79,13 +80,13 @@ internal fun IncomingCallScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = notificationData.senderName ?: notificationData.senderId.value,
-                style = ElementTheme.typography.fontHeadingMdBold,
+                style = ElementTheme.zeroTypography.fontHeadingMdBold,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.screen_incoming_call_subtitle_android),
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
             )
@@ -152,7 +153,7 @@ private fun ActionButton(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = title,
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             color = ElementTheme.colors.textPrimary,
             overflow = TextOverflow.Ellipsis,
         )

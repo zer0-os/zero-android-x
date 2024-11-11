@@ -11,6 +11,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.theme.components.Surface
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 @Suppress("ModifierMissing")
@@ -19,7 +20,7 @@ fun ElementPreview(
     showBackground: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    ElementTheme(darkTheme = darkTheme) {
+    ElementTheme(darkTheme = darkTheme, typography = zeroTypography) {
         if (showBackground) {
             // If we have a proper contentColor applied we need a Surface instead of a Box
             Surface(content = content)

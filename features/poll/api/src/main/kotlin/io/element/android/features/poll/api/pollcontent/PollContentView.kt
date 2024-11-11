@@ -30,6 +30,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.poll.PollAnswer
 import io.element.android.libraries.matrix.api.poll.PollKind
@@ -156,7 +157,7 @@ private fun ColumnScope.DisclosedPollBottomNotice(
 ) {
     Text(
         modifier = Modifier.align(Alignment.End),
-        style = ElementTheme.typography.fontBodyXsRegular,
+        style = ElementTheme.zeroTypography.fontBodyXsRegular,
         color = ElementTheme.colors.textSecondary,
         text = stringResource(CommonStrings.common_poll_total_votes, votesCount),
     )
@@ -168,7 +169,7 @@ private fun ColumnScope.UndisclosedPollBottomNotice() {
         modifier = Modifier
             .align(Alignment.Start)
             .padding(start = 34.dp),
-        style = ElementTheme.typography.fontBodyXsRegular,
+        style = ElementTheme.zeroTypography.fontBodyXsRegular,
         color = ElementTheme.colors.textSecondary,
         text = stringResource(CommonStrings.common_poll_undisclosed_text),
     )

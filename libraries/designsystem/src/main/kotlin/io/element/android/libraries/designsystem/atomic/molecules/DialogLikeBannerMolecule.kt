@@ -30,6 +30,7 @@ import io.element.android.libraries.designsystem.theme.components.ButtonSize
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -56,7 +57,7 @@ fun DialogLikeBannerMolecule(
                     Text(
                         text = title,
                         modifier = Modifier.weight(1f),
-                        style = ElementTheme.typography.fontBodyLgMedium,
+                        style = ElementTheme.zeroTypography.fontBodyLgMedium,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Start,
                     )
@@ -71,7 +72,7 @@ fun DialogLikeBannerMolecule(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = content,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(

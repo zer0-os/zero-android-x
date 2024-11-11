@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.roundToPx
 import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
 import me.saket.telephoto.zoomable.zoomable
@@ -108,7 +109,7 @@ private fun PdfPagesErrorView(
                 append(error.localizedMessage)
             },
             textAlign = TextAlign.Center,
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
         )
     }
 }

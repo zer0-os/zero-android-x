@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.timeline.item.event.LocalEventSendState
 import io.element.android.libraries.matrix.api.timeline.item.event.isCritical
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -56,14 +57,14 @@ fun TimelineEventTimestampView(
         if (isMessageEdited) {
             Text(
                 stringResource(CommonStrings.common_edited_suffix),
-                style = ElementTheme.typography.fontBodyXsRegular,
+                style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 color = tint,
             )
             Spacer(modifier = Modifier.width(4.dp))
         }
         Text(
             formattedTime,
-            style = ElementTheme.typography.fontBodyXsRegular,
+            style = ElementTheme.zeroTypography.fontBodyXsRegular,
             color = tint,
         )
         if (hasError) {

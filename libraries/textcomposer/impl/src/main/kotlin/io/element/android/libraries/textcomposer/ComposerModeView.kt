@@ -33,6 +33,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.messages.reply.InReplyToDetails
 import io.element.android.libraries.matrix.ui.messages.reply.InReplyToView
 import io.element.android.libraries.textcomposer.model.MessageComposerMode
@@ -84,7 +85,7 @@ private fun EditingModeView(
         )
         Text(
             stringResource(CommonStrings.common_editing),
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
             textAlign = TextAlign.Start,
             color = ElementTheme.materialColors.secondary,
             modifier = Modifier

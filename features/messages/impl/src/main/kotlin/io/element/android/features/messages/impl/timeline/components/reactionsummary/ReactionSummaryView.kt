@@ -63,6 +63,7 @@ import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.media.MediaSource
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.media.MediaRequestData
@@ -200,7 +201,7 @@ private fun AggregatedReactionButton(
             } else {
                 Text(
                     text = reaction.displayKey,
-                    style = ElementTheme.typography.fontBodyMdRegular.copy(
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular.copy(
                         fontSize = 20.sp,
                         lineHeight = REACTION_SUMMARY_LINE_HEIGHT
                     ),
@@ -211,7 +212,7 @@ private fun AggregatedReactionButton(
                 Text(
                     text = reaction.count.toString(),
                     color = textColor,
-                    style = ElementTheme.typography.fontBodyMdRegular.copy(
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular.copy(
                         fontSize = 20.sp,
                         lineHeight = REACTION_SUMMARY_LINE_HEIGHT
                     )
@@ -251,14 +252,14 @@ private fun SenderRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.primary,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 )
                 Text(
                     text = sentTime,
                     color = MaterialTheme.colorScheme.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
             }
             Text(
@@ -266,7 +267,7 @@ private fun SenderRow(
                 color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
             )
         }
     }

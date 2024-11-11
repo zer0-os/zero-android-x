@@ -48,6 +48,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.components.bottomsheet.rememberBottomSheetScaffoldState
 import io.element.android.libraries.designsystem.theme.components.bottomsheet.rememberStandardBottomSheetState
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.maplibre.compose.CameraMode
 import io.element.android.libraries.maplibre.compose.CameraMoveStartedReason
@@ -165,7 +166,7 @@ fun SendLocationView(
                 title = {
                     Text(
                         text = stringResource(CommonStrings.screen_share_location_title),
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 navigationIcon = {

@@ -40,6 +40,7 @@ import io.element.android.libraries.designsystem.theme.components.ListSectionHea
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.hide
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -157,13 +158,13 @@ private fun ChangeOwnRoleBottomSheet(
         Text(
             modifier = Modifier.padding(14.dp),
             text = stringResource(R.string.screen_room_roles_and_permissions_change_my_role),
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             color = ElementTheme.colors.textPrimary,
         )
         Text(
             modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 16.dp),
             text = stringResource(R.string.screen_room_change_role_confirm_demote_self_description),
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary,
         )
         ListItem(

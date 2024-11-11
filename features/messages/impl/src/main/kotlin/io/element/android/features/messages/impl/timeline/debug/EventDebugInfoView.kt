@@ -49,6 +49,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import org.json.JSONException
 import org.json.JSONObject
@@ -75,7 +76,7 @@ fun EventDebugInfoView(
                 title = {
                     Text(
                         text = "Debug event info",
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 navigationIcon = { BackButton(onClick = onBackClick) }
@@ -167,7 +168,7 @@ private fun CopyableText(
     ) {
         Text(
             text = text,
-            style = ElementTheme.typography.fontBodyMdRegular.copy(fontFamily = FontFamily.Monospace),
+            style = ElementTheme.zeroTypography.fontBodyMdRegular.copy(fontFamily = FontFamily.Monospace),
             modifier = Modifier.padding(8.dp),
         )
     }

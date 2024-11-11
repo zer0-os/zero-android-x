@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun MainActionButton(
@@ -67,7 +68,7 @@ fun MainActionButton(
         Spacer(modifier = Modifier.height(14.dp))
         Text(
             title,
-            style = ElementTheme.typography.fontBodyMdMedium.copy(hyphens = Hyphens.Auto),
+            style = ElementTheme.zeroTypography.fontBodyMdMedium.copy(hyphens = Hyphens.Auto),
             color = tintColor,
             overflow = TextOverflow.Visible,
             textAlign = TextAlign.Center,

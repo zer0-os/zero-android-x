@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.support.zero.common.extension.innerShadow
 
 private val TEXT_FIELD_BACKGROUND_SECONDARY = Color(0xBF262626)
@@ -78,11 +79,11 @@ fun SimpleInputField(
 			},
 			placeholderText = placeholder?.let { stringResource(id = it) } ?: "",
 			textStyle =
-			ElementTheme.typography
+			ElementTheme.zeroTypography
 				.fontBodyLgRegular
 				.copy(color = Color.White),
 			placeHolderTextStyle =
-            ElementTheme.typography
+            ElementTheme.zeroTypography
                 .fontBodyLgRegular
 				.copy(color = Color.Gray),
 			modifier =

@@ -22,6 +22,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun TimelineItemLegacyCallInviteView(
@@ -38,7 +39,7 @@ fun TimelineItemLegacyCallInviteView(
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             color = ElementTheme.colors.textSecondary,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             text = stringResource(R.string.screen_room_timeline_legacy_call),
             textAlign = TextAlign.Start,
         )

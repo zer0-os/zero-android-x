@@ -34,6 +34,7 @@ import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.toEnabledColor
 import io.element.android.libraries.designsystem.toSecondaryEnabledColor
 
@@ -68,7 +69,7 @@ fun PreferenceText(
         ),
         headlineContent = {
             Text(
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 text = title,
                 color = tintColor ?: enabled.toEnabledColor(),
             )
@@ -76,7 +77,7 @@ fun PreferenceText(
         supportingContent = if (subtitle != null) {
             {
                 Text(
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     text = subtitle,
                     color = tintColor ?: enabled.toSecondaryEnabledColor(),
                 )
@@ -85,7 +86,7 @@ fun PreferenceText(
             subtitleAnnotated?.let {
                 {
                     Text(
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         text = it,
                         color = tintColor ?: enabled.toSecondaryEnabledColor(),
                     )
@@ -100,7 +101,7 @@ fun PreferenceText(
                     if (currentValue != null) {
                         Text(
                             text = currentValue,
-                            style = ElementTheme.typography.fontBodyXsMedium,
+                            style = ElementTheme.zeroTypography.fontBodyXsMedium,
                             color = enabled.toSecondaryEnabledColor(),
                         )
                     } else if (loadingCurrentValue) {

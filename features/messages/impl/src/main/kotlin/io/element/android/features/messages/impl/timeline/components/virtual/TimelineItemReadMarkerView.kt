@@ -22,6 +22,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 internal fun TimelineItemReadMarkerView(
@@ -36,7 +37,7 @@ internal fun TimelineItemReadMarkerView(
     ) {
         Text(
             text = stringResource(id = R.string.screen_room_timeline_read_marker_title).uppercase(),
-            style = ElementTheme.typography.fontBodySmMedium,
+            style = ElementTheme.zeroTypography.fontBodySmMedium,
             color = ElementTheme.colors.textSecondary,
         )
         HorizontalDivider(

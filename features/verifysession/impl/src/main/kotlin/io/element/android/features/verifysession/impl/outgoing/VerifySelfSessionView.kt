@@ -47,6 +47,7 @@ import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -233,7 +234,7 @@ private fun ContentInitial(
                 .clickable { onLearnMoreClick() }
                 .padding(vertical = 4.dp, horizontal = 16.dp),
             text = stringResource(CommonStrings.action_learn_more),
-            style = ElementTheme.typography.fontBodyLgMedium
+            style = ElementTheme.zeroTypography.fontBodyLgMedium
         )
     }
 }

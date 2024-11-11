@@ -28,6 +28,7 @@ import io.element.android.libraries.designsystem.icons.CompoundDrawables
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -60,7 +61,7 @@ fun SessionDetailsView(
             )
             Text(
                 text = deviceName,
-                style = ElementTheme.typography.fontBodyMdMedium,
+                style = ElementTheme.zeroTypography.fontBodyMdMedium,
                 color = ElementTheme.colors.textPrimary,
             )
         }

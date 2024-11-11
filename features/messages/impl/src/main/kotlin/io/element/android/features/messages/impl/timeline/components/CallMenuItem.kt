@@ -29,6 +29,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -98,7 +99,7 @@ private fun OnGoingCallMenuItem(
             Spacer(Modifier.width(8.dp))
             Text(
                 text = stringResource(CommonStrings.action_join),
-                style = ElementTheme.typography.fontBodyMdMedium
+                style = ElementTheme.zeroTypography.fontBodyMdMedium
             )
             Spacer(Modifier.width(8.dp))
         }

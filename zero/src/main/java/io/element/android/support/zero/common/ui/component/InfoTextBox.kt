@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.support.zero.common.ui.theme.PADDING_2X
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
@@ -75,7 +76,7 @@ private fun InfoTextBox(
             Spacer(modifier = Modifier.size(SPACING_2X.dp))
             Text(
                 text = text,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 color = contentColor
             )
         }

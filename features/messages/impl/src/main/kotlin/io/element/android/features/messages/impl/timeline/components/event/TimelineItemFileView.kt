@@ -33,6 +33,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun TimelineItemFileView(
@@ -67,13 +68,13 @@ fun TimelineItemFileView(
                 text = content.bestDescription,
                 color = ElementTheme.materialColors.primary,
                 maxLines = 2,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = content.fileExtensionAndSize,
                 color = ElementTheme.materialColors.secondary,
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 onTextLayout = ContentAvoidingLayout.measureLastTextLine(

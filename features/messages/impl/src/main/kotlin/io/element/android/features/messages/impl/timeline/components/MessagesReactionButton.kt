@@ -47,6 +47,7 @@ import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.media.MediaSource
 import io.element.android.libraries.matrix.ui.media.MediaRequestData
 
@@ -121,7 +122,7 @@ private fun TextContent(
     modifier = Modifier
         .height(REACTION_EMOJI_LINE_HEIGHT.toDp()),
     text = text,
-    style = ElementTheme.typography.fontBodyMdRegular,
+    style = ElementTheme.zeroTypography.fontBodyMdRegular,
     color = ElementTheme.materialColors.primary
 )
 
@@ -154,7 +155,7 @@ private fun ReactionContent(
     } else {
         Text(
             text = reaction.displayKey,
-            style = ElementTheme.typography.fontBodyMdRegular.copy(
+            style = ElementTheme.zeroTypography.fontBodyMdRegular.copy(
                 fontSize = 15.sp,
                 lineHeight = REACTION_EMOJI_LINE_HEIGHT,
             ),
@@ -165,7 +166,7 @@ private fun ReactionContent(
         Text(
             text = reaction.count.toString(),
             color = if (reaction.isHighlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
         )
     }
 }

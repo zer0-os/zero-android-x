@@ -83,6 +83,7 @@ import io.element.android.libraries.designsystem.swipe.rememberSwipeableActionsS
 import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
@@ -463,7 +464,7 @@ private fun MessageEventBubbleContent(
             )
             Text(
                 text = stringResource(CommonStrings.common_thread),
-                style = ElementTheme.typography.fontBodyXsRegular,
+                style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 color = ElementTheme.colors.textPrimary,
                 modifier = Modifier.clearAndSetSemantics { }
             )

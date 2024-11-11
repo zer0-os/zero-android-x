@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 private val TEXT_FIELD_BACKGROUND_SECONDARY = Color(0xBF262626)
 
@@ -39,7 +40,7 @@ fun CustomTextFieldValue(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = ElementTheme.typography.fontBodyLgRegular,
+    textStyle: TextStyle = ElementTheme.zeroTypography.fontBodyLgRegular,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,

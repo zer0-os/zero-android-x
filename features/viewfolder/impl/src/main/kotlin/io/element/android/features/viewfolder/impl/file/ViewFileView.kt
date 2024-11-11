@@ -45,6 +45,7 @@ import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -66,7 +67,7 @@ fun ViewFileView(
                 title = {
                     Text(
                         text = state.name,
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 actions = {
@@ -171,7 +172,7 @@ private fun LineRow(
             text = "$lineNumber",
             textAlign = TextAlign.End,
             color = ElementTheme.colors.textSecondary,
-            style = ElementTheme.typography.fontBodyMdMedium,
+            style = ElementTheme.zeroTypography.fontBodyMdMedium,
         )
         val color = ElementTheme.colors.textSecondary
         val width = 0.5.dp.value
@@ -191,7 +192,7 @@ private fun LineRow(
                 .padding(horizontal = 4.dp),
             text = line,
             color = line.toColor(colorationMode),
-            style = ElementTheme.typography.fontBodyMdRegular
+            style = ElementTheme.zeroTypography.fontBodyMdRegular
         )
     }
 }

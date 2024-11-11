@@ -22,6 +22,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
 
@@ -65,9 +66,9 @@ private fun RowScope.MainText(
     mode: SenderNameMode,
 ) {
     val style = when (mode) {
-        is SenderNameMode.Timeline -> ElementTheme.typography.fontBodyMdMedium
+        is SenderNameMode.Timeline -> ElementTheme.zeroTypography.fontBodyMdMedium
         SenderNameMode.ActionList,
-        SenderNameMode.Reply -> ElementTheme.typography.fontBodySmMedium
+        SenderNameMode.Reply -> ElementTheme.zeroTypography.fontBodySmMedium
     }
     val modifier = when (mode) {
         is SenderNameMode.Timeline -> Modifier.alignByBaseline()
@@ -95,9 +96,9 @@ private fun RowScope.SecondaryText(
     mode: SenderNameMode,
 ) {
     val style = when (mode) {
-        is SenderNameMode.Timeline -> ElementTheme.typography.fontBodySmRegular
+        is SenderNameMode.Timeline -> ElementTheme.zeroTypography.fontBodySmRegular
         SenderNameMode.ActionList,
-        SenderNameMode.Reply -> ElementTheme.typography.fontBodyXsRegular
+        SenderNameMode.Reply -> ElementTheme.zeroTypography.fontBodyXsRegular
     }
     val modifier = when (mode) {
         is SenderNameMode.Timeline -> Modifier.alignByBaseline()

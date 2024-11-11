@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * https://www.figma.com/file/o9p34zmiuEpZRyvZXJZAYL/FTUE?type=design&node-id=604-60817
@@ -76,7 +77,7 @@ fun AccountProviderView(
                         .padding(start = 16.dp)
                         .weight(1f),
                     text = item.title,
-                    style = ElementTheme.typography.fontBodyLgMedium,
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
                 if (item.isPublic) {
@@ -95,7 +96,7 @@ fun AccountProviderView(
                     modifier = Modifier
                         .padding(start = 46.dp, bottom = 12.dp, end = 26.dp),
                     text = item.subtitle,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }

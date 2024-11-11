@@ -47,6 +47,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 // Designs: https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&mode=design&t=U03tOFZz5FSLVUMa-1
 
@@ -207,7 +208,7 @@ private fun ButtonInternal(
         ButtonSize.Medium,
         ButtonSize.MediumLowPadding -> MaterialTheme.typography.labelLarge
         ButtonSize.Large,
-        ButtonSize.LargeLowPadding -> ElementTheme.typography.fontBodyLgMedium
+        ButtonSize.LargeLowPadding -> ElementTheme.zeroTypography.fontBodyLgMedium
     }
 
     androidx.compose.material3.Button(

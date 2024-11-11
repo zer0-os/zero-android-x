@@ -33,6 +33,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.utils.time.formatShort
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
@@ -64,7 +65,7 @@ internal fun VoiceMessageRecording(
         Text(
             text = duration.formatShort(),
             color = ElementTheme.colors.textSecondary,
-            style = ElementTheme.typography.fontBodySmMedium
+            style = ElementTheme.zeroTypography.fontBodySmMedium
         )
 
         Spacer(Modifier.size(20.dp))

@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -61,7 +62,7 @@ fun LoadingRoomNodeView(
                     Text(
                         text = stringResource(id = CommonStrings.error_unknown),
                         color = ElementTheme.colors.textSecondary,
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     )
                 } else {
                     CircularProgressIndicator()

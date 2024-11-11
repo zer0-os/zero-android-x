@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
 import io.element.android.libraries.matrix.api.timeline.item.event.getDisambiguatedDisplayName
@@ -139,7 +140,7 @@ private fun ReplyToErrorContent(
     ) {
         Text(
             text = data.message,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = MaterialTheme.colorScheme.error,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -179,7 +180,7 @@ private fun ReplyToContentText(metadata: InReplyToMetadata?) {
         }
         Text(
             text = text,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             fontStyle = fontStyle,
             textAlign = TextAlign.Start,
             color = MaterialTheme.colorScheme.secondary,

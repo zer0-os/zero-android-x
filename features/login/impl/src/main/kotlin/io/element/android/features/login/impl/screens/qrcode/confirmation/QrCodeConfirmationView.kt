@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -126,7 +127,7 @@ private fun WaitingForOtherDevice() {
         )
         Text(
             text = stringResource(R.string.screen_qr_code_login_verify_code_loading),
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
             color = ElementTheme.colors.textSecondary,
             textAlign = TextAlign.Center,
         )

@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun RoomPreviewTitleAtom(
@@ -23,7 +24,7 @@ fun RoomPreviewTitleAtom(
     Text(
         modifier = modifier,
         text = title,
-        style = ElementTheme.typography.fontHeadingMdBold,
+        style = ElementTheme.zeroTypography.fontHeadingMdBold,
         textAlign = TextAlign.Center,
         fontStyle = fontStyle,
         color = ElementTheme.colors.textPrimary,

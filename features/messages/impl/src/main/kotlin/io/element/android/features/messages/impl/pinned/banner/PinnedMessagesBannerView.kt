@@ -50,6 +50,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.pinnedMessageBannerBorder
 import io.element.android.libraries.designsystem.theme.pinnedMessageBannerIndicator
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.annotatedTextWithBold
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -239,7 +240,7 @@ private fun PinnedMessageItem(
                     text = fullCountMessage,
                     boldText = countMessage,
                 ),
-                style = ElementTheme.typography.fontBodySmMedium,
+                style = ElementTheme.zeroTypography.fontBodySmMedium,
                 color = ElementTheme.colors.textActionAccent,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -248,7 +249,7 @@ private fun PinnedMessageItem(
         if (message != null) {
             Text(
                 text = message,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 color = ElementTheme.colors.textPrimary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,

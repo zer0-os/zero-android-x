@@ -63,6 +63,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.MediumTopAppBar
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
@@ -138,8 +139,8 @@ private fun DefaultRoomListTopBar(
     val statusBarPadding = with(LocalDensity.current) { WindowInsets.statusBars.getTop(this).toDp() }
 
     Box(modifier = modifier) {
-        val collapsedTitleTextStyle = ElementTheme.typography.aliasScreenTitle
-        val expandedTitleTextStyle = ElementTheme.typography.fontHeadingLgBold.copy(
+        val collapsedTitleTextStyle = ElementTheme.zeroTypography.aliasScreenTitle
+        val expandedTitleTextStyle = ElementTheme.zeroTypography.fontHeadingLgBold.copy(
             // Due to a limitation of MediumTopAppBar, and to avoid the text to be truncated,
             // ensure that the font size will never be bigger than 28.dp.
             fontSize = 28.dp.applyScaleDown().toSp()

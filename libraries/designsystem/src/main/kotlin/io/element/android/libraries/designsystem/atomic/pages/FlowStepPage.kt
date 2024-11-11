@@ -29,6 +29,7 @@ import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * A Page with:
@@ -103,7 +104,7 @@ internal fun FlowStepPagePreview() = ElementPreview {
         ) {
             Text(
                 text = "Content",
-                style = ElementTheme.typography.fontHeadingXlBold
+                style = ElementTheme.zeroTypography.fontHeadingXlBold
             )
         }
     }

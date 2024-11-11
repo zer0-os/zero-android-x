@@ -33,6 +33,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 private val CORNER_RADIUS = 8.dp
 
@@ -68,7 +69,7 @@ fun GroupHeaderView(
                 Text(
                     text = text,
                     color = MaterialTheme.colorScheme.secondary,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 )
                 val rotation: Float by animateFloatAsState(
                     targetValue = if (isExpanded) 90f else 0f,

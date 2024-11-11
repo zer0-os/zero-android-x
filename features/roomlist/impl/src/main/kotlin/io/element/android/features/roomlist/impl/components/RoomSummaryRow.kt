@@ -58,6 +58,7 @@ import io.element.android.libraries.designsystem.theme.roomListRoomMessage
 import io.element.android.libraries.designsystem.theme.roomListRoomMessageDate
 import io.element.android.libraries.designsystem.theme.roomListRoomName
 import io.element.android.libraries.designsystem.theme.unreadIndicator
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.matrix.ui.components.InviteSenderView
@@ -141,7 +142,7 @@ internal fun RoomSummaryRow(
                             text = room.canonicalAlias.value,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = ElementTheme.typography.fontBodyMdRegular,
+                            style = ElementTheme.zeroTypography.fontBodyMdRegular,
                             color = ElementTheme.colors.textSecondary,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -150,7 +151,7 @@ internal fun RoomSummaryRow(
                         text = stringResource(id = R.string.screen_join_room_knock_sent_title),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         color = ElementTheme.colors.textSecondary,
                     )
                 }
@@ -209,7 +210,7 @@ private fun NameAndTimestampRow(
         // Name
         Text(
             modifier = Modifier.weight(1f),
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             text = name ?: stringResource(id = CommonStrings.common_no_room_name),
             fontStyle = FontStyle.Italic.takeIf { name == null },
             color = MaterialTheme.roomListRoomName(),
@@ -219,7 +220,7 @@ private fun NameAndTimestampRow(
         // Timestamp
         Text(
             text = timestamp ?: "",
-            style = ElementTheme.typography.fontBodySmMedium,
+            style = ElementTheme.zeroTypography.fontBodySmMedium,
             color = if (isHighlighted) {
                 ElementTheme.colors.unreadIndicator
             } else {
@@ -246,7 +247,7 @@ private fun InviteSubtitle(
             text = subtitle,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = MaterialTheme.roomListRoomMessage(),
             modifier = modifier,
         )
@@ -269,7 +270,7 @@ private fun LastMessageAndIndicatorRow(
             modifier = Modifier.weight(1f),
             text = attributedLastMessage,
             color = MaterialTheme.roomListRoomMessage(),
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             minLines = 2,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
@@ -312,7 +313,7 @@ private fun InviteNameAndIndicatorRow(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             text = name ?: stringResource(id = CommonStrings.common_no_room_name),
             fontStyle = FontStyle.Italic.takeIf { name == null },
             color = MaterialTheme.roomListRoomName(),
