@@ -58,6 +58,13 @@ class NotLoggedInImageLoaderFactory @Inject constructor(
         return ImageLoader
             .Builder(context)
             .okHttpClient { okHttpClient.get() }
+            .components {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
             .build()
     }
 }
