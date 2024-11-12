@@ -32,7 +32,7 @@ class ZeroRetrofitFactory(
             .addConverterFactory(jsonConverter)
             .build()
 
-    fun apiClient(): Retrofit =
+    val apiClient: Retrofit =
         Retrofit.Builder()
             .baseUrl(ZeroConfig.environment.apiUrl.ensureTrailingSlash())
             .client(okHttpClient)

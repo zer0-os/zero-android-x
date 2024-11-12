@@ -71,8 +71,10 @@ import io.element.android.libraries.matrix.impl.verification.RustSessionVerifica
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.TimeoutCancellationException
@@ -86,6 +88,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -129,7 +132,8 @@ class RustMatrixClient(
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     featureFlagService: FeatureFlagService,
     zeroConversationRepository: ConversationRepository?,
-    ) : MatrixClient {
+    private val zeroUserRepository: UserRepository?,
+) : MatrixClient {
     override val sessionId: UserId = UserId(client.userId())
     override val deviceId: DeviceId = DeviceId(client.deviceId())
     override val sessionCoroutineScope = appCoroutineScope.childScope(dispatchers.main, "Session-$sessionId")
@@ -374,18 +378,39 @@ class RustMatrixClient(
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> =
         withContext(sessionDispatcher) {
             runCatching {
-                client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
+                zeroUserRepository?.let { userRepo ->
+                    val zeroSearchResults = userRepo.getUsers(filterName = searchTerm).firstOrNull() ?: emptyList()
+                    val matrixUserProfiles = zeroSearchResults.map { userId ->
+                        UserProfileMapper.map(client.getProfile(userId))
+                    }
+                    MatrixSearchUserResults(
+                        results = matrixUserProfiles.toImmutableList(),
+                        limited = matrixUserProfiles.isNotEmpty(),
+                    )
+                } ?: client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
+
+                //client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
             }
         }
 
     override suspend fun setDisplayName(displayName: String): Result<Unit> =
         withContext(sessionDispatcher) {
-            runCatching { client.setDisplayName(displayName) }
+            val result = runCatching { client.setDisplayName(displayName) }
+            if (result.isSuccess) {
+                zeroUserRepository?.updateUserProfile(userName = displayName)
+            }
+            result
         }
 
     override suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit> =
         withContext(sessionDispatcher) {
-            runCatching { client.uploadAvatar(mimeType, data) }
+            val result = runCatching { client.uploadAvatar(mimeType, data) }
+            if (result.isSuccess) {
+                client.avatarUrl()?.let {
+                    zeroUserRepository?.updateUserProfile(avatarUrl = it)
+                }
+            }
+            result
         }
 
     override suspend fun removeAvatar(): Result<Unit> =

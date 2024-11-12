@@ -11,8 +11,11 @@ import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.AuthRepositoryImpl
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.ConversationRepositoryImpl
+import io.element.android.support.zero.data.repository.UserRepository
+import io.element.android.support.zero.data.repository.UserRepositoryImpl
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroConversationService
+import io.element.android.support.zero.network.service.ZeroUserService
 
 @Module
 @ContributesTo(AppScope::class)
@@ -31,4 +34,10 @@ object RepositoryModule {
     fun bindConversationRepository(
         zeroConversationService: ZeroConversationService
     ): ConversationRepository = ConversationRepositoryImpl(zeroConversationService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindUserRepository(
+        zeroUserService: ZeroUserService
+    ): UserRepository = UserRepositoryImpl(zeroUserService)
 }
