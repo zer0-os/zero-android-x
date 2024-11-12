@@ -18,6 +18,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 
 /**
  * A helper to create [AsyncIndicatorView] with some defaults.
@@ -43,7 +44,7 @@ object AsyncIndicator {
                 modifier = Modifier
                     .progressSemantics()
                     .size(12.dp),
-                color = ElementTheme.colors.textPrimary,
+                color = ElementTheme.colors.zeroBrandColor,
                 strokeWidth = 1.5.dp,
             )
         }

@@ -130,7 +130,7 @@ fun ConfigureRoomView(
                     state.eventSink(ConfigureRoomEvents.RoomVisibilityChanged(it))
                 },
             )
-            if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
+            /*if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
                 RoomAccessOptions(
                     selected = when (state.config.roomVisibility.roomAccess) {
                         RoomAccess.Anyone -> RoomAccessItem.Anyone
@@ -149,7 +149,7 @@ fun ConfigureRoomView(
                     onAddressChange = { state.eventSink(ConfigureRoomEvents.RoomAddressChanged(it)) },
                 )
                 Spacer(Modifier)
-            }
+            }*/
         }
     }
 
@@ -188,7 +188,8 @@ private fun ConfigureRoomToolbar(
     TopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.screen_create_room_title),
+                //text = stringResource(R.string.screen_create_room_title),
+                text = "Group Details",
                 style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
@@ -211,10 +212,9 @@ private fun RoomNameWithAvatar(
     onChangeRoomName: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         UnsavedAvatar(
             avatarUri = avatarUri,
@@ -222,9 +222,11 @@ private fun RoomNameWithAvatar(
         )
 
         TextField(
-            label = stringResource(R.string.screen_create_room_room_name_label),
+            //label = stringResource(R.string.screen_create_room_room_name_label),
+            label = "Group Name",
             value = roomName,
-            placeholder = stringResource(CommonStrings.common_room_name_placeholder),
+            // placeholder = stringResource(CommonStrings.common_room_name_placeholder),
+            placeholder = "e.g: Test App Group",
             singleLine = true,
             onValueChange = onChangeRoomName,
         )
@@ -276,7 +278,8 @@ private fun RoomVisibilityOptions(
     modifier: Modifier = Modifier,
 ) {
     ConfigureRoomOptions(
-        title = stringResource(R.string.screen_create_room_room_visibility_section_title),
+        // title = stringResource(R.string.screen_create_room_room_visibility_section_title),
+        title = "Group Type",
         modifier = modifier,
     ) {
         RoomVisibilityItem.entries.forEach { item ->

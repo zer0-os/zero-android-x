@@ -152,7 +152,7 @@ private fun ZeroPlaceholderImage(
         contentDescription = "zero_placeholder_image",
         modifier = modifier.size(size)
             .background(Color.Black)
-            .padding(12.dp)
+            .padding(8.dp)
     )
 }
 

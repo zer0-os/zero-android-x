@@ -47,6 +47,8 @@ import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -98,7 +100,7 @@ fun MessageEventBubble(
 
     // Ignore state.isHighlighted for now, we need a design decision on it.
     val backgroundBubbleColor = when {
-        state.isMine -> ElementTheme.colors.messageFromMeBackground
+        state.isMine -> ElementTheme.colors.zeroBrandColorAlpha20
         else -> ElementTheme.colors.messageFromOtherBackground
     }
     val bubbleShape = bubbleShape()

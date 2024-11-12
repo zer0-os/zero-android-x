@@ -38,6 +38,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.withColoredPeriod
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
@@ -78,7 +79,7 @@ fun SunsetPage(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
                                 strokeWidth = 2.dp,
-                                color = ElementTheme.colors.iconPrimary
+                                color = ElementTheme.colors.zeroBrandColor
                             )
                         } else {
                             Spacer(modifier = Modifier.height(24.dp))

@@ -58,6 +58,7 @@ import io.element.android.libraries.designsystem.theme.roomListRoomMessage
 import io.element.android.libraries.designsystem.theme.roomListRoomMessageDate
 import io.element.android.libraries.designsystem.theme.roomListRoomName
 import io.element.android.libraries.designsystem.theme.unreadIndicator
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
@@ -222,7 +223,7 @@ private fun NameAndTimestampRow(
             text = timestamp ?: "",
             style = ElementTheme.zeroTypography.fontBodySmMedium,
             color = if (isHighlighted) {
-                ElementTheme.colors.unreadIndicator
+                ElementTheme.colors.zeroBrandColor
             } else {
                 MaterialTheme.roomListRoomMessageDate()
             },
@@ -281,7 +282,7 @@ private fun LastMessageAndIndicatorRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val tint = if (room.isHighlighted) ElementTheme.colors.unreadIndicator else ElementTheme.colors.iconQuaternary
+            val tint = if (room.isHighlighted) ElementTheme.colors.zeroBrandColor else ElementTheme.colors.iconQuaternary
             if (room.hasRoomCall) {
                 OnGoingCallIcon(
                     color = tint,
@@ -379,7 +380,7 @@ private fun MentionIndicatorAtom() {
         modifier = Modifier.size(16.dp),
         contentDescription = null,
         imageVector = CompoundIcons.Mention(),
-        tint = ElementTheme.colors.unreadIndicator,
+        tint = ElementTheme.colors.zeroBrandColor,
     )
 }
 

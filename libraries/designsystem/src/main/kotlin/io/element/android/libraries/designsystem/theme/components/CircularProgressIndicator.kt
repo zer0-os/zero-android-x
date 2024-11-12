@@ -19,14 +19,16 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 
 @Composable
 fun CircularProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.circularColor,
+    color: Color = ElementTheme.colors.zeroBrandColor,
     trackColor: Color = ProgressIndicatorDefaults.circularDeterminateTrackColor,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth
 ) {
@@ -42,7 +44,7 @@ fun CircularProgressIndicator(
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.circularColor,
+    color: Color = ElementTheme.colors.zeroBrandColor,
     trackColor: Color = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
 ) {

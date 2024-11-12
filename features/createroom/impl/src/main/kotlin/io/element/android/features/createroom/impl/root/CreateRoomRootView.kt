@@ -146,7 +146,8 @@ private fun CreateRoomActionButtonsList(
         item {
             CreateRoomActionButton(
                 iconRes = CompoundDrawables.ic_compound_plus,
-                text = stringResource(id = R.string.screen_create_room_action_create_room),
+                // text = stringResource(id = R.string.screen_create_room_action_create_room),
+                text = "New Group",
                 onClick = onNewRoomClick,
             )
         }

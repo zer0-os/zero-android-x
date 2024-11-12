@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 
 // Designs in https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&mode=design&t=qb99xBP5mwwCtGkN-1
 
@@ -37,7 +38,10 @@ fun Checkbox(
     enabled: Boolean = true,
     hasError: Boolean = false,
     indeterminate: Boolean = false,
-    colors: CheckboxColors = if (hasError) compoundErrorCheckBoxColors() else compoundCheckBoxColors(),
+    colors: CheckboxColors = if (hasError) compoundErrorCheckBoxColors()
+        .copy(checkedBoxColor = ElementTheme.colors.zeroBrandColor)
+    else compoundCheckBoxColors()
+        .copy(checkedBoxColor = ElementTheme.colors.zeroBrandColor),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     var indeterminateState by remember { mutableStateOf(indeterminate) }

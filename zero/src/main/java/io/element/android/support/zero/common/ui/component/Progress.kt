@@ -8,13 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 
 @Composable
 fun CircularProgress(modifier: Modifier = Modifier, size: Dp = 42.dp, stroke: Dp = 5.dp) =
 	CircularProgressIndicator(
 		modifier = modifier.size(size),
 		strokeWidth = stroke,
-		color = ElementTheme.colors.textSecondary
+		color = ElementTheme.colors.zeroBrandColor
 	)
 
 @Composable

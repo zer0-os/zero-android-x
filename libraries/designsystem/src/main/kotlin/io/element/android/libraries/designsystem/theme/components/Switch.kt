@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import androidx.compose.material3.Switch as Material3Switch
 
 // Designs in https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&node-id=425%3A24203&mode=design&t=qb99xBP5mwwCtGkN-1
@@ -37,7 +38,8 @@ fun Switch(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: SwitchColors = compoundSwitchColors(),
+    colors: SwitchColors = compoundSwitchColors()
+        .copy(checkedTrackColor = ElementTheme.colors.zeroBrandColor),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     thumbContent: (@Composable () -> Unit)? = null,
 ) {

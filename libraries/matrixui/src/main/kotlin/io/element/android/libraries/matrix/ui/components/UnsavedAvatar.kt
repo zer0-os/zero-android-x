@@ -44,7 +44,7 @@ fun UnsavedAvatar(
     modifier: Modifier = Modifier,
 ) {
     val commonModifier = modifier
-        .size(70.dp)
+        .size(120.dp)
         .clip(CircleShape)
 
     if (avatarUri != null) {
