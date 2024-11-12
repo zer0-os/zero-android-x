@@ -137,7 +137,11 @@ class EventMessageMapper {
             TextMessageType(
                 type.content.body,
                 //type.content.formatted?.map()
-                type.content.formatted?.map(type.content.body)
+                (type.content.formatted ?: RustFormattedBody(
+                    format = org.matrix.rustcomponents.sdk.MessageFormat.Html,
+                    body = type.content.body
+                )
+                    ).map(type.content.body)
             )
         }
         is RustMessageType.Emote -> {
