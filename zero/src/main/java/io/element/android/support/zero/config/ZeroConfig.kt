@@ -1,7 +1,7 @@
 package io.element.android.support.zero.config
 
 object ZeroConfig {
-    val environment: EnvironmentConfig = EnvironmentConfig.Development
+    val environment: EnvironmentConfig = EnvironmentConfig.Production
 }
 
 sealed class EnvironmentConfig(

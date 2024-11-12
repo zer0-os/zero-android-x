@@ -337,14 +337,14 @@ private fun RoomAddressField(
         leadingIcon = {
             Text(
                 text = "#",
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 color = ElementTheme.colors.textSecondary,
             )
         },
         trailingIcon = {
             Text(
                 text = homeserverName,
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 color = ElementTheme.colors.textSecondary,
             )
         },

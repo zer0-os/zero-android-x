@@ -13,7 +13,7 @@ data class EventMessageContent(
 
 @Serializable
 data class MessageContent(
-    @SerialName("optimisticId") val optimisticID: String? = null,
+    //@SerialName("optimisticId") val optimisticID: String? = null,
     val info: EncryptedAttachmentInfo? = null,
     @SerialName("localId") val localID: String? = null,
     val file: EncryptedAttachmentFile? = null,
@@ -42,8 +42,8 @@ data class EncryptedAttachment(
 data class EncryptedAttachmentInfo(
     @SerialName("mimetype") val mimeType: String,
     val name: String? = null,
-    @SerialName("optimisticId") val optimisticID: String,
-    @SerialName("rootMessageId") val rootMessageID: String,
+    /*@SerialName("optimisticId") val optimisticID: String?,
+    @SerialName("rootMessageId") val rootMessageID: String?,*/
     val size: Int,
     val width: Float? = null,
     val height: Float? = null,

@@ -115,7 +115,8 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.NotificationsOptIn -> {
                 val callback = object : NotificationsOptInNode.Callback {
                     override fun onNotificationsOptInFinished() {
-                        moveToNextStepIfNeeded()
+                        //moveToNextStepIfNeeded()
+                        proceedToDashboardAfterNotificationsPermission()
                     }
                 }
                 createNode<NotificationsOptInNode>(buildContext, listOf(callback))
@@ -155,6 +156,10 @@ class FtueFlowNode @AssistedInject constructor(
             }
             null -> Unit
         }
+    }
+
+    private fun proceedToDashboardAfterNotificationsPermission() = lifecycleScope.launch {
+        ftueState.updateState()
     }
 
     @Composable

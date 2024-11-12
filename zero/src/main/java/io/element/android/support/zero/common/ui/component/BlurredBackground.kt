@@ -14,7 +14,7 @@ import io.element.android.support.zero.R
 @Composable
 fun BlurredBackground(
 	modifier: Modifier = Modifier,
-	@DrawableRes background: Int = R.drawable.bg_level_3
+	@DrawableRes background: Int = R.drawable.bg_auth
 ) {
 	Image(
 		modifier = modifier.fillMaxWidth(),
@@ -27,7 +27,7 @@ fun BlurredBackground(
 @Composable
 fun SheetBlurredBackground(
 	modifier: Modifier = Modifier,
-	@DrawableRes background: Int = R.drawable.bg_level_3
+	@DrawableRes background: Int = R.drawable.bg_auth
 ) {
 	Image(
 		modifier = modifier,
