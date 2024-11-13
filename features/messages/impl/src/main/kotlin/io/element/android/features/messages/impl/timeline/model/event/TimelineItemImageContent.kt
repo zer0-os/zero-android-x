@@ -35,7 +35,7 @@ data class TimelineItemImageContent(
     val showCaption = caption != null
 
     val thumbnailMediaRequestData: MediaRequestData by lazy {
-        if (mimeType.isMimeTypeAnimatedImage()) {
+        /*if (mimeType.isMimeTypeAnimatedImage()) {
             MediaRequestData(
                 source = mediaSource,
                 kind = MediaRequestData.Kind.File(
@@ -51,7 +51,11 @@ data class TimelineItemImageContent(
                     height = thumbnailHeight?.toLong() ?: MAX_THUMBNAIL_HEIGHT
                 ),
             )
-        }
+        }*/
+        MediaRequestData(
+            source = mediaSource,
+            kind = MediaRequestData.Kind.Content
+        )
     }
 }
 
@@ -59,4 +63,4 @@ val TimelineItemImageContent.giphySourceUrl: String
     get() = mediaSource.url
 
 val TimelineItemImageContent.isGiphySource: Boolean
-    get() = mediaSource.url.contains("media4.giphy.com")
+    get() = mediaSource.url.contains("giphy.com")
