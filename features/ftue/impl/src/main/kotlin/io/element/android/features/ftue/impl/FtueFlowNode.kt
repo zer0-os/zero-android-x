@@ -107,7 +107,7 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.SessionVerification -> {
                 val callback = object : FtueSessionVerificationFlowNode.Callback {
                     override fun onDone() {
-                        moveToNextStepIfNeeded()
+                        moveToNextStepIfNeeded(fromSessionVerification = true)
                     }
                 }
                 createNode<FtueSessionVerificationFlowNode>(buildContext, listOf(callback))
@@ -137,7 +137,7 @@ class FtueFlowNode @AssistedInject constructor(
         }
     }
 
-    private fun moveToNextStepIfNeeded() = lifecycleScope.launch {
+    private fun moveToNextStepIfNeeded(fromSessionVerification: Boolean = false) = lifecycleScope.launch {
         when (ftueState.getNextStep()) {
             FtueStep.WaitingForInitialState -> {
                 backstack.newRoot(NavTarget.Placeholder)
@@ -154,7 +154,11 @@ class FtueFlowNode @AssistedInject constructor(
             FtueStep.LockscreenSetup -> {
                 backstack.newRoot(NavTarget.LockScreenSetup)
             }
-            null -> Unit
+            null -> {
+                if (fromSessionVerification) {
+                    ftueState.updateState()
+                } else Unit
+            }
         }
     }
 

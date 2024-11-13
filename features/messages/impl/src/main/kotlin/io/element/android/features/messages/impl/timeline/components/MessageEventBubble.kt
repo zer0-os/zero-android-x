@@ -114,17 +114,17 @@ fun MessageEventBubble(
             }
             .drawWithContent {
                 drawContent()
-                if (state.cutTopStart) {
-                    drawCircle(
-                        color = Color.Black,
-                        center = Offset(
-                            x = if (isRtl) size.width else 0f,
-                            y = yOffsetPx,
-                        ),
-                        radius = radiusPx,
-                        blendMode = BlendMode.Clear,
-                    )
-                }
+//                if (state.cutTopStart) {
+//                    drawCircle(
+//                        color = Color.Black,
+//                        center = Offset(
+//                            x = if (isRtl) size.width else 0f,
+//                            y = yOffsetPx,
+//                        ),
+//                        radius = radiusPx,
+//                        blendMode = BlendMode.Clear,
+//                    )
+//                }
             },
         // Need to set the contentAlignment again (it's already set in TimelineItemEventRow), for the case
         // when content width is low.

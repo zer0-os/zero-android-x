@@ -34,6 +34,7 @@ dependencies {
     implementation(projects.libraries.preferences.api)
     implementation(projects.libraries.uiStrings)
     implementation(projects.features.logout.api)
+    implementation(projects.zero)
     api(libs.statemachine)
     api(projects.features.verifysession.api)
 

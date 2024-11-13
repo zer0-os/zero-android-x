@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,8 +43,17 @@ fun TimelineEventTimestampView(
     eventSink: (TimelineEvents.EventFromTimelineItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val formattedTime = event.sentTime
     val hasError = event.localSendState is LocalEventSendState.Failed
+    val isVerifiedUserSendFailure = event.localSendState is LocalEventSendState.Failed.VerifiedUser
+
+    //Automatically calling resolve and resend method
+    LaunchedEffect(event.localSendState) {
+        if (hasError && isVerifiedUserSendFailure) {
+            eventSink(TimelineEvents.ComputeVerifiedUserSendFailure(event))
+        }
+    }
+
+    val formattedTime = event.sentTime
     val hasEncryptionCritical = event.messageShield?.isCritical.orFalse()
     val isMessageEdited = event.content.isEdited()
     // val tint = if (hasError || hasEncryptionCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -68,7 +78,7 @@ fun TimelineEventTimestampView(
             color = tint,
         )
         if (hasError) {
-            val isVerifiedUserSendFailure = event.localSendState is LocalEventSendState.Failed.VerifiedUser
+            //val isVerifiedUserSendFailure = event.localSendState is LocalEventSendState.Failed.VerifiedUser
             Spacer(modifier = Modifier.width(2.dp))
             Icon(
                 imageVector = CompoundIcons.Error(),

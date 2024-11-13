@@ -98,9 +98,9 @@ private fun ImageAvatar(
             when (val state = painter.state) {
                 is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
                 is AsyncImagePainter.State.Error -> {
-                    SideEffect {
+                    /*SideEffect {
                         Timber.e(state.result.throwable, "Error loading avatar $state\n${state.result}")
-                    }
+                    }*/
                     ZeroPlaceholderImage(
                         avatarData = avatarData,
                         forcedAvatarSize = forcedAvatarSize,

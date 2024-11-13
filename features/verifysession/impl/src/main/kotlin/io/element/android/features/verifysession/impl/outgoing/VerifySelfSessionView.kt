@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -46,10 +46,10 @@ import io.element.android.libraries.designsystem.theme.components.InvisibleButto
 import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
-import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.screens.verifysession.ZeroVerifySelfSessionView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +85,8 @@ fun VerifySelfSessionView(
         }
     }
     BackHandler {
-        cancelOrResetFlow()
+        //cancelOrResetFlow()
+        state.eventSink(VerifySelfSessionViewEvents.SkipVerification)
     }
 
     if (step is Step.Loading ||
@@ -98,10 +99,17 @@ fun VerifySelfSessionView(
             CircularProgressIndicator()
         }
     } else {
+        val pagePaddingValues: PaddingValues =
+            if (step is Step.Initial) {
+                PaddingValues(0.dp)
+            } else {
+                PaddingValues(20.dp)
+            }
         HeaderFooterPage(
             modifier = modifier,
+            paddingValues = pagePaddingValues,
             topBar = {
-                TopAppBar(
+                /*TopAppBar(
                     title = {},
                     actions = {
                         if (step !is Step.Completed &&
@@ -119,25 +127,38 @@ fun VerifySelfSessionView(
                             )
                         }
                     }
-                )
+                )*/
             },
             header = {
-                VerifySelfSessionHeader(step = step)
+                if (step !is Step.Initial) {
+                    VerifySelfSessionHeader(step = step)
+                }
             },
             footer = {
-                VerifySelfSessionBottomMenu(
-                    screenState = state,
-                    onCancelClick = ::cancelOrResetFlow,
-                    onEnterRecoveryKey = onEnterRecoveryKey,
-                    onContinueClick = onFinish,
-                    onResetKey = onResetKey,
-                )
+                if (step !is Step.Initial) {
+                    VerifySelfSessionBottomMenu(
+                        screenState = state,
+                        onCancelClick = ::cancelOrResetFlow,
+                        onEnterRecoveryKey = onEnterRecoveryKey,
+                        onContinueClick = onFinish,
+                        onResetKey = onResetKey,
+                    )
+                }
             }
         ) {
-            VerifySelfSessionContent(
-                flowState = step,
-                onLearnMoreClick = onLearnMoreClick,
-            )
+            if (step !is Step.Initial) {
+                VerifySelfSessionContent(
+                    flowState = step,
+                    onLearnMoreClick = onLearnMoreClick,
+                )
+            } else {
+                ZeroVerifySelfSessionView(
+                    onSkipVerification = {
+                        state.eventSink(VerifySelfSessionViewEvents.SkipVerification)
+                    },
+                    onEnterRecoveryKey = onEnterRecoveryKey
+                )
+            }
         }
     }
 
