@@ -222,7 +222,8 @@ private fun RoomsViewList(
                     )
                 }
             }
-            SecurityBannerState.RecoveryKeyConfirmation -> {
+            else -> {}
+            /*SecurityBannerState.RecoveryKeyConfirmation -> {
                 item {
                     ConfirmRecoveryKeyBanner(
                         onContinueClick = onConfirmRecoveryKeyClick,
@@ -242,7 +243,7 @@ private fun RoomsViewList(
                 item {
                     FullScreenIntentPermissionBanner(state = state.fullScreenIntentPermissionsState)
                 }
-            }
+            }*/
         }
 
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room

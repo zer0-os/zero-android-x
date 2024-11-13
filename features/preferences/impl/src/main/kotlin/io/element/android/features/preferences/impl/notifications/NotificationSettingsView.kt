@@ -127,7 +127,7 @@ private fun NotificationSettingsContentView(
     )
 
     if (systemSettings.appNotificationsEnabled) {
-        if (!state.fullScreenIntentPermissionsState.permissionGranted) {
+        /*if (!state.fullScreenIntentPermissionsState.permissionGranted) {
             PreferenceCategory {
                 PreferenceText(
                     icon = CompoundIcons.VoiceCall(),
@@ -138,7 +138,7 @@ private fun NotificationSettingsContentView(
                     }
                 )
             }
-        }
+        }*/
         PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_notification_section_title)) {
             PreferenceText(
                 title = stringResource(id = R.string.screen_notification_settings_group_chats),
