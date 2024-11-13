@@ -114,6 +114,9 @@ internal fun TimelineItemRow(
                         )
                     }
                     else -> {
+                        val shouldCallItemClick =
+                            (timelineItem.content as? TimelineItemImageContent)?.isGiphySource == false
+
                         TimelineItemEventRow(
                             event = timelineItem,
                             timelineRoomInfo = timelineRoomInfo,
@@ -121,7 +124,11 @@ internal fun TimelineItemRow(
                             timelineProtectionState = timelineProtectionState,
                             isLastOutgoingMessage = isLastOutgoingMessage,
                             isHighlighted = timelineItem.isEvent(focusedEventId),
-                            onEventClick = { onContentClick(timelineItem) },
+                            onEventClick = {
+                                if (shouldCallItemClick) {
+                                    onContentClick(timelineItem)
+                                }
+                            },
                             onLongClick = { onLongClick(timelineItem) },
                             onLinkClick = onLinkClick,
                             onUserDataClick = onUserDataClick,

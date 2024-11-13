@@ -118,7 +118,7 @@ android {
             } else {
                 resValue("string", "app_name", "$baseAppName dbg")
             }
-            applicationIdSuffix = ".debug"
+            //applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
 
