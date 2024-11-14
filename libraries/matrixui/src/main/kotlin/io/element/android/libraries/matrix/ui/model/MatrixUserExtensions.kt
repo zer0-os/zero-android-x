@@ -19,5 +19,5 @@ fun MatrixUser.getAvatarData(size: AvatarSize) = AvatarData(
 )
 
 fun MatrixUser.getBestName(): String {
-    return displayName?.takeIf { it.isNotEmpty() } ?: userId.value
+    return displayName?.takeIf { it.isNotEmpty() } ?: ""
 }
