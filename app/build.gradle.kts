@@ -59,27 +59,27 @@ android {
         versionCode = Versions.VERSION_CODE
         versionName = Versions.VERSION_NAME
 
-        // Keep abiFilter for the universalApk
-        ndk {
-            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-        }
-
-        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
-        splits {
-            // Configures multiple APKs based on ABI.
-            abi {
-                // Enables building multiple APKs per ABI.
-                isEnable = true
-                // By default all ABIs are included, so use reset() and include to specify that we only
-                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
-                // Resets the list of ABIs that Gradle should create APKs for to none.
-                reset()
-                // Specifies a list of ABIs that Gradle should create APKs for.
-                include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-                // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
-                isUniversalApk = true
-            }
-        }
+//        // Keep abiFilter for the universalApk
+//        ndk {
+//            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+//        }
+//
+//        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
+//        splits {
+//            // Configures multiple APKs based on ABI.
+//            abi {
+//                // Enables building multiple APKs per ABI.
+//                isEnable = true
+//                // By default all ABIs are included, so use reset() and include to specify that we only
+//                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
+//                // Resets the list of ABIs that Gradle should create APKs for to none.
+//                reset()
+//                // Specifies a list of ABIs that Gradle should create APKs for.
+//                include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+//                // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
+//                isUniversalApk = true
+//            }
+//        }
 
         defaultConfig {
             resourceConfigurations += locales
@@ -233,7 +233,7 @@ androidComponents {
             val abiCode = abiVersionCodes[name] ?: 0
             // Assigns the new version code to output.versionCode, which changes the version code
             // for only the output APK, not for the variant itself.
-            output.versionCode.set((output.versionCode.orNull ?: 0) * 10 + abiCode)
+            output.versionCode.set((output.versionCode.orNull ?: 0))
         }
     }
 
