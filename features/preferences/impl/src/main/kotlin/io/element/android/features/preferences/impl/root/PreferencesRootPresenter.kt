@@ -48,6 +48,10 @@ class PreferencesRootPresenter @Inject constructor(
     @Composable
     override fun present(): PreferencesRootState {
         val matrixUser = matrixClient.userProfile.collectAsState()
+
+        val shouldShowNewRewardsIntimation = matrixClient.shouldShowNewRewardsIntimation.collectAsState()
+        val userRewards = matrixClient.userRewards.collectAsState()
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             matrixClient.getUserProfile()
@@ -102,6 +106,9 @@ class PreferencesRootPresenter @Inject constructor(
                 is PreferencesRootEvents.OnVersionInfoClick -> {
                     showDeveloperSettingsProvider.unlockDeveloperSettings()
                 }
+                is PreferencesRootEvents.DismissRewardsIntimation -> {
+                    matrixClient.dismissRewardsIntimation()
+                }
             }
         }
 
@@ -122,6 +129,8 @@ class PreferencesRootPresenter @Inject constructor(
             directLogoutState = directLogoutState,
             snackbarMessage = snackbarMessage,
             eventSink = ::handleEvent,
+            shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation.value,
+            userRewards = userRewards.value,
         )
     }
 

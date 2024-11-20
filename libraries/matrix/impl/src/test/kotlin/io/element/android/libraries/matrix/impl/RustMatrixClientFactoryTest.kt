@@ -54,5 +54,6 @@ fun TestScope.createRustMatrixClientFactory(
     timelineEventTypeFilterFactory = FakeTimelineEventTypeFilterFactory(),
     clientBuilderProvider = FakeClientBuilderProvider(),
     zeroConversationRepository = null,
-    zeroUserRepository = null
+    zeroUserRepository = null,
+    zeroRewardsRepository = null
 )

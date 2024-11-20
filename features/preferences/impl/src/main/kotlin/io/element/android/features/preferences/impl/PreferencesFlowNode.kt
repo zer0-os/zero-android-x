@@ -160,6 +160,10 @@ class PreferencesFlowNode @AssistedInject constructor(
                     override fun onOpenAccountDeactivation() {
                         backstack.push(NavTarget.AccountDeactivation)
                     }
+
+                    override fun onOpenRewards() {
+
+                    }
                 }
                 createNode<PreferencesRootNode>(buildContext, plugins = listOf(callback))
             }

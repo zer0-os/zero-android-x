@@ -15,7 +15,6 @@ setupAnvil()
 dependencies {
     implementation(projects.libraries.core)
     implementation(projects.libraries.designsystem)
-    implementation(projects.libraries.matrix.api)
     implementation(libs.dagger)
     implementation(projects.libraries.di)
 

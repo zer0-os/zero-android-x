@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     api(projects.features.preferences.api)
 
+    implementation(projects.zero)
+
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.molecule.runtime)

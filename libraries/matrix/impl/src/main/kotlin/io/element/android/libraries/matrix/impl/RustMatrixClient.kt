@@ -12,6 +12,7 @@ import io.element.android.libraries.androidutils.file.safeDelete
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.coroutine.childScope
+import io.element.android.libraries.core.coroutine.mapState
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
@@ -46,6 +47,7 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
@@ -70,13 +72,17 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.common.extension.withSameScope
+import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
@@ -133,6 +139,7 @@ class RustMatrixClient(
     featureFlagService: FeatureFlagService,
     zeroConversationRepository: ConversationRepository?,
     private val zeroUserRepository: UserRepository?,
+    private val zeroRewardsRepository: RewardsRepository?,
 ) : MatrixClient {
     override val sessionId: UserId = UserId(client.userId())
     override val deviceId: DeviceId = DeviceId(client.deviceId())
@@ -709,6 +716,27 @@ class RustMatrixClient(
             true
         }
     }
+
+    //region ZERO
+    override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
+        zeroRewardsRepository?.shouldShowNewRewardsIntimation ?: MutableStateFlow(false)
+
+    override val userRewards: StateFlow<ZeroUserRewards> =
+        (zeroRewardsRepository?.userRewards ?: MutableStateFlow(UserRewards.empty()))
+            .mapState {
+                ZeroUserRewards(zero = it.zero, decimals = it.decimals, price = it.price)
+            }
+
+    override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {
+        zeroRewardsRepository?.getMyRewards(shouldCheckRewardsIntimation)
+    }
+
+    override fun dismissRewardsIntimation() {
+        withSameScope {
+            zeroRewardsRepository?.dismissRewardsIntimation()
+        }
+    }
+    //endregion
 }
 
 private val defaultRoomCreationPowerLevels = PowerLevels(

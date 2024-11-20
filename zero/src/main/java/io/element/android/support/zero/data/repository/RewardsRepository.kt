@@ -1,11 +1,15 @@
 package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.data.model.UserRewards
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface RewardsRepository {
 
-    val shouldShowNewRewardsIntimation: Flow<Boolean>
+    val shouldShowNewRewardsIntimation: StateFlow<Boolean>
 
-    suspend fun getMyRewards(shouldCheckRewardsIntimation: Boolean = false): Flow<UserRewards>
+    val userRewards: StateFlow<UserRewards>
+
+    suspend fun getMyRewards(shouldCheckRewardsIntimation: Boolean = false)
+
+    suspend fun dismissRewardsIntimation()
 }

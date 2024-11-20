@@ -1,16 +1,17 @@
 package io.element.android.support.zero.data.repository
 
-import io.element.android.support.zero.common.extension.channelFlowWithAwait
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.network.model.response.ApiUserRewards
 import io.element.android.support.zero.network.model.response.ApiZeroTokens
 import io.element.android.support.zero.network.service.ZeroRewardService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 
 class RewardsRepositoryImpl(
     private val preferences: Preferences,
@@ -18,15 +19,15 @@ class RewardsRepositoryImpl(
 ) : RewardsRepository {
 
     private val _shouldShouldNewRewardsIntimation = MutableStateFlow(false)
-    override val shouldShowNewRewardsIntimation: Flow<Boolean> =
+    override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
         _shouldShouldNewRewardsIntimation
 
-    override suspend fun getMyRewards(shouldCheckRewardsIntimation: Boolean) =
-        channelFlowWithAwait {
+    private val _userRewards = MutableStateFlow(preferences.userRewards())
+    override val userRewards: StateFlow<UserRewards> = _userRewards
+
+    override suspend fun getMyRewards(shouldCheckRewardsIntimation: Boolean) {
+        withContext(Dispatchers.IO) {
             val existingRewards = preferences.userRewards()
-            if (shouldCheckRewardsIntimation) {
-                trySend(existingRewards)
-            }
             val apiZeroRewards =
                 awaitAll(
                     async { zeroRewardService.fetchMyRewards() },
@@ -42,12 +43,17 @@ class RewardsRepositoryImpl(
                 it.earnedRewards = earnedCredits
 
                 preferences.saveUserRewards(it)
+                _userRewards.emit(it)
                 if (shouldCheckRewardsIntimation) {
                     _shouldShouldNewRewardsIntimation.emit(earnedCredits > 0)
                 }
-                trySend(it)
             }
         }
+    }
+
+    override suspend fun dismissRewardsIntimation() {
+        _shouldShouldNewRewardsIntimation.emit(false)
+    }
 
     private fun parseZeroCredits(userRewards: UserRewards): Double {
         return parseCredits(userRewards.zero, userRewards.decimals)

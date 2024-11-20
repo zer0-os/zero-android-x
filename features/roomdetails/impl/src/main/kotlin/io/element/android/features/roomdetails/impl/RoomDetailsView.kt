@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -49,6 +51,7 @@ import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
 import io.element.android.libraries.designsystem.components.ClickableLinkText
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
@@ -369,12 +372,22 @@ private fun DmHeaderSection(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DmAvatars(
+        val avatarData = otherMember.getAvatarData(size = AvatarSize.RoomHeader)
+        Avatar(
+            avatarData = avatarData,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(enabled = avatarData.url != null) {
+                    avatarData.url?.let { openAvatarPreview(roomName, it) }
+                }
+                .testTag(TestTags.memberDetailAvatar)
+        )
+        /*DmAvatars(
             userAvatarData = me.getAvatarData(size = AvatarSize.DmCluster),
             otherUserAvatarData = otherMember.getAvatarData(size = AvatarSize.DmCluster),
             openAvatarPreview = { url -> openAvatarPreview(me.getBestName(), url) },
             openOtherAvatarPreview = { url -> openAvatarPreview(roomName, url) },
-        )
+        )*/
         TitleAndSubtitle(
             title = roomName,
             subtitle = otherMember.userId.value,
