@@ -35,6 +35,7 @@ import io.element.android.features.preferences.impl.notifications.NotificationSe
 import io.element.android.features.preferences.impl.notifications.edit.EditDefaultNotificationSettingNode
 import io.element.android.features.preferences.impl.root.PreferencesRootNode
 import io.element.android.features.preferences.impl.user.editprofile.EditUserProfileNode
+import io.element.android.features.zerorewards.api.RewardsModalEntryPoint
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.appyx.canPop
@@ -54,6 +55,7 @@ class PreferencesFlowNode @AssistedInject constructor(
     private val logoutEntryPoint: LogoutEntryPoint,
     private val openSourceLicensesEntryPoint: OpenSourceLicensesEntryPoint,
     private val accountDeactivationEntryPoint: AccountDeactivationEntryPoint,
+    private val userRewardsEntryPoint: RewardsModalEntryPoint,
 ) : BaseFlowNode<PreferencesFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = plugins.filterIsInstance<PreferencesEntryPoint.Params>().first().initialElement.toNavTarget(),
@@ -107,6 +109,9 @@ class PreferencesFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object OssLicenses : NavTarget
+
+        @Parcelize
+        data object UserRewards : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -162,7 +167,7 @@ class PreferencesFlowNode @AssistedInject constructor(
                     }
 
                     override fun onOpenRewards() {
-
+                        backstack.push(NavTarget.UserRewards)
                     }
                 }
                 createNode<PreferencesRootNode>(buildContext, plugins = listOf(callback))
@@ -251,6 +256,11 @@ class PreferencesFlowNode @AssistedInject constructor(
             }
             NavTarget.AccountDeactivation -> {
                 accountDeactivationEntryPoint.createNode(this, buildContext)
+            }
+            NavTarget.UserRewards -> {
+                userRewardsEntryPoint
+                    .nodeBuilder(this, buildContext)
+                    .build()
             }
         }
     }

@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.features.logout.api)
     implementation(projects.features.deactivation.api)
     implementation(projects.features.roomlist.api)
+    implementation(projects.features.zerorewards.api)
     implementation(projects.services.analytics.api)
     implementation(projects.services.analytics.compose)
     implementation(projects.services.toolbox.api)

@@ -114,7 +114,7 @@ class RoomListPresenter @Inject constructor(
             // Force a refresh of the profile
             client.getUserProfile()
             // Fetch user rewards
-            client.getUserRewards()
+            client.getUserRewards(shouldCheckRewardsIntimation = true)
         }
 
         var securityBannerDismissed by rememberSaveable { mutableStateOf(false) }
