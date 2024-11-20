@@ -11,10 +11,13 @@ import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.AuthRepositoryImpl
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.ConversationRepositoryImpl
+import io.element.android.support.zero.data.repository.RewardsRepository
+import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroConversationService
+import io.element.android.support.zero.network.service.ZeroRewardService
 import io.element.android.support.zero.network.service.ZeroUserService
 
 @Module
@@ -40,4 +43,11 @@ object RepositoryModule {
     fun bindUserRepository(
         zeroUserService: ZeroUserService
     ): UserRepository = UserRepositoryImpl(zeroUserService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindRewardsRepository(
+        zeroRewardService: ZeroRewardService,
+        preferences: Preferences
+    ): RewardsRepository = RewardsRepositoryImpl(preferences, zeroRewardService)
 }

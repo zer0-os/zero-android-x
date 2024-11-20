@@ -1,5 +1,6 @@
 package io.element.android.support.zero.data.delegate
 
+import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.datastore.AppPreferences
 
 class PreferencesImpl(private val appPreferences: AppPreferences) :
@@ -21,4 +22,10 @@ class PreferencesImpl(private val appPreferences: AppPreferences) :
     override suspend fun setUserId(id: String) {
         appPreferences.setUserId(id)
     }
+
+    override suspend fun saveUserRewards(rewards: UserRewards) {
+        appPreferences.saveUserRewards(rewards)
+    }
+
+    override fun userRewards(): UserRewards = appPreferences.userRewards()
 }

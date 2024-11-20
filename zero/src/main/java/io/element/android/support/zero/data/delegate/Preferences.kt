@@ -1,5 +1,7 @@
 package io.element.android.support.zero.data.delegate
 
+import io.element.android.support.zero.data.model.UserRewards
+
 interface Preferences {
     fun zosToken(): String
 
@@ -12,4 +14,8 @@ interface Preferences {
     fun userId(): String
 
     suspend fun setUserId(id: String)
+
+    suspend fun saveUserRewards(rewards: UserRewards)
+
+    fun userRewards(): UserRewards
 }
