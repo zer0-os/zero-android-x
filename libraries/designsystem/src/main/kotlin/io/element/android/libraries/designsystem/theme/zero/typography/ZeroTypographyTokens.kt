@@ -31,11 +31,17 @@ object ZeroTypographyTokens {
     val fontBodyMdRegular = TypographyTokens.fontBodyMdRegular
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
 
+    val fontBodyMdRegularRoboto = TypographyTokens.fontBodyMdRegular
+        .copy(fontFamily = ZeroFontFamily.RobotoMonoFontFamily)
+
     val fontBodySmMedium = TypographyTokens.fontBodySmMedium
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
 
     val fontBodySmRegular = TypographyTokens.fontBodySmRegular
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
+
+    val fontBodySmRegularRoboto = TypographyTokens.fontBodySmRegular
+        .copy(fontFamily = ZeroFontFamily.RobotoMonoFontFamily)
 
     val fontBodyXsMedium = TypographyTokens.fontBodyXsMedium
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
@@ -45,6 +51,9 @@ object ZeroTypographyTokens {
 
     val fontHeadingLgBold = TypographyTokens.fontHeadingLgBold
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
+
+    val fontHeadingLgMediumRoboto = TypographyTokens.fontHeadingLgBold
+        .copy(fontFamily = ZeroFontFamily.RobotoMonoFontFamily, fontWeight = FontWeight.Medium)
 
     val fontHeadingLgRegular = TypographyTokens.fontHeadingLgRegular
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
@@ -57,6 +66,9 @@ object ZeroTypographyTokens {
 
     val fontHeadingSmMedium = TypographyTokens.fontHeadingSmMedium
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
+
+    val fontHeadingSmMediumRoboto = TypographyTokens.fontHeadingSmMedium
+        .copy(fontFamily = ZeroFontFamily.RobotoMonoFontFamily)
 
     val fontHeadingSmRegular = TypographyTokens.fontHeadingSmRegular
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)

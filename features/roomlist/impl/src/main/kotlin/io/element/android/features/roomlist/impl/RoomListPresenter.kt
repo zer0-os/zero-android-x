@@ -160,7 +160,7 @@ class RoomListPresenter @Inject constructor(
                     } else {
                         Handler(Looper.getMainLooper()).postDelayed({
                             shouldShowRoomIntimation = false
-                        }, 5000)
+                        }, 3_000)
                     }
                 }
             }

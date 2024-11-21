@@ -7,6 +7,8 @@
 
 package io.element.android.features.preferences.impl.root
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -107,7 +109,9 @@ class PreferencesRootPresenter @Inject constructor(
                     showDeveloperSettingsProvider.unlockDeveloperSettings()
                 }
                 is PreferencesRootEvents.DismissRewardsIntimation -> {
-                    matrixClient.dismissRewardsIntimation()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        matrixClient.dismissRewardsIntimation()
+                    }, 3_000)
                 }
             }
         }

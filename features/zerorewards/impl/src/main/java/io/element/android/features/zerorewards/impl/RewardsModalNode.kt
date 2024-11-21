@@ -26,7 +26,8 @@ class RewardsModalNode @AssistedInject constructor(
 
         RewardsModalView(
             modifier = modifier,
-            state = state
+            state = state,
+            onBackClick = ::navigateUp
         )
     }
 }

@@ -222,7 +222,7 @@ private fun ColumnScope.RewardsSection(
                     Text(
                         modifier = Modifier.align(Alignment.Center),
                         text = "\$$refPrice".trim(),
-                        style = ElementTheme.zeroTypography.fontHeadingSmMedium,
+                        style = ElementTheme.zeroTypography.fontHeadingSmMediumRoboto,
                         color = ElementTheme.colors.textPrimary
                     )
                 }
@@ -233,7 +233,7 @@ private fun ColumnScope.RewardsSection(
                 )
                 Text(
                     text = "$credits MEOW",
-                    style = ElementTheme.zeroTypography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegularRoboto,
                     color = ElementTheme.colors.textSecondary
                 )
             }
