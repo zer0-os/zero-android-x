@@ -23,6 +23,7 @@ import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.UserRepository
@@ -55,6 +56,7 @@ class RustMatrixClientFactory @Inject constructor(
     private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val clientBuilderProvider: ClientBuilderProvider,
     private val zeroConversationRepository: ConversationRepository?,
+    private val zeroAuthRepository: AuthRepository?,
     private val zeroUserRepository: UserRepository?,
     private val zeroRewardsRepository: RewardsRepository?,
 ) {
@@ -95,6 +97,7 @@ class RustMatrixClientFactory @Inject constructor(
             timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
             featureFlagService = featureFlagService,
             zeroConversationRepository = zeroConversationRepository,
+            zeroAuthRepository = zeroAuthRepository,
             zeroUserRepository = zeroUserRepository,
             zeroRewardsRepository = zeroRewardsRepository
         ).also {

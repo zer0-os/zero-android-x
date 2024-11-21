@@ -7,10 +7,11 @@ import androidx.datastore.preferences.core.edit
 class DatastoreCleaner(private val dataStore: DataStore<Preferences>) {
 
     suspend fun clean() {
-        dataStore.edit { mPrefs ->
+        /*dataStore.edit { mPrefs ->
             val preferencesKeys = mPrefs.asMap().keys
             preferencesKeys.forEach { mPrefs.remove(it) }
-        }
+        }*/
+        clearAll()
     }
 
     suspend fun clearAll() {

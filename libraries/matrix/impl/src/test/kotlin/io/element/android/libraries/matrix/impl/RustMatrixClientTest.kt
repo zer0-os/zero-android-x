@@ -49,6 +49,7 @@ class RustMatrixClientTest {
         timelineEventTypeFilterFactory = FakeTimelineEventTypeFilterFactory(),
         featureFlagService = FakeFeatureFlagService(),
         zeroConversationRepository = null,
+        zeroAuthRepository = null,
         zeroUserRepository = null,
         zeroRewardsRepository = null,
     )

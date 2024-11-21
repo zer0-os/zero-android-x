@@ -74,6 +74,7 @@ import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.data.model.UserRewards
+import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.UserRepository
@@ -138,6 +139,7 @@ class RustMatrixClient(
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     featureFlagService: FeatureFlagService,
     zeroConversationRepository: ConversationRepository?,
+    private val zeroAuthRepository: AuthRepository?,
     private val zeroUserRepository: UserRepository?,
     private val zeroRewardsRepository: RewardsRepository?,
 ) : MatrixClient {
@@ -547,6 +549,7 @@ class RustMatrixClient(
         clientDelegateTaskHandle = null
         withContext(sessionDispatcher) {
             if (userInitiated) {
+                zeroAuthRepository?.logout()
                 try {
                     result = client.logout()
                 } catch (failure: Throwable) {
