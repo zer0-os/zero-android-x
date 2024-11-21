@@ -13,13 +13,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun RoomPreviewDescriptionAtom(description: String, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = description,
-        style = ElementTheme.typography.fontBodySmRegular,
+        style = ElementTheme.zeroTypography.fontBodySmRegular,
         textAlign = TextAlign.Center,
         color = ElementTheme.colors.textSecondary,
         maxLines = 3,

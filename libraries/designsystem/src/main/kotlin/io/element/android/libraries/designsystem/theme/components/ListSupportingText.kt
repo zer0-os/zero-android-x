@@ -24,6 +24,7 @@ import io.element.android.libraries.designsystem.components.ClickableLinkText
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 // Designs: https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&node-id=425%3A24208&mode=design&t=G5hCfkLB6GgXDuWe-1
 
@@ -42,7 +43,7 @@ fun ListSupportingText(
     Text(
         text = text,
         modifier = modifier.padding(contentPadding.paddingValues()),
-        style = ElementTheme.typography.fontBodySmRegular,
+        style = ElementTheme.zeroTypography.fontBodySmRegular,
         color = ElementTheme.colors.textSecondary,
     )
 }
@@ -60,7 +61,7 @@ fun ListSupportingText(
     modifier: Modifier = Modifier,
     contentPadding: ListSupportingTextDefaults.Padding = ListSupportingTextDefaults.Padding.Default,
 ) {
-    val style = ElementTheme.typography.fontBodySmRegular
+    val style = ElementTheme.zeroTypography.fontBodySmRegular
         .copy(color = ElementTheme.colors.textSecondary)
     val paddedModifier = modifier.padding(contentPadding.paddingValues())
     ClickableLinkText(

@@ -41,6 +41,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.timeline.item.event.toEventOrTransactionId
@@ -228,7 +229,8 @@ fun TextComposer(
         enableVoiceMessages && !canSendMessage ->
             when (voiceMessageState) {
                 VoiceMessageState.Idle,
-                is VoiceMessageState.Recording -> recordVoiceButton
+                // is VoiceMessageState.Recording -> recordVoiceButton
+                is VoiceMessageState.Recording -> sendButton
                 is VoiceMessageState.Preview -> when (voiceMessageState.isSending) {
                     true -> uploadVoiceProgress
                     false -> sendVoiceButton
@@ -444,7 +446,7 @@ private fun TextInputBox(
                 onResetComposerMode = onResetComposerMode,
             )
         }
-        val defaultTypography = ElementTheme.typography.fontBodyLgRegular
+        val defaultTypography = ElementTheme.zeroTypography.fontBodyLgRegular
         Box(
             modifier = Modifier
                 .padding(top = 4.dp, bottom = 4.dp, start = 12.dp, end = 12.dp)

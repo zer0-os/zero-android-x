@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2024 New Vector Ltd.
+  ~
+  ~ SPDX-License-Identifier: AGPL-3.0-only
+  ~ Please see LICENSE in the repository root for full details.
+  -->
+
+<resources>
+    <string name="log_in">Log In</string>
+
+    <string name="web3">Web3</string>
+    <string name="email">Email</string>
+    <string name="connect_a_wallet">Connect a Wallet</string>
+    <string name="email_address">Email address</string>
+    <string name="password">Password</string>
+
+    <string name="email_required">Email is required</string>
+    <string name="email_invalid">Email is invalid</string>
+    <string name="password_required">Password is required</string>
+    <string name="field_required">Field is required</string>
+    <string name="name_required">Name is required</string>
+    <string name="password_mismatch_error">Passwords do not match</string>
+    <string name="password_match">Passwords Match</string>
+    <string name="invite_code_required">Invite code is required</string>
+    <string name="error_user_name_length">Display name must be at least 3 characters long</string>
+    <string name="error_user_name_max_length">Name must be 24 characters or less</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="password_criteria">Must include at least 8 characters, 1 number, 1 lowercase and 1 uppercase letter</string>
+    <string name="weak">Weak</string>
+    <string name="acceptable">Acceptable</string>
+    <string name="strong">Strong</string>
+    <string name="password_strength">Password Strength:</string>
+    <string name="password_validation">Password must have 8 characters, including 1 number, 1 uppercase letter and 1 special character (!, @, #, $, %, ^, &amp;, *).</string>
+
+
+</resources>

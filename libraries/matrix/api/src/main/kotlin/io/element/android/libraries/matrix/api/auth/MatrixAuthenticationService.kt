@@ -31,6 +31,8 @@ interface MatrixAuthenticationService {
     suspend fun setHomeserver(homeserver: String): Result<Unit>
     suspend fun login(username: String, password: String): Result<SessionId>
 
+    suspend fun loginWithZero(username: String, password: String): Result<SessionId>
+
     /**
      * Import a session that was created using another client, for instance Element Web.
      */

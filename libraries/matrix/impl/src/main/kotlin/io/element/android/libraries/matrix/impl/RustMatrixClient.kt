@@ -12,6 +12,7 @@ import io.element.android.libraries.androidutils.file.safeDelete
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.coroutine.childScope
+import io.element.android.libraries.core.coroutine.mapState
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
@@ -46,6 +47,7 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
@@ -70,10 +72,18 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.common.extension.withSameScope
+import io.element.android.support.zero.data.model.UserRewards
+import io.element.android.support.zero.data.repository.AuthRepository
+import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.RewardsRepository
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
@@ -85,6 +95,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -127,6 +138,10 @@ class RustMatrixClient(
     clock: SystemClock,
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     featureFlagService: FeatureFlagService,
+    zeroConversationRepository: ConversationRepository?,
+    private val zeroAuthRepository: AuthRepository?,
+    private val zeroUserRepository: UserRepository?,
+    private val zeroRewardsRepository: RewardsRepository?,
 ) : MatrixClient {
     override val sessionId: UserId = UserId(client.userId())
     override val deviceId: DeviceId = DeviceId(client.deviceId())
@@ -191,6 +206,7 @@ class RustMatrixClient(
         roomSyncSubscriber = roomSyncSubscriber,
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         featureFlagService = featureFlagService,
+        zeroConversationRepository = zeroConversationRepository
     )
 
     override val mediaLoader: MatrixMediaLoader = RustMediaLoader(
@@ -371,18 +387,39 @@ class RustMatrixClient(
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> =
         withContext(sessionDispatcher) {
             runCatching {
-                client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
+                zeroUserRepository?.let { userRepo ->
+                    val zeroSearchResults = userRepo.getUsers(filterName = searchTerm).firstOrNull() ?: emptyList()
+                    val matrixUserProfiles = zeroSearchResults.map { userId ->
+                        UserProfileMapper.map(client.getProfile(userId))
+                    }
+                    MatrixSearchUserResults(
+                        results = matrixUserProfiles.toImmutableList(),
+                        limited = matrixUserProfiles.isNotEmpty(),
+                    )
+                } ?: client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
+
+                //client.searchUsers(searchTerm, limit.toULong()).let(UserSearchResultMapper::map)
             }
         }
 
     override suspend fun setDisplayName(displayName: String): Result<Unit> =
         withContext(sessionDispatcher) {
-            runCatching { client.setDisplayName(displayName) }
+            val result = runCatching { client.setDisplayName(displayName) }
+            if (result.isSuccess) {
+                zeroUserRepository?.updateUserProfile(userName = displayName)
+            }
+            result
         }
 
     override suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit> =
         withContext(sessionDispatcher) {
-            runCatching { client.uploadAvatar(mimeType, data) }
+            val result = runCatching { client.uploadAvatar(mimeType, data) }
+            if (result.isSuccess) {
+                client.avatarUrl()?.let {
+                    zeroUserRepository?.updateUserProfile(avatarUrl = it)
+                }
+            }
+            result
         }
 
     override suspend fun removeAvatar(): Result<Unit> =
@@ -512,6 +549,7 @@ class RustMatrixClient(
         clientDelegateTaskHandle = null
         withContext(sessionDispatcher) {
             if (userInitiated) {
+                zeroAuthRepository?.logout()
                 try {
                     result = client.logout()
                 } catch (failure: Throwable) {
@@ -681,6 +719,27 @@ class RustMatrixClient(
             true
         }
     }
+
+    //region ZERO
+    override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
+        zeroRewardsRepository?.shouldShowNewRewardsIntimation ?: MutableStateFlow(false)
+
+    override val userRewards: StateFlow<ZeroUserRewards> =
+        (zeroRewardsRepository?.userRewards ?: MutableStateFlow(UserRewards.empty()))
+            .mapState {
+                ZeroUserRewards(zero = it.zero, decimals = it.decimals, price = it.price)
+            }
+
+    override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {
+        zeroRewardsRepository?.getMyRewards(shouldCheckRewardsIntimation)
+    }
+
+    override fun dismissRewardsIntimation() {
+        withSameScope {
+            zeroRewardsRepository?.dismissRewardsIntimation()
+        }
+    }
+    //endregion
 }
 
 private val defaultRoomCreationPowerLevels = PowerLevels(

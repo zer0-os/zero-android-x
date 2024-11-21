@@ -28,6 +28,7 @@ const val AVATAR_THUMBNAIL_SIZE_IN_PIXEL = 240L
 internal fun AvatarData.toMediaRequestData(): MediaRequestData {
     return MediaRequestData(
         source = url?.let { MediaSource(it) },
-        kind = MediaRequestData.Kind.Thumbnail(AVATAR_THUMBNAIL_SIZE_IN_PIXEL)
+        //kind = MediaRequestData.Kind.Thumbnail(AVATAR_THUMBNAIL_SIZE_IN_PIXEL)
+        kind = MediaRequestData.Kind.Content
     )
 }

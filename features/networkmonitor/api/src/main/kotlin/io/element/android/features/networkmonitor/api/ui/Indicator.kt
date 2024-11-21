@@ -28,6 +28,7 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -53,7 +54,7 @@ internal fun Indicator(
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = stringResource(CommonStrings.common_offline),
-            style = ElementTheme.typography.fontBodyMdMedium,
+            style = ElementTheme.zeroTypography.fontBodyMdMedium,
             color = tint,
         )
     }

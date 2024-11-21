@@ -33,7 +33,7 @@ class MatrixRoomInfoMapper {
             name = it.displayName,
             rawName = it.rawName,
             topic = it.topic,
-            avatarUrl = it.avatarUrl,
+            avatarUrl = it.avatarUrl ?: it.heroes.firstOrNull()?.avatarUrl,
             isDirect = it.isDirect,
             isPublic = it.isPublic,
             isSpace = it.isSpace,

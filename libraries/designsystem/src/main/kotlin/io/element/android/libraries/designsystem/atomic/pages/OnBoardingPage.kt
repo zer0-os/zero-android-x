@@ -25,6 +25,7 @@ import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 /**
  * Page for onboarding screens, with content and optional footer.
@@ -89,7 +90,7 @@ internal fun OnBoardingPagePreview() = ElementPreview {
             ) {
                 Text(
                     text = "Content",
-                    style = ElementTheme.typography.fontHeadingXlBold
+                    style = ElementTheme.zeroTypography.fontHeadingXlBold
                 )
             }
         },
@@ -101,7 +102,7 @@ internal fun OnBoardingPagePreview() = ElementPreview {
             ) {
                 Text(
                     text = "Footer",
-                    style = ElementTheme.typography.fontHeadingXlBold
+                    style = ElementTheme.zeroTypography.fontHeadingXlBold
                 )
             }
         }

@@ -7,6 +7,8 @@
 
 package io.element.android.libraries.matrix.impl.timeline.item.event
 
+import io.element.android.libraries.matrix.api.media.ImageInfo
+import io.element.android.libraries.matrix.api.media.MediaSource
 import io.element.android.libraries.matrix.api.timeline.item.event.AudioMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.EmoteMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.FileMessageType
@@ -21,8 +23,12 @@ import io.element.android.libraries.matrix.api.timeline.item.event.OtherMessageT
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VideoMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageType
+import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
+import io.element.android.support.zero.data.model.helper.EventMessageContent
+import io.element.android.support.zero.data.model.helper.isRemoteGif
+import io.element.android.support.zero.datastore.converter.AppJson.toJson
 import org.matrix.rustcomponents.sdk.MessageType
 import org.matrix.rustcomponents.sdk.use
 import org.matrix.rustcomponents.sdk.FormattedBody as RustFormattedBody
@@ -45,6 +51,35 @@ class EventMessageMapper {
         )
     }
 
+    fun mapToCustomEvent(messageContent: EventMessageContent): MessageContent? {
+        val content = messageContent.content
+        return if (content.isRemoteGif) {
+            val source = MediaSource(url = content.url ?: "", content.toJson())
+            val height = (content.info?.height ?: content.info?.h)?.toLong()
+            val width = (content.info?.width ?: content.info?.w)?.toLong()
+            val mimeType = content.info?.mimeType
+            val size = content.info?.size?.toLong()
+            val type = ImageMessageType(
+                filename = content.info?.name ?: "",
+                caption = null,
+                formattedCaption = null,
+                source = source,
+                info = ImageInfo(
+                    height, width, mimeType, size, null, null, null
+                ),
+            )
+            MessageContent(
+                body = content.body ?: "",
+                inReplyTo = null,
+                isEdited = false,
+                isThreaded = false,
+                type = type
+            )
+        } else {
+            null
+        }
+    }
+
     fun mapMessageType(type: RustMessageType) = when (type) {
         is RustMessageType.Audio -> {
             when (type.content.voice) {
@@ -52,7 +87,8 @@ class EventMessageMapper {
                     AudioMessageType(
                         filename = type.content.filename,
                         caption = type.content.caption,
-                        formattedCaption = type.content.formattedCaption?.map(),
+                        //formattedCaption = type.content.formattedCaption?.map(),
+                        formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                         source = type.content.source.map(),
                         info = type.content.info?.map(),
                     )
@@ -61,7 +97,8 @@ class EventMessageMapper {
                     VoiceMessageType(
                         filename = type.content.filename,
                         caption = type.content.caption,
-                        formattedCaption = type.content.formattedCaption?.map(),
+                        //formattedCaption = type.content.formattedCaption?.map(),
+                        formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                         source = type.content.source.map(),
                         info = type.content.info?.map(),
                         details = type.content.audio?.map(),
@@ -73,7 +110,8 @@ class EventMessageMapper {
             FileMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
@@ -82,25 +120,43 @@ class EventMessageMapper {
             ImageMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
         }
         is RustMessageType.Notice -> {
-            NoticeMessageType(type.content.body, type.content.formatted?.map())
+            NoticeMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                type.content.formatted?.map(type.content.body)
+            )
         }
         is RustMessageType.Text -> {
-            TextMessageType(type.content.body, type.content.formatted?.map())
+            TextMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                (type.content.formatted ?: RustFormattedBody(
+                    format = org.matrix.rustcomponents.sdk.MessageFormat.Html,
+                    body = type.content.body
+                )
+                    ).map(type.content.body)
+            )
         }
         is RustMessageType.Emote -> {
-            EmoteMessageType(type.content.body, type.content.formatted?.map())
+            EmoteMessageType(
+                type.content.body,
+                //type.content.formatted?.map()
+                type.content.formatted?.map(type.content.body)
+            )
         }
         is RustMessageType.Video -> {
             VideoMessageType(
                 filename = type.content.filename,
                 caption = type.content.caption,
-                formattedCaption = type.content.formattedCaption?.map(),
+                //formattedCaption = type.content.formattedCaption?.map(),
+                formattedCaption = type.content.formattedCaption?.map(type.content.caption),
                 source = type.content.source.map(),
                 info = type.content.info?.map(),
             )
@@ -118,6 +174,36 @@ private fun RustFormattedBody.map(): FormattedBody = FormattedBody(
     format = format.map(),
     body = body
 )
+
+private fun RustFormattedBody.map(actualText: String?): FormattedBody = FormattedBody(
+    format = format.map(),
+    body = correctlyFormattedHtmlBody(actualText)
+)
+
+private fun RustFormattedBody.correctlyFormattedHtmlBody(text: String?): String {
+    val baseUrl = "https://matrix.to/#/@"
+    val domain = MatrixSessionCommon.getHomeServerPostfix()
+    val htmlBody: String = body
+    val actualText: String = text ?: ""
+
+    // Use a regular expression to find user mentions in the format @[Name](user:UUID)
+    val regexPattern = """@\[(.+?)\]\(user:(.+?)\)""".toRegex()
+    if (htmlBody.isNotBlank()) {
+        val actualMentionRegex = """\[@([a-f0-9\-]+:[a-zA-Z0-9\.\-]+)\]\(https:\/\/matrix\.to\/#\/@\1\)""".toRegex()
+        val matches = actualMentionRegex.findAll(actualText).toList()
+        if (matches.isNotEmpty() && htmlBody.contains("<a href=")) {
+            return htmlBody
+        } else {
+            // Replace matches with the appropriate HTML anchor tags
+            val modifiedBody = regexPattern.replace(actualText) {
+                "<a href=\"$baseUrl${it.groupValues[2]}:$domain\">@${it.groupValues[2]}:$domain</a>"
+            }
+            return modifiedBody
+        }
+    } else {
+        return htmlBody
+    }
+}
 
 private fun RustMessageFormat.map(): MessageFormat {
     return when (this) {

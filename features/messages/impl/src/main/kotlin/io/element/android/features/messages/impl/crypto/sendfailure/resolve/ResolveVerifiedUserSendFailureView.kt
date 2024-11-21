@@ -7,11 +7,6 @@
 
 package io.element.android.features.messages.impl.crypto.sendfailure.resolve
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -23,17 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import io.element.android.features.messages.impl.crypto.sendfailure.VerifiedUserSendFailure
-import io.element.android.libraries.designsystem.atomic.molecules.ButtonColumnMolecule
-import io.element.android.libraries.designsystem.atomic.molecules.IconTitleSubtitleMolecule
-import io.element.android.libraries.designsystem.components.BigIcon
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.Button
-import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
-import io.element.android.libraries.designsystem.theme.components.OutlinedButton
-import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,11 +49,13 @@ fun ResolveVerifiedUserSendFailureView(
             sheetState.hide()
             showSheet = false
         } else {
-            showSheet = true
+            // showSheet = true
+            // AUTO resolving and resending message in case of error
+            onResolveAndResendClick()
         }
     }
 
-    Box(modifier = modifier) {
+    /*Box(modifier = modifier) {
         if (showSheet) {
             ModalBottomSheet(
                 modifier = Modifier
@@ -104,7 +93,7 @@ fun ResolveVerifiedUserSendFailureView(
                 }
             }
         }
-    }
+    }*/
 }
 
 @Composable

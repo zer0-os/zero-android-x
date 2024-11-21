@@ -65,6 +65,7 @@ import io.element.android.libraries.designsystem.theme.components.SearchBarResul
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomMembershipState
@@ -104,7 +105,7 @@ fun ChangeRolesView(
                             }
                             Text(
                                 text = title,
-                                style = ElementTheme.typography.aliasScreenTitle,
+                                style = ElementTheme.zeroTypography.aliasScreenTitle,
                             )
                         },
                         navigationIcon = {
@@ -252,7 +253,7 @@ private fun SearchResultsList(
                             .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                         text = stringResource(R.string.screen_room_change_role_moderators_admin_section_footer),
                         color = ElementTheme.colors.textSecondary,
-                        style = ElementTheme.typography.fontBodySmRegular,
+                        style = ElementTheme.zeroTypography.fontBodySmRegular,
                     )
                 }
             }
@@ -298,7 +299,7 @@ private fun ListSectionHeader(text: String) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         text = text,
-        style = ElementTheme.typography.fontBodyLgMedium,
+        style = ElementTheme.zeroTypography.fontBodyLgMedium,
     )
 }
 
@@ -357,14 +358,14 @@ private fun MemberRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.primary,
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 )
                 // Invitation pending marker
                 if (isPending) {
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.screen_room_member_list_pending_header_title),
-                        style = ElementTheme.typography.fontBodySmRegular.copy(fontStyle = FontStyle.Italic),
+                        style = ElementTheme.zeroTypography.fontBodySmRegular.copy(fontStyle = FontStyle.Italic),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -376,7 +377,7 @@ private fun MemberRow(
                     color = MaterialTheme.colorScheme.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
             }
         }

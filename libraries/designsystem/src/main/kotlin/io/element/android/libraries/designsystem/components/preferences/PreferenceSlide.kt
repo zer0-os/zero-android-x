@@ -22,6 +22,7 @@ import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Slider
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun PreferenceSlide(
@@ -49,12 +50,12 @@ fun PreferenceSlide(
         headlineContent = {
             Column {
                 Text(
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
                     text = title,
                 )
                 summary?.let {
                     Text(
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         text = summary,
                     )
                 }

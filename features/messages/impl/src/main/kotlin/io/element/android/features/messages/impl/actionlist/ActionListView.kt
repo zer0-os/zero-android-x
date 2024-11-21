@@ -83,6 +83,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.hide
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.messages.sender.SenderName
 import io.element.android.libraries.matrix.ui.messages.sender.SenderNameMode
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -181,7 +182,7 @@ private fun ActionListViewContent(
             LazyColumn(
                 modifier = modifier.fillMaxWidth()
             ) {
-                item {
+                /*item {
                     Column {
                         MessageSummary(
                             event = target.event,
@@ -199,7 +200,7 @@ private fun ActionListViewContent(
                         }
                         HorizontalDivider()
                     }
-                }
+                }*/
                 if (target.verifiedUserSendFailure != None) {
                     item {
                         VerifiedUserSendFailureView(
@@ -248,7 +249,7 @@ private fun ActionListViewContent(
 private fun MessageSummary(event: TimelineItem.Event, modifier: Modifier = Modifier) {
     val content: @Composable () -> Unit
     val icon: @Composable () -> Unit = { Avatar(avatarData = event.senderAvatar.copy(size = AvatarSize.MessageActionSender)) }
-    val contentStyle = ElementTheme.typography.fontBodyMdRegular.copy(color = MaterialTheme.colorScheme.secondary)
+    val contentStyle = ElementTheme.zeroTypography.fontBodyMdRegular.copy(color = MaterialTheme.colorScheme.secondary)
 
     @Composable
     fun ContentForBody(body: String) {
@@ -310,7 +311,7 @@ private fun MessageSummary(event: TimelineItem.Event, modifier: Modifier = Modif
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             event.sentTime,
-            style = ElementTheme.typography.fontBodyXsRegular,
+            style = ElementTheme.zeroTypography.fontBodyXsRegular,
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.End,
         )
@@ -389,7 +390,7 @@ private fun VerifiedUserSendFailureView(
         headlineContent = {
             Text(
                 text = sendFailure.headline(),
-                style = ElementTheme.typography.fontBodySmMedium,
+                style = ElementTheme.zeroTypography.fontBodySmMedium,
             )
         },
         colors = ListItemDefaults.colors(
@@ -428,7 +429,7 @@ private fun EmojiButton(
     ) {
         Text(
             emoji,
-            style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = 24.dp.toSp(), color = Color.White),
+            style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = 24.dp.toSp(), color = Color.White),
             modifier = Modifier
                 .clickable(
                     enabled = true,

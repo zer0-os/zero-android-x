@@ -22,6 +22,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.ui.model.InviteSender
 
@@ -39,7 +40,7 @@ fun InviteSenderView(
             }
         Text(
             text = inviteSender.annotatedString(),
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = MaterialTheme.colorScheme.secondary,
         )
     }

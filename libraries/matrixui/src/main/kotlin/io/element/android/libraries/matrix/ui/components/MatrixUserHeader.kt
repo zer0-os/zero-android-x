@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.model.getBestName
@@ -54,42 +56,41 @@ private fun MatrixUserHeaderContent(
     modifier: Modifier = Modifier,
     // onClick: () -> Unit,
 ) {
-    Row(
+    Column(
         modifier = modifier
             // .clickable(onClick = onClick)
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Avatar(
             modifier = Modifier
                 .padding(vertical = 12.dp),
-            avatarData = matrixUser.getAvatarData(size = AvatarSize.UserPreference),
+            avatarData = matrixUser.getAvatarData(size = AvatarSize.UserHeader),
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Spacer(modifier = Modifier.size(16.dp))
+        Column {
             // Name
             Text(
                 modifier = Modifier.clipToBounds(),
                 text = matrixUser.getBestName(),
                 maxLines = 1,
-                style = ElementTheme.typography.fontHeadingSmMedium,
+                style = ElementTheme.zeroTypography.fontHeadingSmMedium,
                 overflow = TextOverflow.Ellipsis,
                 color = ElementTheme.materialColors.primary,
             )
-            // Id
+            /*// Id
             if (matrixUser.displayName.isNullOrEmpty().not()) {
                 Text(
                     text = matrixUser.userId.value,
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = ElementTheme.materialColors.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-            }
+            }*/
         }
+        Spacer(modifier = Modifier.size(32.dp))
     }
 }
 

@@ -10,13 +10,10 @@ package io.element.android.libraries.designsystem.theme
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.theme.Theme
 import io.element.android.compound.theme.isDark
-import io.element.android.compound.theme.mapToTheme
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 
 /**
@@ -31,10 +28,11 @@ fun ElementThemeApp(
     appPreferencesStore: AppPreferencesStore,
     content: @Composable () -> Unit,
 ) {
-    val theme by remember {
+    /*val theme by remember {
         appPreferencesStore.getThemeFlow().mapToTheme()
     }
-        .collectAsState(initial = Theme.System)
+        .collectAsState(initial = Theme.System)*/
+    val theme = Theme.Dark
     LaunchedEffect(theme) {
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
@@ -47,5 +45,6 @@ fun ElementThemeApp(
     ElementTheme(
         darkTheme = theme.isDark(),
         content = content,
+        typography = zeroTypography
     )
 }

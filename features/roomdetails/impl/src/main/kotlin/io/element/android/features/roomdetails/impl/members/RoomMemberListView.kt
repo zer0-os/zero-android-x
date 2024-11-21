@@ -58,6 +58,7 @@ import io.element.android.libraries.designsystem.theme.components.SegmentedButto
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.toMatrixUser
 import io.element.android.libraries.matrix.ui.components.MatrixUserRow
@@ -277,7 +278,7 @@ private fun LazyListScope.roomMemberListSection(
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 text = it(),
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = MaterialTheme.colorScheme.secondary,
             )
         }
@@ -310,7 +311,7 @@ private fun RoomMemberListItem(
             @Composable {
                 Text(
                     text = it,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                     color = ElementTheme.colors.textSecondary,
                 )
             }
@@ -329,7 +330,7 @@ private fun RoomMemberListTopBar(
         title = {
             Text(
                 text = stringResource(CommonStrings.common_people),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },

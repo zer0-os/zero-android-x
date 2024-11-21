@@ -51,6 +51,7 @@ import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
@@ -93,7 +94,7 @@ private fun RoomDirectoryTopBar(
         title = {
             Text(
                 text = stringResource(id = R.string.screen_room_directory_search_title),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         }
     )
@@ -144,7 +145,7 @@ private fun RoomDirectoryRoomList(
             item {
                 Text(
                     text = stringResource(id = CommonStrings.common_no_results),
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
                     color = ElementTheme.colors.textSecondary,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -196,7 +197,7 @@ private fun SearchTextField(
     val focusManager = LocalFocusManager.current
     FilledTextField(
         modifier = modifier.testTag(TestTags.searchTextField.value),
-        textStyle = ElementTheme.typography.fontBodyLgRegular,
+        textStyle = ElementTheme.zeroTypography.fontBodyLgRegular,
         singleLine = true,
         value = query,
         onValueChange = onQueryChange,
@@ -258,14 +259,14 @@ private fun RoomDirectoryRoomRow(
             Text(
                 text = roomDescription.computedName,
                 maxLines = 1,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textPrimary,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = roomDescription.computedDescription,
                 maxLines = 1,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 color = ElementTheme.colors.textSecondary,
                 overflow = TextOverflow.Ellipsis,
             )

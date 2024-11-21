@@ -7,6 +7,8 @@
 
 package io.element.android.features.roomlist.impl
 
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -103,10 +105,16 @@ class RoomListPresenter @Inject constructor(
         val searchState = searchPresenter.present()
         val acceptDeclineInviteState = acceptDeclineInvitePresenter.present()
 
+        var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
+        val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
+        val userRewards = client.userRewards.collectAsState()
+
         LaunchedEffect(Unit) {
             roomListDataSource.launchIn(this)
             // Force a refresh of the profile
             client.getUserProfile()
+            // Fetch user rewards
+            client.getUserRewards(shouldCheckRewardsIntimation = true)
         }
 
         var securityBannerDismissed by rememberSaveable { mutableStateOf(false) }
@@ -146,6 +154,15 @@ class RoomListPresenter @Inject constructor(
                         AcceptDeclineInviteEvents.DeclineInvite(event.roomListRoomSummary.toInviteData())
                     )
                 }
+                is RoomListEvents.DismissRewardsIntimation -> {
+                    if (event.immediate) {
+                        shouldShowRoomIntimation = false
+                    } else {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            shouldShowRoomIntimation = false
+                        }, 3_000)
+                    }
+                }
             }
         }
 
@@ -166,6 +183,8 @@ class RoomListPresenter @Inject constructor(
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
             eventSink = ::handleEvents,
+            shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
+            userRewards = userRewards.value,
         )
     }
 

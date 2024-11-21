@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun TextWithLabelMolecule(
@@ -22,12 +23,12 @@ fun TextWithLabelMolecule(
     Column(modifier = modifier) {
         Text(
             text = label,
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
             color = ElementTheme.colors.textSecondary,
         )
         Text(
             text = text,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = ElementTheme.colors.textPrimary,
         )
     }

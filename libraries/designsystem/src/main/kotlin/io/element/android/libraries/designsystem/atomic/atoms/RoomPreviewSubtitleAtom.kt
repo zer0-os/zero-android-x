@@ -12,13 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun RoomPreviewSubtitleAtom(subtitle: String, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = subtitle,
-        style = ElementTheme.typography.fontBodyMdRegular,
+        style = ElementTheme.zeroTypography.fontBodyMdRegular,
         textAlign = TextAlign.Center,
         color = ElementTheme.colors.textSecondary,
     )

@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +41,7 @@ fun SingleChoiceSegmentedButtonRowScope.SegmentedButton(
         label = {
             Text(
                 text = text,
-                style = ElementTheme.typography.fontBodyMdMedium,
+                style = ElementTheme.zeroTypography.fontBodyMdMedium,
             )
         },
         colors = SegmentedButtonDefaults.colors(

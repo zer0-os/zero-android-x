@@ -46,6 +46,7 @@ import io.element.android.libraries.designsystem.theme.components.SearchBarResul
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.ui.components.SelectedRoom
 import io.element.android.libraries.matrix.ui.model.SelectRoomInfo
@@ -100,7 +101,7 @@ fun RoomSelectView(
                             RoomSelectMode.Forward -> stringResource(CommonStrings.common_forward_message)
                             RoomSelectMode.Share -> stringResource(CommonStrings.common_send_to)
                         },
-                        style = ElementTheme.typography.aliasScreenTitle
+                        style = ElementTheme.zeroTypography.aliasScreenTitle
                     )
                 },
                 navigationIcon = {
@@ -227,7 +228,7 @@ private fun RoomSummaryView(
         ) {
             // Name
             Text(
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 text = roomInfo.name ?: stringResource(id = CommonStrings.common_no_room_name),
                 fontStyle = FontStyle.Italic.takeIf { roomInfo.name == null },
                 color = ElementTheme.colors.textPrimary,
@@ -239,7 +240,7 @@ private fun RoomSummaryView(
                 Text(
                     text = alias.value,
                     color = ElementTheme.colors.textSecondary,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

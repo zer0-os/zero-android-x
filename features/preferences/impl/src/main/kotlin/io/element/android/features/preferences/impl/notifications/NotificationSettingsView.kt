@@ -127,7 +127,7 @@ private fun NotificationSettingsContentView(
     )
 
     if (systemSettings.appNotificationsEnabled) {
-        if (!state.fullScreenIntentPermissionsState.permissionGranted) {
+        /*if (!state.fullScreenIntentPermissionsState.permissionGranted) {
             PreferenceCategory {
                 PreferenceText(
                     icon = CompoundIcons.VoiceCall(),
@@ -138,7 +138,7 @@ private fun NotificationSettingsContentView(
                     }
                 )
             }
-        }
+        }*/
         PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_notification_section_title)) {
             PreferenceText(
                 title = stringResource(id = R.string.screen_notification_settings_group_chats),
@@ -153,14 +153,14 @@ private fun NotificationSettingsContentView(
             )
         }
 
-        PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_mode_mentions)) {
+        /*PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_mode_mentions)) {
             PreferenceSwitch(
                 modifier = Modifier,
                 title = stringResource(id = R.string.screen_notification_settings_room_mention_label),
                 isChecked = matrixSettings.atRoomNotificationsEnabled,
                 onCheckedChange = onMentionNotificationsChange
             )
-        }
+        }*/
         PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_additional_settings_section_title)) {
             // TODO We are removing the call notification toggle until support for call notifications has been added
 //                PreferenceSwitch(
@@ -177,7 +177,7 @@ private fun NotificationSettingsContentView(
                 onCheckedChange = onInviteForMeNotificationsChange
             )
         }
-        PreferenceCategory(title = stringResource(id = R.string.troubleshoot_notifications_entry_point_section)) {
+        /*PreferenceCategory(title = stringResource(id = R.string.troubleshoot_notifications_entry_point_section)) {
             PreferenceText(
                 modifier = Modifier,
                 title = stringResource(id = R.string.troubleshoot_notifications_entry_point_title),
@@ -229,7 +229,7 @@ private fun NotificationSettingsContentView(
                     onDismissRequest = { state.eventSink(NotificationSettingsEvents.CancelChangePushProvider) },
                 )
             }
-        }
+        }*/
     }
 }
 

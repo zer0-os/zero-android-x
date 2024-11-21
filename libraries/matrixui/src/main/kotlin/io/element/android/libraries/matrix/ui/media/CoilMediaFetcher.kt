@@ -60,12 +60,14 @@ internal class CoilMediaFetcher(
     }
 
     private suspend fun fetchContent(mediaSource: MediaSource, options: Options): FetchResult? {
-        return mediaLoader.loadMediaContent(
-            source = mediaSource,
-        ).map { byteArray ->
-            byteArray.asSourceResult(options)
-        }.onFailure {
-            Timber.e(it)
+        return runCatching {
+            mediaLoader.loadMediaContent(
+                source = mediaSource,
+            ).map { byteArray ->
+                byteArray.asSourceResult(options)
+            }.onFailure {
+                //Timber.e(it)
+            }.getOrNull()
         }.getOrNull()
     }
 

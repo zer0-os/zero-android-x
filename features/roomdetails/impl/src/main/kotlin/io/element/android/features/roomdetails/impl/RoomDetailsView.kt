@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -49,6 +51,7 @@ import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
 import io.element.android.libraries.designsystem.components.ClickableLinkText
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
@@ -73,6 +76,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -161,12 +165,12 @@ fun RoomDetailsView(
             )
             Spacer(Modifier.height(12.dp))
 
-            if (state.roomTopic !is RoomTopicState.Hidden) {
+            /*if (state.roomTopic !is RoomTopicState.Hidden) {
                 TopicSection(
                     roomTopic = state.roomTopic,
                     onActionClick = onActionClick,
                 )
-            }
+            }*/
 
             PreferenceCategory {
                 if (state.canShowNotificationSettings && state.roomNotificationSettings != null) {
@@ -176,7 +180,7 @@ fun RoomDetailsView(
                     )
                 }
 
-                FavoriteItem(
+                /*FavoriteItem(
                     isFavorite = state.isFavorite,
                     onFavoriteChanges = {
                         state.eventSink(RoomDetailsEvent.SetFavorite(it))
@@ -196,7 +200,7 @@ fun RoomDetailsView(
                         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
                         onClick = openAdminSettings,
                     )
-                }
+                }*/
             }
 
             val displayMemberListItem = state.roomType is RoomDetailsType.Room
@@ -209,19 +213,19 @@ fun RoomDetailsView(
                 }
             }
 
-            PollsSection(
+            /*PollsSection(
                 openPollHistory = openPollHistory
-            )
+            )*/
 
             if (state.isEncrypted) {
                 SecuritySection()
             }
 
-            if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
+            /*if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
                 val roomMemberState = state.roomMemberDetailsState
                 BlockUserSection(roomMemberState)
                 BlockUserDialogs(roomMemberState)
-            }
+            }*/
 
             OtherActionsSection(
                 isDm = state.roomType is RoomDetailsType.Dm,
@@ -300,7 +304,7 @@ private fun MainActionsSection(
                 )
             }
         }
-        if (state.roomCallState.hasPermissionToJoin()) {
+        /*if (state.roomCallState.hasPermissionToJoin()) {
             // TODO Improve the view depending on all the cases here?
             MainActionButton(
                 title = stringResource(CommonStrings.action_call),
@@ -322,7 +326,7 @@ private fun MainActionsSection(
                 imageVector = CompoundIcons.ShareAndroid(),
                 onClick = onShareRoom
             )
-        }
+        }*/
     }
 }
 
@@ -368,12 +372,22 @@ private fun DmHeaderSection(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DmAvatars(
+        val avatarData = otherMember.getAvatarData(size = AvatarSize.RoomHeader)
+        Avatar(
+            avatarData = avatarData,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(enabled = avatarData.url != null) {
+                    avatarData.url?.let { openAvatarPreview(roomName, it) }
+                }
+                .testTag(TestTags.memberDetailAvatar)
+        )
+        /*DmAvatars(
             userAvatarData = me.getAvatarData(size = AvatarSize.DmCluster),
             otherUserAvatarData = otherMember.getAvatarData(size = AvatarSize.DmCluster),
             openAvatarPreview = { url -> openAvatarPreview(me.getBestName(), url) },
             openOtherAvatarPreview = { url -> openAvatarPreview(roomName, url) },
-        )
+        )*/
         TitleAndSubtitle(
             title = roomName,
             subtitle = otherMember.userId.value,
@@ -389,18 +403,18 @@ private fun ColumnScope.TitleAndSubtitle(
     Spacer(modifier = Modifier.height(24.dp))
     Text(
         text = title,
-        style = ElementTheme.typography.fontHeadingLgBold,
+        style = ElementTheme.zeroTypography.fontHeadingLgBold,
         textAlign = TextAlign.Center,
     )
-    if (subtitle != null) {
+    /*if (subtitle != null) {
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = subtitle,
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
         )
-    }
+    }*/
 }
 
 @Composable

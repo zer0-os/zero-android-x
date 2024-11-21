@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.toSp
 import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -161,7 +162,7 @@ private fun PinKeypadDigitButton(
         onClick = { onClick(digit) }
     ) {
         val fontSize = size.toSp() / 2
-        val originalFont = ElementTheme.typography.fontHeadingXlBold
+        val originalFont = ElementTheme.zeroTypography.fontHeadingXlBold
         val ratio = fontSize.value / originalFont.fontSize.value
         val lineHeight = originalFont.lineHeight * ratio
         Text(

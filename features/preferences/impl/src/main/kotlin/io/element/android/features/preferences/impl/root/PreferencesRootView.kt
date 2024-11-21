@@ -7,13 +7,26 @@
 
 package io.element.android.features.preferences.impl.root
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -33,13 +46,20 @@ import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha50
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.ui.components.MatrixUserProvider
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.theme.SPACING_4X
+import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @Composable
 fun PreferencesRootView(
@@ -58,6 +78,7 @@ fun PreferencesRootView(
     onOpenBlockedUsers: () -> Unit,
     onSignOutClick: () -> Unit,
     onDeactivateClick: () -> Unit,
+    onOpenRewards: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
@@ -66,7 +87,8 @@ fun PreferencesRootView(
     PreferencePage(
         modifier = modifier,
         onBackClick = onBackClick,
-        title = stringResource(id = CommonStrings.common_settings),
+        // title = stringResource(id = CommonStrings.common_settings),
+        title = "",
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         UserPreferences(
@@ -74,6 +96,16 @@ fun PreferencesRootView(
                 onOpenUserProfile(state.myUser)
             },
             user = state.myUser,
+        )
+
+        // 'Zero User Rewards' section
+        RewardsSection(
+            shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
+            userRewards = state.userRewards,
+            onRewardsClicked = onOpenRewards,
+            onDismissRewardsIntimation = {
+                state.eventSink(PreferencesRootEvents.DismissRewardsIntimation)
+            }
         )
 
         // 'Manage my app' section
@@ -84,12 +116,12 @@ fun PreferencesRootView(
             onSecureBackupClick = onSecureBackupClick,
         )
 
-        // 'Account' section
+        /*// 'Account' section
         ManageAccountSection(
             state = state,
             onManageAccountClick = onManageAccountClick,
             onOpenBlockedUsers = onOpenBlockedUsers
-        )
+        )*/
 
         // General section
         GeneralSection(
@@ -103,7 +135,7 @@ fun PreferencesRootView(
             onDeactivateClick = onDeactivateClick,
         )
 
-        Footer(
+        /*Footer(
             version = state.version,
             deviceId = state.deviceId,
             onClick = if (!state.showDeveloperSettings) {
@@ -111,8 +143,104 @@ fun PreferencesRootView(
             } else {
                 null
             }
-        )
+        )*/
     }
+}
+
+@Composable
+private fun ColumnScope.RewardsSection(
+    shouldShowNewRewardsIntimation: Boolean,
+    userRewards: ZeroUserRewards,
+    onRewardsClicked: () -> Unit,
+    onDismissRewardsIntimation: () -> Unit
+) {
+    LaunchedEffect(userRewards) {
+        if (shouldShowNewRewardsIntimation) {
+            onDismissRewardsIntimation()
+        }
+    }
+    Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Card(
+            modifier = Modifier
+                .align(Alignment.Center),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+            border = BorderStroke(1.dp, ElementTheme.colors.zeroBrandColorAlpha20),
+            onClick = onRewardsClicked,
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 80.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box {
+                    if (shouldShowNewRewardsIntimation) {
+                        Box(modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(start = 80.dp, bottom = 30.dp)
+                        ) {
+                            Box(
+                                modifier =
+                                Modifier
+                                    .size(18.dp)
+                                    .align(Alignment.Center)
+                                    .background(color = Color.Transparent, shape = CircleShape)
+                                    .border(
+                                        width = 1.dp,
+                                        color = ElementTheme.colors.zeroBrandColorAlpha20,
+                                        shape = CircleShape
+                                    )
+                            )
+                            Box(
+                                modifier =
+                                Modifier
+                                    .size(14.dp)
+                                    .align(Alignment.Center)
+                                    .background(color = Color.Transparent, shape = CircleShape)
+                                    .border(
+                                        width = 1.dp,
+                                        color = ElementTheme.colors.zeroBrandColorAlpha50,
+                                        shape = CircleShape
+                                    )
+                            )
+                            Box(
+                                modifier =
+                                Modifier
+                                    .size(10.dp)
+                                    .align(Alignment.Center)
+                                    .background(color = ElementTheme.colors.zeroBrandColor, shape = CircleShape)
+                            )
+                        }
+                    }
+
+                    val refPrice = RewardsUtil.getRefPrice(
+                        zero = userRewards.zero,
+                        decimals = userRewards.decimals,
+                        refPrice = userRewards.price
+                    )
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "\$$refPrice".trim(),
+                        style = ElementTheme.zeroTypography.fontHeadingSmMediumRoboto,
+                        color = ElementTheme.colors.textPrimary
+                    )
+                }
+
+                val credits = RewardsUtil.getEarnedRewardsFormatted(
+                    zero = userRewards.zero,
+                    decimals = userRewards.decimals
+                )
+                Text(
+                    text = "$credits MEOW",
+                    style = ElementTheme.zeroTypography.fontBodySmRegularRoboto,
+                    color = ElementTheme.colors.textSecondary
+                )
+            }
+        }
+    }
+
+    Spacer(Modifier.size(SPACING_4X.dp))
 }
 
 @Composable
@@ -129,21 +257,27 @@ private fun ColumnScope.ManageAppSection(
             onClick = onOpenNotificationSettings,
         )
     }
-    if (state.showLockScreenSettings) {
+    /*if (state.showLockScreenSettings) {
         ListItem(
             headlineContent = { Text(stringResource(id = CommonStrings.common_screen_lock)) },
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Lock())),
             onClick = onOpenLockScreenSettings,
         )
-    }
-    if (state.showSecureBackup) {
+    }*/
+    /*if (state.showSecureBackup) {
         ListItem(
             headlineContent = { Text(stringResource(id = CommonStrings.common_encryption)) },
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Key())),
             trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
             onClick = onSecureBackupClick,
         )
-    }
+    }*/
+    ListItem(
+        headlineContent = { Text(stringResource(id = CommonStrings.common_encryption)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Key())),
+        trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
+        onClick = onSecureBackupClick,
+    )
     if (state.showNotificationSettings || state.showLockScreenSettings || state.showSecureBackup) {
         HorizontalDivider()
     }
@@ -197,28 +331,28 @@ private fun ColumnScope.GeneralSection(
     onSignOutClick: () -> Unit,
     onDeactivateClick: () -> Unit,
 ) {
-    ListItem(
-        headlineContent = { Text(stringResource(id = CommonStrings.common_about)) },
-        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Info())),
-        onClick = onOpenAbout,
-    )
-    ListItem(
-        headlineContent = { Text(stringResource(id = CommonStrings.common_report_a_problem)) },
-        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.ChatProblem())),
-        onClick = onOpenRageShake
-    )
-    if (state.showAnalyticsSettings) {
-        ListItem(
-            headlineContent = { Text(stringResource(id = CommonStrings.common_analytics)) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Chart())),
-            onClick = onOpenAnalytics,
+    /*    ListItem(
+            headlineContent = { Text(stringResource(id = CommonStrings.common_about)) },
+            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Info())),
+            onClick = onOpenAbout,
         )
-    }
-    ListItem(
-        headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
-        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Settings())),
-        onClick = onOpenAdvancedSettings,
-    )
+        ListItem(
+            headlineContent = { Text(stringResource(id = CommonStrings.common_report_a_problem)) },
+            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.ChatProblem())),
+            onClick = onOpenRageShake
+        )
+        if (state.showAnalyticsSettings) {
+            ListItem(
+                headlineContent = { Text(stringResource(id = CommonStrings.common_analytics)) },
+                leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Chart())),
+                onClick = onOpenAnalytics,
+            )
+        }
+        ListItem(
+            headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
+            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Settings())),
+            onClick = onOpenAdvancedSettings,
+        )*/
     if (state.showDeveloperSettings) {
         DeveloperPreferencesView(onOpenDeveloperSettings)
     }
@@ -228,14 +362,14 @@ private fun ColumnScope.GeneralSection(
         style = ListItemStyle.Destructive,
         onClick = onSignOutClick,
     )
-    if (state.canDeactivateAccount) {
+    /*if (state.canDeactivateAccount) {
         ListItem(
             headlineContent = { Text(stringResource(id = CommonStrings.action_deactivate_account)) },
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Warning())),
             style = ListItemStyle.Destructive,
             onClick = onDeactivateClick,
         )
-    }
+    }*/
 }
 
 @Composable
@@ -261,7 +395,7 @@ private fun ColumnScope.Footer(
             .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 24.dp),
         textAlign = TextAlign.Center,
         text = text,
-        style = ElementTheme.typography.fontBodySmRegular,
+        style = ElementTheme.zeroTypography.fontBodySmRegular,
         color = ElementTheme.materialColors.secondary,
     )
 }
@@ -269,7 +403,8 @@ private fun ColumnScope.Footer(
 @Composable
 private fun DeveloperPreferencesView(onOpenDeveloperSettings: () -> Unit) {
     ListItem(
-        headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
+        //headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
+        headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
         leadingContent = ListItemContent.Icon(IconSource.Resource(CommonDrawables.ic_developer_options)),
         onClick = onOpenDeveloperSettings
     )
@@ -304,5 +439,6 @@ private fun ContentToPreview(matrixUser: MatrixUser) {
         onOpenBlockedUsers = {},
         onSignOutClick = {},
         onDeactivateClick = {},
+        onOpenRewards = {}
     )
 }

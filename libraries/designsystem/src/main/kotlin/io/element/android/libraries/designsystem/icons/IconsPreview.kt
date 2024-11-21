@@ -27,6 +27,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
@@ -96,7 +97,7 @@ private fun IconsPreview(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            style = ElementTheme.typography.fontHeadingSmMedium,
+            style = ElementTheme.zeroTypography.fontHeadingSmMedium,
             text = title,
             textAlign = TextAlign.Center,
         )
@@ -119,7 +120,7 @@ private fun IconsPreview(
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
-                            style = ElementTheme.typography.fontBodyXsMedium,
+                            style = ElementTheme.zeroTypography.fontBodyXsMedium,
                             color = ElementTheme.colors.textSecondary,
                         )
                     }

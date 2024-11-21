@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.features.logout.api)
     implementation(projects.features.deactivation.api)
     implementation(projects.features.roomlist.api)
+    implementation(projects.features.zerorewards.api)
     implementation(projects.services.analytics.api)
     implementation(projects.services.analytics.compose)
     implementation(projects.services.toolbox.api)
@@ -62,6 +63,8 @@ dependencies {
     implementation(libs.androidx.browser)
     implementation(libs.androidx.datastore.preferences)
     api(projects.features.preferences.api)
+
+    implementation(projects.zero)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)

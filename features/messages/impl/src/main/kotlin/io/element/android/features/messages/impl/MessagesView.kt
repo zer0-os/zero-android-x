@@ -96,6 +96,7 @@ import io.element.android.libraries.designsystem.theme.components.BottomSheetDra
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
@@ -394,7 +395,7 @@ private fun MessagesViewContent(
                         onJoinCallClick = onJoinCallClick,
                         nestedScrollConnection = scrollBehavior.nestedScrollConnection,
                     )
-                    AnimatedVisibility(
+                    /*AnimatedVisibility(
                         visible = state.pinnedMessagesBannerState is PinnedMessagesBannerState.Visible && scrollBehavior.isVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
@@ -409,7 +410,7 @@ private fun MessagesViewContent(
                             onClick = ::focusOnPinnedEvent,
                             onViewAllClick = onViewAllPinnedMessagesClick,
                         )
-                    }
+                    }*/
                 }
             },
             sheetContent = { subcomposing: Boolean ->
@@ -507,11 +508,11 @@ private fun MessagesViewTopBar(
             }
         },
         actions = {
-            CallMenuItem(
+            /*CallMenuItem(
                 roomCallState = roomCallState,
                 onJoinCallClick = onJoinCallClick,
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))*/
         },
         windowInsets = WindowInsets(0.dp)
     )
@@ -535,7 +536,7 @@ private fun RoomAvatarAndNameRow(
         Text(
             modifier = Modifier.padding(horizontal = 8.dp),
             text = roomName,
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

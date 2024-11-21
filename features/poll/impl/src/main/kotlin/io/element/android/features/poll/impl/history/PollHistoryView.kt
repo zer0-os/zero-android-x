@@ -49,6 +49,7 @@ import io.element.android.libraries.designsystem.theme.components.SegmentedButto
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
@@ -80,7 +81,7 @@ fun PollHistoryView(
                 title = {
                     Text(
                         text = stringResource(R.string.screen_polls_history_title),
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 navigationIcon = {
@@ -191,7 +192,7 @@ private fun PollHistoryList(
                     }
                     Text(
                         text = emptyStringResource,
-                        style = ElementTheme.typography.fontBodyLgRegular,
+                        style = ElementTheme.zeroTypography.fontBodyLgRegular,
                         color = ElementTheme.colors.textSecondary,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp, horizontal = 16.dp),
                         textAlign = TextAlign.Center,
@@ -237,7 +238,7 @@ private fun PollHistoryItemRow(
             Text(
                 text = pollHistoryItem.formattedDate,
                 color = MaterialTheme.colorScheme.secondary,
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
             )
             Spacer(modifier = Modifier.height(4.dp))
             PollContentView(

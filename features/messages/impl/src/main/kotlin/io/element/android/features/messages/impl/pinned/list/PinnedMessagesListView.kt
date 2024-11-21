@@ -46,6 +46,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.compose.LocalAnalyticsService
@@ -98,7 +99,7 @@ private fun PinnedMessagesListTopBar(
         title = {
             Text(
                 text = state.title(),
-                style = ElementTheme.typography.fontBodyLgMedium
+                style = ElementTheme.zeroTypography.fontBodyLgMedium
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },

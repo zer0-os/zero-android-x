@@ -107,7 +107,7 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.SessionVerification -> {
                 val callback = object : FtueSessionVerificationFlowNode.Callback {
                     override fun onDone() {
-                        moveToNextStepIfNeeded()
+                        moveToNextStepIfNeeded(fromSessionVerification = true)
                     }
                 }
                 createNode<FtueSessionVerificationFlowNode>(buildContext, listOf(callback))
@@ -115,7 +115,8 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.NotificationsOptIn -> {
                 val callback = object : NotificationsOptInNode.Callback {
                     override fun onNotificationsOptInFinished() {
-                        moveToNextStepIfNeeded()
+                        //moveToNextStepIfNeeded()
+                        proceedToDashboardAfterNotificationsPermission()
                     }
                 }
                 createNode<NotificationsOptInNode>(buildContext, listOf(callback))
@@ -136,7 +137,7 @@ class FtueFlowNode @AssistedInject constructor(
         }
     }
 
-    private fun moveToNextStepIfNeeded() = lifecycleScope.launch {
+    private fun moveToNextStepIfNeeded(fromSessionVerification: Boolean = false) = lifecycleScope.launch {
         when (ftueState.getNextStep()) {
             FtueStep.WaitingForInitialState -> {
                 backstack.newRoot(NavTarget.Placeholder)
@@ -153,8 +154,16 @@ class FtueFlowNode @AssistedInject constructor(
             FtueStep.LockscreenSetup -> {
                 backstack.newRoot(NavTarget.LockScreenSetup)
             }
-            null -> Unit
+            null -> {
+                if (fromSessionVerification) {
+                    ftueState.updateState()
+                } else Unit
+            }
         }
+    }
+
+    private fun proceedToDashboardAfterNotificationsPermission() = lifecycleScope.launch {
+        ftueState.updateState()
     }
 
     @Composable

@@ -129,7 +129,7 @@ class RoomDetailsEditPresenter @Inject constructor(
                 listOfNotNull(
                     AvatarAction.TakePhoto,
                     AvatarAction.ChoosePhoto,
-                    AvatarAction.Remove.takeIf { roomAvatarUriEdited != null },
+                    //AvatarAction.Remove.takeIf { roomAvatarUriEdited != null },
                 ).toImmutableList()
             }
         }

@@ -34,6 +34,7 @@ import io.element.android.libraries.designsystem.theme.currentUserMentionPillBac
 import io.element.android.libraries.designsystem.theme.currentUserMentionPillText
 import io.element.android.libraries.designsystem.theme.mentionPillBackground
 import io.element.android.libraries.designsystem.theme.mentionPillText
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
@@ -73,7 +74,7 @@ class MentionSpanTheme @Inject constructor() {
         otherTextColor = ElementTheme.colors.mentionPillText.toArgb()
         otherBackgroundColor = ElementTheme.colors.mentionPillBackground.toArgb()
 
-        typeface.value = ElementTheme.typography.fontBodyLgMedium.rememberTypeface().value
+        typeface.value = ElementTheme.zeroTypography.fontBodyLgMedium.rememberTypeface().value
         val density = LocalDensity.current
         val layoutDirection = LocalLayoutDirection.current
         paddingValuesPx.value = remember(paddingValues, density, layoutDirection) {

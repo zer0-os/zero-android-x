@@ -34,6 +34,7 @@ dependencies {
     implementation(projects.libraries.matrix.api)
     implementation(projects.libraries.testtags)
     implementation(projects.libraries.uiStrings)
+    implementation(projects.zero)
     api(projects.features.onboarding.api)
 
     testImplementation(libs.test.junit)

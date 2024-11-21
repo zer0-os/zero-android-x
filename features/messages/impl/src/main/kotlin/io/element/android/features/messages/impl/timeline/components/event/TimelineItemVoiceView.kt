@@ -51,6 +51,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.coroutines.delay
 
@@ -92,7 +93,7 @@ fun TimelineItemVoiceView(
         Text(
             text = state.time,
             color = ElementTheme.materialColors.secondary,
-            style = ElementTheme.typography.fontBodySmMedium,
+            style = ElementTheme.zeroTypography.fontBodySmMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

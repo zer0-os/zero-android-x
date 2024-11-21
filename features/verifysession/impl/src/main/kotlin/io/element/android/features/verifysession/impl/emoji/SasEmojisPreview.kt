@@ -25,6 +25,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 @PreviewsDayNight
@@ -54,7 +55,7 @@ internal fun SasEmojisPreview() = ElementPreview {
                                 text = emoji.first.toString() + ":" + stringResource(id = emoji.second.nameRes),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = ElementTheme.typography.fontBodySmRegular.copy(
+                                style = ElementTheme.zeroTypography.fontBodySmRegular.copy(
                                     fontSize = 8.sp
                                 )
                             )

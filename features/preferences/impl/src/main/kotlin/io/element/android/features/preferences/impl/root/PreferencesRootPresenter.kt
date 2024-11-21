@@ -7,6 +7,8 @@
 
 package io.element.android.features.preferences.impl.root
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -48,6 +50,10 @@ class PreferencesRootPresenter @Inject constructor(
     @Composable
     override fun present(): PreferencesRootState {
         val matrixUser = matrixClient.userProfile.collectAsState()
+
+        val shouldShowNewRewardsIntimation = matrixClient.shouldShowNewRewardsIntimation.collectAsState()
+        val userRewards = matrixClient.userRewards.collectAsState()
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             matrixClient.getUserProfile()
@@ -102,6 +108,11 @@ class PreferencesRootPresenter @Inject constructor(
                 is PreferencesRootEvents.OnVersionInfoClick -> {
                     showDeveloperSettingsProvider.unlockDeveloperSettings()
                 }
+                is PreferencesRootEvents.DismissRewardsIntimation -> {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        matrixClient.dismissRewardsIntimation()
+                    }, 3_000)
+                }
             }
         }
 
@@ -122,6 +133,8 @@ class PreferencesRootPresenter @Inject constructor(
             directLogoutState = directLogoutState,
             snackbarMessage = snackbarMessage,
             eventSink = ::handleEvent,
+            shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation.value,
+            userRewards = userRewards.value,
         )
     }
 

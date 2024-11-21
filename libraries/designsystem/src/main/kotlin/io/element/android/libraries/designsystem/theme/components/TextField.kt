@@ -42,6 +42,7 @@ import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.preview.ElementPreviewDark
 import io.element.android.libraries.designsystem.preview.ElementPreviewLight
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.allBooleans
 import io.element.android.libraries.designsystem.utils.asInt
 
@@ -179,7 +180,7 @@ private fun DecorationBox(
             Text(
                 text = label,
                 color = ElementTheme.colors.textPrimary,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -201,7 +202,7 @@ private fun DecorationBox(
                         Text(
                             text = placeholder,
                             color = ElementTheme.colors.textSecondary,
-                            style = ElementTheme.typography.fontBodyLgRegular,
+                            style = ElementTheme.zeroTypography.fontBodyLgRegular,
                         )
                     }
                     innerTextField()
@@ -267,14 +268,14 @@ private fun SupportingTextLayout(isError: Boolean, supportingText: String) {
         Text(
             text = supportingText,
             color = if (isError) ElementTheme.colors.textCriticalPrimary else ElementTheme.colors.textSecondary,
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
         )
     }
 }
 
 @Composable
 private fun textFieldStyle(enabled: Boolean): TextStyle {
-    return ElementTheme.typography.fontBodyLgRegular.copy(
+    return ElementTheme.zeroTypography.fontBodyLgRegular.copy(
         color = if (enabled) {
             ElementTheme.colors.textPrimary
         } else {

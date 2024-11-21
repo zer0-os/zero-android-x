@@ -7,19 +7,30 @@
 
 package io.element.android.features.roomlist.impl.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,18 +40,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import io.element.android.appconfig.RoomListConfig
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.roomlist.impl.R
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersView
 import io.element.android.features.roomlist.impl.filters.aRoomListFiltersState
@@ -55,7 +67,6 @@ import io.element.android.libraries.designsystem.text.applyScaleDown
 import io.element.android.libraries.designsystem.text.roundToPx
 import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.text.toSp
-import io.element.android.libraries.designsystem.theme.aliasScreenTitle
 import io.element.android.libraries.designsystem.theme.components.DropdownMenu
 import io.element.android.libraries.designsystem.theme.components.DropdownMenuItem
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -63,12 +74,20 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.MediumTopAppBar
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha50
+import io.element.android.libraries.designsystem.theme.zero.color.zeroDialogBackgroundColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.ui.model.getAvatarData
+import io.element.android.libraries.matrix.ui.model.getBestName
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 private val avatarBloomSize = 430.dp
 
@@ -86,6 +105,9 @@ fun RoomListTopBar(
     displayFilters: Boolean,
     filtersState: RoomListFiltersState,
     modifier: Modifier = Modifier,
+    shouldShowNewRewardsIntimation: Boolean,
+    userRewards: ZeroUserRewards,
+    onDismissRewardsTooltip: (Boolean) -> Unit,
 ) {
     DefaultRoomListTopBar(
         matrixUser = matrixUser,
@@ -99,6 +121,9 @@ fun RoomListTopBar(
         displayFilters = displayFilters,
         filtersState = filtersState,
         modifier = modifier,
+        shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation,
+        userRewards = userRewards,
+        onDismissRewardsTooltip = onDismissRewardsTooltip
     )
 }
 
@@ -116,6 +141,9 @@ private fun DefaultRoomListTopBar(
     displayFilters: Boolean,
     filtersState: RoomListFiltersState,
     modifier: Modifier = Modifier,
+    shouldShowNewRewardsIntimation: Boolean,
+    userRewards: ZeroUserRewards,
+    onDismissRewardsTooltip: (Boolean) -> Unit = {},
 ) {
     // We need this to manually clip the top app bar in preview mode
     val previewAppBarHeight = if (LocalInspectionMode.current) {
@@ -137,8 +165,8 @@ private fun DefaultRoomListTopBar(
     val statusBarPadding = with(LocalDensity.current) { WindowInsets.statusBars.getTop(this).toDp() }
 
     Box(modifier = modifier) {
-        val collapsedTitleTextStyle = ElementTheme.typography.aliasScreenTitle
-        val expandedTitleTextStyle = ElementTheme.typography.fontHeadingLgBold.copy(
+        val collapsedTitleTextStyle = ElementTheme.zeroTypography.aliasScreenTitle
+        val expandedTitleTextStyle = ElementTheme.zeroTypography.fontHeadingLgBold.copy(
             // Due to a limitation of MediumTopAppBar, and to avoid the text to be truncated,
             // ensure that the font size will never be bigger than 28.dp.
             fontSize = 28.dp.applyScaleDown().toSp()
@@ -190,13 +218,20 @@ private fun DefaultRoomListTopBar(
                         scrolledContainerColor = Color.Transparent,
                     ),
                     title = {
-                        Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+                        //Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+                        Text(
+                            text = matrixUser.getBestName(),
+                            maxLines = 1
+                        )
                     },
                     navigationIcon = {
                         NavigationIcon(
                             avatarData = avatarData,
                             showAvatarIndicator = showAvatarIndicator,
                             onClick = onOpenSettings,
+                            shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation,
+                            userRewards = userRewards,
+                            onDismissRewardsTooltip = onDismissRewardsTooltip
                         )
                     },
                     actions = {
@@ -285,20 +320,121 @@ private fun DefaultRoomListTopBar(
 private fun NavigationIcon(
     avatarData: AvatarData,
     showAvatarIndicator: Boolean,
+    shouldShowNewRewardsIntimation: Boolean,
+    userRewards: ZeroUserRewards,
     onClick: () -> Unit,
+    onDismissRewardsTooltip: (Boolean) -> Unit,
 ) {
-    IconButton(
-        modifier = Modifier.testTag(TestTags.homeScreenSettings),
-        onClick = onClick,
+    LaunchedEffect(userRewards) {
+        if (shouldShowNewRewardsIntimation) {
+            onDismissRewardsTooltip(false)
+        }
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(
+            modifier = Modifier.testTag(TestTags.homeScreenSettings),
+            onClick = onClick,
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                if (shouldShowNewRewardsIntimation) {
+                    NewRewardsIntimationGlow(avatarSize = avatarData.size.dp)
+                }
+                Avatar(
+                    avatarData = avatarData,
+                    contentDescription = stringResource(CommonStrings.common_settings),
+                )
+                if (showAvatarIndicator) {
+                    RedIndicatorAtom(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                    )
+                }
+            }
+        }
+
+        if (shouldShowNewRewardsIntimation) {
+            UserRewardsToolTip(userRewards) {
+                onDismissRewardsTooltip(true)
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewRewardsIntimationGlow(avatarSize: Dp) {
+    Box {
+        Box(
+            modifier = Modifier
+                .size((avatarSize.value.plus(8)).dp)
+                .align(Alignment.Center)
+                .background(color = Color.Transparent, shape = CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = ElementTheme.colors.zeroBrandColorAlpha20,
+                    shape = CircleShape
+                )
+        )
+        Box(
+            modifier = Modifier
+                .size((avatarSize.value.plus(4)).dp)
+                .align(Alignment.Center)
+                .background(color = Color.Transparent, shape = CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = ElementTheme.colors.zeroBrandColorAlpha50,
+                    shape = CircleShape
+                )
+        )
+    }
+}
+
+@Composable
+private fun UserRewardsToolTip(
+    userRewards: ZeroUserRewards,
+    onDismissRewardsTooltip: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.offset(x = -16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box {
-            Avatar(
-                avatarData = avatarData,
-                contentDescription = stringResource(CommonStrings.common_settings),
+        val earnedRewards = RewardsUtil.getRefPrice(
+            zero = userRewards.zero,
+            decimals = userRewards.decimals,
+            refPrice = userRewards.price
+        )
+        Icon(
+            modifier = Modifier
+                .rotate(180f)
+                .size(32.dp)
+                .offset(x = -12.dp),
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = null,
+            tint = ElementTheme.colors.zeroDialogBackgroundColor
+        )
+        Row(
+            modifier = Modifier
+                .background(
+                    color = ElementTheme.colors.zeroDialogBackgroundColor,
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "You earned \$$earnedRewards",
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                color = ElementTheme.colors.zeroBrandColor
             )
-            if (showAvatarIndicator) {
-                RedIndicatorAtom(
-                    modifier = Modifier.align(Alignment.TopEnd)
+            Spacer(Modifier.size(12.dp))
+            IconButton(
+                onClick = onDismissRewardsTooltip
+            ) {
+                Icon(
+                    imageVector = CompoundIcons.Close(),
+                    contentDescription = null,
+                    tint = ElementTheme.colors.textPrimary
                 )
             }
         }
@@ -320,6 +456,8 @@ internal fun DefaultRoomListTopBarPreview() = ElementPreview {
         displayFilters = true,
         filtersState = aRoomListFiltersState(),
         onMenuActionClick = {},
+        shouldShowNewRewardsIntimation = true,
+        userRewards = ZeroUserRewards.empty()
     )
 }
 
@@ -338,5 +476,7 @@ internal fun DefaultRoomListTopBarWithIndicatorPreview() = ElementPreview {
         displayFilters = true,
         filtersState = aRoomListFiltersState(),
         onMenuActionClick = {},
+        shouldShowNewRewardsIntimation = true,
+        userRewards = ZeroUserRewards.empty()
     )
 }

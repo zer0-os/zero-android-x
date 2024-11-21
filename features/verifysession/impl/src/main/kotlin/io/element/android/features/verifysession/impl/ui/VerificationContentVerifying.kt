@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.verifysession.impl.emoji.toEmojiResource
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
 import io.element.android.libraries.matrix.api.verification.VerificationEmoji
 
@@ -48,7 +49,7 @@ internal fun VerificationContentVerifying(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = text,
-                    style = ElementTheme.typography.fontHeadingLgBold,
+                    style = ElementTheme.zeroTypography.fontHeadingLgBold,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                 )
@@ -85,7 +86,7 @@ private fun EmojiItemView(emoji: VerificationEmoji, modifier: Modifier = Modifie
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(id = emojiResource.nameRes),
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = MaterialTheme.colorScheme.secondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

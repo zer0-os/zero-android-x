@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.theme.aliasScreenTitle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -109,7 +110,7 @@ private fun RoomSpecificNotificationSettingsView(
                         },
                         modifier = Modifier
                             .padding(start = 16.dp, bottom = 16.dp, end = 16.dp),
-                        style = ElementTheme.typography.fontBodyMdRegular
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular
                             .copy(
                                 color = MaterialTheme.colorScheme.secondary,
                             )
@@ -172,7 +173,7 @@ private fun RoomNotificationSettingsTopBar(
         title = {
             Text(
                 text = stringResource(R.string.screen_room_details_notification_title),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },

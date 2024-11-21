@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.libraries.permissions.api)
     implementation(projects.libraries.qrcode)
     implementation(projects.libraries.oidc.api)
+    implementation(projects.zero)
     implementation(libs.androidx.browser)
     implementation(platform(libs.network.retrofit.bom))
     implementation(libs.androidx.webkit)

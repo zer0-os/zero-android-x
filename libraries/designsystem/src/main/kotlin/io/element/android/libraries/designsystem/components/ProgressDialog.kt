@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
@@ -34,6 +35,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.DialogPreview
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.ui.strings.CommonStrings
 import timber.log.Timber
 
@@ -64,13 +66,13 @@ fun ProgressDialog(
                 when (type) {
                     is ProgressDialogType.Indeterminate -> {
                         CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary
+                            color = ElementTheme.colors.zeroBrandColor
                         )
                     }
                     is ProgressDialogType.Determinate -> {
                         CircularProgressIndicator(
                             progress = { type.progress },
-                            color = MaterialTheme.colorScheme.primary
+                            color = ElementTheme.colors.zeroBrandColor
                         )
                     }
                 }
@@ -93,7 +95,7 @@ private fun ProgressDialogContent(
     onCancelClick: () -> Unit = {},
     progressIndicator: @Composable () -> Unit = {
         CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.primary
+            color = ElementTheme.colors.zeroBrandColor
         )
     }
 ) {

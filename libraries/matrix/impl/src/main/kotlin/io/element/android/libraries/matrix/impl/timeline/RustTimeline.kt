@@ -45,6 +45,7 @@ import io.element.android.libraries.matrix.impl.timeline.postprocessor.TypingNot
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
 import io.element.android.libraries.matrix.impl.util.MessageEventContent
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.data.repository.ConversationRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -88,6 +89,7 @@ class RustTimeline(
     private val dispatcher: CoroutineDispatcher,
     private val roomContentForwarder: RoomContentForwarder,
     private val featureFlagsService: FeatureFlagService,
+    private val zeroConversationRepository: ConversationRepository?,
     onNewSyncedEvent: () -> Unit,
 ) : Timeline {
     private val initLatch = CompletableDeferred<Unit>()
@@ -319,10 +321,14 @@ class RustTimeline(
         intentionalMentions: List<IntentionalMention>,
         fromNotification: Boolean,
     ): Result<Unit> = withContext(dispatcher) {
-        runCatching {
+        val result = runCatching {
             val msg = MessageEventContent.from(body, htmlBody, intentionalMentions)
             inner.sendReply(msg, eventId.value)
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = matrixRoom.roomId.value)
+        }
+        return@withContext result
     }
 
     override suspend fun sendImage(

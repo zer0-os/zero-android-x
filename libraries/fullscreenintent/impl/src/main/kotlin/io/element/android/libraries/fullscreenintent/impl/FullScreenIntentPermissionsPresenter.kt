@@ -73,7 +73,7 @@ class FullScreenIntentPermissionsPresenter @Inject constructor(
     }
 
     private fun openFullScreenIntentSettings() {
-        if (buildVersionSdkIntProvider.isAtLeast(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)) {
+        /*if (buildVersionSdkIntProvider.isAtLeast(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)) {
             try {
                 val intent = Intent(
                     Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
@@ -85,6 +85,6 @@ class FullScreenIntentPermissionsPresenter @Inject constructor(
                     .putExtra(Settings.EXTRA_APP_PACKAGE, buildMeta.applicationId)
                 externalIntentLauncher.launch(intent)
             }
-        }
+        }*/
     }
 }

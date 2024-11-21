@@ -27,6 +27,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -81,7 +82,7 @@ private fun RoomListModalBottomSheetContent(
             headlineContent = {
                 Text(
                     text = contextMenu.roomName ?: stringResource(id = CommonStrings.common_no_room_name),
-                    style = ElementTheme.typography.fontBodyLgMedium,
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
                     fontStyle = FontStyle.Italic.takeIf { contextMenu.roomName == null }
                 )
             }

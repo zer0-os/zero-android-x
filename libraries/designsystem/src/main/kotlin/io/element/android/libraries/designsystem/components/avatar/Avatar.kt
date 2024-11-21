@@ -7,10 +7,12 @@
 
 package io.element.android.libraries.designsystem.components.avatar
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -18,8 +20,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -31,12 +35,14 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.colors.AvatarColorsProvider
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.preview.debugPlaceholderAvatar
 import io.element.android.libraries.designsystem.text.toSp
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import timber.log.Timber
 
 @Composable
@@ -51,7 +57,7 @@ fun Avatar(
         .size(forcedAvatarSize ?: avatarData.size.dp)
         .clip(CircleShape)
     if (avatarData.url.isNullOrBlank()) {
-        InitialsAvatar(
+        ZeroPlaceholderImage(
             avatarData = avatarData,
             forcedAvatarSize = forcedAvatarSize,
             modifier = commonModifier,
@@ -92,15 +98,15 @@ private fun ImageAvatar(
             when (val state = painter.state) {
                 is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
                 is AsyncImagePainter.State.Error -> {
-                    SideEffect {
+                    /*SideEffect {
                         Timber.e(state.result.throwable, "Error loading avatar $state\n${state.result}")
-                    }
-                    InitialsAvatar(
+                    }*/
+                    ZeroPlaceholderImage(
                         avatarData = avatarData,
                         forcedAvatarSize = forcedAvatarSize,
                     )
                 }
-                else -> InitialsAvatar(
+                else -> ZeroPlaceholderImage(
                     avatarData = avatarData,
                     forcedAvatarSize = forcedAvatarSize,
                 )
@@ -120,7 +126,7 @@ private fun InitialsAvatar(
         modifier.background(color = avatarColors.background)
     ) {
         val fontSize = (forcedAvatarSize ?: avatarData.size.dp).toSp() / 2
-        val originalFont = ElementTheme.typography.fontHeadingMdBold
+        val originalFont = ElementTheme.zeroTypography.fontHeadingMdBold
         val ratio = fontSize.value / originalFont.fontSize.value
         val lineHeight = originalFont.lineHeight * ratio
         Text(
@@ -132,6 +138,22 @@ private fun InitialsAvatar(
             color = avatarColors.foreground,
         )
     }
+}
+
+@Composable
+private fun ZeroPlaceholderImage(
+    avatarData: AvatarData,
+    forcedAvatarSize: Dp?,
+    modifier: Modifier = Modifier,
+) {
+    val size = forcedAvatarSize ?: avatarData.size.dp
+    Image(
+        painter = painterResource(id = R.drawable.ic_zero_avatar_default),
+        contentDescription = "zero_placeholder_image",
+        modifier = modifier.size(size)
+            .background(Color.Black)
+            .padding(8.dp)
+    )
 }
 
 @Preview(group = PreviewGroup.Avatars)

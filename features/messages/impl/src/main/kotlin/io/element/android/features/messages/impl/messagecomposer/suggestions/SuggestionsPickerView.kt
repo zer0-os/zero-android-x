@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
@@ -54,7 +55,8 @@ fun SuggestionsPickerView(
         modifier = modifier.fillMaxWidth(),
     ) {
         items(
-            suggestions,
+            suggestions
+                .filter { it !is ResolvedSuggestion.AtRoom },
             key = { suggestion ->
                 when (suggestion) {
                     is ResolvedSuggestion.AtRoom -> "@room"
@@ -119,18 +121,18 @@ private fun SuggestionItemView(
             title?.let {
                 Text(
                     text = it,
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Text(
+            /*Text(
                 text = subtitle,
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-            )
+            )*/
         }
     }
 }

@@ -27,6 +27,7 @@ import io.element.android.libraries.matrix.impl.RustMatrixClientFactory
 import io.element.android.libraries.matrix.impl.auth.qrlogin.QrErrorMapper
 import io.element.android.libraries.matrix.impl.auth.qrlogin.SdkQrCodeLoginData
 import io.element.android.libraries.matrix.impl.auth.qrlogin.toStep
+import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.exception.mapClientException
 import io.element.android.libraries.matrix.impl.keys.PassphraseGenerator
 import io.element.android.libraries.matrix.impl.mapper.toSessionData
@@ -35,12 +36,15 @@ import io.element.android.libraries.matrix.impl.paths.SessionPathsFactory
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.sessionstorage.api.LoggedInState
 import io.element.android.libraries.sessionstorage.api.LoginType
+import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.support.zero.data.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.Client
 import org.matrix.rustcomponents.sdk.ClientBuildException
@@ -65,6 +69,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     private val passphraseGenerator: PassphraseGenerator,
     private val oidcConfigurationProvider: OidcConfigurationProvider,
     private val appPreferencesStore: AppPreferencesStore,
+    private val authRepository: AuthRepository?,
 ) : MatrixAuthenticationService {
     // Passphrase which will be used for new sessions. Existing sessions will use the passphrase
     // stored in the SessionData.
@@ -106,6 +111,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                     } else {
                         Timber.w("Restoring a session with a passphrase")
                     }
+                    MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
                     rustMatrixClientFactory.create(sessionData)
                 } else {
                     error("Token is not valid")
@@ -161,6 +167,37 @@ class RustMatrixAuthenticationService @Inject constructor(
                     )
                 newMatrixClientObserver?.invoke(rustMatrixClientFactory.create(client))
                 sessionStore.storeData(sessionData)
+                SessionId(sessionData.userId)
+            }.mapFailure { failure ->
+                failure.mapAuthenticationException()
+            }
+        }
+
+    override suspend fun loginWithZero(username: String, password: String): Result<SessionId> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+                val client = currentClient ?: error("You need to call `setHomeserver()` first")
+                val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
+
+                val authSsoToken = authRepository.login(username, password).firstOrNull()
+                val ssoToken = authSsoToken?.token
+                    ?: error("SSO Token from zos is null or blank")
+                client.customLoginWithJwt(ssoToken, "Element X Android", null)
+                val sessionData = client.session()
+                    .toSessionData(
+                        isTokenValid = true,
+                        loginType = LoginType.PASSWORD,
+                        passphrase = pendingPassphrase,
+                        sessionPaths = currentSessionPaths,
+                    )
+                clear()
+                MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
+                sessionStore.storeData(sessionData)
+                authRepository.saveMatrixLoginInfo(
+                    token = sessionData.accessToken,
+                    userId = sessionData.userId
+                )
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->
                 failure.mapAuthenticationException()
@@ -362,5 +399,11 @@ class RustMatrixAuthenticationService @Inject constructor(
     private fun clear() {
         currentClient?.close()
         currentClient = null
+    }
+
+    private fun getHomeServerPostfix(sessionData: SessionData): String {
+        return sessionData.userId
+            .substringAfter(":")
+            .trim()
     }
 }

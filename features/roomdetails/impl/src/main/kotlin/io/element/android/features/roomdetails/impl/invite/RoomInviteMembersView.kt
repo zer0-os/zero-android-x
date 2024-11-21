@@ -36,6 +36,7 @@ import io.element.android.libraries.designsystem.theme.components.SearchBarResul
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.components.CheckableUserRow
 import io.element.android.libraries.matrix.ui.components.CheckableUserRowData
@@ -111,7 +112,7 @@ private fun RoomInviteMembersTopBar(
         title = {
             Text(
                 text = stringResource(R.string.screen_room_details_invite_people_title),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },
@@ -167,7 +168,7 @@ private fun RoomInviteMembersSearchBar(
         resultHandler = { results ->
             Text(
                 text = stringResource(id = CommonStrings.common_search_results),
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 8.dp)

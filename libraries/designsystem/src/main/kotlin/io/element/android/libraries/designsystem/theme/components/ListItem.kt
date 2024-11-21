@@ -30,6 +30,7 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 // Designs: https://www.figma.com/file/G1xy0HDZKJf5TCRFmKb5d5/Compound-Android-Components?type=design&node-id=425%3A24208&mode=design&t=G5hCfkLB6GgXDuWe-1
 
@@ -142,7 +143,7 @@ fun ListItem(
     val decoratedTrailingContent: (@Composable () -> Unit)? = trailingContent?.let { content ->
         {
             CompositionLocalProvider(
-                LocalTextStyle provides ElementTheme.typography.fontBodyMdRegular,
+                LocalTextStyle provides ElementTheme.zeroTypography.fontBodyMdRegular,
                 LocalContentColor provides trailingContentColor,
             ) {
                 content.View()

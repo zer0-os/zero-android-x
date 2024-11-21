@@ -21,6 +21,7 @@ import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun PreferenceSwitch(
@@ -46,14 +47,14 @@ fun PreferenceSwitch(
         ),
         headlineContent = {
             Text(
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 text = title,
             )
         },
         supportingContent = subtitle?.let {
             {
                 Text(
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     text = subtitle,
                 )
             }

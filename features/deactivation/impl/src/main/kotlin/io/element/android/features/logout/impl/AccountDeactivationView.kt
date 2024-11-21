@@ -66,6 +66,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -90,7 +91,7 @@ fun AccountDeactivationView(
                 title = {
                     Text(
                         text = stringResource(R.string.screen_deactivate_account_title),
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
             )
@@ -179,7 +180,7 @@ private fun Content(
                 bold = true,
                 underline = false,
             ),
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = ElementTheme.colors.textSecondary,
         )
         InfoListOrganism(
@@ -235,7 +236,7 @@ private fun Content(
                     },
                 ),
             ),
-            textStyle = ElementTheme.typography.fontBodyMdRegular,
+            textStyle = ElementTheme.zeroTypography.fontBodyMdRegular,
             textColor = ElementTheme.colors.textSecondary,
             iconTint = ElementTheme.colors.iconSuccessPrimary,
             backgroundColor = Color.Transparent,
@@ -253,7 +254,7 @@ private fun Content(
             Text(
                 modifier = Modifier.padding(start = 16.dp),
                 text = stringResource(R.string.screen_deactivate_account_delete_all_messages_notice),
-                style = ElementTheme.typography.fontBodySmRegular,
+                style = ElementTheme.zeroTypography.fontBodySmRegular,
                 color = ElementTheme.colors.textSecondary,
             )
         }

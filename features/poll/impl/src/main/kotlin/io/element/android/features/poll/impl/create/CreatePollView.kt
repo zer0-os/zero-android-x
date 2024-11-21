@@ -52,6 +52,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.poll.PollKind
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.coroutines.Dispatchers
@@ -211,7 +212,7 @@ private fun CreatePollTopAppBar(
                     CreatePollState.Mode.New -> stringResource(id = R.string.screen_create_poll_title)
                     CreatePollState.Mode.Edit -> stringResource(id = R.string.screen_edit_poll_title)
                 },
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = {

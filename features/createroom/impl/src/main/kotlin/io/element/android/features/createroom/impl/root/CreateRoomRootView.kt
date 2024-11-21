@@ -42,6 +42,7 @@ import io.element.android.libraries.designsystem.theme.components.ListSectionHea
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.ui.components.MatrixUserRow
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -122,7 +123,7 @@ private fun CreateRoomRootViewTopBar(
         title = {
             Text(
                 text = stringResource(id = CommonStrings.action_start_chat),
-                style = ElementTheme.typography.aliasScreenTitle,
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = {
@@ -145,17 +146,18 @@ private fun CreateRoomActionButtonsList(
         item {
             CreateRoomActionButton(
                 iconRes = CompoundDrawables.ic_compound_plus,
-                text = stringResource(id = R.string.screen_create_room_action_create_room),
+                // text = stringResource(id = R.string.screen_create_room_action_create_room),
+                text = "New Group",
                 onClick = onNewRoomClick,
             )
         }
-        item {
+        /*item {
             CreateRoomActionButton(
                 iconRes = CompoundDrawables.ic_compound_share_android,
                 text = stringResource(id = CommonStrings.action_invite_friends_to_app, state.applicationName),
                 onClick = onInvitePeopleClick,
             )
-        }
+        }*/
         if (state.userListState.recentDirectRooms.isNotEmpty()) {
             item {
                 ListSectionHeader(
@@ -202,7 +204,7 @@ private fun CreateRoomActionButton(
         )
         Text(
             text = text,
-            style = ElementTheme.typography.fontBodyLgRegular,
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
         )
     }
 }

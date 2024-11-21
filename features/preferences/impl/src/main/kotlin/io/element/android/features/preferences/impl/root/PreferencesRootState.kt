@@ -11,6 +11,7 @@ import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 data class PreferencesRootState(
     val myUser: MatrixUser,
@@ -29,4 +30,7 @@ data class PreferencesRootState(
     val directLogoutState: DirectLogoutState,
     val snackbarMessage: SnackbarMessage?,
     val eventSink: (PreferencesRootEvents) -> Unit,
+
+    val shouldShowNewRewardsIntimation: Boolean = true,
+    val userRewards: ZeroUserRewards = ZeroUserRewards.empty()
 )

@@ -47,6 +47,9 @@ import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 
@@ -97,7 +100,7 @@ fun MessageEventBubble(
 
     // Ignore state.isHighlighted for now, we need a design decision on it.
     val backgroundBubbleColor = when {
-        state.isMine -> ElementTheme.colors.messageFromMeBackground
+        state.isMine -> ElementTheme.colors.zeroBrandColorAlpha20
         else -> ElementTheme.colors.messageFromOtherBackground
     }
     val bubbleShape = bubbleShape()
@@ -111,17 +114,17 @@ fun MessageEventBubble(
             }
             .drawWithContent {
                 drawContent()
-                if (state.cutTopStart) {
-                    drawCircle(
-                        color = Color.Black,
-                        center = Offset(
-                            x = if (isRtl) size.width else 0f,
-                            y = yOffsetPx,
-                        ),
-                        radius = radiusPx,
-                        blendMode = BlendMode.Clear,
-                    )
-                }
+//                if (state.cutTopStart) {
+//                    drawCircle(
+//                        color = Color.Black,
+//                        center = Offset(
+//                            x = if (isRtl) size.width else 0f,
+//                            y = yOffsetPx,
+//                        ),
+//                        radius = radiusPx,
+//                        blendMode = BlendMode.Clear,
+//                    )
+//                }
             },
         // Need to set the contentAlignment again (it's already set in TimelineItemEventRow), for the case
         // when content width is low.
@@ -175,7 +178,7 @@ internal fun MessageEventBubblePreview(@PreviewParameter(BubbleStateProvider::cl
             ) {
                 Text(
                     text = "${state.groupPosition.javaClass.simpleName} m:${state.isMine.to01()} h:${state.isHighlighted.to01()}",
-                    style = ElementTheme.typography.fontBodyXsRegular,
+                    style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 )
             }
         }

@@ -83,6 +83,8 @@ import io.element.android.libraries.designsystem.swipe.rememberSwipeableActionsS
 import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
@@ -297,9 +299,11 @@ private fun TimelineItemEventRowContent(
             pinIcon,
         ) = createRefs()
 
+         val showSenderInfo = event.showSenderInformation && !timelineRoomInfo.isDm
+
         // Sender
-        if (event.showSenderInformation && !timelineRoomInfo.isDm) {
-            MessageSenderInformation(
+        if (showSenderInfo) {
+            /*MessageSenderInformation(
                 event.senderId,
                 event.senderProfile,
                 event.senderAvatar,
@@ -311,6 +315,22 @@ private fun TimelineItemEventRowContent(
                     }
                     .padding(horizontal = 16.dp)
                     .zIndex(1f)
+                    .clickable(onClick = onUserDataClick)
+                    // This is redundant when using talkback
+                    .clearAndSetSemantics {
+                        invisibleToUser()
+                        testTag = TestTags.timelineItemSenderInfo.value
+                    }
+            )*/
+            Avatar(
+                avatarData = event.senderAvatar,
+                modifier = Modifier
+                    .constrainAs(sender) {
+                        top.linkTo(parent.top)
+                        // Required for correct RTL layout
+                        start.linkTo(parent.start)
+                    }
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
                     .clickable(onClick = onUserDataClick)
                     // This is redundant when using talkback
                     .clearAndSetSemantics {
@@ -330,17 +350,21 @@ private fun TimelineItemEventRowContent(
         MessageEventBubble(
             modifier = Modifier
                 .constrainAs(message) {
-                    val topMargin = if (bubbleState.cutTopStart) {
-                        NEGATIVE_MARGIN_FOR_BUBBLE
-                    } else {
-                        0.dp
-                    }
-                    top.linkTo(sender.bottom, margin = topMargin)
+//                    val topMargin = if (bubbleState.cutTopStart) {
+//                        NEGATIVE_MARGIN_FOR_BUBBLE
+//                    } else {
+//                        0.dp
+//                    }
+                    //top.linkTo(sender.bottom, margin = topMargin)
+                    top.linkTo(parent.top)
                     if (event.isMine) {
                         end.linkTo(parent.end, margin = 16.dp)
                     } else {
-                        val startMargin = if (timelineRoomInfo.isDm) 16.dp else 16.dp + BUBBLE_INCOMING_OFFSET
-                        start.linkTo(parent.start, margin = startMargin)
+                        //val startMargin = if (timelineRoomInfo.isDm) 16.dp else 16.dp + BUBBLE_INCOMING_OFFSET
+                        val startMargin = if (timelineRoomInfo.isDm) 16.dp else {
+                            if (showSenderInfo) 0.dp else 32.dp + BUBBLE_INCOMING_OFFSET
+                        }
+                        start.linkTo(sender.end, margin = startMargin)
                     }
                 },
             state = bubbleState,
@@ -348,14 +372,25 @@ private fun TimelineItemEventRowContent(
             onClick = onContentClick,
             onLongClick = onLongClick,
         ) {
-            MessageEventBubbleContent(
-                event = event,
-                timelineProtectionState = timelineProtectionState,
-                onMessageLongClick = onLongClick,
-                inReplyToClick = inReplyToClick,
-                eventSink = eventSink,
-                eventContentView = eventContentView,
-            )
+            Column {
+                if (showSenderInfo) {
+                    SenderName(
+                        senderId = event.senderId,
+                        senderProfile = event.senderProfile,
+                        senderNameMode = SenderNameMode.Timeline(ElementTheme.colors.zeroBrandColor),
+                        modifier = Modifier
+                            .padding(top = 8.dp, start = 12.dp, bottom = 0.dp, end = 12.dp)
+                    )
+                }
+                MessageEventBubbleContent(
+                    event = event,
+                    timelineProtectionState = timelineProtectionState,
+                    onMessageLongClick = onLongClick,
+                    inReplyToClick = inReplyToClick,
+                    eventSink = eventSink,
+                    eventContentView = eventContentView,
+                )
+            }
         }
 
         // Pin icon
@@ -400,7 +435,8 @@ private fun TimelineItemEventRowContent(
                         start = when {
                             event.isMine -> 22.dp
                             timelineRoomInfo.isDm -> 22.dp
-                            else -> 22.dp + BUBBLE_INCOMING_OFFSET
+                            //else -> 22.dp + BUBBLE_INCOMING_OFFSET
+                            else -> 40.dp + BUBBLE_INCOMING_OFFSET
                         },
                         end = 16.dp
                     )
@@ -463,7 +499,7 @@ private fun MessageEventBubbleContent(
             )
             Text(
                 text = stringResource(CommonStrings.common_thread),
-                style = ElementTheme.typography.fontBodyXsRegular,
+                style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 color = ElementTheme.colors.textPrimary,
                 modifier = Modifier.clearAndSetSemantics { }
             )

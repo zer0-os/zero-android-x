@@ -18,6 +18,8 @@ import io.element.android.compound.tokens.generated.internal.DarkColorTokens
 import io.element.android.compound.tokens.generated.internal.LightColorTokens
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
 import kotlinx.collections.immutable.persistentMapOf
 
 /**
@@ -103,34 +105,24 @@ val SemanticColors.pinDigitBg
     }
 
 val SemanticColors.currentUserMentionPillText
-    get() = if (isLight) {
-        // We want LightDesignTokens.colorGreen1100
-        Color(0xff005c45)
-    } else {
-        // We want DarkDesignTokens.colorGreen1100
-        Color(0xff1fc090)
-    }
+    get() = zeroBrandColor
 
 val SemanticColors.currentUserMentionPillBackground
-    get() = if (isLight) {
-        // We want LightDesignTokens.colorGreenAlpha400
-        Color(0x3b07b661)
-    } else {
-        // We want DarkDesignTokens.colorGreenAlpha500
-        Color(0xff003d29)
-    }
+    get() = zeroBrandColorAlpha15
 
 val SemanticColors.mentionPillText
-    get() = textPrimary
+    //get() = textPrimary
+    get() = zeroBrandColor
 
 val SemanticColors.mentionPillBackground
-    get() = if (isLight) {
+    /*get() = if (isLight) {
         // We want LightDesignTokens.colorGray400
         Color(0x1f052e61)
     } else {
         // We want DarkDesignTokens.colorGray500
         Color(0x26f4f7fa)
-    }
+    }*/
+    get() = zeroBrandColorAlpha15
 
 @OptIn(CoreColorToken::class)
 val SemanticColors.bigCheckmarkBorderColor

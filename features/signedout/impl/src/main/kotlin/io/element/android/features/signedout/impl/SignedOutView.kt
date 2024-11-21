@@ -34,6 +34,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.temporaryColorBgSpecial
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.persistentListOf
 
@@ -92,7 +93,7 @@ private fun SignedOutContent() {
                     iconVector = CompoundIcons.Block(),
                 ),
             ),
-            textStyle = ElementTheme.typography.fontBodyMdMedium,
+            textStyle = ElementTheme.zeroTypography.fontBodyMdMedium,
             iconTint = ElementTheme.colors.iconSecondary,
             backgroundColor = ElementTheme.colors.temporaryColorBgSpecial
         )

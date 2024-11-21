@@ -18,6 +18,7 @@ sealed interface RoomListEvents {
     data class AcceptInvite(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
     data class DeclineInvite(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
     data class ShowContextMenu(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
+    data class DismissRewardsIntimation(val immediate: Boolean = true): RoomListEvents
 
     sealed interface ContextMenuEvents : RoomListEvents
     data object HideContextMenu : ContextMenuEvents

@@ -23,6 +23,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 internal fun UserRow(
@@ -52,18 +53,18 @@ internal fun UserRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.primary,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
             )
-            // Id
+            /*// Id
             subtext?.let {
                 Text(
                     text = subtext,
                     color = MaterialTheme.colorScheme.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = ElementTheme.typography.fontBodySmRegular,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
-            }
+            }*/
         }
         trailingContent?.invoke()
     }

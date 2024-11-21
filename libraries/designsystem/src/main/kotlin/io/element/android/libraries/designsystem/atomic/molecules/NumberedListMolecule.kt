@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.modifiers.squareSize
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun NumberedListMolecule(
@@ -33,7 +34,7 @@ fun NumberedListMolecule(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ItemNumber(index = index)
-        Text(text = text, style = ElementTheme.typography.fontBodyMdRegular, color = ElementTheme.colors.textPrimary)
+        Text(text = text, style = ElementTheme.zeroTypography.fontBodyMdRegular, color = ElementTheme.colors.textPrimary)
     }
 }
 
@@ -50,7 +51,7 @@ private fun ItemNumber(
         Text(
             modifier = Modifier.padding(1.5.dp),
             text = index.toString(),
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
             color = color,
             textAlign = TextAlign.Center,
         )

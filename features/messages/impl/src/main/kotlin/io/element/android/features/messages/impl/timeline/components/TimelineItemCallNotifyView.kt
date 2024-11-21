@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.toDp
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -61,7 +62,7 @@ internal fun TimelineItemCallNotifyView(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = event.safeSenderName,
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -77,7 +78,7 @@ internal fun TimelineItemCallNotifyView(
                 )
                 Text(
                     text = stringResource(CommonStrings.common_call_started),
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = ElementTheme.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -92,7 +93,7 @@ internal fun TimelineItemCallNotifyView(
         } else {
             Text(
                 text = event.sentTime,
-                style = ElementTheme.typography.fontBodyMdRegular,
+                style = ElementTheme.zeroTypography.fontBodyMdRegular,
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

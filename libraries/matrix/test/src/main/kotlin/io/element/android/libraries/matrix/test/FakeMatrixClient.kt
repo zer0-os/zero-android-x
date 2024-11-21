@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
 import io.element.android.libraries.matrix.test.media.FakeMatrixMediaLoader
 import io.element.android.libraries.matrix.test.notification.FakeNotificationService
@@ -351,4 +352,16 @@ class FakeMatrixClient(
     override fun isUsingNativeSlidingSync(): Boolean {
         return isUsingNativeSlidingSyncLambda()
     }
+
+    //region ZERO
+    override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
+        MutableStateFlow(false)
+
+    override val userRewards: StateFlow<ZeroUserRewards> =
+        MutableStateFlow(ZeroUserRewards.empty())
+
+    override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {}
+
+    override fun dismissRewardsIntimation() {}
+    //endregion
 }

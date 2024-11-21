@@ -54,6 +54,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.SelectedUsersRowList
@@ -104,11 +105,11 @@ fun ConfigureRoomView(
                 onAvatarClick = ::onAvatarClick,
                 onChangeRoomName = { state.eventSink(ConfigureRoomEvents.RoomNameChanged(it)) },
             )
-            RoomTopic(
+            /*RoomTopic(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 topic = state.config.topic.orEmpty(),
                 onTopicChange = { state.eventSink(ConfigureRoomEvents.TopicChanged(it)) },
-            )
+            )*/
             if (state.config.invites.isNotEmpty()) {
                 SelectedUsersRowList(
                     contentPadding = PaddingValues(horizontal = 24.dp),
@@ -129,7 +130,7 @@ fun ConfigureRoomView(
                     state.eventSink(ConfigureRoomEvents.RoomVisibilityChanged(it))
                 },
             )
-            if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
+            /*if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
                 RoomAccessOptions(
                     selected = when (state.config.roomVisibility.roomAccess) {
                         RoomAccess.Anyone -> RoomAccessItem.Anyone
@@ -148,7 +149,7 @@ fun ConfigureRoomView(
                     onAddressChange = { state.eventSink(ConfigureRoomEvents.RoomAddressChanged(it)) },
                 )
                 Spacer(Modifier)
-            }
+            }*/
         }
     }
 
@@ -187,8 +188,9 @@ private fun ConfigureRoomToolbar(
     TopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.screen_create_room_title),
-                style = ElementTheme.typography.aliasScreenTitle,
+                //text = stringResource(R.string.screen_create_room_title),
+                text = "Group Details",
+                style = ElementTheme.zeroTypography.aliasScreenTitle,
             )
         },
         navigationIcon = { BackButton(onClick = onBackClick) },
@@ -210,10 +212,9 @@ private fun RoomNameWithAvatar(
     onChangeRoomName: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         UnsavedAvatar(
             avatarUri = avatarUri,
@@ -221,9 +222,11 @@ private fun RoomNameWithAvatar(
         )
 
         TextField(
-            label = stringResource(R.string.screen_create_room_room_name_label),
+            //label = stringResource(R.string.screen_create_room_room_name_label),
+            label = "Group Name",
             value = roomName,
-            placeholder = stringResource(CommonStrings.common_room_name_placeholder),
+            // placeholder = stringResource(CommonStrings.common_room_name_placeholder),
+            placeholder = "e.g: Test App Group",
             singleLine = true,
             onValueChange = onChangeRoomName,
         )
@@ -260,7 +263,7 @@ private fun ConfigureRoomOptions(
     ) {
         Text(
             text = title,
-            style = ElementTheme.typography.fontBodyLgMedium,
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             color = ElementTheme.colors.textPrimary,
             modifier = Modifier.padding(horizontal = 16.dp),
         )
@@ -275,7 +278,8 @@ private fun RoomVisibilityOptions(
     modifier: Modifier = Modifier,
 ) {
     ConfigureRoomOptions(
-        title = stringResource(R.string.screen_create_room_room_visibility_section_title),
+        // title = stringResource(R.string.screen_create_room_room_visibility_section_title),
+        title = "Group Type",
         modifier = modifier,
     ) {
         RoomVisibilityItem.entries.forEach { item ->
@@ -333,14 +337,14 @@ private fun RoomAddressField(
         leadingIcon = {
             Text(
                 text = "#",
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 color = ElementTheme.colors.textSecondary,
             )
         },
         trailingIcon = {
             Text(
                 text = homeserverName,
-                style = ElementTheme.typography.fontBodyLgMedium,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
                 color = ElementTheme.colors.textSecondary,
             )
         },

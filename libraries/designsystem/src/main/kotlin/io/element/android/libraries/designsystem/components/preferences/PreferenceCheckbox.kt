@@ -21,6 +21,7 @@ import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.toEnabledColor
 import io.element.android.libraries.designsystem.toSecondaryEnabledColor
 
@@ -47,7 +48,7 @@ fun PreferenceCheckbox(
         ),
         headlineContent = {
             Text(
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 text = title,
                 color = enabled.toEnabledColor(),
             )
@@ -55,7 +56,7 @@ fun PreferenceCheckbox(
         supportingContent = supportingText?.let {
             {
                 Text(
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     text = it,
                     color = enabled.toSecondaryEnabledColor(),
                 )

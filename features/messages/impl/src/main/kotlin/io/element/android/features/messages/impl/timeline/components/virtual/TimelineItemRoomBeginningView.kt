@@ -23,6 +23,7 @@ import io.element.android.features.messages.impl.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun TimelineItemRoomBeginningView(
@@ -42,7 +43,7 @@ fun TimelineItemRoomBeginningView(
         }
         Text(
             color = MaterialTheme.colorScheme.secondary,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
             text = text,
             textAlign = TextAlign.Center,
         )

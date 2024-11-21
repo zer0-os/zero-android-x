@@ -31,6 +31,8 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha10
 import io.element.android.libraries.ui.strings.CommonStrings
 
 /**
@@ -87,7 +89,7 @@ object BigIcon {
             is Style.Default -> ElementTheme.colors.bgSubtleSecondary
             Style.Alert, Style.Success -> Color.Transparent
             Style.AlertSolid -> ElementTheme.colors.bgCriticalSubtle
-            Style.SuccessSolid -> ElementTheme.colors.bgSuccessSubtle
+            Style.SuccessSolid -> ElementTheme.colors.zeroBrandColorAlpha10
         }
         val icon = when (style) {
             is Style.Default -> style.vectorIcon
@@ -102,7 +104,7 @@ object BigIcon {
         val iconTint = when (style) {
             is Style.Default -> ElementTheme.colors.iconSecondary
             Style.Alert, Style.AlertSolid -> ElementTheme.colors.iconCriticalPrimary
-            Style.Success, Style.SuccessSolid -> ElementTheme.colors.iconSuccessPrimary
+            Style.Success, Style.SuccessSolid -> ElementTheme.colors.zeroBrandColor
         }
         Box(
             modifier = modifier

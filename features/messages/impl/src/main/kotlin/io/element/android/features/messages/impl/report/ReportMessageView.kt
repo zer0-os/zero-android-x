@@ -42,6 +42,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +68,7 @@ fun ReportMessageView(
                 title = {
                     Text(
                         stringResource(CommonStrings.action_report_content),
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                     )
                 },
                 navigationIcon = {
@@ -108,11 +109,11 @@ fun ReportMessageView(
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = stringResource(R.string.screen_report_content_block_user),
-                        style = ElementTheme.typography.fontBodyLgRegular,
+                        style = ElementTheme.zeroTypography.fontBodyLgRegular,
                     )
                     Text(
                         text = stringResource(R.string.screen_report_content_block_user_hint),
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         color = MaterialTheme.colorScheme.secondary,
                     )
                 }

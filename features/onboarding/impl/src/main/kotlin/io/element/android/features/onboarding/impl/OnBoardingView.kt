@@ -41,9 +41,11 @@ import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.screens.onboarding.ZeroOnboardingView
 
 // Refs:
 // FTUE:
@@ -60,7 +62,7 @@ fun OnBoardingView(
     onReportProblem: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    OnBoardingPage(
+    /*OnBoardingPage(
         modifier = modifier,
         content = {
             OnBoardingContent(
@@ -77,7 +79,9 @@ fun OnBoardingView(
                 onReportProblem = onReportProblem,
             )
         }
-    )
+    )*/
+
+    ZeroOnboardingView(onSignIn = onSignIn)
 }
 
 @Composable
@@ -115,14 +119,14 @@ private fun OnBoardingContent(
                 Text(
                     text = stringResource(id = R.string.screen_onboarding_welcome_title),
                     color = ElementTheme.materialColors.primary,
-                    style = ElementTheme.typography.fontHeadingLgBold,
+                    style = ElementTheme.zeroTypography.fontHeadingLgBold,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(id = R.string.screen_onboarding_welcome_message, state.productionApplicationName),
                     color = ElementTheme.materialColors.secondary,
-                    style = ElementTheme.typography.fontBodyLgRegular.copy(fontSize = 17.sp),
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular.copy(fontSize = 17.sp),
                     textAlign = TextAlign.Center
                 )
             }
@@ -184,7 +188,7 @@ private fun OnBoardingButtons(
                 .padding(16.dp)
                 .clickable(onClick = onReportProblem),
             text = stringResource(id = CommonStrings.common_report_a_problem),
-            style = ElementTheme.typography.fontBodySmRegular,
+            style = ElementTheme.zeroTypography.fontBodySmRegular,
             color = ElementTheme.colors.textSecondary,
         )
     }

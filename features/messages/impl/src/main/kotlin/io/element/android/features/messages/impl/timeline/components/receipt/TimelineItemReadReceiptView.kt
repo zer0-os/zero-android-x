@@ -41,6 +41,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.timeline.item.event.LocalEventSendState
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -166,7 +167,7 @@ private fun ReadReceiptsAvatars(
         if (receipts.size > TimelineConfig.MAX_READ_RECEIPT_TO_DISPLAY) {
             Text(
                 text = "+" + (receipts.size - TimelineConfig.MAX_READ_RECEIPT_TO_DISPLAY),
-                style = ElementTheme.typography.fontBodyXsRegular,
+                style = ElementTheme.zeroTypography.fontBodyXsRegular,
                 color = ElementTheme.colors.textSecondary,
             )
         }

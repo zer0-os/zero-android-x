@@ -7,6 +7,7 @@
 
 package io.element.android.libraries.textcomposer.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,8 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.timeline.item.event.toEventOrTransactionId
 import io.element.android.libraries.textcomposer.model.MessageComposerMode
@@ -69,12 +72,10 @@ internal fun SendButton(
             modifier = Modifier
                 .clip(CircleShape)
                 .size(36.dp)
-                .then(
-                    if (canSendMessage) {
-                        buttonBackgroundModifier()
-                    } else {
-                        Modifier
-                    }
+                .background(if (canSendMessage)
+                    ElementTheme.colors.zeroBrandColorAlpha15
+                else
+                    Color.Transparent
                 )
         ) {
             Icon(
@@ -83,15 +84,8 @@ internal fun SendButton(
                     .align(Alignment.Center),
                 imageVector = iconVector,
                 contentDescription = contentDescription,
-                tint = if (canSendMessage) {
-                    if (ElementTheme.colors.isLight) {
-                        ElementTheme.colors.iconOnSolidPrimary
-                    } else {
-                        ElementTheme.colors.iconPrimary
-                    }
-                } else {
-                    ElementTheme.colors.iconQuaternary
-                }
+                // Exception here, we use Color.White instead of ElementTheme.colors.iconOnSolidPrimary
+                tint = if (canSendMessage) ElementTheme.colors.zeroBrandColor else ElementTheme.colors.iconDisabled
             )
         }
     }

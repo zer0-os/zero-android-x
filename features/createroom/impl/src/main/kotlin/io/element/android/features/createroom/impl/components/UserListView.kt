@@ -105,9 +105,9 @@ fun UserListView(
                                 subtext = recentDirectRoom.matrixUser.userId.value,
                             ),
                         )
-                        if (index < state.recentDirectRooms.lastIndex) {
+                        /*if (index < state.recentDirectRooms.lastIndex) {
                             HorizontalDivider()
-                        }
+                        }*/
                     }
                 }
             }

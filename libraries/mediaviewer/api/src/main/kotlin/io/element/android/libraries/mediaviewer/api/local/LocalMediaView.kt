@@ -60,6 +60,7 @@ import io.element.android.libraries.core.mimetype.MimeTypes.isMimeTypeImage
 import io.element.android.libraries.core.mimetype.MimeTypes.isMimeTypeVideo
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
@@ -305,7 +306,7 @@ private fun MediaFileView(
                 Text(
                     text = info.filename,
                     maxLines = 2,
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary
@@ -313,7 +314,7 @@ private fun MediaFileView(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = formatFileExtensionAndSize(info.fileExtension, info.formattedFileSize),
-                    style = ElementTheme.typography.fontBodyMdRegular,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.primary

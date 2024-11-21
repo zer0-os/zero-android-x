@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.LinearProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.progressIndicatorTrackColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.toEnabledColor
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.ui.strings.CommonPlurals
@@ -69,7 +70,7 @@ internal fun PollAnswerView(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = answerItem.answer.text,
-                    style = if (answerItem.isWinner) ElementTheme.typography.fontBodyLgMedium else ElementTheme.typography.fontBodyLgRegular,
+                    style = if (answerItem.isWinner) ElementTheme.zeroTypography.fontBodyLgMedium else ElementTheme.zeroTypography.fontBodyLgRegular,
                 )
                 if (answerItem.showVotes) {
                     val text = pluralStringResource(
@@ -90,13 +91,13 @@ internal fun PollAnswerView(
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
                                 text = text,
-                                style = ElementTheme.typography.fontBodySmMedium,
+                                style = ElementTheme.zeroTypography.fontBodySmMedium,
                                 color = ElementTheme.colors.textPrimary,
                             )
                         } else {
                             Text(
                                 text = text,
-                                style = ElementTheme.typography.fontBodySmRegular,
+                                style = ElementTheme.zeroTypography.fontBodySmRegular,
                                 color = ElementTheme.colors.textSecondary,
                             )
                         }

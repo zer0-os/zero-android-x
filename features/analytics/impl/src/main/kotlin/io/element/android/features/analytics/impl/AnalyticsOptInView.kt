@@ -43,6 +43,7 @@ import io.element.android.libraries.designsystem.text.buildAnnotatedStringWithSt
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.persistentListOf
 
@@ -109,7 +110,7 @@ private fun AnalyticsOptInHeader(
             onClick = { onClickTerms() },
             modifier = Modifier
                 .padding(8.dp),
-            style = ElementTheme.typography.fontBodyMdRegular
+            style = ElementTheme.zeroTypography.fontBodyMdRegular
                 .copy(
                     color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.Center,
@@ -142,7 +143,7 @@ private fun AnalyticsOptInContent() {
                     iconVector = CompoundIcons.CheckCircle(),
                 ),
             ),
-            textStyle = ElementTheme.typography.fontBodyLgMedium,
+            textStyle = ElementTheme.zeroTypography.fontBodyLgMedium,
             iconTint = ElementTheme.colors.iconSuccessPrimary,
             backgroundColor = ElementTheme.colors.bgActionSecondaryHovered,
         )

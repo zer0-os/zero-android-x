@@ -31,6 +31,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
 fun SecureBackupDisableView(
@@ -103,7 +104,7 @@ private fun SecureBackupDisableItem(text: String) {
         Text(
             text = text,
             color = ElementTheme.colors.textSecondary,
-            style = ElementTheme.typography.fontBodyMdRegular,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
         )
     }
 }

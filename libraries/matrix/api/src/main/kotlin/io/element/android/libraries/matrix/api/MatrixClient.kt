@@ -34,6 +34,7 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +52,10 @@ interface MatrixClient : Closeable {
     val mediaLoader: MatrixMediaLoader
     val sessionCoroutineScope: CoroutineScope
     val ignoredUsersFlow: StateFlow<ImmutableList<UserId>>
+
+    val shouldShowNewRewardsIntimation: StateFlow<Boolean>
+    val userRewards: StateFlow<ZeroUserRewards>
+
     suspend fun getRoom(roomId: RoomId): MatrixRoom?
     suspend fun getPendingRoom(roomId: RoomId): PendingRoom?
     suspend fun findDM(userId: UserId): RoomId?
@@ -156,6 +161,9 @@ interface MatrixClient : Closeable {
 
     fun canDeactivateAccount(): Boolean
     suspend fun deactivateAccount(password: String, eraseData: Boolean): Result<Unit>
+
+    suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
+    fun dismissRewardsIntimation()
 }
 
 /**

@@ -118,7 +118,8 @@ class DefaultFtueService @Inject constructor(
     }
 
     private suspend fun needsAnalyticsOptIn(): Boolean {
-        return analyticsService.didAskUserConsent().first().not()
+        //return analyticsService.didAskUserConsent().first().not()
+        return false //Skipping analytics consent screen after login
     }
 
     private suspend fun shouldAskNotificationPermissions(): Boolean {

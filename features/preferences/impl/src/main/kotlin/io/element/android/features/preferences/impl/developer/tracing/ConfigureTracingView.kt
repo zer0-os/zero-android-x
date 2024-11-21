@@ -47,6 +47,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.tracing.LogLevel
 import io.element.android.libraries.matrix.api.tracing.Target
 import kotlinx.collections.immutable.ImmutableMap
@@ -73,7 +74,7 @@ fun ConfigureTracingView(
                 title = {
                     Text(
                         text = "Configure tracing",
-                        style = ElementTheme.typography.aliasScreenTitle,
+                        style = ElementTheme.zeroTypography.aliasScreenTitle,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -122,7 +123,7 @@ fun ConfigureTracingView(
                         Text(
                             modifier = Modifier.clickable { Runtime.getRuntime().exit(0) },
                             text = "Tap here to kill the app and apply the changes. You'll have to re-open the app manually.",
-                            style = ElementTheme.typography.fontHeadingSmMedium,
+                            style = ElementTheme.zeroTypography.fontHeadingSmMedium,
                         )
                     },
                 )

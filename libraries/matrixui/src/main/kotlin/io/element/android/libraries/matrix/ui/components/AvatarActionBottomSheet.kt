@@ -33,6 +33,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.hide
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.media.AvatarAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -96,7 +97,7 @@ private fun AvatarActionBottomSheetContent(
                 headlineContent = {
                     Text(
                         text = stringResource(action.titleResId),
-                        style = ElementTheme.typography.fontBodyLgRegular,
+                        style = ElementTheme.zeroTypography.fontBodyLgRegular,
                         color = if (action.destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                     )
                 },

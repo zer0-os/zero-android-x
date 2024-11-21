@@ -24,6 +24,11 @@ import extension.setupAnvil
 import extension.setupKover
 import java.util.Locale
 
+val APP_TIER_ZERO = "ZERO"
+val APP_TIER_ELEMENT = "ELEMENT"
+//TODO: Change the tier here only to `APP_TIER_ELEMENT` to show app element app name and icon
+val CURRENT_APP_TIER = APP_TIER_ZERO
+
 plugins {
     id("io.element.android-compose-application")
     alias(libs.plugins.kotlin.android)
@@ -43,7 +48,9 @@ android {
     namespace = "io.element.android.x"
 
     defaultConfig {
-        applicationId = if (isEnterpriseBuild) {
+        applicationId = if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+            "com.zero.android.messenger"
+        } else if (isEnterpriseBuild) {
             "io.element.enterprise"
         } else {
             "io.element.android.x"
@@ -52,27 +59,27 @@ android {
         versionCode = Versions.VERSION_CODE
         versionName = Versions.VERSION_NAME
 
-        // Keep abiFilter for the universalApk
-        ndk {
-            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-        }
-
-        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
-        splits {
-            // Configures multiple APKs based on ABI.
-            abi {
-                // Enables building multiple APKs per ABI.
-                isEnable = true
-                // By default all ABIs are included, so use reset() and include to specify that we only
-                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
-                // Resets the list of ABIs that Gradle should create APKs for to none.
-                reset()
-                // Specifies a list of ABIs that Gradle should create APKs for.
-                include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-                // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
-                isUniversalApk = true
-            }
-        }
+//        // Keep abiFilter for the universalApk
+//        ndk {
+//            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+//        }
+//
+//        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
+//        splits {
+//            // Configures multiple APKs based on ABI.
+//            abi {
+//                // Enables building multiple APKs per ABI.
+//                isEnable = true
+//                // By default all ABIs are included, so use reset() and include to specify that we only
+//                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
+//                // Resets the list of ABIs that Gradle should create APKs for to none.
+//                reset()
+//                // Specifies a list of ABIs that Gradle should create APKs for.
+//                include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+//                // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
+//                isUniversalApk = true
+//            }
+//        }
 
         defaultConfig {
             resourceConfigurations += locales
@@ -106,13 +113,21 @@ android {
 
     buildTypes {
         getByName("debug") {
-            resValue("string", "app_name", "$baseAppName dbg")
-            applicationIdSuffix = ".debug"
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                resValue("string", "app_name", "ZERO")
+            } else {
+                resValue("string", "app_name", "$baseAppName dbg")
+            }
+            //applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
 
         getByName("release") {
-            resValue("string", "app_name", baseAppName)
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                resValue("string", "app_name", "ZERO")
+            } else {
+                resValue("string", "app_name", baseAppName)
+            }
             signingConfig = signingConfigs.getByName("debug")
 
             postprocessing {
@@ -172,11 +187,27 @@ android {
             isDefault = true
             buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"G\"")
             buildConfigField("String", "FLAVOR_DESCRIPTION", "\"GooglePlay\"")
+            if (CURRENT_APP_TIER == APP_TIER_ZERO) {
+                // Zero app icons and themes
+                manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher_zero"
+                manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round_zero"
+                manifestPlaceholders["app_theme"] = "@style/Theme.ElementX" //keeping Element theme for now
+                manifestPlaceholders["app_theme_splash"] = "@style/Theme.ZERO.Splash"
+            } else {
+                manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher"
+                manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round"
+                manifestPlaceholders["app_theme"] = "@style/Theme.ElementX"
+                manifestPlaceholders["app_theme_splash"] = "@style/Theme.ElementX.Splash"
+            }
         }
         create("fdroid") {
             dimension = "store"
             buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"F\"")
             buildConfigField("String", "FLAVOR_DESCRIPTION", "\"FDroid\"")
+            manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher"
+            manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round"
+            manifestPlaceholders["app_theme"] = "@style/Theme.ElementX"
+            manifestPlaceholders["app_theme_splash"] = "@style/Theme.ElementX.Splash"
         }
     }
 }
@@ -202,7 +233,7 @@ androidComponents {
             val abiCode = abiVersionCodes[name] ?: 0
             // Assigns the new version code to output.versionCode, which changes the version code
             // for only the output APK, not for the variant itself.
-            output.versionCode.set((output.versionCode.orNull ?: 0) * 10 + abiCode)
+            output.versionCode.set((output.versionCode.orNull ?: 0))
         }
     }
 
@@ -251,6 +282,7 @@ dependencies {
     implementation(projects.appconfig)
     implementation(projects.libraries.uiStrings)
     implementation(projects.services.analytics.compose)
+    implementation(projects.zero)
 
     if (ModulesConfig.pushProvidersConfig.includeFirebase) {
         "gplayImplementation"(projects.libraries.pushproviders.firebase)
@@ -268,10 +300,13 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.startup)
     implementation(libs.androidx.preference)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil)
 
     implementation(platform(libs.network.okhttp.bom))
     implementation(libs.network.okhttp.logging)
+    implementation(platform(libs.network.retrofit.bom))
+    implementation(libs.network.retrofit.converter.serialization)
     implementation(libs.serialization.json)
 
     implementation(libs.matrix.emojibase.bindings)

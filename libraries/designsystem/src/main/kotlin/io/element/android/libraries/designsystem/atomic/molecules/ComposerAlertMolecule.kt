@@ -34,6 +34,7 @@ import io.element.android.libraries.designsystem.text.toAnnotatedString
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.BooleanProvider
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -77,7 +78,7 @@ fun ComposerAlertMolecule(
                     Text(
                         text = content,
                         modifier = Modifier.weight(1f),
-                        style = ElementTheme.typography.fontBodyMdRegular,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
                         color = ElementTheme.colors.textPrimary,
                         textAlign = TextAlign.Start,
                     )

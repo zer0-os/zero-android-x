@@ -45,6 +45,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.lowHorizontalPaddingValue
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @OptIn(CoreColorToken::class)
 @Composable
@@ -118,7 +119,7 @@ fun SuperButton(
     ) {
         CompositionLocalProvider(
             LocalContentColor provides if (enabled) ElementTheme.colors.textPrimary else ElementTheme.colors.textDisabled,
-            LocalTextStyle provides ElementTheme.typography.fontBodyLgMedium,
+            LocalTextStyle provides ElementTheme.zeroTypography.fontBodyLgMedium,
         ) {
             content()
         }

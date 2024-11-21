@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.theme.components.InvisibleButto
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -141,7 +142,7 @@ private fun ContentInitial(
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 16.dp),
             text = stringResource(R.string.screen_session_verification_request_footer),
-            style = ElementTheme.typography.fontBodyMdMedium,
+            style = ElementTheme.zeroTypography.fontBodyMdMedium,
             textAlign = TextAlign.Center,
         )
     }

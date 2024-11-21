@@ -84,7 +84,7 @@ class ConfigureRoomPresenter @Inject constructor(
                 listOfNotNull(
                     AvatarAction.TakePhoto,
                     AvatarAction.ChoosePhoto,
-                    AvatarAction.Remove.takeIf { createRoomConfig.avatarUri != null },
+                    //AvatarAction.Remove.takeIf { createRoomConfig.avatarUri != null },
                 ).toImmutableList()
             }
         }

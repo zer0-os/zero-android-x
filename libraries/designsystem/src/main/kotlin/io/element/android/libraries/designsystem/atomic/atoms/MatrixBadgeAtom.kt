@@ -20,6 +20,8 @@ import io.element.android.libraries.designsystem.theme.badgeNeutralBackgroundCol
 import io.element.android.libraries.designsystem.theme.badgeNeutralContentColor
 import io.element.android.libraries.designsystem.theme.badgePositiveBackgroundColor
 import io.element.android.libraries.designsystem.theme.badgePositiveContentColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
 
 object MatrixBadgeAtom {
     data class MatrixBadgeData(
@@ -39,17 +41,17 @@ object MatrixBadgeAtom {
         data: MatrixBadgeData,
     ) {
         val backgroundColor = when (data.type) {
-            Type.Positive -> ElementTheme.colors.badgePositiveBackgroundColor
+            Type.Positive -> ElementTheme.colors.zeroBrandColorAlpha15
             Type.Neutral -> ElementTheme.colors.badgeNeutralBackgroundColor
             Type.Negative -> ElementTheme.colors.badgeNegativeBackgroundColor
         }
         val textColor = when (data.type) {
-            Type.Positive -> ElementTheme.colors.badgePositiveContentColor
+            Type.Positive -> ElementTheme.colors.zeroBrandColor
             Type.Neutral -> ElementTheme.colors.badgeNeutralContentColor
             Type.Negative -> ElementTheme.colors.badgeNegativeContentColor
         }
         val iconColor = when (data.type) {
-            Type.Positive -> ElementTheme.colors.iconSuccessPrimary
+            Type.Positive -> ElementTheme.colors.zeroBrandColor
             Type.Neutral -> ElementTheme.colors.iconSecondary
             Type.Negative -> ElementTheme.colors.iconCriticalPrimary
         }

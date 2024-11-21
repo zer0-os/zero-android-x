@@ -18,6 +18,7 @@ import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsState
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -34,8 +35,12 @@ data class RoomListState(
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,
     val eventSink: (RoomListEvents) -> Unit,
+
+    val shouldShowNewRewardsIntimation: Boolean = true,
+    val userRewards: ZeroUserRewards = ZeroUserRewards.empty()
 ) {
-    val displayFilters = contentState is RoomListContentState.Rooms
+    //val displayFilters = contentState is RoomListContentState.Rooms
+    val displayFilters = false //Hiding room list filters for now
     val displayActions = true
 
     sealed interface ContextMenu {

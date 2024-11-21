@@ -9,4 +9,5 @@ package io.element.android.features.preferences.impl.root
 
 sealed interface PreferencesRootEvents {
     data object OnVersionInfoClick : PreferencesRootEvents
+    data object DismissRewardsIntimation: PreferencesRootEvents
 }

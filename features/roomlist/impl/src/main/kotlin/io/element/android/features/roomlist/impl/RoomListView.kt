@@ -132,6 +132,11 @@ private fun RoomListScaffold(
                 displayMenuItems = state.displayActions,
                 displayFilters = state.displayFilters,
                 filtersState = state.filtersState,
+                shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
+                userRewards = state.userRewards,
+                onDismissRewardsTooltip = { immediate ->
+                    state.eventSink(RoomListEvents.DismissRewardsIntimation(immediate))
+                }
             )
         },
         content = { padding ->
