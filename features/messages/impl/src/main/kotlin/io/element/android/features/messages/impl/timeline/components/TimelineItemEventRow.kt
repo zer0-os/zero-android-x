@@ -72,6 +72,7 @@ import io.element.android.features.messages.impl.timeline.model.event.aTimelineI
 import io.element.android.features.messages.impl.timeline.model.event.aTimelineItemTextContent
 import io.element.android.features.messages.impl.timeline.protection.TimelineProtectionEvent
 import io.element.android.features.messages.impl.timeline.protection.TimelineProtectionState
+import io.element.android.features.messages.impl.timeline.protection.mustBeProtected
 import io.element.android.libraries.designsystem.colors.AvatarColorsProvider
 import io.element.android.libraries.designsystem.components.EqualWidthColumn
 import io.element.android.libraries.designsystem.components.avatar.Avatar
@@ -148,6 +149,13 @@ fun TimelineItemEventRow(
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
 
+    val onContentClick = if (event.mustBeProtected()) {
+        // In this case, let the content handle the click
+        {}
+    } else {
+        onEventClick
+    }
+
     fun onUserDataClick() {
         onUserDataClick(event.senderId)
     }
@@ -180,7 +188,7 @@ fun TimelineItemEventRow(
                         isHighlighted = isHighlighted,
                         timelineRoomInfo = timelineRoomInfo,
                         interactionSource = interactionSource,
-                        onContentClick = onEventClick,
+                        onContentClick = onContentClick,
                         onLongClick = onLongClick,
                         inReplyToClick = ::inReplyToClick,
                         onUserDataClick = ::onUserDataClick,
@@ -214,7 +222,7 @@ fun TimelineItemEventRow(
                 isHighlighted = isHighlighted,
                 timelineRoomInfo = timelineRoomInfo,
                 interactionSource = interactionSource,
-                onContentClick = onEventClick,
+                onContentClick = onContentClick,
                 onLongClick = onLongClick,
                 inReplyToClick = ::inReplyToClick,
                 onUserDataClick = ::onUserDataClick,

@@ -154,7 +154,7 @@ test_konsist = "com.lemonappdev:konsist:0.16.1"
 test_turbine = "app.cash.turbine:turbine:1.2.0"
 test_truth = "com.google.truth:truth:1.4.4"
 test_parameter_injector = "com.google.testparameterinjector:test-parameter-injector:1.18"
-test_robolectric = "org.robolectric:robolectric:4.14"
+test_robolectric = "org.robolectric:robolectric:4.14.1"
 test_appyx_junit = { module = "com.bumble.appyx:testing-junit4", version.ref = "appyx" }
 test_composable_preview_scanner = "com.github.sergio-sastre.ComposablePreviewScanner:android:0.1.2"
 
@@ -163,7 +163,7 @@ coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil_compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coil_gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
 coil_test = { module = "io.coil-kt:coil-test", version.ref = "coil" }
-compound = { module = "io.element.android:compound-android", version = "0.1.1" }
+compound = { module = "io.element.android:compound-android", version = "0.2.0" }
 datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 serialization_json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization_json" }
 kotlinx_collections_immutable = "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8"
