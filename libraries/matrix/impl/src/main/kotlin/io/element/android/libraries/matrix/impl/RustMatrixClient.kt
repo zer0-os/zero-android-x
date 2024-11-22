@@ -48,6 +48,7 @@ import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
@@ -85,6 +86,8 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -113,6 +116,7 @@ import org.matrix.rustcomponents.sdk.PowerLevels
 import org.matrix.rustcomponents.sdk.SendQueueRoomErrorListener
 import org.matrix.rustcomponents.sdk.SlidingSyncVersion
 import org.matrix.rustcomponents.sdk.TaskHandle
+import org.matrix.rustcomponents.sdk.UserProfile
 import org.matrix.rustcomponents.sdk.use
 import timber.log.Timber
 import java.io.File
@@ -378,7 +382,13 @@ class RustMatrixClient(
 
     override suspend fun getProfile(userId: UserId): Result<MatrixUser> = withContext(sessionDispatcher) {
         runCatching {
-            client.getProfile(userId.value).let(UserProfileMapper::map)
+            val profiles = awaitAll(
+                async { client.getProfile(userId.value) },
+                async { zeroUserRepository?.getUser(userId.value)?.firstOrNull() }
+            )
+            val matrixProfile = profiles.first() as UserProfile
+            val zeroUser = profiles.getOrNull(1) as? ZeroUser
+            UserProfileMapper.map(matrixProfile, zeroUser)
         }
     }
 
@@ -390,8 +400,8 @@ class RustMatrixClient(
             runCatching {
                 zeroUserRepository?.let { userRepo ->
                     val zeroSearchResults = userRepo.getUsers(filterName = searchTerm).firstOrNull() ?: emptyList()
-                    val matrixUserProfiles = zeroSearchResults.map { userId ->
-                        UserProfileMapper.map(client.getProfile(userId))
+                    val matrixUserProfiles = zeroSearchResults.map { zeroUser ->
+                        UserProfileMapper.map(client.getProfile(zeroUser.matrixId), zeroUser)
                     }
                     MatrixSearchUserResults(
                         results = matrixUserProfiles.toImmutableList(),

@@ -36,7 +36,8 @@ fun SearchMultipleUsersResultItem(
     } else {
         CheckableUserRowData.Resolved(
             name = searchResult.matrixUser.getBestName(),
-            subtext = if (searchResult.matrixUser.displayName.isNullOrEmpty()) null else searchResult.matrixUser.userId.value,
+            //subtext = if (searchResult.matrixUser.displayName.isNullOrEmpty()) null else searchResult.matrixUser.userId.value,
+            subtext = searchResult.matrixUser.primaryZeroId,
             avatarData = searchResult.matrixUser.getAvatarData(AvatarSize.UserListItem),
         )
     }

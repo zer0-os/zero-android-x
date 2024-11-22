@@ -17,6 +17,7 @@ import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroConversationService
+import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroRewardService
 import io.element.android.support.zero.network.service.ZeroUserService
 
@@ -41,8 +42,9 @@ object RepositoryModule {
     @Provides
     @SingleIn(AppScope::class)
     fun bindUserRepository(
-        zeroUserService: ZeroUserService
-    ): UserRepository = UserRepositoryImpl(zeroUserService)
+        zeroUserService: ZeroUserService,
+        zeroMatrixUserService: ZeroMatrixUserService
+    ): UserRepository = UserRepositoryImpl(zeroUserService, zeroMatrixUserService)
 
     @Provides
     @SingleIn(AppScope::class)

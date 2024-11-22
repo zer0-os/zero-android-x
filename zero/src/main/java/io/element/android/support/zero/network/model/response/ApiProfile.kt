@@ -18,5 +18,5 @@ data class ApiProfile(
 	val gender: String? = null,
 	val summary: String? = null,
 	val backgroundImage: String? = null,
-	val createdAt: Long? = 0L
+	//val createdAt: Long? = 0L
 ) : ApiBaseProfile

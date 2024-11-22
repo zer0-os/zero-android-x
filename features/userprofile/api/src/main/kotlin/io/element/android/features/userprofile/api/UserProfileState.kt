@@ -16,6 +16,7 @@ data class UserProfileState(
     val userId: UserId,
     val userName: String?,
     val avatarUrl: String?,
+    val primaryZeroId: String?,
     val isVerified: AsyncData<Boolean>,
     val isBlocked: AsyncData<Boolean>,
     val startDmActionState: AsyncAction<RoomId>,
