@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.jsoup)
 
+    implementation(projects.zero)
+
     testImplementation(libs.coroutines.test)
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)

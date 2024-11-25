@@ -699,7 +699,11 @@ class MessageComposerPresenter @AssistedInject constructor(
                 markdownTextEditorState.selection = IntRange.EMPTY
             }
             val pillifiedContent = pillificationHelper.pillify(content)
-            markdownTextEditorState.text.update(pillifiedContent, true)
+
+            //Adding mentions pills with zero format
+            val zeroPillifiedContent = pillificationHelper.pillifyWithZero(pillifiedContent)
+
+            markdownTextEditorState.text.update(zeroPillifiedContent, true)
             if (requestFocus) {
                 markdownTextEditorState.requestFocusAction()
             }

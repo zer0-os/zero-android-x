@@ -11,6 +11,7 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.timeline.item.event.FormattedBody
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageFormat
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
+import io.element.android.support.zero.common.util.ZeroMentionPatterns
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -53,7 +54,7 @@ fun Document.toPlainText(): String {
 
 private fun TextMessageType.simplyFormattedBody(): String {
     val actualText = body
-    val regexPattern = """@\[(.+?)\]\(user:(.+?)\)""".toRegex()
+    val regexPattern = ZeroMentionPatterns.ZERO_USER_MENTION_REGEX
     return regexPattern.replace(actualText) { matchResult ->
         "@${matchResult.groupValues[1]}"
     }
