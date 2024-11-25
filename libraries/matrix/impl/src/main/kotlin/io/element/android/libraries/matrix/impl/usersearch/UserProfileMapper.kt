@@ -9,13 +9,15 @@ package io.element.android.libraries.matrix.impl.usersearch
 
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import org.matrix.rustcomponents.sdk.UserProfile
 
 object UserProfileMapper {
-    fun map(userProfile: UserProfile): MatrixUser =
+    fun map(userProfile: UserProfile, zeroUser: ZeroUser? = null): MatrixUser =
         MatrixUser(
             userId = UserId(userProfile.userId),
             displayName = userProfile.displayName,
             avatarUrl = userProfile.avatarUrl,
+            primaryZeroId = zeroUser?.primaryZeroId
         )
 }

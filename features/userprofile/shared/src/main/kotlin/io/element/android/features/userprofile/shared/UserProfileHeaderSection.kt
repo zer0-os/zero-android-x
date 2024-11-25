@@ -44,6 +44,7 @@ fun UserProfileHeaderSection(
     avatarUrl: String?,
     userId: UserId,
     userName: String?,
+    primaryZeroId: String?,
     isUserVerified: AsyncData<Boolean>,
     openAvatarPreview: (url: String) -> Unit,
     modifier: Modifier = Modifier
@@ -70,13 +71,15 @@ fun UserProfileHeaderSection(
             )
             Spacer(modifier = Modifier.height(6.dp))
         }
-        /*Text(
-            text = userId.value,
-            style = ElementTheme.zeroTypography.fontBodyLgRegular,
-            color = MaterialTheme.colorScheme.secondary,
-            textAlign = TextAlign.Center,
-        )
-        if (isUserVerified.dataOrNull() == true) {
+        if (!primaryZeroId.isNullOrBlank()) {
+            Text(
+                text = primaryZeroId,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center,
+            )
+        }
+        /*if (isUserVerified.dataOrNull() == true) {
             MatrixBadgeRowMolecule(
                 data = listOf(
                     MatrixBadgeAtom.MatrixBadgeData(
@@ -98,6 +101,7 @@ internal fun UserProfileHeaderSectionPreview() = ElementPreview {
         avatarUrl = null,
         userId = UserId("@alice:example.com"),
         userName = "Alice",
+        primaryZeroId = null,
         isUserVerified = AsyncData.Success(true),
         openAvatarPreview = {},
     )

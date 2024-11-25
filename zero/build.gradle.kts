@@ -17,6 +17,7 @@ dependencies {
     implementation(projects.libraries.designsystem)
     implementation(libs.dagger)
     implementation(projects.libraries.di)
+    implementation(projects.libraries.matrix.api)
 
     implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.network.okhttp.bom))

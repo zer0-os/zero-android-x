@@ -132,6 +132,7 @@ class UserProfilePresenter @AssistedInject constructor(
             userId = userId,
             userName = userProfile?.displayName,
             avatarUrl = userProfile?.avatarUrl,
+            primaryZeroId = userProfile?.primaryZeroId,
             isBlocked = isBlocked.value,
             isVerified = isVerified.value,
             startDmActionState = startDmActionState.value,

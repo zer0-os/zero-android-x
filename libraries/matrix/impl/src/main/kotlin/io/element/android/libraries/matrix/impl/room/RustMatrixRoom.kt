@@ -35,6 +35,7 @@ import io.element.android.libraries.matrix.api.room.MatrixRoomMembersState
 import io.element.android.libraries.matrix.api.room.MatrixRoomNotificationSettingsState
 import io.element.android.libraries.matrix.api.room.MessageEventType
 import io.element.android.libraries.matrix.api.room.RoomMember
+import io.element.android.libraries.matrix.api.room.RoomMembershipObserver
 import io.element.android.libraries.matrix.api.room.StateEventType
 import io.element.android.libraries.matrix.api.room.draft.ComposerDraft
 import io.element.android.libraries.matrix.api.room.location.AssetType
@@ -61,7 +62,6 @@ import io.element.android.libraries.matrix.impl.widget.generateWidgetWebViewUrl
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.ConversationRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,7 +93,6 @@ import org.matrix.rustcomponents.sdk.IdentityStatusChange as RustIdentityStateCh
 import org.matrix.rustcomponents.sdk.Room as InnerRoom
 import org.matrix.rustcomponents.sdk.Timeline as InnerTimeline
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RustMatrixRoom(
     override val sessionId: SessionId,
     private val deviceId: DeviceId,
@@ -108,6 +107,7 @@ class RustMatrixRoom(
     private val roomSyncSubscriber: RoomSyncSubscriber,
     private val matrixRoomInfoMapper: MatrixRoomInfoMapper,
     private val featureFlagService: FeatureFlagService,
+    private val roomMembershipObserver: RoomMembershipObserver,
     private val zeroConversationRepository: ConversationRepository?,
 ) : MatrixRoom {
     override val roomId = RoomId(innerRoom.id())
@@ -382,6 +382,8 @@ class RustMatrixRoom(
     override suspend fun leave(): Result<Unit> = withContext(roomDispatcher) {
         runCatching {
             innerRoom.leave()
+        }.onSuccess {
+            roomMembershipObserver.notifyUserLeftRoom(roomId)
         }
     }
 
@@ -481,16 +483,40 @@ class RustMatrixRoom(
         return result
     }
 
-    override suspend fun sendAudio(file: File, audioInfo: AudioInfo, progressCallback: ProgressCallback?): Result<MediaUploadHandler> {
-        val result = liveTimeline.sendAudio(file, audioInfo, progressCallback)
+    override suspend fun sendAudio(
+        file: File,
+        audioInfo: AudioInfo,
+        caption: String?,
+        formattedCaption: String?,
+        progressCallback: ProgressCallback?,
+    ): Result<MediaUploadHandler> {
+        val result = liveTimeline.sendAudio(
+            file = file,
+            audioInfo = audioInfo,
+            caption = caption,
+            formattedCaption = formattedCaption,
+            progressCallback = progressCallback,
+        )
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
         }
         return result
     }
 
-    override suspend fun sendFile(file: File, fileInfo: FileInfo, progressCallback: ProgressCallback?): Result<MediaUploadHandler> {
-        val result = liveTimeline.sendFile(file, fileInfo, progressCallback)
+    override suspend fun sendFile(
+        file: File,
+        fileInfo: FileInfo,
+        caption: String?,
+        formattedCaption: String?,
+        progressCallback: ProgressCallback?,
+    ): Result<MediaUploadHandler> {
+        val result = liveTimeline.sendFile(
+            file,
+            fileInfo,
+            caption,
+            formattedCaption,
+            progressCallback,
+        )
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value)
         }

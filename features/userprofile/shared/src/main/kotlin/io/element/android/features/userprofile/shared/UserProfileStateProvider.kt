@@ -46,6 +46,7 @@ fun aUserProfileState(
     userId = userId,
     userName = userName,
     avatarUrl = avatarUrl,
+    primaryZeroId = null,
     isBlocked = isBlocked,
     isVerified = isVerified,
     startDmActionState = startDmActionState,
