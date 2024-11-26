@@ -23,9 +23,10 @@ import io.element.android.libraries.matrix.api.timeline.item.event.OtherMessageT
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VideoMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageType
-import io.element.android.libraries.matrix.impl.common.MatrixSessionCommon
+import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
+import io.element.android.support.zero.common.util.ZeroPatterns
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.data.model.helper.isRemoteGif
 import io.element.android.support.zero.datastore.converter.AppJson.toJson
@@ -181,28 +182,12 @@ private fun RustFormattedBody.map(actualText: String?): FormattedBody = Formatte
 )
 
 private fun RustFormattedBody.correctlyFormattedHtmlBody(text: String?): String {
-    val baseUrl = "https://matrix.to/#/@"
-    val domain = MatrixSessionCommon.getHomeServerPostfix()
-    val htmlBody: String = body
-    val actualText: String = text ?: ""
-
     // Use a regular expression to find user mentions in the format @[Name](user:UUID)
-    val regexPattern = """@\[(.+?)\]\(user:(.+?)\)""".toRegex()
-    if (htmlBody.isNotBlank()) {
-        val actualMentionRegex = """\[@([a-f0-9\-]+:[a-zA-Z0-9\.\-]+)\]\(https:\/\/matrix\.to\/#\/@\1\)""".toRegex()
-        val matches = actualMentionRegex.findAll(actualText).toList()
-        if (matches.isNotEmpty() && htmlBody.contains("<a href=")) {
-            return htmlBody
-        } else {
-            // Replace matches with the appropriate HTML anchor tags
-            val modifiedBody = regexPattern.replace(actualText) {
-                "<a href=\"$baseUrl${it.groupValues[2]}:$domain\">@${it.groupValues[2]}:$domain</a>"
-            }
-            return modifiedBody
-        }
-    } else {
-        return htmlBody
-    }
+    return ZeroPatterns.correctlyFormattedHtmlString(
+        text = text,
+        messageBody = body,
+        domain = MatrixSessionCommon.getHomeServerPostfix()
+    )
 }
 
 private fun RustMessageFormat.map(): MessageFormat {

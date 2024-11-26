@@ -1,6 +1,6 @@
-package io.element.android.libraries.matrix.impl.common
+package io.element.android.libraries.matrix.api.common
 
-internal object MatrixSessionCommon {
+object MatrixSessionCommon {
     private lateinit var homeServerPostfix: String
 
     fun setHomeServerUrl(url: String) {

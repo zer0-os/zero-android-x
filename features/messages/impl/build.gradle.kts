@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.telephoto.zoomableimage)
     implementation(libs.matrix.emojibase.bindings)
 
+    implementation(projects.zero)
+
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.molecule.runtime)

@@ -142,7 +142,7 @@ private fun AttachmentSourcePickerMenu(
                 headlineContent = { Text(stringResource(R.string.screen_room_attachment_source_poll)) },
                 style = ListItemStyle.Primary,
             )
-        }*/
+        }
         if (enableTextFormatting) {
             ListItem(
                 modifier = Modifier.clickable { state.eventSink(MessageComposerEvents.ToggleTextFormatting(enabled = true)) },
@@ -150,7 +150,7 @@ private fun AttachmentSourcePickerMenu(
                 headlineContent = { Text(stringResource(R.string.screen_room_attachment_text_formatting)) },
                 style = ListItemStyle.Primary,
             )
-        }
+        }*/
     }
 }
 
