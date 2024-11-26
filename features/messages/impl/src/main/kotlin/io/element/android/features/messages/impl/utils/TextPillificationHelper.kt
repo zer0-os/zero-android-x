@@ -22,7 +22,7 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.textcomposer.mentions.MentionSpan
 import io.element.android.libraries.textcomposer.mentions.MentionSpanProvider
-import io.element.android.support.zero.common.util.ZeroMentionPatterns
+import io.element.android.support.zero.common.util.ZeroPatterns
 import javax.inject.Inject
 
 interface TextPillificationHelper {
@@ -80,7 +80,7 @@ class DefaultTextPillificationHelper @Inject constructor(
     }
 
     override fun pillifyWithZero(text: CharSequence): CharSequence {
-        val matches = ZeroMentionPatterns.ZERO_USER_MENTION_REGEX.findAll(text)
+        val matches = ZeroPatterns.ZERO_USER_MENTION_REGEX.findAll(text)
         if (matches.none()) return text
 
         val spannable = SpannableStringBuilder(text)

@@ -26,7 +26,7 @@ import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageT
 import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
-import io.element.android.support.zero.common.util.ZeroMentionPatterns
+import io.element.android.support.zero.common.util.ZeroPatterns
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.data.model.helper.isRemoteGif
 import io.element.android.support.zero.datastore.converter.AppJson.toJson
@@ -183,7 +183,7 @@ private fun RustFormattedBody.map(actualText: String?): FormattedBody = Formatte
 
 private fun RustFormattedBody.correctlyFormattedHtmlBody(text: String?): String {
     // Use a regular expression to find user mentions in the format @[Name](user:UUID)
-    return ZeroMentionPatterns.highlightMentionsInMessage(
+    return ZeroPatterns.correctlyFormattedHtmlString(
         text = text,
         messageBody = body,
         domain = MatrixSessionCommon.getHomeServerPostfix()

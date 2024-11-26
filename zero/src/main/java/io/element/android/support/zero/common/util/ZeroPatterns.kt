@@ -1,6 +1,6 @@
 package io.element.android.support.zero.common.util
 
-object ZeroMentionPatterns {
+object ZeroPatterns {
     private const val ZERO_USER_MENTION_PATTERN = """@\[(.+?)\]\(user:(.+?)\)"""
     val ZERO_USER_MENTION_REGEX = ZERO_USER_MENTION_PATTERN.toRegex()
 
@@ -9,14 +9,14 @@ object ZeroMentionPatterns {
 
     const val MATRIX_USER_LINK_BASE_URL = "https://matrix.to/#/@"
 
-    fun highlightMentionsInMessage(
+    fun correctlyFormattedHtmlString(
         text: String?,
         messageBody: String,
         domain: String
     ): String {
         val baseUrl = MATRIX_USER_LINK_BASE_URL
         val htmlBody: String = messageBody
-        val actualText: String = text ?: ""
+        val actualText: String = (text ?: "").replace("\n", "<br>")
 
         // Use a regular expression to find user mentions in the format @[Name](user:UUID)
         val regexPattern = ZERO_USER_MENTION_REGEX
