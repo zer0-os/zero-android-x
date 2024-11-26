@@ -2,8 +2,10 @@ package io.element.android.features.zerorewards.impl
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -89,12 +91,23 @@ fun RewardsModalView(
             )
         },
         content = {
-            Column(
-                modifier = Modifier
+            val parentModifier: Modifier = if (showRewardsFAQ.value) {
+                Modifier
                     .padding(it)
                     .consumeWindowInsets(it)
-                    .verticalScroll(state = rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .verticalScroll(state = rememberScrollState())
+            } else {
+                Modifier
+                    .padding(it)
+                    .consumeWindowInsets(it)
+            }
+            val parentArrangement = if (showRewardsFAQ.value) {
+                Arrangement.Top
+            } else Arrangement.SpaceBetween
+            Column(
+                modifier = parentModifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = parentArrangement
             ) {
                 if (showRewardsFAQ.value) {
                     RewardsFAQView()
@@ -112,65 +125,70 @@ fun RewardsModalView(
 }
 
 @Composable
-fun RewardCredits(
+fun ColumnScope.RewardCredits(
     rewards: ZeroUserRewards,
     onViewRewardsFaq: () -> Unit = {}
 ) {
     // credits
-    Spacer(modifier = Modifier.size(SPACING_2X.dp))
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Image(
-            modifier = Modifier.align(Alignment.Center),
-            painter = painterResource(id = R.drawable.ic_rewards_header),
-            contentDescription = null
-        )
-        Icon(
-            modifier = Modifier.size(50.dp).align(Alignment.Center).padding(top = PADDING_3X.dp),
-            painter = painterResource(id = io.element.android.support.zero.R.drawable.zero_logo_icon),
-            contentDescription = null
-        )
-    }
-
-    Spacer(modifier = Modifier.size(SPACING_10X.dp))
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val refPrice = RewardsUtil.getRefPrice(
-            zero = rewards.zero,
-            decimals = rewards.decimals,
-            refPrice = rewards.price
-        )
-        Text(
-            text = "\$$refPrice".trim(),
-            style = ElementTheme.zeroTypography.fontHeadingLgMediumRoboto,
-            color = ElementTheme.colors.textPrimary
-        )
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Spacer(modifier = Modifier.size(SPACING_2X.dp))
-        val credits = RewardsUtil.getEarnedRewardsFormatted(
-            zero = rewards.zero,
-            decimals = rewards.decimals
-        )
-        Text(
-            text = "$credits MEOW",
-            style = ElementTheme.zeroTypography.fontBodyMdRegularRoboto,
-            color = ElementTheme.colors.textSecondary
-        )
-    }
-
-    // others
-    Spacer(modifier = Modifier.size(300.dp))
-
-    val infoText = buildAnnotatedString {
-        withStyle(SpanStyle(color = ElementTheme.colors.textPrimary)) {
-            append(stringResource(id = R.string.earn_by_messaging))
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Image(
+                modifier = Modifier.align(Alignment.Center),
+                painter = painterResource(id = R.drawable.ic_rewards_header),
+                contentDescription = null
+            )
+            Icon(
+                modifier = Modifier.size(50.dp).align(Alignment.Center).padding(top = PADDING_3X.dp),
+                painter = painterResource(id = io.element.android.support.zero.R.drawable.zero_logo_icon),
+                contentDescription = null
+            )
         }
-        append(" ")
-        withStyle(SpanStyle(color = ElementTheme.colors.zeroBrandColor)) { append("More ->") }
+        Spacer(modifier = Modifier.size(SPACING_10X.dp))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            val refPrice = RewardsUtil.getRefPrice(
+                zero = rewards.zero,
+                decimals = rewards.decimals,
+                refPrice = rewards.price
+            )
+            Text(
+                text = "\$$refPrice".trim(),
+                style = ElementTheme.zeroTypography.fontHeadingLgMediumRoboto,
+                color = ElementTheme.colors.textPrimary
+            )
+            Spacer(modifier = Modifier.size(SPACING_2X.dp))
+            val credits = RewardsUtil.getEarnedRewardsFormatted(
+                zero = rewards.zero,
+                decimals = rewards.decimals
+            )
+            Text(
+                text = "$credits MEOW",
+                style = ElementTheme.zeroTypography.fontBodyMdRegularRoboto,
+                color = ElementTheme.colors.textSecondary
+            )
+        }
     }
-    ClickableText(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = PADDING_8X.dp),
-        text = infoText,
-        style = ElementTheme.zeroTypography.fontBodyMdRegular,
-        onClick = { onViewRewardsFaq.invoke() }
-    )
+
+    Column {
+        val infoText = buildAnnotatedString {
+            withStyle(SpanStyle(color = ElementTheme.colors.textPrimary)) {
+                append(stringResource(id = R.string.earn_by_messaging))
+            }
+            append(" ")
+            withStyle(SpanStyle(color = ElementTheme.colors.zeroBrandColor)) { append("More ->") }
+        }
+        ClickableText(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = PADDING_8X.dp),
+            text = infoText,
+            style = ElementTheme.zeroTypography.fontBodyMdRegular,
+            onClick = { onViewRewardsFaq.invoke() }
+        )
+        Spacer(modifier = Modifier.size(SPACING_10X.dp))
+    }
 }
 
 @PreviewsDayNight
