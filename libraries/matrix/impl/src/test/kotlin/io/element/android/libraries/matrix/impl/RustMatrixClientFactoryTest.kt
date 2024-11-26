@@ -56,5 +56,6 @@ fun TestScope.createRustMatrixClientFactory(
     zeroConversationRepository = null,
     zeroAuthRepository = null,
     zeroUserRepository = null,
-    zeroRewardsRepository = null
+    zeroRewardsRepository = null,
+    zeroInviteRepository = null,
 )

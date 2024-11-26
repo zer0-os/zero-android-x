@@ -35,6 +35,7 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +57,7 @@ interface MatrixClient : Closeable {
 
     val shouldShowNewRewardsIntimation: StateFlow<Boolean>
     val userRewards: StateFlow<ZeroUserRewards>
+    val messengerInvite: StateFlow<ZeroMessengerInvite>
 
     suspend fun getRoom(roomId: RoomId): MatrixRoom?
     suspend fun getPendingRoom(roomId: RoomId): PendingRoom?
@@ -166,6 +168,8 @@ interface MatrixClient : Closeable {
 
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
+
+    suspend fun getZeroMessengerInvite()
 }
 
 /**

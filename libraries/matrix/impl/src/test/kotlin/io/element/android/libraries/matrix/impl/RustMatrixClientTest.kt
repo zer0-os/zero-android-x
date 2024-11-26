@@ -52,5 +52,6 @@ class RustMatrixClientTest {
         zeroAuthRepository = null,
         zeroUserRepository = null,
         zeroRewardsRepository = null,
+        zeroInviteRepository = null,
     )
 }
