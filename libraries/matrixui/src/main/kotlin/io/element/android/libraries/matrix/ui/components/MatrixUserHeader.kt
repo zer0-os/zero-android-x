@@ -69,7 +69,7 @@ private fun MatrixUserHeaderContent(
             avatarData = matrixUser.getAvatarData(size = AvatarSize.UserHeader),
         )
         Spacer(modifier = Modifier.size(16.dp))
-        Column {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             // Name
             Text(
                 modifier = Modifier.clipToBounds(),
@@ -79,16 +79,16 @@ private fun MatrixUserHeaderContent(
                 overflow = TextOverflow.Ellipsis,
                 color = ElementTheme.materialColors.primary,
             )
-            /*// Id
-            if (matrixUser.displayName.isNullOrEmpty().not()) {
+            // zero id
+            if (matrixUser.primaryZeroId.isNullOrEmpty().not()) {
                 Text(
-                    text = matrixUser.userId.value,
+                    text = matrixUser.primaryZeroId!!,
                     style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     color = ElementTheme.materialColors.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-            }*/
+            }
         }
         Spacer(modifier = Modifier.size(32.dp))
     }

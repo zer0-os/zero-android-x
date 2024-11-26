@@ -219,10 +219,21 @@ private fun DefaultRoomListTopBar(
                     ),
                     title = {
                         //Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
-                        Text(
-                            text = matrixUser.getBestName(),
-                            maxLines = 1
-                        )
+                        Column {
+                            Text(
+                                text = matrixUser.getBestName(),
+                                maxLines = 1,
+                                style = ElementTheme.zeroTypography.fontHeadingSmMedium,
+                            )
+                            if (matrixUser.primaryZeroId.isNullOrEmpty().not()) {
+                                Text(
+                                    text = matrixUser.primaryZeroId!!,
+                                    maxLines = 1,
+                                    style = ElementTheme.zeroTypography.fontBodySmRegular,
+                                    color = ElementTheme.colors.textSecondary
+                                )
+                            }
+                        }
                     },
                     navigationIcon = {
                         NavigationIcon(
