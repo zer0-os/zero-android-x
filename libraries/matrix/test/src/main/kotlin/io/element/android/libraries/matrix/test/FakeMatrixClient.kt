@@ -34,6 +34,7 @@ import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
 import io.element.android.libraries.matrix.test.media.FakeMatrixMediaLoader
@@ -359,5 +360,10 @@ class FakeMatrixClient(
     override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {}
 
     override fun dismissRewardsIntimation() {}
+
+    override val messengerInvite: StateFlow<ZeroMessengerInvite> =
+        MutableStateFlow(ZeroMessengerInvite.empty())
+
+    override suspend fun getZeroMessengerInvite() {}
     //endregion
 }

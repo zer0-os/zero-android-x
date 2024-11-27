@@ -10,9 +10,12 @@ package io.element.android.libraries.designsystem.theme
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.theme.Theme
 import io.element.android.compound.theme.isDark
+import io.element.android.compound.theme.toMaterialColorScheme
+import io.element.android.compound.tokens.generated.compoundColorsDark
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 
@@ -45,6 +48,13 @@ fun ElementThemeApp(
     ElementTheme(
         darkTheme = theme.isDark(),
         content = content,
-        typography = zeroTypography
+        typography = zeroTypography,
+        materialColorsDark = compoundColorsDark
+            .toMaterialColorScheme()
+            .copy(
+                background = Color.Black,
+                primaryContainer = Color.Black,
+                surface = Color.Black
+            )
     )
 }

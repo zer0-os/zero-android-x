@@ -25,6 +25,7 @@ import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.InviteRepository
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +60,7 @@ class RustMatrixClientFactory @Inject constructor(
     private val zeroAuthRepository: AuthRepository?,
     private val zeroUserRepository: UserRepository?,
     private val zeroRewardsRepository: RewardsRepository?,
+    private val zeroInviteRepository: InviteRepository?,
 ) {
     private val sessionDelegate = RustClientSessionDelegate(sessionStore, appCoroutineScope, coroutineDispatchers)
 
@@ -99,7 +101,8 @@ class RustMatrixClientFactory @Inject constructor(
             zeroConversationRepository = zeroConversationRepository,
             zeroAuthRepository = zeroAuthRepository,
             zeroUserRepository = zeroUserRepository,
-            zeroRewardsRepository = zeroRewardsRepository
+            zeroRewardsRepository = zeroRewardsRepository,
+            zeroInviteRepository = zeroInviteRepository
         ).also {
             Timber.tag(it.toString()).d("Creating Client with access token '$anonymizedAccessToken' and refresh token '$anonymizedRefreshToken'")
         }

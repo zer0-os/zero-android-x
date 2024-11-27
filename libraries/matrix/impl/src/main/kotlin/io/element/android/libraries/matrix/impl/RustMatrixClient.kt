@@ -49,8 +49,10 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
+import io.element.android.libraries.matrix.impl.conversion.map
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
@@ -77,9 +79,11 @@ import io.element.android.libraries.matrix.impl.verification.RustSessionVerifica
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
+import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.InviteRepository
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.collections.immutable.ImmutableList
@@ -87,7 +91,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -148,6 +151,7 @@ class RustMatrixClient(
     private val zeroAuthRepository: AuthRepository?,
     private val zeroUserRepository: UserRepository?,
     private val zeroRewardsRepository: RewardsRepository?,
+    private val zeroInviteRepository: InviteRepository?,
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
     override val deviceId: DeviceId = DeviceId(innerClient.deviceId())
@@ -737,9 +741,7 @@ class RustMatrixClient(
 
     override val userRewards: StateFlow<ZeroUserRewards> =
         (zeroRewardsRepository?.userRewards ?: MutableStateFlow(UserRewards.empty()))
-            .mapState {
-                ZeroUserRewards(zero = it.zero, decimals = it.decimals, price = it.price)
-            }
+            .mapState { it.map() }
 
     override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {
         zeroRewardsRepository?.getMyRewards(shouldCheckRewardsIntimation)
@@ -749,6 +751,14 @@ class RustMatrixClient(
         withSameScope {
             zeroRewardsRepository?.dismissRewardsIntimation()
         }
+    }
+
+    override val messengerInvite: StateFlow<ZeroMessengerInvite> =
+        (zeroInviteRepository?.messengerInvite ?: MutableStateFlow(MessengerInvite.empty()))
+            .mapState { it.map() }
+
+    override suspend fun getZeroMessengerInvite() {
+        zeroInviteRepository?.fetchMessengerInvite()
     }
     //endregion
 }

@@ -55,6 +55,7 @@ dependencies {
     implementation(projects.features.deactivation.api)
     implementation(projects.features.roomlist.api)
     implementation(projects.features.zerorewards.api)
+    implementation(projects.features.zeroinvite.api)
     implementation(projects.services.analytics.api)
     implementation(projects.services.analytics.compose)
     implementation(projects.services.toolbox.api)

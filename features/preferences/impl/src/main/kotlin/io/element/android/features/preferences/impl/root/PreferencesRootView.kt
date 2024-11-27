@@ -79,6 +79,7 @@ fun PreferencesRootView(
     onSignOutClick: () -> Unit,
     onDeactivateClick: () -> Unit,
     onOpenRewards: () -> Unit,
+    onInviteFriend: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
@@ -114,6 +115,7 @@ fun PreferencesRootView(
             onOpenNotificationSettings = onOpenNotificationSettings,
             onOpenLockScreenSettings = onOpenLockScreenSettings,
             onSecureBackupClick = onSecureBackupClick,
+            onInviteFriend = onInviteFriend
         )
 
         /*// 'Account' section
@@ -249,7 +251,14 @@ private fun ColumnScope.ManageAppSection(
     onOpenNotificationSettings: () -> Unit,
     onOpenLockScreenSettings: () -> Unit,
     onSecureBackupClick: () -> Unit,
+    onInviteFriend: () -> Unit,
 ) {
+    ListItem(
+        headlineContent = { Text("Invite Friend") },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Plus())),
+        onClick = onInviteFriend,
+    )
+
     if (state.showNotificationSettings) {
         ListItem(
             headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
@@ -439,6 +448,7 @@ private fun ContentToPreview(matrixUser: MatrixUser) {
         onOpenBlockedUsers = {},
         onSignOutClick = {},
         onDeactivateClick = {},
-        onOpenRewards = {}
+        onOpenRewards = {},
+        onInviteFriend = {}
     )
 }
