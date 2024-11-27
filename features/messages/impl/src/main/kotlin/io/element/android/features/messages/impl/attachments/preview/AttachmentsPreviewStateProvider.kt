@@ -26,8 +26,10 @@ open class AttachmentsPreviewStateProvider : PreviewParameterProvider<Attachment
             anAttachmentsPreviewState(mediaInfo = aVideoMediaInfo()),
             anAttachmentsPreviewState(mediaInfo = anAudioMediaInfo()),
             anAttachmentsPreviewState(mediaInfo = anApkMediaInfo()),
+            anAttachmentsPreviewState(sendActionState = SendActionState.Sending.Processing),
             anAttachmentsPreviewState(sendActionState = SendActionState.Sending.Uploading(0.5f)),
             anAttachmentsPreviewState(sendActionState = SendActionState.Failure(RuntimeException("error"))),
+            anAttachmentsPreviewState(allowCaption = false),
         )
 }
 
@@ -35,11 +37,13 @@ fun anAttachmentsPreviewState(
     mediaInfo: MediaInfo = anImageMediaInfo(),
     textEditorState: TextEditorState = aTextEditorStateMarkdown(),
     sendActionState: SendActionState = SendActionState.Idle,
+    allowCaption: Boolean = true,
 ) = AttachmentsPreviewState(
     attachment = Attachment.Media(
         localMedia = LocalMedia("file://path".toUri(), mediaInfo),
     ),
     sendActionState = sendActionState,
     textEditorState = textEditorState,
+    allowCaption = allowCaption,
     eventSink = {}
 )
