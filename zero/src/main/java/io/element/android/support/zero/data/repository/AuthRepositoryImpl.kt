@@ -6,8 +6,11 @@ import io.element.android.support.zero.data.delegate.DataCleaner
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
+import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
+import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 class AuthRepositoryImpl(
     private val preferences: Preferences,
@@ -33,6 +36,23 @@ class AuthRepositoryImpl(
         preferences.setMatrixToken(token)
         preferences.setUserId(userId)
     }
+
+    override suspend fun createAndAuthorise(email: String, password: String, inviteSlug: String): Boolean {
+        return runSafeCall {
+            val nonce = zeroAuthService.authenticateNonce()
+            val payload = CreateAndAuthoriseUserRequest.newRequest(email, password, inviteSlug)
+            val credentials =
+                zeroAuthService
+                    .createAndAuthorise(nonceToken = nonce.nonceHeader, payload = payload)
+            preferences.setZeroToken(credentials.accessToken)
+            return@runSafeCall credentials.accessToken.isNotBlank()
+        }
+    }
+
+    override suspend fun completeProfile(inviteCode: String, name: String, profileImage: File?): Flow<AuthSSOToken> =
+        channelFlowWithAwait {
+            trySend(AuthSSOToken(""))
+        }
 
     override suspend fun logout() {
         dataCleaner.clean()

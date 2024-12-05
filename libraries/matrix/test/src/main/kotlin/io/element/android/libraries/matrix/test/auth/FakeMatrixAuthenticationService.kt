@@ -134,4 +134,8 @@ class FakeMatrixAuthenticationService(
     fun givenMatrixClient(matrixClient: MatrixClient) {
         this.matrixClient = matrixClient
     }
+
+    override suspend fun validateInviteCode(inviteCode: String): Result<Boolean> {
+        return Result.success(false)
+    }
 }

@@ -13,8 +13,9 @@ class InviteRepositoryImpl(
     private val _messengerInvite = MutableStateFlow(MessengerInvite.empty())
     override val messengerInvite: StateFlow<MessengerInvite> = _messengerInvite
 
-    override suspend fun validateInvite(inviteCode: String) {
-        zeroInviteService.validateInvite(inviteCode)
+    override suspend fun validateInvite(inviteCode: String): Boolean {
+        val result = zeroInviteService.validateInvite(inviteCode)
+        return result.isSuccessful
     }
 
     override suspend fun fetchMessengerInvite() {

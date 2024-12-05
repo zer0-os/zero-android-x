@@ -39,6 +39,7 @@ import io.element.android.libraries.sessionstorage.api.LoginType
 import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.data.repository.AuthRepository
+import io.element.android.support.zero.data.repository.InviteRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +71,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     private val oidcConfigurationProvider: OidcConfigurationProvider,
     private val appPreferencesStore: AppPreferencesStore,
     private val authRepository: AuthRepository?,
+    private val inviteRepository: InviteRepository?,
 ) : MatrixAuthenticationService {
     // Passphrase which will be used for new sessions. Existing sessions will use the passphrase
     // stored in the SessionData.
@@ -406,4 +408,13 @@ class RustMatrixAuthenticationService @Inject constructor(
             .substringAfter(":")
             .trim()
     }
+
+    override suspend fun validateInviteCode(inviteCode: String): Result<Boolean> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                inviteRepository?.validateInvite(inviteCode) ?: false
+            }.mapFailure {
+                it.mapAuthenticationException()
+            }
+        }
 }

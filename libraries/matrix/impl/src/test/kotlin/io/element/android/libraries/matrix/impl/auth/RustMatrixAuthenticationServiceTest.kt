@@ -51,7 +51,8 @@ class RustMatrixAuthenticationServiceTest {
             passphraseGenerator = FakePassphraseGenerator(),
             oidcConfigurationProvider = OidcConfigurationProvider(baseDirectory),
             appPreferencesStore = InMemoryAppPreferencesStore(),
-            authRepository = null
+            authRepository = null,
+            inviteRepository = null,
         )
     }
 }

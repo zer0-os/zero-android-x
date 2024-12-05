@@ -33,5 +33,7 @@
     <string name="password_strength">Password Strength:</string>
     <string name="password_validation">Password must have 8 characters, including 1 number, 1 uppercase letter and 1 special character (!, @, #, $, %, ^, &amp;, *).</string>
 
-
+    <string name="invite_code">Invite Code</string>
+    <string name="create_account">Create Account</string>
+    <string name="error_invalid_invite_code">Invite code is not valid</string>
 </resources>
