@@ -34,6 +34,7 @@ fun ConfirmAccountProviderView(
     onLearnMoreClick: () -> Unit,
     onCreateAccountContinue: (url: String) -> Unit,
     onChange: () -> Unit,
+    onCreateZeroAccount: (inviteCode: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isLoading by remember(state.loginFlow) {
@@ -142,7 +143,7 @@ fun ConfirmAccountProviderView(
                     is LoginFlow.OidcFlow -> onOidcDetails(loginFlowState.oidcDetails)
                     LoginFlow.PasswordLogin -> onNeedLoginPassword()
                     is LoginFlow.AccountCreationFlow -> onCreateAccountContinue(loginFlowState.url)
-                    is LoginFlow.ZeroCreateAccountFlow -> {}
+                    is LoginFlow.ZeroCreateAccountFlow -> onCreateZeroAccount(loginFlowState.inviteCode)
                 }
             }
             AsyncData.Uninitialized -> Unit
@@ -162,5 +163,6 @@ internal fun ConfirmAccountProviderViewPreview(
         onCreateAccountContinue = {},
         onLearnMoreClick = {},
         onChange = {},
+        onCreateZeroAccount = {},
     )
 }

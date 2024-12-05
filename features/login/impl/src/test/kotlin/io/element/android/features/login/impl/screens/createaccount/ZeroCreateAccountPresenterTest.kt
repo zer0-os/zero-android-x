@@ -27,7 +27,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
-class CreateAccountPresenterTest {
+class ZeroCreateAccountPresenterTest {
     @get:Rule
     val warmUpRule = WarmUpRule()
 

@@ -138,4 +138,8 @@ class FakeMatrixAuthenticationService(
     override suspend fun validateInviteCode(inviteCode: String): Result<Boolean> {
         return Result.success(false)
     }
+
+    override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> {
+        return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
 }

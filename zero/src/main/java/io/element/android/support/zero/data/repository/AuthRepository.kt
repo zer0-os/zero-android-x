@@ -13,12 +13,6 @@ interface AuthRepository {
         email: String,
         password: String,
         inviteSlug: String
-    ): Boolean
-
-    suspend fun completeProfile(
-        inviteCode: String,
-        name: String,
-        profileImage: File? = null
     ): Flow<AuthSSOToken>
 
     suspend fun logout()

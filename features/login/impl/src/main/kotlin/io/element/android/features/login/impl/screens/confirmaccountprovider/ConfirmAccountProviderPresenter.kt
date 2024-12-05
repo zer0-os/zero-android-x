@@ -158,7 +158,7 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
             val isCodeValid = result.getOrNull() ?: false
             if (isCodeValid) {
                 loginFlowAction.value = AsyncData.Success(
-                    LoginFlow.PasswordLogin
+                    LoginFlow.ZeroCreateAccountFlow(inviteCode)
                 )
             } else {
                 loginFlowAction.value = AsyncData.Failure(InvalidZeroInviteCode())

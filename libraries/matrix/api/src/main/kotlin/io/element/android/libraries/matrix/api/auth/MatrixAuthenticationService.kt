@@ -63,4 +63,6 @@ interface MatrixAuthenticationService {
     fun listenToNewMatrixClients(lambda: (MatrixClient) -> Unit)
 
     suspend fun validateInviteCode(inviteCode: String): Result<Boolean>
+
+    suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId>
 }

@@ -30,7 +30,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 import io.element.android.support.zero.common.ui.component.ElevatedButton
 
 @Composable
-fun LoginTypeSegmentedControl(
+fun AuthenticationTypeSegmentedControl(
     modifier: Modifier = Modifier,
     controlWidth: Dp? = null,
     items: List<String>,
@@ -150,8 +150,8 @@ fun RowScope.SegmentSelectedControl(
 
 @PreviewsDayNight
 @Composable
-fun LoginTypeSegmentedControlPreview() = ElementPreview {
-    LoginTypeSegmentedControl(
+fun AuthenticationTypeSegmentedControlPreview() = ElementPreview {
+    AuthenticationTypeSegmentedControl(
         items = listOf("Item 1", "Item 2"),
         onItemSelection = {}
     )

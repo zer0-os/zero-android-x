@@ -45,6 +45,7 @@ class ConfirmAccountProviderNode @AssistedInject constructor(
         fun onOidcDetails(oidcDetails: OidcDetails)
         fun onCreateAccountContinue(url: String)
         fun onChangeAccountProvider()
+        fun onCreateZeroAccount(inviteCode: String)
     }
 
     private fun onOidcDetails(data: OidcDetails) {
@@ -63,6 +64,10 @@ class ConfirmAccountProviderNode @AssistedInject constructor(
         plugins<Callback>().forEach { it.onChangeAccountProvider() }
     }
 
+    private fun onCreateZeroAccount(inviteCode: String) {
+        plugins<Callback>().forEach { it.onCreateZeroAccount(inviteCode) }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -74,6 +79,7 @@ class ConfirmAccountProviderNode @AssistedInject constructor(
             onNeedLoginPassword = ::onLoginPasswordNeeded,
             onCreateAccountContinue = ::onCreateAccountContinue,
             onChange = ::onChangeAccountProvider,
+            onCreateZeroAccount = ::onCreateZeroAccount,
             onLearnMoreClick = { openLearnMorePage(context) },
         )
     }

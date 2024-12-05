@@ -60,8 +60,8 @@ import io.element.android.support.zero.common.ui.theme.SPACING_10X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_5X
 import io.element.android.support.zero.common.ui.theme.SPACING_6X
-import io.element.android.support.zero.screens.login.LoginTypeSegmentedControl
-import io.element.android.support.zero.screens.login.util.LoginFlowType
+import io.element.android.support.zero.screens.login.AuthenticationTypeSegmentedControl
+import io.element.android.support.zero.screens.login.util.ZeroAuthenticationFlowType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,8 +86,8 @@ fun ZeroLoginPasswordView(
         state.eventSink(LoginPasswordEvents.Submit)
     }
 
-    val loginFlow: MutableState<LoginFlowType> = remember { mutableStateOf(LoginFlowType.WEB3) }
-    val showWeb3LoginUI = loginFlow.value == LoginFlowType.WEB3
+    val loginFlow: MutableState<ZeroAuthenticationFlowType> = remember { mutableStateOf(ZeroAuthenticationFlowType.EMAIL) }
+    val showWeb3LoginUI = loginFlow.value == ZeroAuthenticationFlowType.WEB3
 
     ZeroAuthScreensBackground(isLoading = isLoading) {
         Scaffold(
@@ -118,15 +118,15 @@ fun ZeroLoginPasswordView(
                 Spacer(modifier = Modifier.size(SPACING_5X.dp))
 
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    LoginTypeSegmentedControl(
-                        defaultSelectedItemIndex = LoginFlowType.indexOf(loginFlow.value),
+                    AuthenticationTypeSegmentedControl(
+                        defaultSelectedItemIndex = ZeroAuthenticationFlowType.indexOf(loginFlow.value),
                         controlWidth = 230.dp,
                         items =
                         listOf(
                             stringResource(io.element.android.support.zero.R.string.web3),
                             stringResource(io.element.android.support.zero.R.string.email)
                         ),
-                        onItemSelection = { loginFlow.value = LoginFlowType.get(it) }
+                        onItemSelection = { loginFlow.value = ZeroAuthenticationFlowType.get(it) }
                     )
                 }
                 if (showWeb3LoginUI) {

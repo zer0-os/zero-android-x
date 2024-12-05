@@ -417,4 +417,36 @@ class RustMatrixAuthenticationService @Inject constructor(
                 it.mapAuthenticationException()
             }
         }
+
+    override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+                val client = currentClient ?: error("You need to call `setHomeserver()` first")
+                val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
+
+                val authSsoToken = authRepository.createAndAuthorise(email, password, inviteCode)
+                    .firstOrNull()
+                val ssoToken = authSsoToken?.token
+                    ?: error("SSO Token from zos is null or blank")
+                client.customLoginWithJwt(ssoToken, "Element X Android", null)
+                val sessionData = client.session()
+                    .toSessionData(
+                        isTokenValid = true,
+                        loginType = LoginType.PASSWORD,
+                        passphrase = pendingPassphrase,
+                        sessionPaths = currentSessionPaths,
+                    )
+                clear()
+                MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
+                sessionStore.storeData(sessionData)
+                authRepository.saveMatrixLoginInfo(
+                    token = sessionData.accessToken,
+                    userId = sessionData.userId
+                )
+                SessionId(sessionData.userId)
+            }.mapFailure { failure ->
+                failure.mapAuthenticationException()
+            }
+        }
 }
