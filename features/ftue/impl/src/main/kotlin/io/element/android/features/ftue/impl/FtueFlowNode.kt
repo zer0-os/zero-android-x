@@ -26,6 +26,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.analytics.api.AnalyticsEntryPoint
+import io.element.android.features.ftue.impl.completeprofile.CompleteProfileNode
 import io.element.android.features.ftue.impl.notifications.NotificationsOptInNode
 import io.element.android.features.ftue.impl.sessionverification.FtueSessionVerificationFlowNode
 import io.element.android.features.ftue.impl.state.DefaultFtueService
@@ -79,6 +80,9 @@ class FtueFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object LockScreenSetup : NavTarget
+
+        @Parcelize
+        data object CompleteProfile : NavTarget
     }
 
     override fun onBuilt() {
@@ -134,6 +138,14 @@ class FtueFlowNode @AssistedInject constructor(
                     .callback(callback)
                     .build()
             }
+            NavTarget.CompleteProfile -> {
+                val callback = object : CompleteProfileNode.Callback {
+                    override fun onProfileUpdated() {
+                        moveToNextStepIfNeeded()
+                    }
+                }
+                createNode<CompleteProfileNode>(buildContext, listOf(callback))
+            }
         }
     }
 
@@ -153,6 +165,9 @@ class FtueFlowNode @AssistedInject constructor(
             }
             FtueStep.LockscreenSetup -> {
                 backstack.newRoot(NavTarget.LockScreenSetup)
+            }
+            FtueStep.CompleteProfile -> {
+                backstack.newRoot(NavTarget.CompleteProfile)
             }
             null -> {
                 if (fromSessionVerification) {

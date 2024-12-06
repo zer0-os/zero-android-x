@@ -14,6 +14,12 @@ class UserRepositoryImpl(
     private val zeroUserService: ZeroUserService,
     private val zeroMatrixUserService: ZeroMatrixUserService,
 ) : UserRepository {
+
+    override suspend fun getCurrentUser(): Flow<ZeroUser> = channelFlowWithAwait {
+        val user = zeroUserService.getCurrentUser()
+        trySend(user.toModel())
+    }
+
     override suspend fun getUsers(filterName: String?): Flow<List<ZeroUser>> = channelFlowWithAwait {
         if (filterName.isNullOrEmpty()) {
             trySend(emptyList())

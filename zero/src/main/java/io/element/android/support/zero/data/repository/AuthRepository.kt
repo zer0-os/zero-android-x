@@ -1,5 +1,6 @@
 package io.element.android.support.zero.data.repository
 
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.support.zero.data.model.AuthSSOToken
 import kotlinx.coroutines.flow.Flow
 import java.io.File
@@ -14,6 +15,12 @@ interface AuthRepository {
         password: String,
         inviteSlug: String
     ): Flow<AuthSSOToken>
+
+    suspend fun completeSignUp(
+        inviteCode: String,
+        displayName: String,
+        avatarUrl: String?
+    ): Flow<ZeroUser>
 
     suspend fun logout()
 }

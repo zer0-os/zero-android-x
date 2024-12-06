@@ -25,6 +25,7 @@ import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.core.SessionId
+import io.element.android.support.zero.common.util.ZeroCreateAccountInviteHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -102,6 +103,7 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
                     inviteCode = params.inviteCode
                 )
                     .onSuccess { sessionId ->
+                        ZeroCreateAccountInviteHolder.inviteCode = params.inviteCode
                         defaultLoginUserStory.setLoginFlowIsDone(true)
                         createAccountActionState.value = AsyncData.Success(sessionId)
                     }

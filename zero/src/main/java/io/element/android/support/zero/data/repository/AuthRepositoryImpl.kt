@@ -1,5 +1,6 @@
 package io.element.android.support.zero.data.repository
 
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.support.zero.common.extension.channelFlowWithAwait
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.delegate.DataCleaner
@@ -7,6 +8,7 @@ import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
+import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +49,20 @@ class AuthRepositoryImpl(
         return ssoRequest.toModel()
     }
 
+    override suspend fun completeSignUp(
+        inviteCode: String, displayName: String, avatarUrl: String?
+    ): Flow<ZeroUser> = channelFlowWithAwait {
+        val userId = preferences.userId().cleanedZeroId()
+        val payload = FinaliseCreateAccountRequest(
+            inviteCode = inviteCode,
+            name = displayName,
+            profileImage = avatarUrl,
+            userId = userId
+        )
+        val inviter = zeroAuthService.finaliseSignUp(payload)
+        trySend(inviter.inviter.toModel())
+    }
+
     override suspend fun logout() {
         dataCleaner.clean()
     }
@@ -58,3 +74,6 @@ class AuthRepositoryImpl(
             throw e
         }
 }
+
+private fun String.cleanedZeroId() =
+    substringAfter("@").substringBefore(":")
