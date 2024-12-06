@@ -50,6 +50,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.sanitize
 import io.element.android.support.zero.common.ui.ZeroAuthScreensBackground
 import io.element.android.support.zero.common.ui.animation.FadeExpandAnimation
 import io.element.android.support.zero.common.ui.component.SimpleInputField
@@ -170,7 +171,6 @@ fun ZeroLoginPasswordView(
                     ) {
                         ZeroLoginForm(
                             state = state,
-                            isLoading = isLoading,
                             onSubmit = ::submit
                         )
                     }
@@ -190,7 +190,6 @@ fun ZeroLoginPasswordView(
 @Composable
 private fun ZeroLoginForm(
     state: LoginPasswordState,
-    isLoading: Boolean,
     onSubmit: () -> Unit,
 ) {
     var loginFieldState by textFieldState(stateValue = state.formState.login)
@@ -211,7 +210,7 @@ private fun ZeroLoginForm(
                 .onTabOrEnterKeyFocusNext(focusManager)
                 .testTag(TestTags.loginEmailUsername)
                 .autofill(
-                    autofillTypes = listOf(AutofillType.Username),
+                    autofillTypes = listOf(AutofillType.EmailAddress),
                     onFill = {
                         val sanitized = it.sanitize()
                         loginFieldState = sanitized
@@ -255,7 +254,13 @@ private fun ZeroLoginForm(
                 passwordFieldState = sanitized
                 eventSink(LoginPasswordEvents.SetPassword(sanitized))
             },
-            onKeyboardActionDone = { onSubmit() },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { onSubmit() }
+            ),
             iconTint = Color.White.copy(alpha = 0.75f)
         )
 
@@ -267,13 +272,6 @@ private fun ZeroLoginForm(
             onClick = { onSubmit() }
         )
     }
-}
-
-/**
- * Ensure that the string does not contain any new line characters, which can happen when pasting values.
- */
-private fun String.sanitize(): String {
-    return replace("\n", "")
 }
 
 @Composable

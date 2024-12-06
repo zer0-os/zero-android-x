@@ -9,8 +9,10 @@ package io.element.android.features.login.impl.screens.zerocreateaccount
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
+import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.core.SessionId
+import io.element.android.support.zero.common.util.ValidationUtil
 import kotlinx.parcelize.Parcelize
 
 @Immutable
@@ -18,12 +20,12 @@ data class ZeroCreateAccountState(
     val inviteCode: String = "",
     val formState: ZeroCreateAccountFormState,
     val createAccountAction: AsyncData<SessionId>,
+    val loginFlow: AsyncData<LoginFlow>,
     val eventSink: (ZeroCreateAccountEvents) -> Unit
 ) {
     val submitEnabled: Boolean
         get() = createAccountAction !is AsyncData.Failure &&
             formState.areInputsValid()
-
 }
 
 @Parcelize
@@ -38,15 +40,16 @@ data class ZeroCreateAccountFormState(
     }
 
     fun isEmailValid(): Boolean {
-        return email.isNotBlank()
+        return email.isNotBlank() && (ValidationUtil.validateEmail(email) == null)
     }
 
-    fun isPasswordValid(): Boolean {
+    private fun isPasswordValid(): Boolean {
         return password.isNotBlank()
     }
 
     fun isConfirmPasswordValid(): Boolean {
-        return confirmPassword.isNotBlank()
+        return confirmPassword.isNotBlank() &&
+            (confirmPassword.equals(password, ignoreCase = false))
     }
 
     companion object {

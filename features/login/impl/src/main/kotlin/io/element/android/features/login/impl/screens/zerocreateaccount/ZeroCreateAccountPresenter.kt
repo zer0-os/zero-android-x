@@ -20,6 +20,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import io.element.android.features.login.impl.DefaultLoginUserStory
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
+import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
@@ -48,6 +49,9 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
         val createAccountAction: MutableState<AsyncData<SessionId>> = remember {
             mutableStateOf(AsyncData.Uninitialized)
         }
+        val loginFlowAction: MutableState<AsyncData<LoginFlow>> = remember {
+            mutableStateOf(AsyncData.Uninitialized)
+        }
 
         val formState = rememberSaveable {
             mutableStateOf(ZeroCreateAccountFormState.Default)
@@ -69,6 +73,9 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
                     localCoroutineScope.submit(formState.value, accountProvider.url, createAccountAction)
                 }
                 ZeroCreateAccountEvents.ClearError -> createAccountAction.value = AsyncData.Uninitialized
+                ZeroCreateAccountEvents.OpenLogin -> {
+                    localCoroutineScope.proceedToLogin(accountProvider.url, createAccountAction, loginFlowAction)
+                }
             }
         }
 
@@ -76,6 +83,7 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
             inviteCode = params.inviteCode,
             formState = formState.value,
             createAccountAction = createAccountAction.value,
+            loginFlow = loginFlowAction.value,
             eventSink = ::handleEvents
         )
     }
@@ -103,6 +111,23 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
             }
             .onFailure { failure ->
                 createAccountActionState.value = AsyncData.Failure(failure)
+            }
+    }
+
+    private fun CoroutineScope.proceedToLogin(
+        homeserverUrl: String,
+        createAccountAction: MutableState<AsyncData<SessionId>>,
+        loginFlowActionState: MutableState<AsyncData<LoginFlow>>
+    ) = launch {
+        createAccountAction.value = AsyncData.Loading()
+        authenticationService.setHomeserver(homeserverUrl)
+            .onSuccess {
+                loginFlowActionState.value = AsyncData.Success(LoginFlow.PasswordLogin)
+                createAccountAction.value = AsyncData.Uninitialized
+            }
+            .onFailure { failure ->
+                loginFlowActionState.value = AsyncData.Failure(failure)
+                createAccountAction.value = AsyncData.Uninitialized
             }
     }
 

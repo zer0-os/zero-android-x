@@ -13,4 +13,5 @@ sealed interface ZeroCreateAccountEvents {
     data class SetConfirmPassword(val confirmPassword: String) : ZeroCreateAccountEvents
     data object Submit : ZeroCreateAccountEvents
     data object ClearError : ZeroCreateAccountEvents
+    data object OpenLogin : ZeroCreateAccountEvents
 }

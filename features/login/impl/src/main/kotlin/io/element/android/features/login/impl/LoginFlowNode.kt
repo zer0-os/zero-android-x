@@ -19,6 +19,7 @@ import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.navmodel.backstack.BackStack
+import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
 import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import dagger.assisted.Assisted
@@ -207,7 +208,13 @@ class LoginFlowNode @AssistedInject constructor(
                 val inputs = ZeroCreateAccountNode.Inputs(
                     inviteCode = navTarget.inviteCode,
                 )
-                createNode<ZeroCreateAccountNode>(buildContext, listOf(inputs))
+                val callback = object : ZeroCreateAccountNode.Callback {
+                    override fun onLoginPasswordNeeded() {
+                        backstack.pop()
+                        backstack.push(NavTarget.LoginPassword)
+                    }
+                }
+                createNode<ZeroCreateAccountNode>(buildContext, listOf(inputs, callback))
             }
         }
     }
