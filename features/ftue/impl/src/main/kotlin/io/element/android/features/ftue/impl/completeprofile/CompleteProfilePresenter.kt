@@ -31,6 +31,7 @@ import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.libraries.mediaupload.api.MediaPreProcessor
 import io.element.android.libraries.permissions.api.PermissionsEvents
 import io.element.android.libraries.permissions.api.PermissionsPresenter
+import io.element.android.support.zero.common.util.ValidationUtil
 import io.element.android.support.zero.common.util.ZeroCreateAccountInviteHolder
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +100,12 @@ class CompleteProfilePresenter @AssistedInject constructor(
                 CompleteProfileEvents.Submit -> {
                     localCoroutineScope.saveProfile(userDisplayName, userAvatarUri, saveAction)
                 }
+                CompleteProfileEvents.Clear -> {
+                    saveAction.value = AsyncAction.Uninitialized
+                }
+                CompleteProfileEvents.ProfileUpdated -> {
+                    callback.onProfileUpdated()
+                }
                 is CompleteProfileEvents.SetDisplayName -> userDisplayName = event.name
                 is CompleteProfileEvents.HandleAvatarAction -> {
                     when (event.action) {
@@ -119,7 +126,8 @@ class CompleteProfilePresenter @AssistedInject constructor(
         }
 
         val canSave = remember(userDisplayName) {
-            userDisplayName.isNotBlank()
+            userDisplayName.isNotBlank() &&
+                (ValidationUtil.liesInLengthRange(min = 3, max = 24, input = userDisplayName) == null)
         }
 
         return CompleteProfileState(
@@ -158,7 +166,6 @@ class CompleteProfilePresenter @AssistedInject constructor(
             avatarData = avatarData
         ).onSuccess {
             saveAction.value = AsyncAction.Success(Unit)
-            callback.onProfileUpdated()
         }.onFailure {
             saveAction.value = AsyncAction.Failure(it)
         }

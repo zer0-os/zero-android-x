@@ -111,7 +111,7 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.SessionVerification -> {
                 val callback = object : FtueSessionVerificationFlowNode.Callback {
                     override fun onDone() {
-                        moveToNextStepIfNeeded(fromSessionVerification = true)
+                        moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
                     }
                 }
                 createNode<FtueSessionVerificationFlowNode>(buildContext, listOf(callback))
@@ -141,7 +141,7 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.CompleteProfile -> {
                 val callback = object : CompleteProfileNode.Callback {
                     override fun onProfileUpdated() {
-                        moveToNextStepIfNeeded()
+                        moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
                     }
                 }
                 createNode<CompleteProfileNode>(buildContext, listOf(callback))
@@ -149,7 +149,7 @@ class FtueFlowNode @AssistedInject constructor(
         }
     }
 
-    private fun moveToNextStepIfNeeded(fromSessionVerification: Boolean = false) = lifecycleScope.launch {
+    private fun moveToNextStepIfNeeded(shouldUpdateStateIfNull: Boolean = false) = lifecycleScope.launch {
         when (ftueState.getNextStep()) {
             FtueStep.WaitingForInitialState -> {
                 backstack.newRoot(NavTarget.Placeholder)
@@ -170,7 +170,7 @@ class FtueFlowNode @AssistedInject constructor(
                 backstack.newRoot(NavTarget.CompleteProfile)
             }
             null -> {
-                if (fromSessionVerification) {
+                if (shouldUpdateStateIfNull) {
                     ftueState.updateState()
                 } else Unit
             }

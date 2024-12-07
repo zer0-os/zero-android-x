@@ -13,4 +13,6 @@ sealed interface CompleteProfileEvents {
     data object Submit : CompleteProfileEvents
     data class SetDisplayName(val name: String) : CompleteProfileEvents
     data class HandleAvatarAction(val action: AvatarAction) : CompleteProfileEvents
+    data object Clear : CompleteProfileEvents
+    data object ProfileUpdated : CompleteProfileEvents
 }
