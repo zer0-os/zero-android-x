@@ -8,7 +8,7 @@ interface UserRepository {
 
     suspend fun getUsers(filterName: String? = null): Flow<List<ZeroUser>>
 
-    suspend fun getUser(userId: String): Flow<ZeroUser>
+    suspend fun getUser(userId: String): Flow<ZeroUser?>
 
     suspend fun updateUserProfile(
         userName: String? = null,

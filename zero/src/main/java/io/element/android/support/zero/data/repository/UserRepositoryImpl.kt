@@ -37,15 +37,13 @@ class UserRepositoryImpl(
             ?: trySend(emptyList())
     }
 
-    override suspend fun getUser(userId: String): Flow<ZeroUser> =
+    override suspend fun getUser(userId: String): Flow<ZeroUser?> =
         channelFlowWithAwait {
             runCatching {
                 val apiUser = zeroMatrixUserService.getMatrixUsers(
                     MatrixUsersFilter.newFilter(listOf(userId))
                 ).firstOrNull()
-                apiUser?.let {
-                    trySend(it.toModel())
-                }
+                trySend(apiUser?.toModel())
             }
         }
 
