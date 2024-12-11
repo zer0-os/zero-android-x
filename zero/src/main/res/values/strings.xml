@@ -14,6 +14,7 @@
     <string name="connect_a_wallet">Connect a Wallet</string>
     <string name="email_address">Email address</string>
     <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
 
     <string name="email_required">Email is required</string>
     <string name="email_invalid">Email is invalid</string>
@@ -33,5 +34,11 @@
     <string name="password_strength">Password Strength:</string>
     <string name="password_validation">Password must have 8 characters, including 1 number, 1 uppercase letter and 1 special character (!, @, #, $, %, ^, &amp;, *).</string>
 
+    <string name="invite_code">Invite Code</string>
+    <string name="create_account">Create Account</string>
+    <string name="error_invalid_invite_code">Invite code is not valid</string>
 
+    <string name="already_on_zero">Already on ZERO?</string>
+    <string name="display_name">Display Name</string>
+    <string name="error_complete_profile">Unable to update profile</string>
 </resources>

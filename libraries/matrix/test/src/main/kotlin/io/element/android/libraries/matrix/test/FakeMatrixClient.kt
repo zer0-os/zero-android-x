@@ -78,8 +78,8 @@ class FakeMatrixClient(
     private val accountManagementUrlString: Result<String?> = Result.success(null),
     private val resolveRoomAliasResult: (RoomAlias) -> Result<Optional<ResolvedRoomAlias>> = {
         Result.success(
-        Optional.of(ResolvedRoomAlias(A_ROOM_ID, emptyList()))
-    )
+            Optional.of(ResolvedRoomAlias(A_ROOM_ID, emptyList()))
+        )
     },
     private val getRoomPreviewInfoResult: (RoomIdOrAlias, List<String>) -> Result<RoomPreviewInfo> = { _, _ -> Result.failure(AN_EXCEPTION) },
     private val clearCacheLambda: () -> Unit = { lambdaError() },
@@ -365,5 +365,15 @@ class FakeMatrixClient(
         MutableStateFlow(ZeroMessengerInvite.empty())
 
     override suspend fun getZeroMessengerInvite() {}
+
+    override suspend fun isZeroProfileCompletionPending(): Boolean {
+        return false
+    }
+
+    override suspend fun completeZeroUserProfile(
+        inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
+    ): Result<Unit> {
+        return Result.success(Unit)
+    }
     //endregion
 }

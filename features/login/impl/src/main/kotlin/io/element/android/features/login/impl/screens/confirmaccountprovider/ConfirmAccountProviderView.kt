@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import io.element.android.support.zero.R
 import io.element.android.features.login.impl.dialogs.SlidingSyncNotSupportedDialog
 import io.element.android.features.login.impl.error.ChangeServerError
 import io.element.android.features.login.impl.screens.createaccount.AccountCreationNotSupported
@@ -33,6 +34,7 @@ fun ConfirmAccountProviderView(
     onLearnMoreClick: () -> Unit,
     onCreateAccountContinue: (url: String) -> Unit,
     onChange: () -> Unit,
+    onCreateZeroAccount: (inviteCode: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isLoading by remember(state.loginFlow) {
@@ -90,7 +92,10 @@ fun ConfirmAccountProviderView(
     ZeroConfirmAccountProviderView(
         modifier = modifier,
         isLoading = isLoading,
-        onInvoked = { eventSink.invoke(ConfirmAccountProviderEvents.Continue) }
+        onInvoked = { eventSink.invoke(ConfirmAccountProviderEvents.Continue) },
+        onValidateInviteCode = { inviteCode ->
+            eventSink.invoke(ConfirmAccountProviderEvents.ValidateInvite(inviteCode))
+        }
     ) {
         when (state.loginFlow) {
             is AsyncData.Failure -> {
@@ -122,6 +127,14 @@ fun ConfirmAccountProviderView(
                             }
                         )
                     }
+                    is InvalidZeroInviteCode -> {
+                        ErrorDialog(
+                            content = stringResource(R.string.error_invalid_invite_code),
+                            onSubmit = {
+                                eventSink.invoke(ConfirmAccountProviderEvents.ClearError)
+                            }
+                        )
+                    }
                 }
             }
             is AsyncData.Loading -> Unit // The Continue button shows the loading state
@@ -130,6 +143,7 @@ fun ConfirmAccountProviderView(
                     is LoginFlow.OidcFlow -> onOidcDetails(loginFlowState.oidcDetails)
                     LoginFlow.PasswordLogin -> onNeedLoginPassword()
                     is LoginFlow.AccountCreationFlow -> onCreateAccountContinue(loginFlowState.url)
+                    is LoginFlow.ZeroCreateAccountFlow -> onCreateZeroAccount(loginFlowState.inviteCode)
                 }
             }
             AsyncData.Uninitialized -> Unit
@@ -149,5 +163,6 @@ internal fun ConfirmAccountProviderViewPreview(
         onCreateAccountContinue = {},
         onLearnMoreClick = {},
         onChange = {},
+        onCreateZeroAccount = {},
     )
 }

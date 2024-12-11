@@ -60,7 +60,7 @@ object ValidationUtil {
         } else null
     }
 
-    fun validatePasswordMatch(password: String?, confirmPassword: String?): Int? {
-        return if (password.equals(confirmPassword, true)) null else R.string.password_mismatch_error
+    fun validatePasswordMatch(password: String?, confirmPassword: String?): Int {
+        return if (password.equals(confirmPassword, false)) R.string.password_match else R.string.password_mismatch_error
     }
 }

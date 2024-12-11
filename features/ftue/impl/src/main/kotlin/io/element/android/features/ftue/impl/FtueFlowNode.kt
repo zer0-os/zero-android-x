@@ -26,6 +26,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.analytics.api.AnalyticsEntryPoint
+import io.element.android.features.ftue.impl.completeprofile.CompleteProfileNode
 import io.element.android.features.ftue.impl.notifications.NotificationsOptInNode
 import io.element.android.features.ftue.impl.sessionverification.FtueSessionVerificationFlowNode
 import io.element.android.features.ftue.impl.state.DefaultFtueService
@@ -79,6 +80,9 @@ class FtueFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object LockScreenSetup : NavTarget
+
+        @Parcelize
+        data object CompleteProfile : NavTarget
     }
 
     override fun onBuilt() {
@@ -107,7 +111,7 @@ class FtueFlowNode @AssistedInject constructor(
             NavTarget.SessionVerification -> {
                 val callback = object : FtueSessionVerificationFlowNode.Callback {
                     override fun onDone() {
-                        moveToNextStepIfNeeded(fromSessionVerification = true)
+                        moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
                     }
                 }
                 createNode<FtueSessionVerificationFlowNode>(buildContext, listOf(callback))
@@ -134,10 +138,18 @@ class FtueFlowNode @AssistedInject constructor(
                     .callback(callback)
                     .build()
             }
+            NavTarget.CompleteProfile -> {
+                val callback = object : CompleteProfileNode.Callback {
+                    override fun onProfileUpdated() {
+                        moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
+                    }
+                }
+                createNode<CompleteProfileNode>(buildContext, listOf(callback))
+            }
         }
     }
 
-    private fun moveToNextStepIfNeeded(fromSessionVerification: Boolean = false) = lifecycleScope.launch {
+    private fun moveToNextStepIfNeeded(shouldUpdateStateIfNull: Boolean = false) = lifecycleScope.launch {
         when (ftueState.getNextStep()) {
             FtueStep.WaitingForInitialState -> {
                 backstack.newRoot(NavTarget.Placeholder)
@@ -154,8 +166,11 @@ class FtueFlowNode @AssistedInject constructor(
             FtueStep.LockscreenSetup -> {
                 backstack.newRoot(NavTarget.LockScreenSetup)
             }
+            FtueStep.CompleteProfile -> {
+                backstack.newRoot(NavTarget.CompleteProfile)
+            }
             null -> {
-                if (fromSessionVerification) {
+                if (shouldUpdateStateIfNull) {
                     ftueState.updateState()
                 } else Unit
             }

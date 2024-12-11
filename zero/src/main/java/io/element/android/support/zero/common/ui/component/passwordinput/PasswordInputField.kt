@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -45,8 +44,8 @@ fun PasswordTextField(
     onTextChanged: (String) -> Unit = {},
     onFocusChanged: (Boolean) -> Unit = {},
     iconTint: Color = ElementTheme.colors.bgAccentHovered,
-    imeAction: ImeAction = ImeAction.Done,
-    onKeyboardActionDone: () -> Unit = {}
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -84,8 +83,7 @@ fun PasswordTextField(
             },
             visualTransformation =
             if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions =
-            KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
+            keyboardOptions = keyboardOptions,
             trailingIcon = {
                 val image =
                     if (passwordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff
@@ -96,7 +94,7 @@ fun PasswordTextField(
                     }
                 }
             },
-            keyboardActions = KeyboardActions(onDone = { onKeyboardActionDone.invoke() })
+            keyboardActions = keyboardActions
         )
         if (showPasswordCriteria && showPasswordCriteriaInternal && error == null) {
             Spacer(modifier = Modifier.size(SPACING_2X.dp))

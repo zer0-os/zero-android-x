@@ -63,10 +63,10 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.TextField
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
-import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.sanitize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,12 +104,12 @@ fun LoginPasswordView(
 
         Column(
             modifier = Modifier
-                    .fillMaxSize()
-                    .imePadding()
-                    .padding(padding)
-                    .consumeWindowInsets(padding)
-                    .verticalScroll(state = scrollState)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                .fillMaxSize()
+                .imePadding()
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .verticalScroll(state = scrollState)
+                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         ) {
             // Title
             IconTitleSubtitleMolecule(
@@ -143,8 +143,8 @@ fun LoginPasswordView(
                         onClick = ::submit,
                         enabled = state.submitEnabled || isLoading,
                         modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(TestTags.loginContinue)
+                            .fillMaxWidth()
+                            .testTag(TestTags.loginContinue)
                     )
                     Spacer(modifier = Modifier.height(48.dp))
                 }
@@ -269,13 +269,6 @@ private fun LoginForm(
             singleLine = true,
         )
     }
-}
-
-/**
- * Ensure that the string does not contain any new line characters, which can happen when pasting values.
- */
-private fun String.sanitize(): String {
-    return replace("\n", "")
 }
 
 @Composable

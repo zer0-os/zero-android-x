@@ -30,7 +30,9 @@ import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.OidcPrompt
 import io.element.android.libraries.oidc.api.OidcAction
 import io.element.android.libraries.oidc.api.OidcActionFlow
+import io.element.android.support.zero.common.extension.withScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ConfirmAccountProviderPresenter @AssistedInject constructor(
@@ -73,6 +75,9 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
                     localCoroutineScope.submit(accountProvider.url, loginFlowAction)
                 }
                 ConfirmAccountProviderEvents.ClearError -> loginFlowAction.value = AsyncData.Uninitialized
+                is ConfirmAccountProviderEvents.ValidateInvite -> {
+                    validateInviteCode(event.inviteCode, loginFlowAction)
+                }
             }
         }
 
@@ -142,4 +147,24 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
         }
         oidcActionFlow.reset()
     }
+
+    private fun validateInviteCode(
+        inviteCode: String,
+        loginFlowAction: MutableState<AsyncData<LoginFlow>>,
+    ) {
+        loginFlowAction.value = AsyncData.Loading()
+        withScope(Dispatchers.IO) {
+            val result = authenticationService.validateInviteCode(inviteCode)
+            val isCodeValid = result.getOrNull() ?: false
+            if (isCodeValid) {
+                loginFlowAction.value = AsyncData.Success(
+                    LoginFlow.ZeroCreateAccountFlow(inviteCode)
+                )
+            } else {
+                loginFlowAction.value = AsyncData.Failure(InvalidZeroInviteCode())
+            }
+        }
+    }
 }
+
+internal class InvalidZeroInviteCode: Exception()

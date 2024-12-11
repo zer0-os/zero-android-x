@@ -35,8 +35,12 @@ dependencies {
     implementation(projects.services.analytics.api)
     implementation(projects.features.lockscreen.api)
     implementation(projects.libraries.permissions.api)
+    implementation(projects.libraries.mediapickers.api)
+    implementation(projects.libraries.mediaupload.api)
     implementation(projects.libraries.permissions.noop)
     implementation(projects.services.toolbox.api)
+
+    implementation(projects.zero)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)

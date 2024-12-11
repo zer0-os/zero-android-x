@@ -19,6 +19,7 @@ import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.navmodel.backstack.BackStack
+import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
 import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import dagger.assisted.Assisted
@@ -33,6 +34,7 @@ import io.element.android.features.login.impl.screens.confirmaccountprovider.Con
 import io.element.android.features.login.impl.screens.createaccount.CreateAccountNode
 import io.element.android.features.login.impl.screens.loginpassword.LoginPasswordNode
 import io.element.android.features.login.impl.screens.searchaccountprovider.SearchAccountProviderNode
+import io.element.android.features.login.impl.screens.zerocreateaccount.ZeroCreateAccountNode
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.NodeInputs
@@ -115,6 +117,9 @@ class LoginFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class OidcView(val oidcDetails: OidcDetails) : NavTarget
+
+        @Parcelize
+        data class ZeroCreateAccount(val inviteCode: String) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -155,6 +160,10 @@ class LoginFlowNode @AssistedInject constructor(
                     override fun onChangeAccountProvider() {
                         backstack.push(NavTarget.ChangeAccountProvider)
                     }
+
+                    override fun onCreateZeroAccount(inviteCode: String) {
+                        backstack.push(NavTarget.ZeroCreateAccount(inviteCode))
+                    }
                 }
                 createNode<ConfirmAccountProviderNode>(buildContext, plugins = listOf(inputs, callback))
             }
@@ -193,6 +202,19 @@ class LoginFlowNode @AssistedInject constructor(
                     url = navTarget.url,
                 )
                 createNode<CreateAccountNode>(buildContext, listOf(inputs))
+            }
+
+            is NavTarget.ZeroCreateAccount -> {
+                val inputs = ZeroCreateAccountNode.Inputs(
+                    inviteCode = navTarget.inviteCode,
+                )
+                val callback = object : ZeroCreateAccountNode.Callback {
+                    override fun onLoginPasswordNeeded() {
+                        backstack.pop()
+                        backstack.push(NavTarget.LoginPassword)
+                    }
+                }
+                createNode<ZeroCreateAccountNode>(buildContext, listOf(inputs, callback))
             }
         }
     }

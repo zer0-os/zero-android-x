@@ -26,6 +26,7 @@ import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.call.api.CallType
 import io.element.android.features.call.api.ElementCallEntryPoint
+import io.element.android.features.knockrequests.api.list.KnockRequestsListEntryPoint
 import io.element.android.features.location.api.Location
 import io.element.android.features.location.api.SendLocationEntryPoint
 import io.element.android.features.location.api.ShowLocationEntryPoint
@@ -40,6 +41,7 @@ import io.element.android.features.messages.impl.timeline.TimelineController
 import io.element.android.features.messages.impl.timeline.debug.EventDebugInfoNode
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemAudioContent
+import io.element.android.features.messages.impl.timeline.model.event.TimelineItemEventContentWithAttachment
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemFileContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemImageContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemLocationContent
@@ -51,6 +53,7 @@ import io.element.android.libraries.architecture.BackstackWithOverlayBox
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.createNode
 import io.element.android.libraries.architecture.overlay.Overlay
+import io.element.android.libraries.architecture.overlay.operation.hide
 import io.element.android.libraries.architecture.overlay.operation.show
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -66,8 +69,8 @@ import io.element.android.libraries.matrix.api.room.joinedRoomMembers
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.matrix.ui.messages.LocalRoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
-import io.element.android.libraries.mediaviewer.api.local.MediaInfo
-import io.element.android.libraries.mediaviewer.api.viewer.MediaViewerNode
+import io.element.android.libraries.mediaviewer.api.MediaInfo
+import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.libraries.textcomposer.mentions.LocalMentionSpanTheme
 import io.element.android.libraries.textcomposer.mentions.MentionSpanTheme
 import io.element.android.services.analytics.api.AnalyticsService
@@ -86,12 +89,14 @@ class MessagesFlowNode @AssistedInject constructor(
     private val showLocationEntryPoint: ShowLocationEntryPoint,
     private val createPollEntryPoint: CreatePollEntryPoint,
     private val elementCallEntryPoint: ElementCallEntryPoint,
+    private val mediaViewerEntryPoint: MediaViewerEntryPoint,
     private val analyticsService: AnalyticsService,
     private val room: MatrixRoom,
     private val roomMemberProfilesCache: RoomMemberProfilesCache,
     private val mentionSpanTheme: MentionSpanTheme,
     private val pinnedEventsTimelineProvider: PinnedEventsTimelineProvider,
     private val timelineController: TimelineController,
+    private val knockRequestsListEntryPoint: KnockRequestsListEntryPoint,
 ) : BaseFlowNode<MessagesFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = plugins.filterIsInstance<MessagesEntryPoint.Params>().first().initialTarget.toNavTarget(),
@@ -143,6 +148,9 @@ class MessagesFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object PinnedMessagesList : NavTarget
+
+        @Parcelize
+        data object KnockRequestsList : NavTarget
     }
 
     private val callbacks = plugins<MessagesEntryPoint.Callback>()
@@ -223,19 +231,31 @@ class MessagesFlowNode @AssistedInject constructor(
                     override fun onViewAllPinnedEvents() {
                         backstack.push(NavTarget.PinnedMessagesList)
                     }
+
+                    override fun onViewKnockRequests() {
+                        backstack.push(NavTarget.KnockRequestsList)
+                    }
                 }
                 val inputs = MessagesNode.Inputs(focusedEventId = navTarget.focusedEventId)
                 createNode<MessagesNode>(buildContext, listOf(callback, inputs))
             }
             is NavTarget.MediaViewer -> {
-                val inputs = MediaViewerNode.Inputs(
+                val params = MediaViewerEntryPoint.Params(
                     mediaInfo = navTarget.mediaInfo,
                     mediaSource = navTarget.mediaSource,
                     thumbnailSource = navTarget.thumbnailSource,
                     canDownload = true,
                     canShare = true,
                 )
-                createNode<MediaViewerNode>(buildContext, listOf(inputs))
+                val callback = object : MediaViewerEntryPoint.Callback {
+                    override fun onDone() {
+                        overlay.hide()
+                    }
+                }
+                mediaViewerEntryPoint.nodeBuilder(this, buildContext)
+                    .params(params)
+                    .callback(callback)
+                    .build()
             }
             is NavTarget.AttachmentPreview -> {
                 val inputs = AttachmentsPreviewNode.Inputs(navTarget.attachment)
@@ -315,102 +335,98 @@ class MessagesFlowNode @AssistedInject constructor(
             NavTarget.Empty -> {
                 node(buildContext) {}
             }
+            NavTarget.KnockRequestsList -> {
+                knockRequestsListEntryPoint.createNode(this, buildContext)
+            }
         }
     }
 
     private fun processEventClick(event: TimelineItem.Event): Boolean {
-        return when (event.content) {
+        val navTarget = when (event.content) {
             is TimelineItemImageContent -> {
-                val navTarget = NavTarget.MediaViewer(
-                    mediaInfo = MediaInfo(
-                        filename = event.content.filename,
-                        caption = event.content.caption,
-                        mimeType = event.content.mimeType,
-                        formattedFileSize = event.content.formattedFileSize,
-                        fileExtension = event.content.fileExtension
-                    ),
+                buildMediaViewerNavTarget(
+                    event = event,
+                    content = event.content,
                     mediaSource = event.content.mediaSource,
                     thumbnailSource = event.content.thumbnailSource,
                 )
-                overlay.show(navTarget)
-                true
             }
             is TimelineItemStickerContent -> {
                 /* Sticker may have an empty url and no thumbnail
                    if encrypted on certain bridges */
-                if (event.content.preferredMediaSource != null) {
-                    val navTarget = NavTarget.MediaViewer(
-                        mediaInfo = MediaInfo(
-                            filename = event.content.filename,
-                            caption = event.content.caption,
-                            mimeType = event.content.mimeType,
-                            formattedFileSize = event.content.formattedFileSize,
-                            fileExtension = event.content.fileExtension
-                        ),
-                        mediaSource = event.content.preferredMediaSource,
+                event.content.preferredMediaSource?.let { preferredMediaSource ->
+                    buildMediaViewerNavTarget(
+                        event = event,
+                        content = event.content,
+                        mediaSource = preferredMediaSource,
                         thumbnailSource = event.content.thumbnailSource,
                     )
-                    overlay.show(navTarget)
-                    true
-                } else {
-                    false
                 }
             }
             is TimelineItemVideoContent -> {
-                val navTarget = NavTarget.MediaViewer(
-                    mediaInfo = MediaInfo(
-                        filename = event.content.filename,
-                        caption = event.content.caption,
-                        mimeType = event.content.mimeType,
-                        formattedFileSize = event.content.formattedFileSize,
-                        fileExtension = event.content.fileExtension
-                    ),
-                    mediaSource = event.content.videoSource,
+                buildMediaViewerNavTarget(
+                    event = event,
+                    content = event.content,
+                    mediaSource = event.content.mediaSource,
                     thumbnailSource = event.content.thumbnailSource,
                 )
-                overlay.show(navTarget)
-                true
             }
             is TimelineItemFileContent -> {
-                val navTarget = NavTarget.MediaViewer(
-                    mediaInfo = MediaInfo(
-                        filename = event.content.filename,
-                        caption = event.content.caption,
-                        mimeType = event.content.mimeType,
-                        formattedFileSize = event.content.formattedFileSize,
-                        fileExtension = event.content.fileExtension
-                    ),
-                    mediaSource = event.content.fileSource,
+                buildMediaViewerNavTarget(
+                    event = event,
+                    content = event.content,
+                    mediaSource = event.content.mediaSource,
                     thumbnailSource = event.content.thumbnailSource,
                 )
-                overlay.show(navTarget)
-                true
             }
             is TimelineItemAudioContent -> {
-                val navTarget = NavTarget.MediaViewer(
-                    mediaInfo = MediaInfo(
-                        filename = event.content.filename,
-                        caption = event.content.caption,
-                        mimeType = event.content.mimeType,
-                        formattedFileSize = event.content.formattedFileSize,
-                        fileExtension = event.content.fileExtension
-                    ),
+                buildMediaViewerNavTarget(
+                    event = event,
+                    content = event.content,
                     mediaSource = event.content.mediaSource,
                     thumbnailSource = null,
                 )
-                overlay.show(navTarget)
-                true
             }
             is TimelineItemLocationContent -> {
-                val navTarget = NavTarget.LocationViewer(
+                NavTarget.LocationViewer(
                     location = event.content.location,
                     description = event.content.description,
                 )
+            }
+            else -> null
+        }
+        return when (navTarget) {
+            is NavTarget.MediaViewer -> {
                 overlay.show(navTarget)
+                true
+            }
+            is NavTarget.LocationViewer -> {
+                backstack.push(navTarget)
                 true
             }
             else -> false
         }
+    }
+
+    private fun buildMediaViewerNavTarget(
+        event: TimelineItem.Event,
+        content: TimelineItemEventContentWithAttachment,
+        mediaSource: MediaSource,
+        thumbnailSource: MediaSource?,
+    ): NavTarget {
+        return NavTarget.MediaViewer(
+            mediaInfo = MediaInfo(
+                filename = content.filename,
+                caption = content.caption,
+                mimeType = content.mimeType,
+                formattedFileSize = content.formattedFileSize,
+                fileExtension = content.fileExtension,
+                senderName = event.safeSenderName,
+                dateSent = event.sentTime,
+            ),
+            mediaSource = mediaSource,
+            thumbnailSource = thumbnailSource,
+        )
     }
 
     @Composable

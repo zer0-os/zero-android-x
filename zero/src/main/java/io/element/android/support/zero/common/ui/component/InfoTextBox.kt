@@ -7,18 +7,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.support.zero.common.ui.theme.PADDING_2X
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
@@ -47,16 +48,11 @@ private fun InfoTextBox(
 ) {
     val contentColor: Color =
         when (type) {
-            InfoTextType.SUCCESS -> Color.Green
+            InfoTextType.SUCCESS -> ElementTheme.colors.zeroBrandColor
             InfoTextType.ERROR -> Color.Red
-            else -> Color.Gray
+            else -> ElementTheme.colors.textSecondary
         }
-    val backgroundColor =
-        when (type) {
-            InfoTextType.SUCCESS -> Color(0xFF0C1F17)
-            InfoTextType.ERROR -> Color(0xFF291415)
-            else -> Color(0x10A3A2A3)
-        }
+    val backgroundColor = contentColor.copy(alpha = 0.1f)
     Box(modifier = modifier.background(color = backgroundColor, shape = RoundedCornerShape(6.dp))) {
         Row(
             modifier = Modifier.padding(vertical = PADDING_2X.dp, horizontal = PADDING_4X.dp),

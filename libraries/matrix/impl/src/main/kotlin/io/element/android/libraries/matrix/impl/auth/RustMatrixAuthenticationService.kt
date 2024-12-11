@@ -39,6 +39,7 @@ import io.element.android.libraries.sessionstorage.api.LoginType
 import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.data.repository.AuthRepository
+import io.element.android.support.zero.data.repository.InviteRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +71,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     private val oidcConfigurationProvider: OidcConfigurationProvider,
     private val appPreferencesStore: AppPreferencesStore,
     private val authRepository: AuthRepository?,
+    private val inviteRepository: InviteRepository?,
 ) : MatrixAuthenticationService {
     // Passphrase which will be used for new sessions. Existing sessions will use the passphrase
     // stored in the SessionData.
@@ -406,4 +408,45 @@ class RustMatrixAuthenticationService @Inject constructor(
             .substringAfter(":")
             .trim()
     }
+
+    override suspend fun validateInviteCode(inviteCode: String): Result<Boolean> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                inviteRepository?.validateInvite(inviteCode) ?: false
+            }.mapFailure {
+                it.mapAuthenticationException()
+            }
+        }
+
+    override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> =
+        withContext(coroutineDispatchers.io) {
+            runCatching {
+                val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+                val client = currentClient ?: error("You need to call `setHomeserver()` first")
+                val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
+
+                val authSsoToken = authRepository.createAndAuthorise(email, password, inviteCode)
+                    .firstOrNull()
+                val ssoToken = authSsoToken?.token
+                    ?: error("SSO Token from zos is null or blank")
+                client.customLoginWithJwt(ssoToken, "Element X Android", null)
+                val sessionData = client.session()
+                    .toSessionData(
+                        isTokenValid = true,
+                        loginType = LoginType.PASSWORD,
+                        passphrase = pendingPassphrase,
+                        sessionPaths = currentSessionPaths,
+                    )
+                clear()
+                MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
+                sessionStore.storeData(sessionData)
+                authRepository.saveMatrixLoginInfo(
+                    token = sessionData.accessToken,
+                    userId = sessionData.userId
+                )
+                SessionId(sessionData.userId)
+            }.mapFailure { failure ->
+                failure.mapAuthenticationException()
+            }
+        }
 }

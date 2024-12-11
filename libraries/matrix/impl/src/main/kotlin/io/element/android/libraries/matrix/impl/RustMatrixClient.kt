@@ -12,8 +12,8 @@ import io.element.android.libraries.androidutils.file.safeDelete
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.coroutine.childScope
-import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.core.coroutine.mapState
+import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
@@ -91,6 +91,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -759,6 +760,37 @@ class RustMatrixClient(
 
     override suspend fun getZeroMessengerInvite() {
         zeroInviteRepository?.fetchMessengerInvite()
+    }
+
+    override suspend fun isZeroProfileCompletionPending(): Boolean {
+        return zeroUserRepository?.getCurrentUser()
+            ?.firstOrNull()
+            ?.name.isNullOrBlank()
+    }
+
+    override suspend fun completeZeroUserProfile(
+        inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
+    ): Result<Unit> = withContext(sessionDispatcher) {
+        runCatching {
+            val updateProfileRequests = mutableListOf<Deferred<Result<Unit>>>()
+            updateProfileRequests.add(
+                async { setDisplayName(displayName) }
+            )
+            if (mimeType != null && avatarData != null) {
+                updateProfileRequests.add(
+                    async { uploadAvatar(mimeType, avatarData) }
+                )
+            }
+            val responses = updateProfileRequests.awaitAll()
+            val avatarUrl = innerClient.getProfile(sessionId.value).avatarUrl
+            val inviterFlow = zeroAuthRepository?.completeSignUp(
+                inviteCode = inviteCode, displayName = displayName, avatarUrl = avatarUrl
+            )
+            val inviterId = inviterFlow?.firstOrNull()?.matrixId
+            if (!inviterId.isNullOrBlank()) {
+                createDM(UserId(inviterId))
+            }
+        }
     }
     //endregion
 }

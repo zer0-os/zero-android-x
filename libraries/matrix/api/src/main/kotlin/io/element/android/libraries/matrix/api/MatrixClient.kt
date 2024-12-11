@@ -170,6 +170,12 @@ interface MatrixClient : Closeable {
     fun dismissRewardsIntimation()
 
     suspend fun getZeroMessengerInvite()
+
+    suspend fun isZeroProfileCompletionPending(): Boolean
+
+    suspend fun completeZeroUserProfile(
+        inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
+    ): Result<Unit>
 }
 
 /**

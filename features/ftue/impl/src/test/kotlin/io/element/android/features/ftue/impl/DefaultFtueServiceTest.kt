@@ -15,8 +15,10 @@ import io.element.android.features.ftue.impl.state.DefaultFtueService
 import io.element.android.features.ftue.impl.state.FtueStep
 import io.element.android.features.lockscreen.api.LockScreenService
 import io.element.android.features.lockscreen.test.FakeLockScreenService
+import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.verification.SessionVerifiedStatus
+import io.element.android.libraries.matrix.test.FakeMatrixClient
 import io.element.android.libraries.matrix.test.verification.FakeSessionVerificationService
 import io.element.android.libraries.permissions.api.PermissionStateProvider
 import io.element.android.libraries.permissions.impl.FakePermissionStateProvider
@@ -235,6 +237,7 @@ class DefaultFtueServiceTest {
         sessionPreferencesStore: SessionPreferencesStore = InMemorySessionPreferencesStore(),
         // First version where notification permission is required
         sdkIntVersion: Int = Build.VERSION_CODES.TIRAMISU,
+        matrixClient: MatrixClient = FakeMatrixClient()
     ) = DefaultFtueService(
         sessionCoroutineScope = backgroundScope,
         sessionVerificationService = sessionVerificationService,
@@ -243,5 +246,6 @@ class DefaultFtueServiceTest {
         permissionStateProvider = permissionStateProvider,
         lockScreenService = lockScreenService,
         sessionPreferencesStore = sessionPreferencesStore,
+        client = matrixClient
     )
 }

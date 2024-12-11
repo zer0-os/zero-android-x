@@ -17,6 +17,7 @@ import io.element.android.features.lockscreen.api.LockScreenService
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
+import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.verification.SessionVerifiedStatus
 import io.element.android.libraries.permissions.api.PermissionStateProvider
@@ -43,6 +44,7 @@ class DefaultFtueService @Inject constructor(
     private val lockScreenService: LockScreenService,
     private val sessionVerificationService: SessionVerificationService,
     private val sessionPreferencesStore: SessionPreferencesStore,
+    private val client: MatrixClient,
 ) : FtueService {
     override val state = MutableStateFlow<FtueState>(FtueState.Unknown)
 
@@ -79,7 +81,12 @@ class DefaultFtueService @Inject constructor(
             } else {
                 getNextStep(FtueStep.WaitingForInitialState)
             }
-            FtueStep.WaitingForInitialState -> if (isSessionNotVerified()) {
+            FtueStep.WaitingForInitialState -> if (isProfileIncomplete()) {
+                FtueStep.CompleteProfile
+            } else {
+                getNextStep(FtueStep.CompleteProfile)
+            }
+            FtueStep.CompleteProfile -> if (isSessionNotVerified()) {
                 FtueStep.SessionVerification
             } else {
                 getNextStep(FtueStep.SessionVerification)
@@ -146,10 +153,15 @@ class DefaultFtueService @Inject constructor(
             else -> FtueState.Incomplete
         }
     }
+
+    private suspend fun isProfileIncomplete(): Boolean {
+        return client.isZeroProfileCompletionPending()
+    }
 }
 
 sealed interface FtueStep {
     data object WaitingForInitialState : FtueStep
+    data object CompleteProfile : FtueStep
     data object SessionVerification : FtueStep
     data object NotificationsOptIn : FtueStep
     data object AnalyticsOptIn : FtueStep

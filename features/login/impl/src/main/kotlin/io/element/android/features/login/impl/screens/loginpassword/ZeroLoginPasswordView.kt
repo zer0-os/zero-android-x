@@ -50,6 +50,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.sanitize
 import io.element.android.support.zero.common.ui.ZeroAuthScreensBackground
 import io.element.android.support.zero.common.ui.animation.FadeExpandAnimation
 import io.element.android.support.zero.common.ui.component.SimpleInputField
@@ -60,8 +61,8 @@ import io.element.android.support.zero.common.ui.theme.SPACING_10X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_5X
 import io.element.android.support.zero.common.ui.theme.SPACING_6X
-import io.element.android.support.zero.screens.login.LoginTypeSegmentedControl
-import io.element.android.support.zero.screens.login.util.LoginFlowType
+import io.element.android.support.zero.screens.login.AuthenticationTypeSegmentedControl
+import io.element.android.support.zero.screens.login.util.ZeroAuthenticationFlowType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,8 +87,8 @@ fun ZeroLoginPasswordView(
         state.eventSink(LoginPasswordEvents.Submit)
     }
 
-    val loginFlow: MutableState<LoginFlowType> = remember { mutableStateOf(LoginFlowType.WEB3) }
-    val showWeb3LoginUI = loginFlow.value == LoginFlowType.WEB3
+    val loginFlow: MutableState<ZeroAuthenticationFlowType> = remember { mutableStateOf(ZeroAuthenticationFlowType.EMAIL) }
+    val showWeb3LoginUI = loginFlow.value == ZeroAuthenticationFlowType.WEB3
 
     ZeroAuthScreensBackground(isLoading = isLoading) {
         Scaffold(
@@ -118,15 +119,15 @@ fun ZeroLoginPasswordView(
                 Spacer(modifier = Modifier.size(SPACING_5X.dp))
 
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    LoginTypeSegmentedControl(
-                        defaultSelectedItemIndex = LoginFlowType.indexOf(loginFlow.value),
+                    AuthenticationTypeSegmentedControl(
+                        defaultSelectedItemIndex = ZeroAuthenticationFlowType.indexOf(loginFlow.value),
                         controlWidth = 230.dp,
                         items =
                         listOf(
                             stringResource(io.element.android.support.zero.R.string.web3),
                             stringResource(io.element.android.support.zero.R.string.email)
                         ),
-                        onItemSelection = { loginFlow.value = LoginFlowType.get(it) }
+                        onItemSelection = { loginFlow.value = ZeroAuthenticationFlowType.get(it) }
                     )
                 }
                 if (showWeb3LoginUI) {
@@ -170,7 +171,6 @@ fun ZeroLoginPasswordView(
                     ) {
                         ZeroLoginForm(
                             state = state,
-                            isLoading = isLoading,
                             onSubmit = ::submit
                         )
                     }
@@ -190,7 +190,6 @@ fun ZeroLoginPasswordView(
 @Composable
 private fun ZeroLoginForm(
     state: LoginPasswordState,
-    isLoading: Boolean,
     onSubmit: () -> Unit,
 ) {
     var loginFieldState by textFieldState(stateValue = state.formState.login)
@@ -211,7 +210,7 @@ private fun ZeroLoginForm(
                 .onTabOrEnterKeyFocusNext(focusManager)
                 .testTag(TestTags.loginEmailUsername)
                 .autofill(
-                    autofillTypes = listOf(AutofillType.Username),
+                    autofillTypes = listOf(AutofillType.EmailAddress),
                     onFill = {
                         val sanitized = it.sanitize()
                         loginFieldState = sanitized
@@ -255,7 +254,13 @@ private fun ZeroLoginForm(
                 passwordFieldState = sanitized
                 eventSink(LoginPasswordEvents.SetPassword(sanitized))
             },
-            onKeyboardActionDone = { onSubmit() },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { onSubmit() }
+            ),
             iconTint = Color.White.copy(alpha = 0.75f)
         )
 
@@ -267,13 +272,6 @@ private fun ZeroLoginForm(
             onClick = { onSubmit() }
         )
     }
-}
-
-/**
- * Ensure that the string does not contain any new line characters, which can happen when pasting values.
- */
-private fun String.sanitize(): String {
-    return replace("\n", "")
 }
 
 @Composable
