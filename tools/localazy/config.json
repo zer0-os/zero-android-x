@@ -81,6 +81,12 @@
       ]
     },
     {
+      "name" : ":libraries:dateformatter:impl",
+      "includeRegex" : [
+        "common\\.date\\..*"
+      ]
+    },
+    {
       "name" : ":libraries:permissions:api",
       "includeRegex" : [
         "dialog\\.permission_.*"
@@ -90,6 +96,13 @@
       "name" : ":libraries:androidutils",
       "includeRegex" : [
         "error_no_compatible_app_found"
+      ]
+    },
+    {
+      "name" : ":libraries:mediaviewer:impl",
+      "includeRegex" : [
+        "screen\\.media_details\\..*",
+        "screen_media_browser_.*"
       ]
     },
     {

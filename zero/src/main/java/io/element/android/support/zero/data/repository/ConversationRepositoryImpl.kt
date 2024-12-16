@@ -9,9 +9,11 @@ class ConversationRepositoryImpl(
 ) : ConversationRepository {
 
     override suspend fun onNewMessageSent(roomId: String) {
-        val sentAt = System.currentTimeMillis()
-        zeroConversationService.notifyMessage(
-            request = ZeroNotifyMessageRequest.newRequest(roomId, sentAt)
-        )
+        runCatching {
+            val sentAt = System.currentTimeMillis()
+            zeroConversationService.notifyMessage(
+                request = ZeroNotifyMessageRequest.newRequest(roomId, sentAt)
+            )
+        }
     }
 }

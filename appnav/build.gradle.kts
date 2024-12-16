@@ -47,6 +47,8 @@ dependencies {
     implementation(projects.services.appnavstate.api)
     implementation(projects.services.analytics.api)
 
+    implementation(projects.zero)
+
     testImplementation(libs.test.junit)
     testImplementation(libs.test.robolectric)
     testImplementation(libs.coroutines.test)

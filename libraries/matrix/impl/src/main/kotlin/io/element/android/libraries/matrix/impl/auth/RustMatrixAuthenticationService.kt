@@ -38,6 +38,8 @@ import io.element.android.libraries.sessionstorage.api.LoggedInState
 import io.element.android.libraries.sessionstorage.api.LoginType
 import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.support.zero.common.state.StateBus
+import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.InviteRepository
 import kotlinx.coroutines.CancellationException
@@ -114,6 +116,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                         Timber.w("Restoring a session with a passphrase")
                     }
                     MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
+                    StateBus.onUserStateChanged(UserState.AUTHORIZED)
                     rustMatrixClientFactory.create(sessionData)
                 } else {
                     error("Token is not valid")
@@ -200,6 +203,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                     token = sessionData.accessToken,
                     userId = sessionData.userId
                 )
+                StateBus.onUserStateChanged(UserState.AUTHORIZED)
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->
                 failure.mapAuthenticationException()
