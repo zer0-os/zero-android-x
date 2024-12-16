@@ -7,6 +7,8 @@ import io.element.android.libraries.di.AppScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.support.zero.data.delegate.DataCleaner
 import io.element.android.support.zero.data.delegate.Preferences
+import io.element.android.support.zero.data.repository.AccountRepository
+import io.element.android.support.zero.data.repository.AccountRepositoryImpl
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.AuthRepositoryImpl
 import io.element.android.support.zero.data.repository.ConversationRepository
@@ -17,6 +19,7 @@ import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
+import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroConversationService
 import io.element.android.support.zero.network.service.ZeroInviteService
@@ -61,4 +64,10 @@ object RepositoryModule {
     fun bindInviteRepository(
         zeroInviteService: ZeroInviteService
     ): InviteRepository = InviteRepositoryImpl(zeroInviteService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindAccountRepository(
+        zeroAccountService: ZeroAccountService
+    ): AccountRepository = AccountRepositoryImpl(zeroAccountService)
 }

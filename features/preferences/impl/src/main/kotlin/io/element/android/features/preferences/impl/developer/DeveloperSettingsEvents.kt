@@ -15,4 +15,5 @@ sealed interface DeveloperSettingsEvents {
     data class SetSimplifiedSlidingSyncEnabled(val isEnabled: Boolean) : DeveloperSettingsEvents
     data class SetHideImagesAndVideos(val value: Boolean) : DeveloperSettingsEvents
     data object ClearCache : DeveloperSettingsEvents
+    data object DeleteUserAccount: DeveloperSettingsEvents
 }

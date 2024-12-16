@@ -81,6 +81,7 @@ import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.data.model.UserRewards
+import io.element.android.support.zero.data.repository.AccountRepository
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.InviteRepository
@@ -153,6 +154,7 @@ class RustMatrixClient(
     private val zeroUserRepository: UserRepository?,
     private val zeroRewardsRepository: RewardsRepository?,
     private val zeroInviteRepository: InviteRepository?,
+    private val zeroAccountRepository: AccountRepository?,
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
     override val deviceId: DeviceId = DeviceId(innerClient.deviceId())
@@ -790,6 +792,13 @@ class RustMatrixClient(
             if (!inviterId.isNullOrBlank()) {
                 createDM(UserId(inviterId))
             }
+        }
+    }
+
+    override suspend fun deleteUserAccount(): Result<Unit> = withContext(sessionDispatcher) {
+        runCatching {
+            val accountRepository = zeroAccountRepository ?: return@runCatching
+            accountRepository.deleteUserAccount()
         }
     }
     //endregion

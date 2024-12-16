@@ -22,6 +22,7 @@ import io.element.android.appconfig.ElementCallConfig
 import io.element.android.features.logout.api.LogoutUseCase
 import io.element.android.features.preferences.impl.tasks.ClearCacheUseCase
 import io.element.android.features.preferences.impl.tasks.ComputeCacheSizeUseCase
+import io.element.android.features.preferences.impl.tasks.DeleteAccountUseCase
 import io.element.android.features.rageshake.api.preferences.RageshakePreferencesState
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
@@ -44,6 +45,7 @@ class DeveloperSettingsPresenter @Inject constructor(
     private val featureFlagService: FeatureFlagService,
     private val computeCacheSizeUseCase: ComputeCacheSizeUseCase,
     private val clearCacheUseCase: ClearCacheUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val rageshakePresenter: Presenter<RageshakePreferencesState>,
     private val appPreferencesStore: AppPreferencesStore,
     private val buildMeta: BuildMeta,
@@ -74,6 +76,10 @@ class DeveloperSettingsPresenter @Inject constructor(
         val hideImagesAndVideos by appPreferencesStore
             .doesHideImagesAndVideosFlow()
             .collectAsState(initial = false)
+
+        val isDeleteAccountInProgress = remember {
+            mutableStateOf<Boolean>(false)
+        }
 
         LaunchedEffect(Unit) {
             FeatureFlags.entries
@@ -122,6 +128,9 @@ class DeveloperSettingsPresenter @Inject constructor(
                 is DeveloperSettingsEvents.SetHideImagesAndVideos -> coroutineScope.launch {
                     appPreferencesStore.setHideImagesAndVideos(event.value)
                 }
+                DeveloperSettingsEvents.DeleteUserAccount -> {
+                    coroutineScope.deleteAccount(isDeleteAccountInProgress)
+                }
             }
         }
 
@@ -137,6 +146,7 @@ class DeveloperSettingsPresenter @Inject constructor(
             ),
             isSimpleSlidingSyncEnabled = isSimplifiedSlidingSyncEnabled,
             hideImagesAndVideos = hideImagesAndVideos,
+            isDeleteAccountInProgress = isDeleteAccountInProgress.value,
             eventSink = ::handleEvents
         )
     }
@@ -184,6 +194,15 @@ class DeveloperSettingsPresenter @Inject constructor(
         suspend {
             clearCacheUseCase()
         }.runCatchingUpdatingState(clearCacheAction)
+    }
+
+    private fun CoroutineScope.deleteAccount(deleteAccountAction: MutableState<Boolean>) = launch {
+        deleteAccountAction.value = true
+        val result = deleteAccountUseCase()
+        deleteAccountAction.value = false
+        if (result) {
+            logoutUseCase.logout(true)
+        }
     }
 }
 

@@ -17,7 +17,8 @@ open class DeveloperSettingsStateProvider : PreviewParameterProvider<DeveloperSe
         get() = sequenceOf(
             aDeveloperSettingsState(),
             aDeveloperSettingsState(
-                clearCacheAction = AsyncData.Loading()
+                clearCacheAction = AsyncData.Loading(),
+                isDeleteAccountInProgress = true
             ),
             aDeveloperSettingsState(
                 customElementCallBaseUrlState = aCustomElementCallBaseUrlState(
@@ -32,6 +33,7 @@ fun aDeveloperSettingsState(
     customElementCallBaseUrlState: CustomElementCallBaseUrlState = aCustomElementCallBaseUrlState(),
     isSimplifiedSlidingSyncEnabled: Boolean = false,
     hideImagesAndVideos: Boolean = false,
+    isDeleteAccountInProgress: Boolean = false,
     eventSink: (DeveloperSettingsEvents) -> Unit = {},
 ) = DeveloperSettingsState(
     features = aFeatureUiModelList(),
@@ -41,6 +43,7 @@ fun aDeveloperSettingsState(
     customElementCallBaseUrlState = customElementCallBaseUrlState,
     isSimpleSlidingSyncEnabled = isSimplifiedSlidingSyncEnabled,
     hideImagesAndVideos = hideImagesAndVideos,
+    isDeleteAccountInProgress = isDeleteAccountInProgress,
     eventSink = eventSink,
 )
 

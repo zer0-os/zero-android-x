@@ -20,6 +20,7 @@ data class DeveloperSettingsState(
     val customElementCallBaseUrlState: CustomElementCallBaseUrlState,
     val isSimpleSlidingSyncEnabled: Boolean,
     val hideImagesAndVideos: Boolean,
+    val isDeleteAccountInProgress: Boolean,
     val eventSink: (DeveloperSettingsEvents) -> Unit
 )
 
