@@ -221,6 +221,12 @@ google_autoservice_annotations = { module = "com.google.auto.service:auto-servic
 android_composeCompiler = { module = "androidx.compose.compiler:compiler", version.ref = "composecompiler" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 
+# Wallet Connect
+walletconnect_bom = "com.reown:android-bom:1.0.0"
+walletconnect_androidcore = { module = "com.reown:android-core" }
+walletconnect_appkit = { module = "com.reown:appkit"  }
+walletconnect_walletkit = { module = "com.reown:walletkit"  }
+
 [bundles]
 
 [plugins]
