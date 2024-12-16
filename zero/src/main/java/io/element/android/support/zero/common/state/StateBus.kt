@@ -1,0 +1,17 @@
+package io.element.android.support.zero.common.state
+
+import io.element.android.support.zero.common.util.UserState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+
+object StateBus {
+
+	private val userStateFlow = MutableStateFlow(UserState.UNIDENTIFIED)
+	val userStateObservable: Flow<UserState> = userStateFlow
+	val userState: UserState
+		get() = userStateFlow.value
+
+	fun onUserStateChanged(state: UserState) {
+		userStateFlow.value = state
+	}
+}

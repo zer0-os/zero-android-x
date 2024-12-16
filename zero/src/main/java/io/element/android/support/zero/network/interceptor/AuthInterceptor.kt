@@ -1,5 +1,8 @@
 package io.element.android.support.zero.network.interceptor
 
+import io.element.android.support.zero.common.state.StateBus
+import io.element.android.support.zero.common.util.UserState
+import io.element.android.support.zero.common.util.isAuthorized
 import io.element.android.support.zero.datastore.AppPreferences
 import io.element.android.support.zero.network.meta.NoAuth
 import okhttp3.Interceptor
@@ -7,6 +10,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
 import retrofit2.Invocation
+import java.net.HttpURLConnection
 
 class AuthInterceptor(private val preferences: AppPreferences) : Interceptor {
 
@@ -25,13 +29,12 @@ class AuthInterceptor(private val preferences: AppPreferences) : Interceptor {
             }
         }
         val response = chain.proceed(requestBuilder.build())
-        /*when (response.code) {
-            HttpURLConnection.HTTP_UNAUTHORIZED,
-            HttpURLConnection.HTTP_UNAVAILABLE ->
+        when (response.code) {
+            HttpURLConnection.HTTP_UNAUTHORIZED ->
                 if (StateBus.userState.isAuthorized) {
-                    StateBus.onUserStateChanged(UserState.UNAUTHORIZED)
+                    StateBus.onUserStateChanged(UserState.ACCESS_TOKEN_EXPIRED)
                 }
-        }*/
+        }
         return response
     }
 }
