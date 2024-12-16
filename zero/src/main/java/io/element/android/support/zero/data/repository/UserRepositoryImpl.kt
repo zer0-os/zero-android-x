@@ -9,6 +9,7 @@ import io.element.android.support.zero.network.model.request.UsersFilter
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroUserService
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 
 class UserRepositoryImpl(
     private val zeroUserService: ZeroUserService,
@@ -67,6 +68,6 @@ class UserRepositoryImpl(
         try {
             run()
         } catch (e: Throwable) {
-            throw e
+            Timber.e(e)
         }
 }
