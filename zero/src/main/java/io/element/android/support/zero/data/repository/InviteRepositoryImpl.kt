@@ -19,8 +19,10 @@ class InviteRepositoryImpl(
     }
 
     override suspend fun fetchMessengerInvite() {
-        val apiInvite = zeroInviteService.fetchMessengerInvite()
-        val messengerInvite = apiInvite.toModel()
-        _messengerInvite.emit(messengerInvite)
+        runCatching {
+            val apiInvite = zeroInviteService.fetchMessengerInvite()
+            val messengerInvite = apiInvite.toModel()
+            _messengerInvite.emit(messengerInvite)
+        }
     }
 }

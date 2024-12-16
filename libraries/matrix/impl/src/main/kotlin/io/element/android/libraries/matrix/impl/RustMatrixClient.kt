@@ -79,6 +79,8 @@ import io.element.android.libraries.matrix.impl.verification.RustSessionVerifica
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
+import io.element.android.support.zero.common.state.StateBus
+import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.AuthRepository
@@ -581,6 +583,7 @@ class RustMatrixClient(
             if (userInitiated) {
                 sessionStore.removeSession(sessionId.value)
             }
+            StateBus.onUserStateChanged(UserState.UNAUTHORIZED)
         }
         return result
     }

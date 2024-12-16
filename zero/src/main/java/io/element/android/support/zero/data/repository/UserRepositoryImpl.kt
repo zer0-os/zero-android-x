@@ -9,6 +9,7 @@ import io.element.android.support.zero.network.model.request.UsersFilter
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroUserService
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 
 class UserRepositoryImpl(
     private val zeroUserService: ZeroUserService,
@@ -16,8 +17,10 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     override suspend fun getCurrentUser(): Flow<ZeroUser> = channelFlowWithAwait {
-        val user = zeroUserService.getCurrentUser()
-        trySend(user.toModel())
+        runSafeCall {
+            val user = zeroUserService.getCurrentUser()
+            trySend(user.toModel())
+        }
     }
 
     override suspend fun getUsers(filterName: String?): Flow<List<ZeroUser>> = channelFlowWithAwait {
@@ -26,20 +29,22 @@ class UserRepositoryImpl(
             return@channelFlowWithAwait
         }
 
-        // Just relying on network result in order to tackle FTS with ranking
-        val filter = UsersFilter.newNameFilter(filterName).toString()
-        zeroUserService
-            .getUsers(filter)
-            ?.takeIf { it.isNotEmpty() }
-            ?.let { zeroUsers ->
-                trySend(zeroUsers.map { it.toModel() })
-            }
-            ?: trySend(emptyList())
+        runSafeCall {
+            // Just relying on network result in order to tackle FTS with ranking
+            val filter = UsersFilter.newNameFilter(filterName).toString()
+            zeroUserService
+                .getUsers(filter)
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { zeroUsers ->
+                    trySend(zeroUsers.map { it.toModel() })
+                }
+                ?: trySend(emptyList())
+        }
     }
 
     override suspend fun getUser(userId: String): Flow<ZeroUser?> =
         channelFlowWithAwait {
-            runCatching {
+            runSafeCall {
                 val apiUser = zeroMatrixUserService.getMatrixUsers(
                     MatrixUsersFilter.newFilter(listOf(userId))
                 ).firstOrNull()
@@ -48,12 +53,21 @@ class UserRepositoryImpl(
         }
 
     override suspend fun updateUserProfile(userName: String?, avatarUrl: String?, profileZId: String?) {
-        zeroUserService.updateProfile(
-            EditUserProfileRequest.newRequest(
-                firstName = userName,
-                image = avatarUrl,
-                profileZid = profileZId
+        runSafeCall {
+            zeroUserService.updateProfile(
+                EditUserProfileRequest.newRequest(
+                    firstName = userName,
+                    image = avatarUrl,
+                    profileZid = profileZId
+                )
             )
-        )
+        }
     }
+
+    private suspend fun <T> runSafeCall(run: suspend () -> T) =
+        try {
+            run()
+        } catch (e: Throwable) {
+            Timber.e(e)
+        }
 }

@@ -27,25 +27,27 @@ class RewardsRepositoryImpl(
 
     override suspend fun getMyRewards(shouldCheckRewardsIntimation: Boolean) {
         withContext(Dispatchers.IO) {
-            val existingRewards = preferences.userRewards()
-            val apiZeroRewards =
-                awaitAll(
-                    async { zeroRewardService.fetchMyRewards() },
-                    async { zeroRewardService.fetchZeroTokens() }
-                )
-            val userRewards = (apiZeroRewards.first() as? ApiUserRewards)
-                ?.toModel(apiZeroRewards[1] as? ApiZeroTokens)
+            runCatching {
+                val existingRewards = preferences.userRewards()
+                val apiZeroRewards =
+                    awaitAll(
+                        async { zeroRewardService.fetchMyRewards() },
+                        async { zeroRewardService.fetchZeroTokens() }
+                    )
+                val userRewards = (apiZeroRewards.first() as? ApiUserRewards)
+                    ?.toModel(apiZeroRewards[1] as? ApiZeroTokens)
 
-            userRewards?.let {
-                val lastZeroCredits = parseZeroCredits(existingRewards)
-                val newZeroCredits = parseZeroCredits(it)
-                val earnedCredits = newZeroCredits.minus(lastZeroCredits)
-                it.earnedRewards = earnedCredits
+                userRewards?.let {
+                    val lastZeroCredits = parseZeroCredits(existingRewards)
+                    val newZeroCredits = parseZeroCredits(it)
+                    val earnedCredits = newZeroCredits.minus(lastZeroCredits)
+                    it.earnedRewards = earnedCredits
 
-                preferences.saveUserRewards(it)
-                _userRewards.emit(it)
-                if (shouldCheckRewardsIntimation) {
-                    _shouldShouldNewRewardsIntimation.emit(earnedCredits > 0)
+                    preferences.saveUserRewards(it)
+                    _userRewards.emit(it)
+                    if (shouldCheckRewardsIntimation) {
+                        _shouldShouldNewRewardsIntimation.emit(earnedCredits > 0)
+                    }
                 }
             }
         }

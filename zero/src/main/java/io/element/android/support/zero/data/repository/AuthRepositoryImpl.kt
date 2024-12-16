@@ -12,6 +12,7 @@ import io.element.android.support.zero.network.model.request.FinaliseCreateAccou
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 
 class AuthRepositoryImpl(
     private val preferences: Preferences,
@@ -71,7 +72,7 @@ class AuthRepositoryImpl(
         try {
             run()
         } catch (e: Throwable) {
-            throw e
+            Timber.e(e)
         }
 }
 
