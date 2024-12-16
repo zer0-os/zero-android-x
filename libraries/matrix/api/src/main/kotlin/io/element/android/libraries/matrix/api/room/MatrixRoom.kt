@@ -107,6 +107,11 @@ interface MatrixRoom : Closeable {
      */
     suspend fun pinnedEventsTimeline(): Result<Timeline>
 
+    /**
+     * Create a new timeline for the media events of the room.
+     */
+    suspend fun mediaTimeline(): Result<Timeline>
+
     fun destroy()
 
     suspend fun subscribeToSync()
@@ -226,6 +231,11 @@ interface MatrixRoom : Closeable {
      *
      */
     suspend fun setUnreadFlag(isUnread: Boolean): Result<Unit>
+
+    /**
+     * Clear the event cache storage for the current room.
+     */
+    suspend fun clearEventCacheStorage(): Result<Unit>
 
     /**
      * Share a location message in the room.
