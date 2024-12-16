@@ -176,6 +176,8 @@ interface MatrixClient : Closeable {
     suspend fun completeZeroUserProfile(
         inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
     ): Result<Unit>
+
+    suspend fun deleteUserAccount(): Result<Unit>
 }
 
 /**

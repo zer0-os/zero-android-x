@@ -6,6 +6,7 @@ import dagger.Provides
 import io.element.android.libraries.di.AppScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.support.zero.network.ZeroRetrofitFactory
+import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroConversationService
 import io.element.android.support.zero.network.service.ZeroInviteService
@@ -46,4 +47,9 @@ object ZeroServiceModule {
     @SingleIn(AppScope::class)
     fun provideZeroInviteService(retrofit: ZeroRetrofitFactory): ZeroInviteService =
         retrofit.baseClient.create(ZeroInviteService::class.java)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideZeroAccountService(retrofit: ZeroRetrofitFactory): ZeroAccountService =
+        retrofit.baseClient.create(ZeroAccountService::class.java)
 }

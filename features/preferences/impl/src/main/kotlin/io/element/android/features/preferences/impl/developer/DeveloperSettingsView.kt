@@ -8,13 +8,16 @@
 package io.element.android.features.preferences.impl.developer
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.preferences.impl.R
-import io.element.android.features.rageshake.api.preferences.RageshakePreferencesView
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
@@ -22,9 +25,11 @@ import io.element.android.libraries.designsystem.components.preferences.Preferen
 import io.element.android.libraries.designsystem.components.preferences.PreferenceTextField
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
 @Composable
 fun DeveloperSettingsView(
@@ -78,6 +83,8 @@ fun DeveloperSettingsView(
                 onClick = { error("This crash is a test.") }
             )
         }*/
+        UserAccountCategory(state = state)
+
         val cache = state.cacheSize
         PreferenceCategory(title = "Cache", showTopDivider = false) {
             PreferenceText(
@@ -150,6 +157,51 @@ private fun FeatureListContent(
         features = state.features,
         onCheckedChange = ::onFeatureEnabled,
     )
+}
+
+@Composable
+private fun UserAccountCategory(
+    state: DeveloperSettingsState,
+) {
+    val showDeleteAccountConfirmation = remember { mutableStateOf(false) }
+
+    val onDismiss: () -> Unit = {
+        showDeleteAccountConfirmation.value = false
+    }
+
+    PreferenceCategory(title = "User Account", showTopDivider = false) {
+        PreferenceText(
+            title = "Delete account",
+            loadingCurrentValue = state.isDeleteAccountInProgress,
+            onClick = {
+                if (state.isDeleteAccountInProgress.not()) {
+                    // show delete account confirmation dialog
+                    showDeleteAccountConfirmation.value = true
+                }
+            }
+        )
+    }
+
+    if (showDeleteAccountConfirmation.value) {
+        ZeroAlertDialog(
+            title = "Delete Account",
+            message = "Are you sure you want to delete your account? You won't be able to recover your account later!",
+            onDismiss = onDismiss,
+            confirmButton = {
+                TextButton(onClick = {
+                    onDismiss()
+                    state.eventSink(DeveloperSettingsEvents.DeleteUserAccount)
+                }) {
+                    Text(text = "Confirm", color = ElementTheme.colors.textPrimary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(text = "Cancel", color = ElementTheme.colors.textPrimary)
+                }
+            }
+        )
+    }
 }
 
 @PreviewsDayNight
