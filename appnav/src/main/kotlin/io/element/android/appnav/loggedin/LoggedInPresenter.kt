@@ -35,9 +35,6 @@ import io.element.android.libraries.preferences.api.store.EnableNativeSlidingSyn
 import io.element.android.libraries.push.api.PushService
 import io.element.android.libraries.pushproviders.api.RegistrationFailure
 import io.element.android.services.analytics.api.AnalyticsService
-import io.element.android.support.zero.common.state.StateBus
-import io.element.android.support.zero.common.util.UserState
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -77,14 +74,6 @@ class LoggedInPresenter @Inject constructor(
                     }
                 }
                 .launchIn(this)
-
-            StateBus.userStateObservable.collectLatest {
-                if (it == UserState.ACCESS_TOKEN_EXPIRED) {
-                    coroutineScope.launch {
-                        matrixClient.logout(userInitiated = true, ignoreSdkError = true)
-                    }
-                }
-            }
         }
         val syncIndicator by matrixClient.roomListService.syncIndicator.collectAsState()
         val networkStatus by networkMonitor.connectivity.collectAsState()

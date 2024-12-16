@@ -82,6 +82,8 @@ import io.element.android.libraries.matrix.api.verification.SessionVerificationR
 import io.element.android.libraries.matrix.api.verification.SessionVerificationServiceListener
 import io.element.android.libraries.preferences.api.store.EnableNativeSlidingSyncUseCase
 import io.element.android.services.appnavstate.api.AppNavigationStateService
+import io.element.android.support.zero.common.state.StateBus
+import io.element.android.support.zero.common.util.UserState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.combine
@@ -160,6 +162,16 @@ class LoggedInFlowNode @AssistedInject constructor(
                             is FtueState.Unknown -> Unit // Nothing to do
                             is FtueState.Incomplete -> backstack.safeRoot(NavTarget.Ftue)
                             is FtueState.Complete -> backstack.safeRoot(NavTarget.RoomList)
+                        }
+                    }
+                    .launchIn(lifecycleScope)
+
+                StateBus.userStateObservable
+                    .onEach { userState ->
+                        if (userState == UserState.ACCESS_TOKEN_EXPIRED) {
+                            coroutineScope.launch {
+                                matrixClient.logout(userInitiated = true, ignoreSdkError = true)
+                            }
                         }
                     }
                     .launchIn(lifecycleScope)
