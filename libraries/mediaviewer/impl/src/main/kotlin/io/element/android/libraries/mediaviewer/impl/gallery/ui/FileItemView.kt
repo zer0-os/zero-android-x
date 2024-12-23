@@ -7,9 +7,9 @@
 
 package io.element.android.libraries.mediaviewer.impl.gallery.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +34,6 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Icon
-import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.mediaviewer.impl.gallery.MediaItem
 
@@ -42,60 +41,57 @@ import io.element.android.libraries.mediaviewer.impl.gallery.MediaItem
 fun FileItemView(
     file: MediaItem.File,
     onClick: () -> Unit,
-    onShareClick: () -> Unit,
-    onDownloadClick: () -> Unit,
-    onInfoClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 16.dp, end = 16.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
         FilenameRow(
             file = file,
             onClick = onClick,
+            onLongClick = onLongClick,
         )
         val caption = file.mediaInfo.caption
         if (caption != null) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Caption(caption)
+            CaptionView(caption)
+        } else {
+            Spacer(modifier = Modifier.height(20.dp))
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        ActionIconsRow(
-            onShareClick = onShareClick,
-            onDownloadClick = onDownloadClick,
-            onInfoClick = onInfoClick,
-        )
         HorizontalDivider()
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FilenameRow(
     file: MediaItem.File,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                        color = ElementTheme.colors.bgSubtleSecondary,
-                        shape = RoundedCornerShape(12.dp),
-                )
-                .clickable { onClick() }
-                .fillMaxWidth()
-                .padding(start = 12.dp, end = 36.dp, top = 8.dp, bottom = 8.dp),
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                color = ElementTheme.colors.bgSubtleSecondary,
+                shape = RoundedCornerShape(12.dp),
+            )
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 36.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             modifier = Modifier
-                    .background(
-                            color = ElementTheme.colors.bgActionSecondaryRest,
-                            shape = CircleShape,
-                    )
-                    .size(32.dp)
-                    .padding(6.dp),
+                .background(
+                    color = ElementTheme.colors.bgActionSecondaryRest,
+                    shape = CircleShape,
+                )
+                .size(32.dp)
+                .padding(6.dp),
             imageVector = CompoundIcons.Attachment(),
             contentDescription = null,
         )
@@ -119,55 +115,6 @@ private fun FilenameRow(
     }
 }
 
-@Composable
-private fun Caption(caption: String) {
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = caption,
-        maxLines = 5,
-        overflow = TextOverflow.Ellipsis,
-        style = ElementTheme.typography.fontBodyLgRegular,
-        color = ElementTheme.colors.textPrimary,
-    )
-}
-
-@Composable
-private fun ActionIconsRow(
-    onShareClick: () -> Unit,
-    onDownloadClick: () -> Unit,
-    onInfoClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        IconButton(
-            onClick = onShareClick,
-        ) {
-            Icon(
-                imageVector = CompoundIcons.ShareAndroid(),
-                contentDescription = null,
-            )
-        }
-        IconButton(
-            onClick = onDownloadClick,
-        ) {
-            Icon(
-                imageVector = CompoundIcons.Download(),
-                contentDescription = null,
-            )
-        }
-        IconButton(
-            onClick = onInfoClick,
-        ) {
-            Icon(
-                imageVector = CompoundIcons.Info(),
-                contentDescription = null,
-            )
-        }
-    }
-}
-
 @PreviewsDayNight
 @Composable
 internal fun FileItemViewPreview(
@@ -176,8 +123,6 @@ internal fun FileItemViewPreview(
     FileItemView(
         file = file,
         onClick = {},
-        onShareClick = {},
-        onDownloadClick = {},
-        onInfoClick = {},
+        onLongClick = {},
     )
 }

@@ -19,12 +19,15 @@ import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemFile
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemImage
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemLoadingIndicator
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemVideo
+import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemVoice
 import kotlinx.collections.immutable.toImmutableList
 
 open class MediaGalleryStateProvider : PreviewParameterProvider<MediaGalleryState> {
     override val values: Sequence<MediaGalleryState>
         get() = sequenceOf(
-            aMediaGalleryState(),
+            aMediaGalleryState(
+                roomName = "A long room name that will be truncated",
+            ),
             aMediaGalleryState(groupedMediaItems = AsyncData.Loading()),
             aMediaGalleryState(groupedMediaItems = AsyncData.Success(aGroupedMediaItems())),
             aMediaGalleryState(
@@ -63,9 +66,8 @@ open class MediaGalleryStateProvider : PreviewParameterProvider<MediaGalleryStat
                                 id = UniqueId("2"),
                                 formattedDate = "September 2004",
                             ),
-                            aMediaItemFile(id = UniqueId("3")),
                             aMediaItemAudio(id = UniqueId("4")),
-                            aMediaItemAudio(
+                            aMediaItemVoice(
                                 id = UniqueId("5"),
                                 waveform = aWaveForm(),
                             ),
@@ -81,6 +83,27 @@ open class MediaGalleryStateProvider : PreviewParameterProvider<MediaGalleryStat
             aMediaGalleryState(
                 mode = MediaGalleryMode.Files,
                 groupedMediaItems = AsyncData.Failure(Exception("Failed to load media")),
+            ),
+            // Timeline is loaded but does not have relevant content yet for images and videos
+            aMediaGalleryState(
+                groupedMediaItems = AsyncData.Success(
+                    aGroupedMediaItems(
+                        imageAndVideoItems = listOf(
+                            aMediaItemLoadingIndicator(),
+                        ),
+                    )
+                )
+            ),
+            // Timeline is loaded but does not have relevant content yet for files
+            aMediaGalleryState(
+                mode = MediaGalleryMode.Files,
+                groupedMediaItems = AsyncData.Success(
+                    aGroupedMediaItems(
+                        fileItems = listOf(
+                            aMediaItemLoadingIndicator(),
+                        ),
+                    )
+                )
             ),
         )
 }

@@ -17,6 +17,7 @@ import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemFile
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemImage
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemLoadingIndicator
 import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemVideo
+import io.element.android.libraries.mediaviewer.impl.gallery.ui.aMediaItemVoice
 import kotlinx.collections.immutable.toImmutableList
 import org.junit.Test
 
@@ -27,6 +28,9 @@ class MediaItemsPostProcessorTest {
     private val audio1 = aMediaItemAudio(id = UniqueId("1"))
     private val audio2 = aMediaItemAudio(id = UniqueId("2"))
     private val audio3 = aMediaItemAudio(id = UniqueId("3"))
+    private val voice1 = aMediaItemVoice(id = UniqueId("1"))
+    private val voice2 = aMediaItemVoice(id = UniqueId("2"))
+    private val voice3 = aMediaItemVoice(id = UniqueId("3"))
     private val image1 = aMediaItemImage(id = UniqueId("1"))
     private val image2 = aMediaItemImage(id = UniqueId("2"))
     private val image3 = aMediaItemImage(id = UniqueId("3"))
@@ -81,10 +85,10 @@ class MediaItemsPostProcessorTest {
             expectedImageAndVideoItems = emptyList(),
             expectedFileItems = listOf(
                 date1,
-                file1,
-                file2,
-                file3,
                 audio1,
+                file3,
+                file2,
+                file1,
             ),
         )
     }
@@ -100,9 +104,9 @@ class MediaItemsPostProcessorTest {
             ),
             expectedImageAndVideoItems = listOf(
                 date1,
-                image1,
-                image2,
                 image3,
+                image2,
+                image1,
             ),
             expectedFileItems = emptyList(),
         )
@@ -120,13 +124,13 @@ class MediaItemsPostProcessorTest {
             ),
             expectedImageAndVideoItems = listOf(
                 date1,
-                video1,
                 image1,
+                video1,
             ),
             expectedFileItems = listOf(
                 date1,
-                file1,
                 audio1,
+                file1,
             ),
         )
     }
@@ -163,6 +167,14 @@ class MediaItemsPostProcessorTest {
     fun `process will handle complex case`() {
         test(
             mediaItems = listOf(
+                file3,
+                date3,
+                video3,
+                video2,
+                date2,
+                voice3,
+                voice2,
+                voice1,
                 audio3,
                 audio2,
                 audio1,
@@ -170,30 +182,28 @@ class MediaItemsPostProcessorTest {
                 image1,
                 video1,
                 date1,
-                file3,
-                date3,
-                video3,
-                video2,
-                date2,
                 loading1,
             ),
             expectedImageAndVideoItems = listOf(
-                date1,
-                video1,
-                image1,
                 date2,
-                video2,
                 video3,
+                video2,
+                date1,
+                image1,
+                video1,
                 loading1,
             ),
             expectedFileItems = listOf(
-                date1,
-                file1,
-                audio1,
-                audio2,
-                audio3,
                 date3,
                 file3,
+                date1,
+                voice3,
+                voice2,
+                voice1,
+                audio3,
+                audio2,
+                audio1,
+                file1,
                 loading1,
             ),
         )

@@ -38,6 +38,7 @@ import io.element.android.features.preferences.impl.user.UserPreferences
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
+import io.element.android.libraries.designsystem.icons.CompoundDrawables
 import io.element.android.libraries.designsystem.preview.ElementPreviewDark
 import io.element.android.libraries.designsystem.preview.ElementPreviewLight
 import io.element.android.libraries.designsystem.preview.PreviewWithLargeHeight
@@ -50,7 +51,6 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha50
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.DeviceId
@@ -414,7 +414,7 @@ private fun DeveloperPreferencesView(onOpenDeveloperSettings: () -> Unit) {
     ListItem(
         //headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
         headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
-        leadingContent = ListItemContent.Icon(IconSource.Resource(CommonDrawables.ic_developer_options)),
+        leadingContent = ListItemContent.Icon(IconSource.Resource(CompoundDrawables.ic_compound_code)),
         onClick = onOpenDeveloperSettings
     )
 }
