@@ -7,3 +7,8 @@ data class ZeroUser(
     val avatarUrl: String? = null,
     val primaryZeroId: String? = null
 )
+
+fun ZeroUser.nameIsMatrixHex(): Boolean {
+    val regex = "^[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+$".toRegex()
+    return name.matches(regex)
+}

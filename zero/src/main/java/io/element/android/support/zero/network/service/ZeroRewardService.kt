@@ -9,6 +9,6 @@ interface ZeroRewardService {
     @GET(value = "rewards/mine")
     suspend fun fetchMyRewards(): ApiUserRewards
 
-    @GET(value = "api/tokens/zero")
+    @GET(value = "api/tokens/meow")
     suspend fun fetchZeroTokens(): ApiZeroTokens
 }

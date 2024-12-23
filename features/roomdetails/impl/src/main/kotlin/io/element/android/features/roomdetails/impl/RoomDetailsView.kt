@@ -182,14 +182,14 @@ fun RoomDetailsView(
                     )
                 }
 
-                /*FavoriteItem(
+                FavoriteItem(
                     isFavorite = state.isFavorite,
                     onFavoriteChanges = {
                         state.eventSink(RoomDetailsEvent.SetFavorite(it))
                     }
                 )
 
-                if (state.canShowPinnedMessages) {
+                /*if (state.canShowPinnedMessages) {
                     PinnedMessagesItem(
                         pinnedMessagesCount = state.pinnedMessagesCount,
                         onPinnedMessagesClick = onPinnedMessagesClick
@@ -212,23 +212,23 @@ fun RoomDetailsView(
                         memberCount = state.memberCount,
                         openRoomMemberList = openRoomMemberList,
                     )
-                    if (state.canShowKnockRequests) {
+                    /*if (state.canShowKnockRequests) {
                         KnockRequestsItem(
                             knockRequestsCount = state.knockRequestsCount,
                             onKnockRequestsClick = onKnockRequestsClick
                         )
-                    }
+                    }*/
                 }
             }
 
             /*PollsSection(
                 openPollHistory = openPollHistory
             )*/
-            /*if (state.canShowMediaGallery) {
+            if (state.canShowMediaGallery) {
                 MediaGallerySection(
                     onClick = openMediaGallery
                 )
-            }*/
+            }
             if (state.isEncrypted) {
                 SecuritySection()
             }

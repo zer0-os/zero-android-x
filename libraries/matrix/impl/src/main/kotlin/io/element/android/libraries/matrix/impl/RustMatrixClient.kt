@@ -52,6 +52,7 @@ import io.element.android.libraries.matrix.api.verification.SessionVerificationS
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
+import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
 import io.element.android.libraries.matrix.impl.conversion.map
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
@@ -769,8 +770,9 @@ class RustMatrixClient(
 
     override suspend fun isZeroProfileCompletionPending(): Boolean {
         return zeroUserRepository?.getCurrentUser()
-            ?.firstOrNull()
-            ?.name.isNullOrBlank()
+            ?.firstOrNull()?.let { user ->
+                user.name.isBlank() || user.nameIsMatrixHex()
+            } ?: false
     }
 
     override suspend fun completeZeroUserProfile(

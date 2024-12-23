@@ -171,16 +171,16 @@ class DefaultActionListPresenter @AssistedInject constructor(
             if (timelineItem.isEditable) {
                 if (timelineItem.content is TimelineItemEventContentWithAttachment) {
                     // Caption
-                    if (timelineItem.content.caption == null) {
+                    /*if (timelineItem.content.caption == null) {
                         if (featureFlagService.isFeatureEnabled(FeatureFlags.MediaCaptionCreation)) {
                             add(TimelineItemAction.AddCaption)
                         }
                     } else {
                         add(TimelineItemAction.EditCaption)
                         add(TimelineItemAction.RemoveCaption)
-                    }
+                    }*/
                 } else if (timelineItem.content is TimelineItemPollContent) {
-                    add(TimelineItemAction.EditPoll)
+                    //add(TimelineItemAction.EditPoll)
                 } else {
                     add(TimelineItemAction.Edit)
                 }
@@ -199,7 +199,7 @@ class DefaultActionListPresenter @AssistedInject constructor(
             if (timelineItem.content.canBeCopied()) {
                 add(TimelineItemAction.CopyText)
             } else if ((timelineItem.content as? TimelineItemEventContentWithAttachment)?.caption.isNullOrBlank().not()) {
-                add(TimelineItemAction.CopyCaption)
+                //add(TimelineItemAction.CopyCaption)
             }
             /*if (timelineItem.isRemote) {
                 add(TimelineItemAction.CopyLink)
