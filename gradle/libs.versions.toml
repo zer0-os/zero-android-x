@@ -222,10 +222,10 @@ android_composeCompiler = { module = "androidx.compose.compiler:compiler", versi
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 
 # Wallet Connect
-walletconnect_bom = "com.reown:android-bom:1.0.0"
+walletconnect_bom = "com.reown:android-bom:1.1.0"
 walletconnect_androidcore = { module = "com.reown:android-core" }
-walletconnect_appkit = { module = "com.reown:appkit"  }
-walletconnect_walletkit = { module = "com.reown:walletkit"  }
+walletconnect_appkit = { module = "com.reown:appkit" }
+walletconnect_webkit = { module = "com.reown:webkit" }
 
 [bundles]
 

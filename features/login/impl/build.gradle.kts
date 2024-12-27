@@ -51,7 +51,6 @@ dependencies {
     implementation(platform(libs.walletconnect.bom))
     implementation(libs.walletconnect.androidcore)
     implementation(libs.walletconnect.appkit)
-    implementation(libs.walletconnect.walletkit)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.androidx.compose.ui.test.junit)

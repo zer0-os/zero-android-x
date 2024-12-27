@@ -53,6 +53,20 @@ dependencyResolutionManagement {
         flatDir {
             dirs("libraries/matrix/libs")
         }
+        // For walletConnect "reown" sdk
+        maven {
+            url = URI("https://jitpack.io")
+            content {
+                includeGroup("com.reown")
+                includeGroup("com.walletconnect.Scarlet")
+                includeGroup("com.github.komputing")
+                includeGroup("com.github.komputing.kethereum")
+                includeGroup("com.github.komputing.khex")
+                includeGroup("com.github.komputing.khash")
+                includeGroup("com.github.multiformats")
+                includeGroup("com.github.alexzhirkevich")
+            }
+        }
     }
 }
 
