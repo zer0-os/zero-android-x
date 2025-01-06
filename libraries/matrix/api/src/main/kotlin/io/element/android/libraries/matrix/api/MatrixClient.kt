@@ -178,6 +178,8 @@ interface MatrixClient : Closeable {
     ): Result<Unit>
 
     suspend fun deleteUserAccount(): Result<Unit>
+
+    suspend fun linkZeroUserIfRequired(): Result<Unit>
 }
 
 /**
