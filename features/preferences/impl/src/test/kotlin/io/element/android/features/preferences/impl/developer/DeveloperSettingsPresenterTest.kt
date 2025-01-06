@@ -14,6 +14,7 @@ import io.element.android.appconfig.ElementCallConfig
 import io.element.android.features.logout.test.FakeLogoutUseCase
 import io.element.android.features.preferences.impl.tasks.FakeClearCacheUseCase
 import io.element.android.features.preferences.impl.tasks.FakeComputeCacheSizeUseCase
+import io.element.android.features.preferences.impl.tasks.FakeDeleteAccountUseCase
 import io.element.android.features.rageshake.api.preferences.aRageshakePreferencesState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
@@ -206,7 +207,8 @@ class DeveloperSettingsPresenterTest {
         clearCacheUseCase: FakeClearCacheUseCase = FakeClearCacheUseCase(),
         preferencesStore: InMemoryAppPreferencesStore = InMemoryAppPreferencesStore(),
         buildMeta: BuildMeta = aBuildMeta(),
-        logoutUseCase: FakeLogoutUseCase = FakeLogoutUseCase(logoutLambda = { "" })
+        logoutUseCase: FakeLogoutUseCase = FakeLogoutUseCase(logoutLambda = { "" }),
+        deleteAccountUserCase: FakeDeleteAccountUseCase = FakeDeleteAccountUseCase()
     ): DeveloperSettingsPresenter {
         return DeveloperSettingsPresenter(
             featureFlagService = featureFlagService,
@@ -216,6 +218,7 @@ class DeveloperSettingsPresenterTest {
             appPreferencesStore = preferencesStore,
             buildMeta = buildMeta,
             logoutUseCase = logoutUseCase,
+            deleteAccountUseCase = deleteAccountUserCase
         )
     }
 }
