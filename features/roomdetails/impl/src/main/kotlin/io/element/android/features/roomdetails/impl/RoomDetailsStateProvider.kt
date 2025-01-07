@@ -88,6 +88,7 @@ fun aRoomDetailsState(
             "|| MAI iki/Marketing " +
             "|| MAI iki/Marketing..."
     ),
+    roomSubTitle: String? = "0://zero-primary-id",
     memberCount: Long = 32,
     isEncrypted: Boolean = true,
     canInvite: Boolean = false,
@@ -114,6 +115,7 @@ fun aRoomDetailsState(
     roomAlias = roomAlias,
     roomAvatarUrl = roomAvatarUrl,
     roomTopic = roomTopic,
+    roomSubTitle = roomSubTitle,
     memberCount = memberCount,
     isEncrypted = isEncrypted,
     canInvite = canInvite,

@@ -86,6 +86,7 @@ open class MessagesStateProvider : PreviewParameterProvider<MessagesState> {
 fun aMessagesState(
     roomName: AsyncData<String> = AsyncData.Success("Room name"),
     roomAvatar: AsyncData<AvatarData> = AsyncData.Success(AvatarData("!id:domain", "Room name", size = AvatarSize.TimelineRoom)),
+    roomSubTitle: String? = "0://zero-primary-id",
     userEventPermissions: UserEventPermissions = aUserEventPermissions(),
     composerState: MessageComposerState = aMessageComposerState(
         textEditorState = aTextEditorStateRich(initialText = "Hello", initialFocus = true),
@@ -114,6 +115,7 @@ fun aMessagesState(
     roomId = RoomId("!id:domain"),
     roomName = roomName,
     roomAvatar = roomAvatar,
+    roomSubTitle = roomSubTitle,
     heroes = persistentListOf(),
     userEventPermissions = userEventPermissions,
     composerState = composerState,

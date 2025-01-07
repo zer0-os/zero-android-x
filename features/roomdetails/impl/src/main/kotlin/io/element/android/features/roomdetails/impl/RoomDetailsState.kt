@@ -25,6 +25,7 @@ data class RoomDetailsState(
     val roomAlias: RoomAlias?,
     val roomAvatarUrl: String?,
     val roomTopic: RoomTopicState,
+    val roomSubTitle: String?,
     val memberCount: Long,
     val isEncrypted: Boolean,
     val roomType: RoomDetailsType,
