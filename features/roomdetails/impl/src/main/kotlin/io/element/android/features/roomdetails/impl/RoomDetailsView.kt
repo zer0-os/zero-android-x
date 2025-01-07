@@ -137,6 +137,7 @@ fun RoomDetailsView(
                         roomId = state.roomId,
                         roomName = state.roomName,
                         roomAlias = state.roomAlias,
+                        roomSubTitle = state.roomSubTitle,
                         heroes = state.heroes,
                         openAvatarPreview = { avatarUrl ->
                             openAvatarPreview(state.roomName, avatarUrl)
@@ -148,6 +149,7 @@ fun RoomDetailsView(
                         me = state.roomType.me,
                         otherMember = state.roomType.otherMember,
                         roomName = state.roomName,
+                        roomSubTitle = state.roomSubTitle,
                         openAvatarPreview = { name, avatarUrl ->
                             openAvatarPreview(name, avatarUrl)
                         },
@@ -255,7 +257,7 @@ private fun KnockRequestsItem(knockRequestsCount: Int?, onKnockRequestsClick: ()
         trailingContent = if (knockRequestsCount == null || knockRequestsCount == 0) {
             null
         } else {
-            ListItemContent.Text(knockRequestsCount.toString())
+            ListItemContent.Counter(knockRequestsCount)
         },
         onClick = onKnockRequestsClick,
     )
@@ -362,6 +364,7 @@ private fun RoomHeaderSection(
     roomId: RoomId,
     roomName: String,
     roomAlias: RoomAlias?,
+    roomSubTitle: String?,
     heroes: ImmutableList<MatrixUser>,
     openAvatarPreview: (url: String) -> Unit,
 ) {
@@ -380,7 +383,8 @@ private fun RoomHeaderSection(
                 .clickable(enabled = avatarUrl != null) { openAvatarPreview(avatarUrl!!) }
                 .testTag(TestTags.roomDetailAvatar)
         )
-        TitleAndSubtitle(title = roomName, subtitle = roomAlias?.value)
+        // TitleAndSubtitle(title = roomName, subtitle = roomAlias?.value)
+        TitleAndSubtitle(title = roomName, subtitle = roomSubTitle)
     }
 }
 
@@ -389,6 +393,7 @@ private fun DmHeaderSection(
     me: RoomMember,
     otherMember: RoomMember,
     roomName: String,
+    roomSubTitle: String?,
     openAvatarPreview: (name: String, url: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -416,7 +421,8 @@ private fun DmHeaderSection(
         )*/
         TitleAndSubtitle(
             title = roomName,
-            subtitle = otherMember.userId.value,
+            // subtitle = otherMember.userId.value,
+            subtitle = roomSubTitle,
         )
     }
 }
@@ -432,7 +438,7 @@ private fun ColumnScope.TitleAndSubtitle(
         style = ElementTheme.zeroTypography.fontHeadingLgBold,
         textAlign = TextAlign.Center,
     )
-    /*if (subtitle != null) {
+    if (subtitle != null) {
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = subtitle,
@@ -440,7 +446,7 @@ private fun ColumnScope.TitleAndSubtitle(
             color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
         )
-    }*/
+    }
 }
 
 @Composable

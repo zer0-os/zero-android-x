@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,6 +80,8 @@ interface MatrixRoom : Closeable {
     val membersStateFlow: StateFlow<MatrixRoomMembersState>
 
     val roomNotificationSettingsStateFlow: StateFlow<MatrixRoomNotificationSettingsState>
+
+    val directZeroUser: StateFlow<ZeroUser?>
 
     /**
      * Try to load the room members and update the membersFlow.
@@ -402,4 +405,6 @@ interface MatrixRoom : Closeable {
     suspend fun withdrawVerificationAndResend(userIds: List<UserId>, sendHandle: SendHandle): Result<Unit>
 
     override fun close() = destroy()
+
+    suspend fun fetchDirectZeroUser()
 }

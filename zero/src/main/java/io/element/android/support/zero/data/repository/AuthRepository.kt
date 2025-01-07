@@ -22,5 +22,7 @@ interface AuthRepository {
         avatarUrl: String?
     ): Flow<ZeroUser>
 
+    suspend fun linkZeroUser(fromCreateAccountFlow: Boolean, matrixUserId: String)
+
     suspend fun logout()
 }

@@ -36,8 +36,9 @@ object RepositoryModule {
     fun bindAuthRepository(
         preferences: Preferences,
         zeroAuthService: ZeroAuthService,
+        zeroUserService: ZeroUserService,
         dataCleaner: DataCleaner
-    ): AuthRepository = AuthRepositoryImpl(preferences, zeroAuthService, dataCleaner)
+    ): AuthRepository = AuthRepositoryImpl(preferences, zeroAuthService, zeroUserService, dataCleaner)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -68,6 +69,7 @@ object RepositoryModule {
     @Provides
     @SingleIn(AppScope::class)
     fun bindAccountRepository(
-        zeroAccountService: ZeroAccountService
-    ): AccountRepository = AccountRepositoryImpl(zeroAccountService)
+        zeroAccountService: ZeroAccountService,
+        zeroUserService: ZeroUserService,
+    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService)
 }

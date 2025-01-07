@@ -379,5 +379,9 @@ class FakeMatrixClient(
     override suspend fun deleteUserAccount(): Result<Unit> {
         return Result.success(Unit)
     }
+
+    override suspend fun linkZeroUserIfRequired(): Result<Unit> {
+        return Result.success(Unit)
+    }
     //endregion
 }

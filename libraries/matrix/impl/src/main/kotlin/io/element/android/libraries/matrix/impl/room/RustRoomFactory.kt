@@ -24,6 +24,7 @@ import io.element.android.libraries.matrix.impl.roomlist.fullRoomWithTimeline
 import io.element.android.libraries.matrix.impl.roomlist.roomOrNull
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
@@ -54,6 +55,7 @@ class RustRoomFactory(
     private val featureFlagService: FeatureFlagService,
     private val roomMembershipObserver: RoomMembershipObserver,
     private val zeroConversationRepository: ConversationRepository?,
+    private val zeroUserRepository: UserRepository?,
 ) {
     private val dispatcher = dispatchers.io.limitedParallelism(1)
     private val mutex = Mutex()
@@ -123,7 +125,8 @@ class RustRoomFactory(
                 matrixRoomInfoMapper = matrixRoomInfoMapper,
                 featureFlagService = featureFlagService,
                 roomMembershipObserver = roomMembershipObserver,
-                zeroConversationRepository = zeroConversationRepository
+                zeroConversationRepository = zeroConversationRepository,
+                zeroUserRepository = zeroUserRepository
             )
         }
     }

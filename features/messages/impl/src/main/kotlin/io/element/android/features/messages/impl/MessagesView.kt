@@ -103,7 +103,6 @@ import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
 import timber.log.Timber
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MessagesView(
@@ -185,6 +184,7 @@ fun MessagesView(
                 MessagesViewTopBar(
                     roomName = state.roomName.dataOrNull(),
                     roomAvatar = state.roomAvatar.dataOrNull(),
+                    roomSubTitle = state.roomSubTitle,
                     heroes = state.heroes,
                     roomCallState = state.roomCallState,
                     onBackClick = { hidingKeyboard { onBackClick() } },
@@ -444,6 +444,7 @@ private fun MessagesViewComposerBottomSheetContents(
 private fun MessagesViewTopBar(
     roomName: String?,
     roomAvatar: AvatarData?,
+    roomSubTitle: String?,
     heroes: ImmutableList<AvatarData>,
     roomCallState: RoomCallState,
     onRoomDetailsClick: () -> Unit,
@@ -463,6 +464,7 @@ private fun MessagesViewTopBar(
                 RoomAvatarAndNameRow(
                     roomName = roomName,
                     roomAvatar = roomAvatar,
+                    roomSubTitle = roomSubTitle,
                     heroes = heroes,
                     modifier = titleModifier
                 )
@@ -488,6 +490,7 @@ private fun MessagesViewTopBar(
 private fun RoomAvatarAndNameRow(
     roomName: String,
     roomAvatar: AvatarData,
+    roomSubTitle: String? = null,
     heroes: ImmutableList<AvatarData>,
     modifier: Modifier = Modifier
 ) {
@@ -499,13 +502,25 @@ private fun RoomAvatarAndNameRow(
             avatarData = roomAvatar,
             heroes = heroes,
         )
-        Text(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            text = roomName,
-            style = ElementTheme.zeroTypography.fontBodyLgMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Column {
+            Text(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                text = roomName,
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (!roomSubTitle.isNullOrBlank()) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = roomSubTitle,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = ElementTheme.colors.textSecondary
+                )
+            }
+        }
     }
 }
 

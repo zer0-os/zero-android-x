@@ -48,6 +48,8 @@ open class RoomDetailsStateProvider : PreviewParameterProvider<RoomDetailsState>
             aRoomDetailsState(isPublic = false),
             aRoomDetailsState(heroes = aMatrixUserList()),
             aRoomDetailsState(pinnedMessagesCount = 3),
+            aRoomDetailsState(knockRequestsCount = null, canShowKnockRequests = true),
+            aRoomDetailsState(knockRequestsCount = 4, canShowKnockRequests = true),
             // Add other state here
         )
 }
@@ -86,6 +88,7 @@ fun aRoomDetailsState(
             "|| MAI iki/Marketing " +
             "|| MAI iki/Marketing..."
     ),
+    roomSubTitle: String? = "0://zero-primary-id",
     memberCount: Long = 32,
     isEncrypted: Boolean = true,
     canInvite: Boolean = false,
@@ -112,6 +115,7 @@ fun aRoomDetailsState(
     roomAlias = roomAlias,
     roomAvatarUrl = roomAvatarUrl,
     roomTopic = roomTopic,
+    roomSubTitle = roomSubTitle,
     memberCount = memberCount,
     isEncrypted = isEncrypted,
     canInvite = canInvite,

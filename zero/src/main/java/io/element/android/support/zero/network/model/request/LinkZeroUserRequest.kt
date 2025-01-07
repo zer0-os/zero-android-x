@@ -8,5 +8,8 @@ data class LinkZeroUserRequest(val matrixId: String, val matrixAccessToken: Stri
 	companion object {
 		fun newRequest(matrixCredentials: ZeroMatrixAuthCredentials) =
 			LinkZeroUserRequest(matrixCredentials.userId, "not-used")
+
+        fun newRequest(matrixUserId: String) =
+            LinkZeroUserRequest(matrixUserId, "not-used")
 	}
 }
