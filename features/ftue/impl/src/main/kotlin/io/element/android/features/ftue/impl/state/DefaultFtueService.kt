@@ -24,10 +24,8 @@ import io.element.android.libraries.permissions.api.PermissionStateProvider
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.sdk.BuildVersionSdkIntProvider
-import io.element.android.support.zero.common.extension.withScope
-import io.element.android.support.zero.common.extension.withScopeAsync
+import io.element.android.support.zero.common.extension.withIOScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -164,9 +162,7 @@ class DefaultFtueService @Inject constructor(
     }
 
     private fun checkAndLinkZeroUser() {
-        withScope(Dispatchers.IO) {
-            client.linkZeroUserIfRequired()
-        }
+        withIOScope { client.linkZeroUserIfRequired() }
     }
 }
 

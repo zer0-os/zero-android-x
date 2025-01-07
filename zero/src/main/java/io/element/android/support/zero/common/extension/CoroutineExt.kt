@@ -21,6 +21,9 @@ inline fun <T> withSameScope(crossinline block: suspend () -> T) =
 inline fun <T> withScope(dispatcher: CoroutineDispatcher, crossinline block: suspend () -> T) =
 	CoroutineScope(dispatcher).launch { block() }
 
+inline fun <T> withIOScope(crossinline block: suspend () -> T) =
+    CoroutineScope(Dispatchers.IO).launch { block() }
+
 inline fun <T> withScopeAsync(dispatcher: CoroutineDispatcher, crossinline block: suspend () -> T) =
 	CoroutineScope(dispatcher).async { block() }
 
