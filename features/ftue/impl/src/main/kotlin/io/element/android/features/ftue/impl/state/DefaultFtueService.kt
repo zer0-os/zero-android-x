@@ -24,6 +24,7 @@ import io.element.android.libraries.permissions.api.PermissionStateProvider
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.sdk.BuildVersionSdkIntProvider
+import io.element.android.support.zero.common.extension.withIOScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -72,6 +73,8 @@ class DefaultFtueService @Inject constructor(
             .distinctUntilChanged()
             .onEach { updateState() }
             .launchIn(sessionCoroutineScope)
+
+        checkAndLinkZeroUser()
     }
 
     suspend fun getNextStep(currentStep: FtueStep? = null): FtueStep? =
@@ -156,6 +159,10 @@ class DefaultFtueService @Inject constructor(
 
     private suspend fun isProfileIncomplete(): Boolean {
         return client.isZeroProfileCompletionPending()
+    }
+
+    private fun checkAndLinkZeroUser() {
+        withIOScope { client.linkZeroUserIfRequired() }
     }
 }
 

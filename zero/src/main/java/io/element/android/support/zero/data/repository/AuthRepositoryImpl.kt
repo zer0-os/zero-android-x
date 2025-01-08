@@ -9,14 +9,17 @@ import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
+import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
+import io.element.android.support.zero.network.service.ZeroUserService
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 class AuthRepositoryImpl(
     private val preferences: Preferences,
     private val zeroAuthService: ZeroAuthService,
+    private val zeroUserService: ZeroUserService,
     private val dataCleaner: DataCleaner,
 ) : AuthRepository {
     override suspend fun login(email: String, password: String) = channelFlowWithAwait {
@@ -62,6 +65,16 @@ class AuthRepositoryImpl(
         )
         val inviter = zeroAuthService.finaliseSignUp(payload)
         trySend(inviter.inviter.toModel())
+    }
+
+    override suspend fun linkZeroUser(fromCreateAccountFlow: Boolean, matrixUserId: String) {
+        runSafeCall {
+            val currentUser = zeroUserService.getCurrentUser()
+            if (fromCreateAccountFlow || currentUser.matrixId.isNullOrBlank()) {
+                val payload = LinkZeroUserRequest.newRequest(matrixUserId = matrixUserId)
+                zeroAuthService.linkZeroUser(payload)
+            }
+        }
     }
 
     override suspend fun loginWithWallet(walletToken: String) = channelFlowWithAwait {

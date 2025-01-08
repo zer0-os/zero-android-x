@@ -22,6 +22,8 @@ interface AuthRepository {
         avatarUrl: String?
     ): Flow<ZeroUser>
 
+    suspend fun linkZeroUser(fromCreateAccountFlow: Boolean, matrixUserId: String)
+
     suspend fun loginWithWallet(walletToken: String): Flow<AuthSSOToken>
 
     suspend fun signUpWithWallet(walletToken: String, inviteSlug: String): Flow<AuthSSOToken>

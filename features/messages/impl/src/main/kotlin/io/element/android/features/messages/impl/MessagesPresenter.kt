@@ -75,6 +75,7 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canSendMessage
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.ui.messages.reply.map
 import io.element.android.libraries.matrix.ui.model.getAvatarData
+import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
 import io.element.android.libraries.textcomposer.model.MessageComposerMode
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
@@ -138,6 +139,7 @@ class MessagesPresenter @AssistedInject constructor(
         val roomCallState = roomCallStatePresenter.present()
 
         val syncUpdateFlow = room.syncUpdateFlow.collectAsState()
+        val directZeroMember = room.directZeroUser.collectAsState()
 
         val userEventPermissions by userEventPermissions(syncUpdateFlow.value)
 
@@ -147,6 +149,7 @@ class MessagesPresenter @AssistedInject constructor(
         val roomAvatar: AsyncData<AvatarData> by remember {
             derivedStateOf { roomInfo?.avatarData()?.let { AsyncData.Success(it) } ?: AsyncData.Uninitialized }
         }
+        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.primaryZeroId } }
         val heroes by remember {
             derivedStateOf { roomInfo?.heroes().orEmpty().toPersistentList() }
         }
@@ -160,6 +163,10 @@ class MessagesPresenter @AssistedInject constructor(
             // as those will be handled by the timeline.
             withContext(dispatchers.io) {
                 room.setUnreadFlag(isUnread = false)
+
+                if (room.isOneToOne) {
+                    room.fetchDirectZeroUser()
+                }
             }
         }
 
@@ -209,6 +216,7 @@ class MessagesPresenter @AssistedInject constructor(
             roomId = room.roomId,
             roomName = roomName,
             roomAvatar = roomAvatar,
+            roomSubTitle = roomSubTitle,
             heroes = heroes,
             composerState = composerState,
             userEventPermissions = userEventPermissions,

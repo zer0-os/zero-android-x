@@ -224,7 +224,8 @@ class RustMatrixClient(
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         featureFlagService = featureFlagService,
         roomMembershipObserver = roomMembershipObserver,
-        zeroConversationRepository = zeroConversationRepository
+        zeroConversationRepository = zeroConversationRepository,
+        zeroUserRepository = zeroUserRepository,
     )
 
     override val mediaLoader: MatrixMediaLoader = RustMediaLoader(
@@ -804,6 +805,13 @@ class RustMatrixClient(
         runCatching {
             val accountRepository = zeroAccountRepository ?: return@runCatching
             accountRepository.deleteUserAccount()
+        }
+    }
+
+    override suspend fun linkZeroUserIfRequired(): Result<Unit> = withContext(sessionDispatcher) {
+        runCatching {
+            val accountRepository = zeroAccountRepository ?: return@runCatching
+            accountRepository.linkUserAccount(sessionId.value)
         }
     }
     //endregion

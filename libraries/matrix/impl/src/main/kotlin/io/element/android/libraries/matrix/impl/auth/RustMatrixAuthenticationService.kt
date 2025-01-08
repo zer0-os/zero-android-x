@@ -203,6 +203,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                     token = sessionData.accessToken,
                     userId = sessionData.userId
                 )
+                checkAndLinkZeroUser(userMatrixId = sessionData.userId)
                 StateBus.onUserStateChanged(UserState.AUTHORIZED)
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->
@@ -448,9 +449,17 @@ class RustMatrixAuthenticationService @Inject constructor(
                     token = sessionData.accessToken,
                     userId = sessionData.userId
                 )
+                checkAndLinkZeroUser(fromCreateAccountFlow = true, userMatrixId = sessionData.userId)
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->
                 failure.mapAuthenticationException()
             }
         }
+
+    private suspend fun checkAndLinkZeroUser(
+        fromCreateAccountFlow: Boolean = false,
+        userMatrixId: String,
+    ) {
+        authRepository?.linkZeroUser(fromCreateAccountFlow, userMatrixId)
+    }
 }

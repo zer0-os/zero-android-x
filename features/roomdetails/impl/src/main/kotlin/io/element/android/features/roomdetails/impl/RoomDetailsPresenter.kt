@@ -75,8 +75,11 @@ class RoomDetailsPresenter @Inject constructor(
         val syncUpdateFlow = room.syncUpdateFlow.collectAsState()
         val roomAvatar by remember { derivedStateOf { roomInfo?.avatarUrl ?: room.avatarUrl } }
 
+        val directZeroMember = room.directZeroUser.collectAsState()
+
         val roomName by remember { derivedStateOf { (roomInfo?.name ?: room.displayName).trim() } }
         val roomTopic by remember { derivedStateOf { roomInfo?.topic ?: room.topic } }
+        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.primaryZeroId } }
         val isFavorite by remember { derivedStateOf { roomInfo?.isFavorite.orFalse() } }
         val joinRule by remember { derivedStateOf { roomInfo?.joinRule } }
 
@@ -153,6 +156,7 @@ class RoomDetailsPresenter @Inject constructor(
             roomAlias = room.alias,
             roomAvatarUrl = roomAvatar,
             roomTopic = topicState,
+            roomSubTitle = roomSubTitle,
             memberCount = room.joinedMemberCount,
             isEncrypted = room.isEncrypted,
             canInvite = canInvite,

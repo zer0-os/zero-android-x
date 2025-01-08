@@ -42,12 +42,14 @@ import io.element.android.libraries.matrix.api.room.knock.KnockRequest
 import io.element.android.libraries.matrix.api.room.location.AssetType
 import io.element.android.libraries.matrix.api.room.powerlevels.MatrixRoomPowerLevels
 import io.element.android.libraries.matrix.api.room.powerlevels.UserRoleChange
+import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
 import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.impl.core.RustSendHandle
 import io.element.android.libraries.matrix.impl.mapper.map
 import io.element.android.libraries.matrix.impl.room.draft.into
@@ -63,6 +65,7 @@ import io.element.android.libraries.matrix.impl.widget.RustWidgetDriver
 import io.element.android.libraries.matrix.impl.widget.generateWidgetWebViewUrl
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -115,6 +118,7 @@ class RustMatrixRoom(
     private val featureFlagService: FeatureFlagService,
     private val roomMembershipObserver: RoomMembershipObserver,
     private val zeroConversationRepository: ConversationRepository?,
+    private val zeroUserRepository: UserRepository?,
 ) : MatrixRoom {
     override val roomId = RoomId(innerRoom.id())
 
@@ -192,6 +196,9 @@ class RustMatrixRoom(
     override val membersStateFlow: StateFlow<MatrixRoomMembersState> = roomMemberListFetcher.membersFlow
 
     override val syncUpdateFlow: StateFlow<Long> = _syncUpdateFlow.asStateFlow()
+
+    private val _directZeroUser = MutableStateFlow<ZeroUser?>(null)
+    override val directZeroUser: StateFlow<ZeroUser?> = _directZeroUser
 
     init {
         val powerLevelChanges = roomInfoFlow.map { it.userPowerLevels }.distinctUntilChanged()
@@ -801,5 +808,14 @@ class RustMatrixRoom(
             featureFlagsService = featureFlagService,
             zeroConversationRepository = zeroConversationRepository
         )
+    }
+
+    override suspend fun fetchDirectZeroUser() {
+        val repository = zeroUserRepository ?: return
+        val roomMembers = membersStateFlow.value.roomMembers()
+        if (!roomMembers.isNullOrEmpty()) {
+            val otherMember = roomMembers.first { it.userId != sessionId }
+            repository.getUser(otherMember.userId.value).collect(_directZeroUser)
+        }
     }
 }

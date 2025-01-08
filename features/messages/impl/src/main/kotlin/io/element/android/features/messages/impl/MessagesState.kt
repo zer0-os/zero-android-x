@@ -30,6 +30,7 @@ data class MessagesState(
     val roomId: RoomId,
     val roomName: AsyncData<String>,
     val roomAvatar: AsyncData<AvatarData>,
+    val roomSubTitle: String?,
     val heroes: ImmutableList<AvatarData>,
     val userEventPermissions: UserEventPermissions,
     val composerState: MessageComposerState,

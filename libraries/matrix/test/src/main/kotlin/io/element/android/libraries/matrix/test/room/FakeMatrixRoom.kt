@@ -42,6 +42,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.test.A_ROOM_ID
 import io.element.android.libraries.matrix.test.A_SESSION_ID
 import io.element.android.libraries.matrix.test.media.FakeMediaUploadHandler
@@ -169,6 +170,9 @@ class FakeMatrixRoom(
 
     private val _knockRequestsFlow: MutableSharedFlow<List<KnockRequest>> = MutableSharedFlow(replay = 1)
     override val knockRequestsFlow: Flow<List<KnockRequest>> = _knockRequestsFlow
+
+    private val _directZeroUser: MutableStateFlow<ZeroUser?> = MutableStateFlow(null)
+    override val directZeroUser: StateFlow<ZeroUser?> = _directZeroUser
 
     fun emitKnockRequests(knockRequests: List<KnockRequest>) {
         _knockRequestsFlow.tryEmit(knockRequests)
@@ -588,6 +592,10 @@ class FakeMatrixRoom(
 
     override suspend fun clearEventCacheStorage(): Result<Unit> {
         return Result.success(Unit)
+    }
+
+    override suspend fun fetchDirectZeroUser() {
+        // for now, do nothing
     }
 }
 
