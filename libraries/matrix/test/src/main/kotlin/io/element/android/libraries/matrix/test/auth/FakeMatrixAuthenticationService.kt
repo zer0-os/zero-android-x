@@ -87,6 +87,10 @@ class FakeMatrixAuthenticationService(
         loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
     }
 
+    override suspend fun loginWithWeb3(web3Token: String): Result<SessionId> = simulateLongTask {
+        loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
+
     override suspend fun importCreatedSession(externalSession: ExternalSession): Result<SessionId> = simulateLongTask {
         return importCreatedSessionLambda(externalSession)
     }
@@ -140,6 +144,10 @@ class FakeMatrixAuthenticationService(
     }
 
     override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> {
+        return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
+
+    override suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId> {
         return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
     }
 }

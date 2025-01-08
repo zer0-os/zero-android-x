@@ -33,6 +33,8 @@ interface MatrixAuthenticationService {
 
     suspend fun loginWithZero(username: String, password: String): Result<SessionId>
 
+    suspend fun loginWithWeb3(web3Token: String): Result<SessionId>
+
     /**
      * Import a session that was created using another client, for instance Element Web.
      */
@@ -65,4 +67,6 @@ interface MatrixAuthenticationService {
     suspend fun validateInviteCode(inviteCode: String): Result<Boolean>
 
     suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId>
+
+    suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId>
 }

@@ -40,6 +40,7 @@ import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
+import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.InviteRepository
 import kotlinx.coroutines.CancellationException
@@ -178,38 +179,23 @@ class RustMatrixAuthenticationService @Inject constructor(
             }
         }
 
-    override suspend fun loginWithZero(username: String, password: String): Result<SessionId> =
-        withContext(coroutineDispatchers.io) {
-            runCatching {
-                val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
-                val client = currentClient ?: error("You need to call `setHomeserver()` first")
-                val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
-
-                val authSsoToken = authRepository.login(username, password).firstOrNull()
-                val ssoToken = authSsoToken?.token
-                    ?: error("SSO Token from zos is null or blank")
-                client.customLoginWithJwt(ssoToken, "Element X Android", null)
-                val sessionData = client.session()
-                    .toSessionData(
-                        isTokenValid = true,
-                        loginType = LoginType.PASSWORD,
-                        passphrase = pendingPassphrase,
-                        sessionPaths = currentSessionPaths,
-                    )
-                clear()
-                MatrixSessionCommon.setHomeServerUrl(getHomeServerPostfix(sessionData))
-                sessionStore.storeData(sessionData)
-                authRepository.saveMatrixLoginInfo(
-                    token = sessionData.accessToken,
-                    userId = sessionData.userId
-                )
-                checkAndLinkZeroUser(userMatrixId = sessionData.userId)
-                StateBus.onUserStateChanged(UserState.AUTHORIZED)
-                SessionId(sessionData.userId)
-            }.mapFailure { failure ->
-                failure.mapAuthenticationException()
+    override suspend fun loginWithZero(username: String, password: String): Result<SessionId> {
+        val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+        return executeZeroAuthFlow(
+            executeCall = {
+                authRepository.login(username, password)
             }
-        }
+        )
+    }
+
+    override suspend fun loginWithWeb3(web3Token: String): Result<SessionId> {
+        val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+        return executeZeroAuthFlow(
+            executeCall = {
+                authRepository.loginWithWallet(web3Token)
+            }
+        )
+    }
 
     override suspend fun importCreatedSession(externalSession: ExternalSession): Result<SessionId> =
         withContext(coroutineDispatchers.io) {
@@ -423,15 +409,37 @@ class RustMatrixAuthenticationService @Inject constructor(
             }
         }
 
-    override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> =
+    override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> {
+        val authRepository = authRepository ?: error("Cannot sing-up with zero, check instantiation")
+        return executeZeroAuthFlow(
+            fromCreateAccountFlow = true,
+            executeCall = {
+                authRepository.createAndAuthorise(email, password, inviteCode)
+            }
+        )
+    }
+
+    override suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId> {
+        val authRepository = authRepository ?: error("Cannot sign-up with zero, check instantiation")
+        return executeZeroAuthFlow(
+            fromCreateAccountFlow = true,
+            executeCall = {
+                authRepository.signUpWithWallet(web3Token, inviteCode)
+            }
+        )
+    }
+
+    private suspend fun executeZeroAuthFlow(
+        fromCreateAccountFlow: Boolean = false,
+        executeCall: suspend () -> Flow<AuthSSOToken>
+    ): Result<SessionId> =
         withContext(coroutineDispatchers.io) {
             runCatching {
-                val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+                val authRepository = authRepository ?: error("Cannot execute auth with zero, check instantiation")
                 val client = currentClient ?: error("You need to call `setHomeserver()` first")
                 val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
 
-                val authSsoToken = authRepository.createAndAuthorise(email, password, inviteCode)
-                    .firstOrNull()
+                val authSsoToken = executeCall().firstOrNull()
                 val ssoToken = authSsoToken?.token
                     ?: error("SSO Token from zos is null or blank")
                 client.customLoginWithJwt(ssoToken, "Element X Android", null)
@@ -449,7 +457,8 @@ class RustMatrixAuthenticationService @Inject constructor(
                     token = sessionData.accessToken,
                     userId = sessionData.userId
                 )
-                checkAndLinkZeroUser(fromCreateAccountFlow = true, userMatrixId = sessionData.userId)
+                checkAndLinkZeroUser(fromCreateAccountFlow = fromCreateAccountFlow, userMatrixId = sessionData.userId)
+                StateBus.onUserStateChanged(UserState.AUTHORIZED)
                 SessionId(sessionData.userId)
             }.mapFailure { failure ->
                 failure.mapAuthenticationException()
