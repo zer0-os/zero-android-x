@@ -23,7 +23,8 @@
         android:roundIcon="${app_icon_round}"
         android:supportsRtl="true"
         android:theme="${app_theme}"
-        tools:targetApi="33">
+        tools:targetApi="33"
+        tools:replace="android:dataExtractionRules">
 
         <provider
             android:name="androidx.startup.InitializationProvider"
