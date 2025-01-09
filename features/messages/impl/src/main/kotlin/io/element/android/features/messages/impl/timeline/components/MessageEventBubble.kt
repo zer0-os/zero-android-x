@@ -23,9 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -45,10 +42,8 @@ import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
-import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
-import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
+import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -100,7 +95,7 @@ fun MessageEventBubble(
 
     // Ignore state.isHighlighted for now, we need a design decision on it.
     val backgroundBubbleColor = when {
-        state.isMine -> ElementTheme.colors.zeroBrandColorAlpha20
+        state.isMine -> ElementTheme.colors.zeroChatBubbleOutgoingColor
         else -> ElementTheme.colors.messageFromOtherBackground
     }
     val bubbleShape = bubbleShape()

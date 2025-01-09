@@ -60,7 +60,7 @@ fun SecureBackupRootView(
                 )
             },
             supportingContent = {
-                Text(
+                /*Text(
                     text = buildAnnotatedStringWithStyledPart(
                         fullTextRes = R.string.screen_chat_backup_key_backup_description,
                         coloredTextRes = CommonStrings.action_learn_more,
@@ -68,9 +68,13 @@ fun SecureBackupRootView(
                         underline = false,
                         bold = true,
                     ),
+                )*/
+                Text(
+                    text = stringResource(R.string.screen_chat_backup_key_backup_description, "")
+                    .replace(" .", "")
                 )
             },
-            onClick = onLearnMoreClick,
+            // onClick = onLearnMoreClick,
         )
 
         // Disable / Enable key storage
