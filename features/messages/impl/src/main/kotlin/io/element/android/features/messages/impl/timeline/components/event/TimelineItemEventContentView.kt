@@ -101,6 +101,7 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemFileContent -> TimelineItemFileView(
             content = content,
+            onContentClick = onContentClick,
             onContentLayoutChange = onContentLayoutChange,
             modifier = modifier
         )

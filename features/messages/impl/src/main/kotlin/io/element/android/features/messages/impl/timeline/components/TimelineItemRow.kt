@@ -59,7 +59,9 @@ internal fun TimelineItemRow(
     eventContentView: @Composable (TimelineItem.Event, Modifier, (ContentAvoidingLayoutData) -> Unit) -> Unit =
         { event, contentModifier, onContentLayoutChange ->
             val shouldCallItemClick =
-                (event.content as? TimelineItemImageContent)?.isGiphySource == false
+                (event.content as? TimelineItemImageContent)?.let {
+                    !it.isGiphySource
+                } ?: true
 
             TimelineItemEventContentView(
                 content = event.content,
