@@ -44,7 +44,7 @@ serialization_json = "1.7.3"
 #other
 coil = "2.7.0"
 showkase = "1.0.3"
-appyx = "1.5.1"
+appyx = "1.6.0"
 sqldelight = "2.0.2"
 wysiwyg = "2.37.14"
 telephoto = "0.14.0"
@@ -53,7 +53,7 @@ telephoto = "0.14.0"
 dependencyAnalysis = "2.6.1"
 
 # DI
-dagger = "2.54"
+dagger = "2.55"
 anvil = "0.4.0"
 
 # Auto service
@@ -194,7 +194,7 @@ opusencoder = "io.element.android:opusencoder:1.1.0"
 zxing_cpp = "io.github.zxing-cpp:android:2.2.0"
 
 # Analytics
-posthog = "com.posthog:posthog-android:3.9.3"
+posthog = "com.posthog:posthog-android:3.10.0"
 sentry = "io.sentry:sentry-android:7.19.1"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"
