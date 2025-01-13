@@ -340,6 +340,17 @@ licensee {
     allowUrl("https://jsoup.org/license")
     allowUrl("https://asm.ow2.io/license.html")
     allowUrl("https://www.gnu.org/licenses/agpl-3.0.txt")
+    // required for wallet connect dependencies
+    allow("BSD-3-Clause")
+    allow("EPL-1.0")
+    allow("CC0-1.0")
+    allowUrl("http://www.bouncycastle.org/licence.html")
+    allowUrl("https://www.bouncycastle.org/licence.html")
+    allowUrl("https://github.com/multiformats/java-multiaddr/blob/master/LICENSE")
+    allowUrl("https://github.com/coinbase/wallet-mobile-sdk/blob/master/LICENSE")
+    ignoreDependencies("com.github.alexzhirkevich", "custom-qr-generator")
+    ignoreDependencies("com.github.komputing", "khex")
+
     ignoreDependencies("com.github.matrix-org", "matrix-analytics-events")
 }
 
