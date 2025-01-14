@@ -37,8 +37,7 @@ internal object WalletConnectInitializer {
 
     fun initialize(application: Application) {
         CoreClient.initialize(
-            //projectId = "{project_id_here}",
-            projectId = "1971c607a3c38cd80dab88290b95656c",
+            projectId = "{project_id_here}",
             connectionType = WalletConnectMetaData.WALLET_CONNECT_CONNECTION_TYPE,
             application = application,
             metaData = appMetaData,

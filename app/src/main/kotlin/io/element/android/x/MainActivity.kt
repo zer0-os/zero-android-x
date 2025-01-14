@@ -133,7 +133,7 @@ class MainActivity : NodeActivity() {
             try {
                 AppKit.register(this)
                 isRegistered = true
-                Timber.tag("WalletConnect").e("AppKit registration successful")
+                Timber.tag("WalletConnect").i("AppKit registration successful")
             } catch (e: Exception) {
                 Timber.e(e)
                 runBlocking { delay(100) }
