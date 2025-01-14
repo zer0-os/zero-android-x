@@ -210,6 +210,12 @@ android {
             manifestPlaceholders["app_theme_splash"] = "@style/Theme.ElementX.Splash"
         }
     }
+
+    packaging {
+        resources {
+            excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
+        }
+    }
 }
 
 androidComponents {
@@ -320,6 +326,11 @@ dependencies {
     testImplementation(projects.libraries.matrix.test)
 
     koverDependencies()
+
+    //Wallet Connect dependencies
+    implementation(platform(libs.walletconnect.bom))
+    implementation(libs.walletconnect.androidcore)
+    implementation(libs.walletconnect.appkit)
 }
 
 tasks.withType<GenerateBuildConfig>().configureEach {

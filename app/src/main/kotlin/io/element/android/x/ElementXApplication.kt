@@ -16,6 +16,7 @@ import io.element.android.x.di.DaggerAppComponent
 import io.element.android.x.info.logApplicationInfo
 import io.element.android.x.initializer.CrashInitializer
 import io.element.android.x.initializer.TracingInitializer
+import io.element.android.x.initializer.walletconnect.WalletConnectInitializer
 
 class ElementXApplication : Application(), DaggerComponentOwner {
     override val daggerComponent: AppComponent = DaggerAppComponent.factory().create(this)
@@ -28,5 +29,7 @@ class ElementXApplication : Application(), DaggerComponentOwner {
             initializeComponent(CacheCleanerInitializer::class.java)
         }
         logApplicationInfo(this)
+
+        WalletConnectInitializer.initialize(this)
     }
 }
