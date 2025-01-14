@@ -1,12 +1,13 @@
 /*
  * Copyright 2023, 2024 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only
- * Please see LICENSE in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package io.element.android.features.messages.impl.timeline.components.event
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 @Composable
 fun TimelineItemFileView(
     content: TimelineItemFileContent,
+    onContentClick: (() -> Unit)?,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -35,7 +37,9 @@ fun TimelineItemFileView(
         fileExtensionAndSize = content.fileExtensionAndSize,
         caption = content.caption,
         onContentLayoutChange = onContentLayoutChange,
-        modifier = modifier,
+        modifier = modifier.clickable {
+            onContentClick?.invoke()
+        },
         icon = {
             Icon(
                 resourceId = CompoundDrawables.ic_compound_attachment,
@@ -55,5 +59,6 @@ internal fun TimelineItemFileViewPreview(@PreviewParameter(TimelineItemFileConte
     TimelineItemFileView(
         content,
         onContentLayoutChange = {},
+        onContentClick = {}
     )
 }

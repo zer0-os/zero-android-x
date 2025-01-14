@@ -106,3 +106,7 @@ lint/tmp/
 .DS_Store
 
 checkouts/**
+
+*.dm
+
+app/gplay/release/output-metadata.json

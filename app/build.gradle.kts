@@ -1,8 +1,8 @@
 /*
  * Copyright 2022-2024 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only
- * Please see LICENSE in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 @file:Suppress("UnstableApiUsage")
@@ -363,6 +363,8 @@ licensee {
     ignoreDependencies("com.github.komputing", "khex")
 
     ignoreDependencies("com.github.matrix-org", "matrix-analytics-events")
+    // Ignore dependency that are not third-party licenses to us.
+    ignoreDependencies(groupId = "io.element.android")
 }
 
 fun Project.configureLicensesTasks(reportingExtension: ReportingExtension) {

@@ -1,8 +1,8 @@
 /*
  * Copyright 2023, 2024 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only
- * Please see LICENSE in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package io.element.android.features.securebackup.impl.root
@@ -60,7 +60,7 @@ fun SecureBackupRootView(
                 )
             },
             supportingContent = {
-                Text(
+                /*Text(
                     text = buildAnnotatedStringWithStyledPart(
                         fullTextRes = R.string.screen_chat_backup_key_backup_description,
                         coloredTextRes = CommonStrings.action_learn_more,
@@ -68,9 +68,13 @@ fun SecureBackupRootView(
                         underline = false,
                         bold = true,
                     ),
+                )*/
+                Text(
+                    text = stringResource(R.string.screen_chat_backup_key_backup_description, "")
+                    .replace(" .", "")
                 )
             },
-            onClick = onLearnMoreClick,
+            // onClick = onLearnMoreClick,
         )
 
         // Disable / Enable key storage
