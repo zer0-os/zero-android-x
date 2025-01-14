@@ -43,6 +43,7 @@ import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
+import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleIncomingColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
@@ -96,7 +97,8 @@ fun MessageEventBubble(
     // Ignore state.isHighlighted for now, we need a design decision on it.
     val backgroundBubbleColor = when {
         state.isMine -> ElementTheme.colors.zeroChatBubbleOutgoingColor
-        else -> ElementTheme.colors.messageFromOtherBackground
+        else -> ElementTheme.colors.zeroChatBubbleIncomingColor
+
     }
     val bubbleShape = bubbleShape()
     val radiusPx = (avatarRadius + SENDER_AVATAR_BORDER_WIDTH).toPx()
