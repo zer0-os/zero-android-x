@@ -14,4 +14,5 @@ sealed interface ZeroCreateAccountEvents {
     data object Submit : ZeroCreateAccountEvents
     data object ClearError : ZeroCreateAccountEvents
     data object OpenLogin : ZeroCreateAccountEvents
+    data class ToggleWeb3Modal(val show: Boolean) : ZeroCreateAccountEvents
 }

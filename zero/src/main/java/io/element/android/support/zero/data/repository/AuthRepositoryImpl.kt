@@ -77,6 +77,22 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun loginWithWallet(walletToken: String) = channelFlowWithAwait {
+        val credentials = zeroAuthService.nonceOrAuthorise(walletToken)
+        val ssoToken = proceedLoginFlow(credentials)
+        trySend(ssoToken)
+    }
+
+    override suspend fun signUpWithWallet(walletToken: String, inviteSlug: String) =
+        channelFlowWithAwait {
+            val payload = CreateAndAuthoriseUserRequest(inviteSlug = inviteSlug)
+            val credentials =
+                zeroAuthService
+                    .createAndAuthorise(nonceToken = walletToken, payload = payload)
+            val ssoToken = proceedLoginFlow(credentials)
+            trySend(ssoToken)
+        }
+
     override suspend fun logout() {
         dataCleaner.clean()
     }

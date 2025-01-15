@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.features.login.impl.error.loginError
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.button.BackButton
@@ -102,6 +103,16 @@ fun ZeroLoginPasswordView(
                         .copy(containerColor = Color.Transparent)
                 )
             },
+            bottomBar = {
+                if (state.showWeb3Modal) {
+                    AppKitComponent(
+                        shouldOpenChooseNetwork = false,
+                        closeModal = {
+                            state.eventSink(LoginPasswordEvents.ToggleWeb3Modal(false))
+                        }
+                    )
+                }
+            },
             containerColor = Color.Transparent
         ) { padding ->
             val scrollState = rememberScrollState()
@@ -146,7 +157,7 @@ fun ZeroLoginPasswordView(
                                 image = io.element.android.support.zero.R.drawable.img_btn_connect_wallet,
                                 text = stringResource(id = io.element.android.support.zero.R.string.connect_a_wallet)
                             ) {
-
+                                state.eventSink(LoginPasswordEvents.ToggleWeb3Modal(true))
                             }
                             /*if (uiState is AuthUiState.Error && uiState.isWalletConnectionError) {
                                 Spacer(modifier = Modifier.size(SPACING_6X.dp))

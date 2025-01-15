@@ -1,4 +1,16 @@
 import extension.setupAnvil
+import java.util.Properties
+
+val getEnv: (String) -> Properties = { env ->
+    val localProperties = Properties()
+    try {
+        val propertiesFile = rootProject.file("zero/$env.properties")
+        propertiesFile.inputStream().use { localProperties.load(it) }
+    } catch (ex: Exception) {
+        println(ex.toString())
+    }
+    localProperties
+}
 
 plugins {
     id("io.element.android-compose-library")
@@ -8,6 +20,21 @@ plugins {
 
 android {
     namespace = "io.element.android.support.zero"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        debug {
+            val properties = getEnv("development")
+            buildConfigField("String", "WALLET_CONNECT_PROJECT_ID", "\"${properties["wallet_connect_project_id"]}\"")
+        }
+        release {
+            val properties = getEnv("production")
+            buildConfigField("String", "WALLET_CONNECT_PROJECT_ID", "\"${properties["wallet_connect_project_id"]}\"")
+        }
+    }
 }
 
 setupAnvil()

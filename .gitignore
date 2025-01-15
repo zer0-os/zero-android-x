@@ -110,3 +110,5 @@ checkouts/**
 *.dm
 
 app/gplay/release/output-metadata.json
+zero/production.properties
+zero/development.properties

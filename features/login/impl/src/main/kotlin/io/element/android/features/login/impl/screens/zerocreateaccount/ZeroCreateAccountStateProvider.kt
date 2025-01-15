@@ -14,6 +14,7 @@ open class ZeroCreateAccountStateProvider : PreviewParameterProvider<ZeroCreateA
     override val values: Sequence<ZeroCreateAccountState>
         get() = sequenceOf(
             aZeroCreateAccountState(),
+            aZeroCreateAccountState().copy(showWeb3Modal = true),
             // Loading
             aZeroCreateAccountState().copy(createAccountAction = AsyncData.Loading()),
             // Error
@@ -26,5 +27,6 @@ fun aZeroCreateAccountState() = ZeroCreateAccountState(
     formState = ZeroCreateAccountFormState.Default,
     createAccountAction = AsyncData.Uninitialized,
     loginFlow = AsyncData.Uninitialized,
+    showWeb3Modal = false,
     eventSink = {}
 )

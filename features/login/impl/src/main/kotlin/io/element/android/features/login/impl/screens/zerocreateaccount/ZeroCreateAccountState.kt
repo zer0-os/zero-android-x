@@ -21,6 +21,7 @@ data class ZeroCreateAccountState(
     val formState: ZeroCreateAccountFormState,
     val createAccountAction: AsyncData<SessionId>,
     val loginFlow: AsyncData<LoginFlow>,
+    val showWeb3Modal: Boolean,
     val eventSink: (ZeroCreateAccountEvents) -> Unit
 ) {
     val submitEnabled: Boolean

@@ -9,6 +9,7 @@ package io.element.android.x
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bumble.appyx.core.integration.NodeHost
 import com.bumble.appyx.core.integrationpoint.NodeActivity
 import com.bumble.appyx.core.plugin.NodeReadyObserver
+import com.reown.appkit.client.AppKit
 import io.element.android.features.lockscreen.api.LockScreenEntryPoint
 import io.element.android.features.lockscreen.api.LockScreenLockState
 import io.element.android.features.lockscreen.api.LockScreenService
@@ -37,7 +39,10 @@ import io.element.android.libraries.designsystem.utils.snackbar.LocalSnackbarDis
 import io.element.android.services.analytics.compose.LocalAnalyticsService
 import io.element.android.x.di.AppBindings
 import io.element.android.x.intent.SafeUriHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 private val loggerTag = LoggerTag("MainActivity")
@@ -53,6 +58,7 @@ class MainActivity : NodeActivity() {
         appBindings = bindings()
         setupLockManagement(appBindings.lockScreenService(), appBindings.lockScreenEntryPoint())
         enableEdgeToEdge()
+        registerWalletConnect()
         setContent {
             MainContent(appBindings)
         }
@@ -120,6 +126,22 @@ class MainActivity : NodeActivity() {
         }
     }
 
+    private fun registerWalletConnect() {
+        var isRegistered = false
+        var counter = 10
+        while (!isRegistered && counter-- > 0) {
+            try {
+                AppKit.register(this)
+                isRegistered = true
+                Timber.tag("WalletConnect").i("AppKit registration successful")
+            } catch (e: Exception) {
+                Timber.e(e)
+                runBlocking { delay(100) }
+            }
+        }
+        if (counter <= 0) Timber.tag("WalletConnect").e("AppKit registration failed")
+    }
+
     /**
      * Called when:
      * - the launcher icon is clicked (if the app is already running);
@@ -130,6 +152,12 @@ class MainActivity : NodeActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Timber.tag(loggerTag.value).w("onNewIntent")
+
+        if (intent.dataString?.contains("wc_ev") == true) {
+            AppKit.handleDeepLink(intent.dataString ?: "") {
+                Timber.tag("WalletConnect").e("Error dispatching envelope: ${it.throwable.message}")
+            }
+        }
         // If the mainNode is not init yet, keep the intent for later.
         // It can happen when the activity is killed by the system. The methods are called in this order :
         // onCreate(savedInstanceState=true) -> onNewIntent -> onResume -> onMainNodeInit
@@ -152,6 +180,15 @@ class MainActivity : NodeActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        closeWalletConnect()
         Timber.tag(loggerTag.value).w("onDestroy")
+    }
+
+    private fun closeWalletConnect() {
+        AppKit.disconnect(
+            onSuccess = {},
+            onError = {}
+        )
+        AppKit.unregister()
     }
 }

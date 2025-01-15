@@ -21,7 +21,8 @@ android {
 
 dependencies {
     implementation(libs.sqldelight.driver.android)
-    implementation(libs.sqlcipher)
+    //implementation(libs.sqlcipher)
+    implementation(libs.sqlcipher.android)
     implementation(libs.sqlite)
     implementation(libs.androidx.security.crypto)
 

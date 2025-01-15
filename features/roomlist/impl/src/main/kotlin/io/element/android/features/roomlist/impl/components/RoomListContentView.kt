@@ -140,13 +140,13 @@ private fun EmptyView(
                 SecurityBannerState.SetUpRecovery -> {
                     SetUpRecoveryKeyBanner(
                         onContinueClick = onSetUpRecoveryClick,
-                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) }
+                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
                     )
                 }
                 SecurityBannerState.RecoveryKeyConfirmation -> {
                     ConfirmRecoveryKeyBanner(
                         onContinueClick = onConfirmRecoveryKeyClick,
-                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) }
+                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
                     )
                 }
                 else -> Unit
@@ -218,7 +218,7 @@ private fun RoomsViewList(
                 item {
                     SetUpRecoveryKeyBanner(
                         onContinueClick = onSetUpRecoveryClick,
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) }
+                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) },
                     )
                 }
             }
@@ -227,7 +227,7 @@ private fun RoomsViewList(
                 item {
                     ConfirmRecoveryKeyBanner(
                         onContinueClick = onConfirmRecoveryKeyClick,
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) }
+                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) },
                     )
                 }
             }
@@ -235,7 +235,7 @@ private fun RoomsViewList(
                 item {
                     NativeSlidingSyncMigrationBanner(
                         onContinueClick = onMigrateToNativeSlidingSyncClick,
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) }
+                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) },
                     )
                 }
             }

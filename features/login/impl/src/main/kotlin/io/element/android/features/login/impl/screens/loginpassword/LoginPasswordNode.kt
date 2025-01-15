@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
+import com.reown.appkit.client.AppKit
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.element.android.anvilannotations.ContributesNode
@@ -34,7 +35,17 @@ class LoginPasswordNode @AssistedInject constructor(
         ZeroLoginPasswordView(
             state = state,
             modifier = modifier,
-            onBackClick = ::navigateUp,
+            onBackClick = {
+                disconnectWallet()
+                navigateUp()
+            },
+        )
+    }
+
+    private fun disconnectWallet() {
+        AppKit.disconnect(
+            onSuccess = {},
+            onError = {}
         )
     }
 }
