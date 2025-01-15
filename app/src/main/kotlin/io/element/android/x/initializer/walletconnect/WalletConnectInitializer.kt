@@ -13,6 +13,7 @@ import com.reown.android.CoreClient
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
 import com.reown.appkit.presets.AppKitChainsPresets
+import io.element.android.support.zero.config.ZeroConfig
 import timber.log.Timber
 
 internal object WalletConnectInitializer {
@@ -34,7 +35,7 @@ internal object WalletConnectInitializer {
 
     fun initialize(application: Application) {
         CoreClient.initialize(
-            projectId = "{project_id_here}",
+            projectId = ZeroConfig.environment.walletConnectKey,
             connectionType = WalletConnectMetaData.WALLET_CONNECT_CONNECTION_TYPE,
             application = application,
             metaData = appMetaData,
