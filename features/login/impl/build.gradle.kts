@@ -22,6 +22,13 @@ android {
             isIncludeAndroidResources = true
         }
     }
+
+    buildTypes {
+        release {
+            proguardFiles("proguard-rules.pro")
+            consumerProguardFiles("consumer-rules.pro")
+        }
+    }
 }
 
 setupAnvil(componentMergingStrategy = ComponentMergingStrategy.KSP)

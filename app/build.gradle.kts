@@ -136,6 +136,7 @@ android {
                 isOptimizeCode = true
                 isRemoveUnusedResources = true
                 proguardFiles("proguard-rules.pro")
+                consumerProguardFiles("consumer-rules.pro")
             }
         }
 
