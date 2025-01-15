@@ -180,7 +180,15 @@ class MainActivity : NodeActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        AppKit.unregister()
+        closeWalletConnect()
         Timber.tag(loggerTag.value).w("onDestroy")
+    }
+
+    private fun closeWalletConnect() {
+        AppKit.disconnect(
+            onSuccess = {},
+            onError = {}
+        )
+        AppKit.unregister()
     }
 }

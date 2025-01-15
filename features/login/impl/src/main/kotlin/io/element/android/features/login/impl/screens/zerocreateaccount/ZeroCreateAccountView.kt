@@ -50,9 +50,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.login.impl.error.loginError
 import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
+import io.element.android.features.login.impl.screens.loginpassword.LoginPasswordEvents
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -122,6 +124,16 @@ fun ZeroCreateAccountView(
                         .copy(containerColor = Color.Transparent)
                 )
             },
+            bottomBar = {
+                if (state.showWeb3Modal) {
+                    AppKitComponent(
+                        shouldOpenChooseNetwork = false,
+                        closeModal = {
+                            state.eventSink(ZeroCreateAccountEvents.ToggleWeb3Modal(false))
+                        }
+                    )
+                }
+            },
             containerColor = Color.Transparent
         ) { padding ->
             val scrollState = rememberScrollState()
@@ -166,7 +178,7 @@ fun ZeroCreateAccountView(
                                 image = io.element.android.support.zero.R.drawable.img_btn_connect_wallet,
                                 text = stringResource(id = io.element.android.support.zero.R.string.connect_a_wallet)
                             ) {
-
+                                state.eventSink(ZeroCreateAccountEvents.ToggleWeb3Modal(true))
                             }
                             /*if (uiState is AuthUiState.Error && uiState.isWalletConnectionError) {
                                 Spacer(modifier = Modifier.size(SPACING_6X.dp))

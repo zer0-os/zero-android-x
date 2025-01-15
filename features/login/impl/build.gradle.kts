@@ -51,6 +51,8 @@ dependencies {
     implementation(platform(libs.walletconnect.bom))
     implementation(libs.walletconnect.androidcore)
     implementation(libs.walletconnect.appkit)
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.accompanist.navigation)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.androidx.compose.ui.test.junit)

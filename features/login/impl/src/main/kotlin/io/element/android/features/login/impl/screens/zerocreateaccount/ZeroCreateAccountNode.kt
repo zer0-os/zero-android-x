@@ -13,6 +13,7 @@ import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.core.plugin.plugins
+import com.reown.appkit.client.AppKit
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.element.android.anvilannotations.ContributesNode
@@ -53,7 +54,17 @@ class ZeroCreateAccountNode @AssistedInject constructor(
             modifier = modifier,
             state = state,
             onProceedToLoginScreen = ::onProceedToLogin,
-            onBackClick = ::navigateUp
+            onBackClick = {
+                disconnectWallet()
+                navigateUp()
+            }
+        )
+    }
+
+    private fun disconnectWallet() {
+        AppKit.disconnect(
+            onSuccess = {},
+            onError = {}
         )
     }
 }
