@@ -242,8 +242,7 @@ fun TextComposer(
         enableVoiceMessages && !canSendMessage ->
             when (voiceMessageState) {
                 VoiceMessageState.Idle,
-                // is VoiceMessageState.Recording -> recordVoiceButton
-                is VoiceMessageState.Recording -> sendButton
+                is VoiceMessageState.Recording -> recordVoiceButton
                 is VoiceMessageState.Preview -> when (voiceMessageState.isSending) {
                     true -> uploadVoiceProgress
                     false -> sendVoiceButton
