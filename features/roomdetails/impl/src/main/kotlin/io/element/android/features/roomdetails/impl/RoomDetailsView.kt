@@ -196,15 +196,16 @@ fun RoomDetailsView(
                         pinnedMessagesCount = state.pinnedMessagesCount,
                         onPinnedMessagesClick = onPinnedMessagesClick
                     )
-                }
+                }*/
 
                 if (state.displayRolesAndPermissionsSettings) {
                     ListItem(
-                        headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
+                        // headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
+                        headlineContent = { Text("Roles") },
                         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
                         onClick = openAdminSettings,
                     )
-                }*/
+                }
             }
 
             val displayMemberListItem = state.roomType is RoomDetailsType.Room
@@ -231,11 +232,11 @@ fun RoomDetailsView(
                     onClick = openMediaGallery
                 )
             }
-            if (state.isEncrypted) {
+            /*if (state.isEncrypted) {
                 SecuritySection()
             }
 
-            /*if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
+            if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
                 val roomMemberState = state.roomMemberDetailsState
                 BlockUserSection(roomMemberState)
                 BlockUserDialogs(roomMemberState)

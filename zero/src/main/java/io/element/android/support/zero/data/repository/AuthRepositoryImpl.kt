@@ -23,12 +23,10 @@ class AuthRepositoryImpl(
     private val dataCleaner: DataCleaner,
 ) : AuthRepository {
     override suspend fun login(email: String, password: String) = channelFlowWithAwait {
-        runSafeCall {
-            val payload = AuthoriseUserRequest.newRequest(email, password)
-            val zeroAuthRequest = zeroAuthService.authorise(payload)
-            val ssoToken = proceedLoginFlow(zeroAuthRequest)
-            trySend(ssoToken)
-        }
+        val payload = AuthoriseUserRequest.newRequest(email, password)
+        val zeroAuthRequest = zeroAuthService.authorise(payload)
+        val ssoToken = proceedLoginFlow(zeroAuthRequest)
+        trySend(ssoToken)
     }
 
     override suspend fun saveMatrixLoginInfo(token: String, userId: String) {
