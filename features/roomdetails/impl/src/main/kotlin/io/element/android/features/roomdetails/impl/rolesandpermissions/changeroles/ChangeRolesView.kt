@@ -370,7 +370,7 @@ private fun MemberRow(
                     )
                 }
             }
-            // Id
+            /*// Id
             userId?.let {
                 Text(
                     text = userId,
@@ -379,7 +379,7 @@ private fun MemberRow(
                     overflow = TextOverflow.Ellipsis,
                     style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
-            }
+            }*/
         }
         trailingContent?.invoke()
     }
