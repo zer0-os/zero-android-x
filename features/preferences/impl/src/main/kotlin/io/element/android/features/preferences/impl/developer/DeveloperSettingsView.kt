@@ -18,7 +18,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.preferences.impl.R
+import io.element.android.features.preferences.impl.developer.tracing.LogLevelItem
+import io.element.android.features.rageshake.api.preferences.RageshakePreferencesView
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
+import io.element.android.libraries.designsystem.components.preferences.PreferenceDropdown
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
 import io.element.android.libraries.designsystem.components.preferences.PreferenceText
@@ -29,13 +32,13 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.toPersistentList
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
 @Composable
 fun DeveloperSettingsView(
     state: DeveloperSettingsState,
     onOpenShowkase: () -> Unit,
-    onOpenConfigureTracing: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,9 +58,14 @@ fun DeveloperSettingsView(
         }
         ElementCallCategory(state = state)
         PreferenceCategory(title = "Rust SDK") {
-            PreferenceText(
-                title = "Configure tracing",
-                onClick = onOpenConfigureTracing,
+            PreferenceDropdown(
+                title = "Tracing log level",
+                supportingText = "Requires app reboot",
+                selectedOption = state.tracingLogLevel.dataOrNull(),
+                options = LogLevelItem.entries.toPersistentList(),
+                onSelectOption = { logLevel ->
+                     state.eventSink(DeveloperSettingsEvents.SetTracingLogLevel(logLevel))
+                }
             )
             PreferenceSwitch(
                 title = "Enable Simplified Sliding Sync",
@@ -210,7 +218,6 @@ internal fun DeveloperSettingsViewPreview(@PreviewParameter(DeveloperSettingsSta
     DeveloperSettingsView(
         state = state,
         onOpenShowkase = {},
-        onOpenConfigureTracing = {},
         onBackClick = {}
     )
 }

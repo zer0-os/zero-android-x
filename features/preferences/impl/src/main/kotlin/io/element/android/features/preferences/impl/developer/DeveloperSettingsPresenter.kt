@@ -20,6 +20,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import io.element.android.appconfig.ElementCallConfig
 import io.element.android.features.logout.api.LogoutUseCase
+import io.element.android.features.preferences.impl.developer.tracing.toLogLevel
+import io.element.android.features.preferences.impl.developer.tracing.toLogLevelItem
 import io.element.android.features.preferences.impl.tasks.ClearCacheUseCase
 import io.element.android.features.preferences.impl.tasks.ComputeCacheSizeUseCase
 import io.element.android.features.preferences.impl.tasks.DeleteAccountUseCase
@@ -38,6 +40,7 @@ import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.net.URL
 import javax.inject.Inject
@@ -77,6 +80,11 @@ class DeveloperSettingsPresenter @Inject constructor(
         val hideImagesAndVideos by appPreferencesStore
             .doesHideImagesAndVideosFlow()
             .collectAsState(initial = false)
+
+        val tracingLogLevel by appPreferencesStore
+            .getTracingLogLevelFlow()
+            .map { AsyncData.Success(it.toLogLevelItem()) }
+            .collectAsState(initial = AsyncData.Uninitialized)
 
         val isDeleteAccountInProgress = remember {
             mutableStateOf<Boolean>(false)
@@ -129,6 +137,9 @@ class DeveloperSettingsPresenter @Inject constructor(
                 is DeveloperSettingsEvents.SetHideImagesAndVideos -> coroutineScope.launch {
                     appPreferencesStore.setHideImagesAndVideos(event.value)
                 }
+                is DeveloperSettingsEvents.SetTracingLogLevel -> coroutineScope.launch {
+                    appPreferencesStore.setTracingLogLevel(event.logLevel.toLogLevel())
+                }
                 DeveloperSettingsEvents.DeleteUserAccount -> {
                     coroutineScope.deleteAccount(isDeleteAccountInProgress)
                 }
@@ -147,6 +158,7 @@ class DeveloperSettingsPresenter @Inject constructor(
             ),
             isSimpleSlidingSyncEnabled = isSimplifiedSlidingSyncEnabled,
             hideImagesAndVideos = hideImagesAndVideos,
+            tracingLogLevel = tracingLogLevel,
             isDeleteAccountInProgress = isDeleteAccountInProgress.value,
             eventSink = ::handleEvents
         )

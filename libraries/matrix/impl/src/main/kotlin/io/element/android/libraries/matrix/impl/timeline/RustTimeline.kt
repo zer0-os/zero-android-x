@@ -72,6 +72,7 @@ import org.matrix.rustcomponents.sdk.FormattedBody
 import org.matrix.rustcomponents.sdk.MessageFormat
 import org.matrix.rustcomponents.sdk.PollData
 import org.matrix.rustcomponents.sdk.SendAttachmentJoinHandle
+import org.matrix.rustcomponents.sdk.UploadParameters
 import org.matrix.rustcomponents.sdk.use
 import timber.log.Timber
 import uniffi.matrix_sdk_ui.LiveBackPaginationStatus
@@ -325,6 +326,7 @@ class RustTimeline(
                 formattedCaption = formattedCaption?.let {
                     FormattedBody(body = it, format = MessageFormat.Html)
                 },
+                mentions = null,
             )
             inner.edit(
                 newContent = editedContent,
@@ -361,14 +363,17 @@ class RustTimeline(
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         return sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendImage(
-                url = file.path,
-                thumbnailUrl = thumbnailFile?.path,
+                params = UploadParameters(
+                    filename = file.path,
+                    caption = caption,
+                    formattedCaption = formattedCaption?.let {
+                        FormattedBody(body = it, format = MessageFormat.Html)
+                    },
+                    useSendQueue = useSendQueue,
+                    mentions = null,
+                ),
+                thumbnailPath = thumbnailFile?.path,
                 imageInfo = imageInfo.map(),
-                caption = caption,
-                formattedCaption = formattedCaption?.let {
-                    FormattedBody(body = it, format = MessageFormat.Html)
-                },
-                useSendQueue = useSendQueue,
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
@@ -385,14 +390,17 @@ class RustTimeline(
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         return sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendVideo(
-                url = file.path,
-                thumbnailUrl = thumbnailFile?.path,
+                params = UploadParameters(
+                    filename = file.path,
+                    caption = caption,
+                    formattedCaption = formattedCaption?.let {
+                        FormattedBody(body = it, format = MessageFormat.Html)
+                    },
+                    useSendQueue = useSendQueue,
+                    mentions = null,
+                ),
+                thumbnailPath = thumbnailFile?.path,
                 videoInfo = videoInfo.map(),
-                caption = caption,
-                formattedCaption = formattedCaption?.let {
-                    FormattedBody(body = it, format = MessageFormat.Html)
-                },
-                useSendQueue = useSendQueue,
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
@@ -408,13 +416,16 @@ class RustTimeline(
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         return sendAttachment(listOf(file)) {
             inner.sendAudio(
-                url = file.path,
+                params = UploadParameters(
+                    filename = file.path,
+                    caption = caption,
+                    formattedCaption = formattedCaption?.let {
+                        FormattedBody(body = it, format = MessageFormat.Html)
+                    },
+                    useSendQueue = useSendQueue,
+                    mentions = null,
+                ),
                 audioInfo = audioInfo.map(),
-                caption = caption,
-                formattedCaption = formattedCaption?.let {
-                    FormattedBody(body = it, format = MessageFormat.Html)
-                },
-                useSendQueue = useSendQueue,
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
@@ -430,13 +441,16 @@ class RustTimeline(
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         return sendAttachment(listOf(file)) {
             inner.sendFile(
-                url = file.path,
+                params = UploadParameters(
+                    filename = file.path,
+                    caption = caption,
+                    formattedCaption = formattedCaption?.let {
+                        FormattedBody(body = it, format = MessageFormat.Html)
+                    },
+                    useSendQueue = useSendQueue,
+                    mentions = null,
+                ),
                 fileInfo = fileInfo.map(),
-                caption = caption,
-                formattedCaption = formattedCaption?.let {
-                    FormattedBody(body = it, format = MessageFormat.Html)
-                },
-                useSendQueue = useSendQueue,
                 progressWatcher = progressCallback?.toProgressWatcher(),
             )
         }
@@ -549,13 +563,16 @@ class RustTimeline(
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         return sendAttachment(listOf(file)) {
             inner.sendVoiceMessage(
-                url = file.path,
+                params = UploadParameters(
+                    filename = file.path,
+                    // Maybe allow a caption in the future?
+                    caption = null,
+                    formattedCaption = null,
+                    useSendQueue = useSendQueue,
+                    mentions = null,
+                ),
                 audioInfo = audioInfo.map(),
                 waveform = waveform.toMSC3246range(),
-                // Maybe allow a caption in the future?
-                caption = null,
-                formattedCaption = null,
-                useSendQueue = useSendQueue,
                 progressWatcher = progressCallback?.toProgressWatcher(),
             )
         }
