@@ -117,6 +117,7 @@ class FakeMatrixClient(
     var joinRoomLambda: (RoomId) -> Result<RoomSummary?> = {
         Result.success(null)
     }
+    var leaveInvitedRoomLambda: (RoomId) -> Result<Unit> = { Result.success(Unit) }
     var joinRoomByIdOrAliasLambda: (RoomIdOrAlias, List<String>) -> Result<RoomSummary?> = { _, _ ->
         Result.success(null)
     }
@@ -224,6 +225,8 @@ class FakeMatrixClient(
     }
 
     override suspend fun joinRoom(roomId: RoomId): Result<RoomSummary?> = joinRoomLambda(roomId)
+
+    override suspend fun leaveInvitedRoom(roomId: RoomId): Result<Unit> =  leaveInvitedRoomLambda(roomId)
 
     override suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomSummary?> {
         return joinRoomByIdOrAliasLambda(roomIdOrAlias, serverNames)

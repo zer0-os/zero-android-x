@@ -159,6 +159,19 @@ class RustRoomFactory(
         )
     }
 
+    suspend fun leaveInvitedRoom(roomId: RoomId) = withContext(dispatcher) {
+        if (isDestroyed) {
+            Timber.d("Room factory is destroyed, returning null for $roomId")
+            return@withContext null
+        }
+        val roomListItem = innerRoomListService.roomOrNull(roomId.value)
+        if (roomListItem == null) {
+            Timber.d("Room not found for $roomId")
+            return@withContext null
+        }
+        roomListItem.invitedRoom().leave()
+    }
+
     private suspend fun getRoomReferences(roomId: RoomId): RustRoomReferences? {
         cache[roomId]?.let {
             Timber.d("Room found in cache for $roomId")

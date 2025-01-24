@@ -466,6 +466,11 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun leaveInvitedRoom(roomId: RoomId) = withContext(sessionDispatcher) {
+        runCatching {
+            roomFactory.leaveInvitedRoom(roomId) ?: error("Failed to decline room invite")
+        }
+    }
     override suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomSummary?> = withContext(sessionDispatcher) {
         runCatching {
             innerClient.joinRoomByIdOrAlias(
