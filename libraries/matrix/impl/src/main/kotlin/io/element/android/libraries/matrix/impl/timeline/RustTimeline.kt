@@ -56,8 +56,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
@@ -215,8 +213,8 @@ class RustTimeline(
 
     override val timelineItems: Flow<List<MatrixTimelineItem>> = combine(
         _timelineItems,
-        backPaginationStatus.filter { !it.isPaginating }.distinctUntilChanged(),
-        forwardPaginationStatus.filter { !it.isPaginating }.distinctUntilChanged(),
+        backPaginationStatus,
+        forwardPaginationStatus,
         matrixRoom.roomInfoFlow.map { it.creator },
         isTimelineInitialized,
     ) { timelineItems,
