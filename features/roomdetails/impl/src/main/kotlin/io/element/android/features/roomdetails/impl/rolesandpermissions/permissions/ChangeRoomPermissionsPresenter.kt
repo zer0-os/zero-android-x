@@ -39,7 +39,7 @@ class ChangeRoomPermissionsPresenter @AssistedInject constructor(
             ChangeRoomPermissionsSection.RoomDetails -> persistentListOf(
                 RoomPermissionType.ROOM_NAME,
                 RoomPermissionType.ROOM_AVATAR,
-                RoomPermissionType.ROOM_TOPIC,
+                //RoomPermissionType.ROOM_TOPIC,
             )
             ChangeRoomPermissionsSection.MessagesAndContent -> persistentListOf(
                 RoomPermissionType.SEND_EVENTS,
@@ -48,7 +48,7 @@ class ChangeRoomPermissionsPresenter @AssistedInject constructor(
             ChangeRoomPermissionsSection.MembershipModeration -> persistentListOf(
                 RoomPermissionType.INVITE,
                 RoomPermissionType.KICK,
-                RoomPermissionType.BAN,
+                //RoomPermissionType.BAN,
             )
         }
     }

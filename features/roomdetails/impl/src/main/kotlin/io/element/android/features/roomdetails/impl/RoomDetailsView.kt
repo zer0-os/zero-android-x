@@ -200,8 +200,7 @@ fun RoomDetailsView(
 
                 if (state.displayRolesAndPermissionsSettings) {
                     ListItem(
-                        // headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
-                        headlineContent = { Text("Roles") },
+                        headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
                         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
                         onClick = openAdminSettings,
                     )

@@ -52,8 +52,7 @@ fun RolesAndPermissionsView(
 ) {
     PreferencePage(
         modifier = modifier,
-        // title = stringResource(R.string.screen_room_roles_and_permissions_title),
-        title = "Roles",
+        title = stringResource(R.string.screen_room_roles_and_permissions_title),
         onBackClick = rolesAndPermissionsNavigator::onBackClick,
     ) {
         ListSectionHeader(title = stringResource(R.string.screen_room_roles_and_permissions_roles_header), hasDivider = false)
@@ -73,7 +72,7 @@ fun RolesAndPermissionsView(
             headlineContent = { Text(stringResource(R.string.screen_room_roles_and_permissions_change_my_role)) },
             onClick = { state.eventSink(RolesAndPermissionsEvents.ChangeOwnRole) },
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Edit()))
-        )
+        )*/
         ListSectionHeader(title = stringResource(R.string.screen_room_roles_and_permissions_permissions_header), hasDivider = true)
         ListItem(
             headlineContent = { Text(stringResource(R.string.screen_room_roles_and_permissions_room_details)) },
@@ -90,7 +89,7 @@ fun RolesAndPermissionsView(
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.User())),
             onClick = { rolesAndPermissionsNavigator.openModerationPermissions() },
         )
-        HorizontalDivider()
+        /*HorizontalDivider()
         ListItem(
             headlineContent = { Text(stringResource(R.string.screen_room_roles_and_permissions_reset)) },
             onClick = { state.eventSink(RolesAndPermissionsEvents.ResetPermissions) },
