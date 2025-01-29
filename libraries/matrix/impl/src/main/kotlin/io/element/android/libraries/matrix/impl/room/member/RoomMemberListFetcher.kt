@@ -10,6 +10,7 @@ package io.element.android.libraries.matrix.impl.room.member
 import io.element.android.libraries.matrix.api.room.MatrixRoomMembersState
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.roomMembers
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,6 +34,7 @@ internal class RoomMemberListFetcher(
     private val room: RoomInterface,
     private val dispatcher: CoroutineDispatcher,
     private val pageSize: Int = 10_000,
+    private val zeroUserRepository: UserRepository?
 ) {
     enum class Source {
         CACHE,
@@ -121,7 +123,13 @@ internal class RoomMemberListFetcher(
                     val chunk = iterator.nextChunk(pageSize.toUInt())
                     // Load next chunk. If null (no more items), exit the loop
                     val members = chunk?.map(RoomMemberMapper::map) ?: break
-                    addAll(members)
+                    val memberIds = members.map { it.userId.value }
+                    val apiMembers = zeroUserRepository?.getUsers(memberIds) ?: emptyList()
+                    val updatedMembers = members.map {
+                        val apiMember = apiMembers.firstOrNull { zeroUser -> zeroUser.matrixId == it.userId.value }
+                        it.copy(displayName = apiMember?.name ?: it.displayName)
+                    }
+                    addAll(updatedMembers)
                     Timber.i("Loaded first $size members for room $roomId")
                 }
             }

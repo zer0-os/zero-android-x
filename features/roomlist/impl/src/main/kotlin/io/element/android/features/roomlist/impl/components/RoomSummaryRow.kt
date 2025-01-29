@@ -90,7 +90,7 @@ internal fun RoomSummaryRow(
                     },
                 ) {
                     InviteNameAndIndicatorRow(name = room.name)
-                    InviteSubtitle(isDm = room.isDm, inviteSender = room.inviteSender, canonicalAlias = room.canonicalAlias)
+                    // InviteSubtitle(isDm = room.isDm, inviteSender = room.inviteSender, canonicalAlias = room.canonicalAlias)
                     if (!room.isDm && room.inviteSender != null) {
                         Spacer(modifier = Modifier.height(4.dp))
                         InviteSenderView(

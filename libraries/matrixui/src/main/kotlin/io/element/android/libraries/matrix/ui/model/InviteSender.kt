@@ -32,7 +32,7 @@ data class InviteSender(
         return stringResource(R.string.screen_invites_invited_you, displayName, userId.value).let { text ->
             val senderNameStart = LocalContext.current.getString(R.string.screen_invites_invited_you).indexOf("%1\$s")
             AnnotatedString(
-                text = text,
+                text = text.replace("(${userId.value}) ", ""),
                 spanStyles = listOf(
                     AnnotatedString.Range(
                         SpanStyle(

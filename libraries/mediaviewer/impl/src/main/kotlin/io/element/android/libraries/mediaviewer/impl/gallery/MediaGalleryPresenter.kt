@@ -32,8 +32,14 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOther
 import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOwn
 import io.element.android.libraries.mediaviewer.api.local.LocalMedia
 import io.element.android.libraries.mediaviewer.api.local.LocalMediaFactory
+import io.element.android.libraries.mediaviewer.impl.datasource.MediaGalleryDataSource
 import io.element.android.libraries.mediaviewer.impl.details.MediaBottomSheetState
 import io.element.android.libraries.mediaviewer.impl.local.LocalMediaActions
+import io.element.android.libraries.mediaviewer.impl.model.GroupedMediaItems
+import io.element.android.libraries.mediaviewer.impl.model.MediaItem
+import io.element.android.libraries.mediaviewer.impl.model.eventId
+import io.element.android.libraries.mediaviewer.impl.model.mediaInfo
+import io.element.android.libraries.mediaviewer.impl.model.mediaSource
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.coroutines.launch
 
@@ -86,11 +92,13 @@ class MediaGalleryPresenter @AssistedInject constructor(
                     mediaGalleryDataSource.deleteItem(event.eventId)
                 }
                 is MediaGalleryEvents.SaveOnDisk -> coroutineScope.launch {
+                    mediaBottomSheetState = MediaBottomSheetState.Hidden
                     groupedMediaItems.dataOrNull().find(event.eventId)?.let {
                         saveOnDisk(it)
                     }
                 }
                 is MediaGalleryEvents.Share -> coroutineScope.launch {
+                    mediaBottomSheetState = MediaBottomSheetState.Hidden
                     groupedMediaItems.dataOrNull().find(event.eventId)?.let {
                         share(it)
                     }
