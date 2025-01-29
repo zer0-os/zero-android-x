@@ -224,7 +224,7 @@ private fun RoomMemberActionsBottomSheet(
                         .fillMaxWidth()
                 )
             }
-            Text(
+            /*Text(
                 text = roomMember.userId.toString(),
                 style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary,
@@ -234,7 +234,7 @@ private fun RoomMemberActionsBottomSheet(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
-            )
+            )*/
             Spacer(modifier = Modifier.height(32.dp))
 
             for (action in actions) {
@@ -255,6 +255,7 @@ private fun RoomMemberActionsBottomSheet(
                         ListItem(
                             headlineContent = { Text(stringResource(R.string.screen_room_member_list_manage_member_remove)) },
                             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Block())),
+                            style = ListItemStyle.Destructive,
                             onClick = {
                                 coroutineScope.launch {
                                     bottomSheetState.hide()
@@ -264,7 +265,7 @@ private fun RoomMemberActionsBottomSheet(
                         )
                     }
                     is ModerationAction.BanUser -> {
-                        ListItem(
+                        /*ListItem(
                             headlineContent = { Text(stringResource(R.string.screen_room_member_list_manage_member_remove_confirmation_ban)) },
                             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Block())),
                             style = ListItemStyle.Destructive,
@@ -274,7 +275,7 @@ private fun RoomMemberActionsBottomSheet(
                                     onSelectAction(action)
                                 }
                             }
-                        )
+                        )*/
                     }
                 }
             }

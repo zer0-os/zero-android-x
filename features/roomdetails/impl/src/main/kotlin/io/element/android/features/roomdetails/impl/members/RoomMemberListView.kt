@@ -151,7 +151,7 @@ private fun RoomMemberList(
     LazyColumn(modifier = Modifier.fillMaxWidth(), state = rememberLazyListState()) {
         stickyHeader {
             Column {
-                if (canDisplayBannedUsersControls) {
+                /*if (canDisplayBannedUsersControls) {
                     val segmentedButtonTitles = persistentListOf(
                         stringResource(id = R.string.screen_room_member_list_mode_members),
                         stringResource(id = R.string.screen_room_member_list_mode_banned),
@@ -172,7 +172,7 @@ private fun RoomMemberList(
                             )
                         }
                     }
-                }
+                }*/
                 AnimatedVisibility(
                     visible = roomMembers.isLoading(),
                     enter = fadeIn() + expandVertically(),

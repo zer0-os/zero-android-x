@@ -22,6 +22,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.sanitize
 
 @Composable
 fun IdentityChangeStateView(
@@ -48,11 +49,19 @@ fun IdentityChangeStateView(
                 val fullText = stringResource(
                     id = CommonStrings.crypto_identity_change_pin_violation_new,
                     displayName,
-                    userIdStr,
-                    learnMoreStr,
+                    "",
+                    "",
                 )
-                append(fullText)
-                val userIdStartIndex = fullText.indexOf(userIdStr)
+                append(fullText.sanitize())
+                val userNameStartIndex = fullText.indexOf(displayName)
+                addStyle(
+                    style = SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    start = userNameStartIndex,
+                    end = userNameStartIndex + displayName.length,
+                )
+                /*val userIdStartIndex = fullText.indexOf(userIdStr)
                 addStyle(
                     style = SpanStyle(
                         fontWeight = FontWeight.Bold,
@@ -78,7 +87,7 @@ fun IdentityChangeStateView(
                     ),
                     start = learnMoreStartIndex,
                     end = learnMoreStartIndex + learnMoreStr.length,
-                )
+                )*/
             },
             onSubmitClick = { state.eventSink(IdentityChangeEvent.Submit(pinViolationIdentityChange.identityRoomMember.userId)) },
             isCritical = pinViolationIdentityChange.identityState == IdentityState.VerificationViolation,

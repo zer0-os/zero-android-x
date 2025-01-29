@@ -10,6 +10,8 @@ interface UserRepository {
 
     suspend fun getUser(userId: String): Flow<ZeroUser?>
 
+    suspend fun getUsers(userIds: List<String>): List<ZeroUser>
+
     suspend fun updateUserProfile(
         userName: String? = null,
         avatarUrl: String? = null,

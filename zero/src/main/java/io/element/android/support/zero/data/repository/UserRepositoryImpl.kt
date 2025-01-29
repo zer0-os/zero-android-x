@@ -52,6 +52,16 @@ class UserRepositoryImpl(
             }
         }
 
+    override suspend fun getUsers(userIds: List<String>): List<ZeroUser> {
+        val result = runCatching {
+            val apiUsers = zeroMatrixUserService.getMatrixUsers(
+                MatrixUsersFilter.newFilter(userIds)
+            )
+            apiUsers.map { it.toModel() }
+        }
+        return result.getOrDefault(emptyList())
+    }
+
     override suspend fun updateUserProfile(userName: String?, avatarUrl: String?, profileZId: String?) {
         runSafeCall {
             zeroUserService.updateProfile(

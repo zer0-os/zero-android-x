@@ -12,4 +12,9 @@ package io.element.android.support.zero.common.extension
  */
 fun String.sanitize(): String {
     return replace("\n", "")
+        .removeDuplicateWhiteSpaces()
+}
+
+private fun String.removeDuplicateWhiteSpaces(): String {
+    return this.replace("\\s+".toRegex(), " ")
 }

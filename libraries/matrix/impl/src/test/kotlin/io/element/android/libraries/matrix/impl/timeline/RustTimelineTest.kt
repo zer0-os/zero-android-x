@@ -120,5 +120,6 @@ private fun TestScope.createRustTimeline(
         roomContentForwarder = roomContentForwarder,
         featureFlagsService = featureFlagsService,
         onNewSyncedEvent = onNewSyncedEvent,
+        zeroConversationRepository = null,
     )
 }

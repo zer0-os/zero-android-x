@@ -187,7 +187,7 @@ class RustMatrixRoom(
 
     override val roomCoroutineScope = sessionCoroutineScope.childScope(coroutineDispatchers.main, "RoomScope-$roomId")
     private val _syncUpdateFlow = MutableStateFlow(0L)
-    private val roomMemberListFetcher = RoomMemberListFetcher(innerRoom, roomMembersDispatcher)
+    private val roomMemberListFetcher = RoomMemberListFetcher(innerRoom, roomMembersDispatcher, zeroUserRepository = zeroUserRepository)
 
     private val _roomNotificationSettingsStateFlow = MutableStateFlow<MatrixRoomNotificationSettingsState>(MatrixRoomNotificationSettingsState.Unknown)
     override val roomNotificationSettingsStateFlow: StateFlow<MatrixRoomNotificationSettingsState> = _roomNotificationSettingsStateFlow

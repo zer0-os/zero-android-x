@@ -193,7 +193,7 @@ private fun RoomInviteMembersSearchBar(
                                 invitableUser.isAlreadyJoined -> stringResource(R.string.screen_room_details_already_a_member)
                                 invitableUser.isAlreadyInvited -> stringResource(R.string.screen_room_details_already_invited)
                                 // Otherwise show the ID, unless that's already used for their name
-                                invitableUser.matrixUser.displayName.isNullOrEmpty().not() -> invitableUser.matrixUser.userId.value
+                                invitableUser.matrixUser.displayName.isNullOrEmpty().not() -> invitableUser.matrixUser.primaryZeroId
                                 else -> null
                             }
                         )
