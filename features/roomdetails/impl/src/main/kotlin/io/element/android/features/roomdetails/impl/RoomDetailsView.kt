@@ -12,7 +12,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -44,9 +43,6 @@ import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
-import io.element.android.features.roomcall.api.hasPermissionToJoin
-import io.element.android.features.userprofile.shared.blockuser.BlockUserDialogs
-import io.element.android.features.userprofile.shared.blockuser.BlockUserSection
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
@@ -55,7 +51,6 @@ import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
-import io.element.android.libraries.designsystem.components.avatar.DmAvatars
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.button.MainActionButton
 import io.element.android.libraries.designsystem.components.list.ListItemContent
@@ -77,12 +72,10 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
-import io.element.android.libraries.matrix.api.room.getBestName
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.testtags.TestTags
@@ -110,6 +103,7 @@ fun RoomDetailsView(
     onJoinCallClick: () -> Unit,
     onPinnedMessagesClick: () -> Unit,
     onKnockRequestsClick: () -> Unit,
+    onSecurityAndPrivacyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -190,25 +184,14 @@ fun RoomDetailsView(
                         state.eventSink(RoomDetailsEvent.SetFavorite(it))
                     }
                 )
-
-                /*if (state.canShowPinnedMessages) {
-                    PinnedMessagesItem(
-                        pinnedMessagesCount = state.pinnedMessagesCount,
-                        onPinnedMessagesClick = onPinnedMessagesClick
-                    )
-                }*/
-
-                if (state.displayRolesAndPermissionsSettings) {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
-                        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
-                        onClick = openAdminSettings,
+                if (state.canShowSecurityAndPrivacy) {
+                    SecurityAndPrivacyItem(
+                        onClick = onSecurityAndPrivacyClick
                     )
                 }
             }
 
-            val displayMemberListItem = state.roomType is RoomDetailsType.Room
-            if (displayMemberListItem) {
+            if (state.roomType is RoomDetailsType.Room) {
                 PreferenceCategory {
                     MembersItem(
                         memberCount = state.memberCount,
@@ -220,22 +203,34 @@ fun RoomDetailsView(
                             onKnockRequestsClick = onKnockRequestsClick
                         )
                     }*/
+                    if (state.displayRolesAndPermissionsSettings) {
+                        ListItem(
+                            headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
+                            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
+                            onClick = openAdminSettings,
+                        )
+                    }
                 }
             }
 
-            /*PollsSection(
-                openPollHistory = openPollHistory
-            )*/
-            if (state.canShowMediaGallery) {
-                MediaGallerySection(
-                    onClick = openMediaGallery
-                )
-            }
-            /*if (state.isEncrypted) {
-                SecuritySection()
+            PreferenceCategory {
+                /*if (state.canShowPinnedMessages) {
+                    PinnedMessagesItem(
+                        pinnedMessagesCount = state.pinnedMessagesCount,
+                        onPinnedMessagesClick = onPinnedMessagesClick
+                    )
+                }
+                PollsItem(
+                    openPollHistory = openPollHistory
+                )*/
+                if (state.canShowMediaGallery) {
+                    MediaGalleryItem(
+                        onClick = openMediaGallery
+                    )
+                }
             }
 
-            if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
+            /*if (state.roomType is RoomDetailsType.Dm && state.roomMemberDetailsState != null) {
                 val roomMemberState = state.roomMemberDetailsState
                 BlockUserSection(roomMemberState)
                 BlockUserDialogs(roomMemberState)
@@ -428,24 +423,26 @@ private fun DmHeaderSection(
 }
 
 @Composable
-private fun ColumnScope.TitleAndSubtitle(
+private fun TitleAndSubtitle(
     title: String,
     subtitle: String?,
 ) {
-    Spacer(modifier = Modifier.height(24.dp))
-    Text(
-        text = title,
-        style = ElementTheme.zeroTypography.fontHeadingLgBold,
-        textAlign = TextAlign.Center,
-    )
-    if (subtitle != null) {
-        Spacer(modifier = Modifier.height(6.dp))
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = subtitle,
-            style = ElementTheme.zeroTypography.fontBodyLgRegular,
-            color = MaterialTheme.colorScheme.secondary,
+            text = title,
+            style = ElementTheme.zeroTypography.fontHeadingLgBold,
             textAlign = TextAlign.Center,
         )
+        if (subtitle != null) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = subtitle,
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
@@ -539,6 +536,19 @@ private fun NotificationItem(
 }
 
 @Composable
+private fun SecurityAndPrivacyItem(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.screen_room_details_security_and_privacy_title)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Lock())),
+        onClick = onClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun FavoriteItem(
     isFavorite: Boolean,
     onFavoriteChanges: (Boolean) -> Unit,
@@ -589,40 +599,25 @@ private fun PinnedMessagesItem(
 }
 
 @Composable
-private fun PollsSection(
+private fun PollsItem(
     openPollHistory: () -> Unit,
 ) {
-    PreferenceCategory {
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.screen_polls_history_title)) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Polls())),
-            onClick = openPollHistory,
-        )
-    }
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.screen_polls_history_title)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Polls())),
+        onClick = openPollHistory,
+    )
 }
 
 @Composable
-private fun MediaGallerySection(
+private fun MediaGalleryItem(
     onClick: () -> Unit,
 ) {
-    PreferenceCategory {
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.screen_room_details_media_gallery_title)) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Image())),
-            onClick = onClick,
-        )
-    }
-}
-
-@Composable
-private fun SecuritySection() {
-    PreferenceCategory(title = stringResource(R.string.screen_room_details_security_title)) {
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.screen_room_details_encryption_enabled_title)) },
-            supportingContent = { Text(stringResource(R.string.screen_room_details_encryption_enabled_subtitle)) },
-            leadingContent = ListItemContent.Icon(IconSource.Resource(CommonDrawables.ic_encryption_enabled)),
-        )
-    }
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.screen_room_details_media_gallery_title)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Image())),
+        onClick = onClick,
+    )
 }
 
 @Composable
@@ -674,5 +669,6 @@ private fun ContentToPreview(state: RoomDetailsState) {
         onJoinCallClick = {},
         onPinnedMessagesClick = {},
         onKnockRequestsClick = {},
+        onSecurityAndPrivacyClick = {},
     )
 }
