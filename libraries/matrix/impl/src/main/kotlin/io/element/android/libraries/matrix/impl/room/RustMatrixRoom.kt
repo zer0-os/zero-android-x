@@ -921,8 +921,10 @@ class RustMatrixRoom(
         val repository = zeroUserRepository ?: return
         val roomMembers = membersStateFlow.value.roomMembers()
         if (!roomMembers.isNullOrEmpty()) {
-            val otherMember = roomMembers.first { it.userId != sessionId }
-            repository.getUser(otherMember.userId.value).collect(_directZeroUser)
+            val otherMember = roomMembers.firstOrNull { it.userId != sessionId }
+            otherMember?.let { member ->
+                repository.getUser(member.userId.value).collect(_directZeroUser)
+            }
         }
     }
 }
