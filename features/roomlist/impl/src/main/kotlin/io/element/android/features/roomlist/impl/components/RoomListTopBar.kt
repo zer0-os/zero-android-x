@@ -190,7 +190,7 @@ private fun DefaultRoomListTopBar(
                             // Workaround to display a very subtle bloom for avatars with very soft colors
                             Color(0xFFF9F9F9)
                         } else {
-                            ElementTheme.materialColors.background
+                            ElementTheme.colors.bgCanvasDefault
                         },
                         blurSize = DpSize(avatarBloomSize, avatarBloomSize),
                         offset = DpOffset(24.dp, 24.dp + statusBarPadding),
@@ -202,7 +202,7 @@ private fun DefaultRoomListTopBar(
                         } else {
                             DpSize.Unspecified
                         },
-                        bottomSoftEdgeColor = ElementTheme.materialColors.background,
+                        bottomSoftEdgeColor = ElementTheme.colors.bgCanvasDefault,
                         bottomSoftEdgeAlpha = if (displayFilters) {
                             1f
                         } else {
@@ -279,7 +279,7 @@ private fun DefaultRoomListTopBar(
                                             leadingIcon = {
                                                 Icon(
                                                     imageVector = CompoundIcons.ShareAndroid(),
-                                                    tint = ElementTheme.materialColors.secondary,
+                                                    tint = ElementTheme.colors.iconSecondary,
                                                     contentDescription = null,
                                                 )
                                             }
@@ -295,7 +295,7 @@ private fun DefaultRoomListTopBar(
                                             leadingIcon = {
                                                 Icon(
                                                     imageVector = CompoundIcons.ChatProblem(),
-                                                    tint = ElementTheme.materialColors.secondary,
+                                                    tint = ElementTheme.colors.iconSecondary,
                                                     contentDescription = null,
                                                 )
                                             }

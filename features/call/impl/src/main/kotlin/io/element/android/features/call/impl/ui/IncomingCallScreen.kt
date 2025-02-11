@@ -174,6 +174,7 @@ internal fun IncomingCallScreenPreview() = ElementPreview {
             avatarUrl = null,
             notificationChannelId = "incoming_call",
             timestamp = 0L,
+            textContent = null,
         ),
         onAnswer = {},
         onCancel = {},

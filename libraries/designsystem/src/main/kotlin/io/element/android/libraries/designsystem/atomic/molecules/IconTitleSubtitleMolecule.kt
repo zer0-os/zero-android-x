@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +51,7 @@ fun IconTitleSubtitleMolecule(
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = ElementTheme.zeroTypography.fontHeadingMdBold,
-            color = MaterialTheme.colorScheme.primary,
+            color = ElementTheme.colors.textPrimary,
         )
         if (subTitle != null) {
             Spacer(Modifier.height(8.dp))
@@ -61,7 +60,7 @@ fun IconTitleSubtitleMolecule(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = ElementTheme.zeroTypography.fontBodyMdRegular,
-                color = MaterialTheme.colorScheme.secondary,
+                color = ElementTheme.colors.textSecondary,
             )
         }
     }

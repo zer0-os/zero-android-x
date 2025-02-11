@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -56,8 +55,8 @@ fun TimelineEventTimestampView(
     val formattedTime = event.sentTime
     val hasEncryptionCritical = event.messageShield?.isCritical.orFalse()
     val isMessageEdited = event.content.isEdited()
-    // val tint = if (hasError || hasEncryptionCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-    val tint = MaterialTheme.colorScheme.secondary
+    // val tint = if (hasError || hasEncryptionCritical) ElementTheme.colors.textCriticalPrimary else ElementTheme.colors.textSecondary
+    val tint = ElementTheme.colors.textSecondary
     Row(
         modifier = Modifier
                 .padding(PaddingValues(start = TimelineEventTimestampViewDefaults.spacing))

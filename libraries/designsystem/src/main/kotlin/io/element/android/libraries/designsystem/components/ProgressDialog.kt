@@ -116,7 +116,7 @@ private fun ProgressDialogContent(
                 Spacer(modifier = Modifier.height(22.dp))
                 Text(
                     text = text,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = ElementTheme.colors.textPrimary,
                 )
             }
             if (showCancelButton) {

@@ -558,6 +558,7 @@ class RustMatrixClient(
 
     override suspend fun logout(userInitiated: Boolean, ignoreSdkError: Boolean): String? {
         var result: String? = null
+        sessionCoroutineScope.cancel()
         // Remove current delegate so we don't receive an auth error
         clientDelegateTaskHandle?.cancelAndDestroy()
         clientDelegateTaskHandle = null

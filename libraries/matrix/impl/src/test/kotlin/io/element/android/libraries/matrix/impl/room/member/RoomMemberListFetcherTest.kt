@@ -38,7 +38,7 @@ class RoomMemberListFetcherTest {
             )
         })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             assertThat(awaitItem()).isInstanceOf(MatrixRoomMembersState.Unknown::class.java)
 
@@ -59,7 +59,7 @@ class RoomMemberListFetcherTest {
             FakeRustRoomMembersIterator(emptyList())
         })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = CACHE)
             assertThat(awaitItem()).isInstanceOf(MatrixRoomMembersState.Unknown::class.java)
@@ -74,7 +74,7 @@ class RoomMemberListFetcherTest {
             error("Some unexpected issue")
         })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = CACHE)
             assertThat(awaitItem()).isInstanceOf(MatrixRoomMembersState.Unknown::class.java)
@@ -95,7 +95,7 @@ class RoomMemberListFetcherTest {
             )
         })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, pageSize = 2)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, pageSize = 2, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = CACHE)
 
@@ -122,7 +122,7 @@ class RoomMemberListFetcherTest {
             )
         })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = SERVER)
 
@@ -136,7 +136,7 @@ class RoomMemberListFetcherTest {
     fun `fetchRoomMembers with SERVER source - on error it emits an Error item`() = runTest {
         val room = FakeRustRoom(getMembers = { error("An unexpected error") })
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = SERVER)
 
@@ -163,7 +163,7 @@ class RoomMemberListFetcherTest {
             }
         )
 
-        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default)
+        val fetcher = RoomMemberListFetcher(room, Dispatchers.Default, zeroUserRepository = null)
         fetcher.membersFlow.test {
             fetcher.fetchRoomMembers(source = CACHE_AND_SERVER)
             // Initial
