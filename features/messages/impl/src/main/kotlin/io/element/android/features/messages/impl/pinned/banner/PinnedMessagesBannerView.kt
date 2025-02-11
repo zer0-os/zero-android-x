@@ -109,7 +109,7 @@ private fun PinnedMessagesBannerRow(
         Icon(
             imageVector = CompoundIcons.PinSolid(),
             contentDescription = null,
-            tint = ElementTheme.materialColors.secondary,
+            tint = ElementTheme.colors.iconSecondary,
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .size(20.dp)

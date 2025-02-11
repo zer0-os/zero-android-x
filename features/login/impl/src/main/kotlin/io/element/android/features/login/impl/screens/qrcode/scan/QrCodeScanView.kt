@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.progressSemantics
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -139,7 +138,7 @@ private fun ColumnScope.Buttons(
                     ) {
                         Icon(
                             imageVector = CompoundIcons.Error(),
-                            tint = MaterialTheme.colorScheme.error,
+                            tint = ElementTheme.colors.iconCriticalPrimary,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -152,7 +151,7 @@ private fun ColumnScope.Buttons(
                                 else -> stringResource(R.string.screen_qr_code_login_invalid_scan_state_subtitle)
                             },
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.error,
+                            color = ElementTheme.colors.textCriticalPrimary,
                             style = ElementTheme.zeroTypography.fontBodySmMedium,
                         )
                     }

@@ -86,6 +86,7 @@ class RustMatrixClientFactory @Inject constructor(
 
         val syncService = client.syncService()
             .withUtdHook(UtdTracker(analyticsService))
+            .withOfflineMode()
             .finish()
 
         return RustMatrixClient(
@@ -130,9 +131,9 @@ class RustMatrixClientFactory @Inject constructor(
             .useEventCachePersistentStorage(featureFlagService.isFeatureEnabled(FeatureFlags.EventCache))
             .roomKeyRecipientStrategy(
                 strategy = if (featureFlagService.isFeatureEnabled(FeatureFlags.OnlySignedDeviceIsolationMode)) {
-                    CollectStrategy.IdentityBasedStrategy
+                    CollectStrategy.IDENTITY_BASED_STRATEGY
                 } else {
-                    CollectStrategy.DeviceBasedStrategy(onlyAllowTrustedDevices = false, errorOnVerifiedUserProblem = true)
+                    CollectStrategy.ERROR_ON_VERIFIED_USER_PROBLEM
                 }
             )
             .roomDecryptionTrustRequirement(

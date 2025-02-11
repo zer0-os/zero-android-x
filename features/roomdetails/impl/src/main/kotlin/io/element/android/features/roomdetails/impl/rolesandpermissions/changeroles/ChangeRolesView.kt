@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -357,7 +356,7 @@ private fun MemberRow(
                     text = name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = ElementTheme.colors.textPrimary,
                     style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 )
                 // Invitation pending marker
@@ -366,7 +365,7 @@ private fun MemberRow(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.screen_room_member_list_pending_header_title),
                         style = ElementTheme.zeroTypography.fontBodySmRegular.copy(fontStyle = FontStyle.Italic),
-                        color = MaterialTheme.colorScheme.secondary
+                        color = ElementTheme.colors.textSecondary
                     )
                 }
             }
@@ -374,7 +373,7 @@ private fun MemberRow(
             userId?.let {
                 Text(
                     text = userId,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = ElementTheme.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = ElementTheme.zeroTypography.fontBodySmRegular,

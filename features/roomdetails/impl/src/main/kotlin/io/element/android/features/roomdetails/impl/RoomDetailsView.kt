@@ -439,7 +439,7 @@ private fun TitleAndSubtitle(
             Text(
                 text = subtitle,
                 style = ElementTheme.zeroTypography.fontBodyLgRegular,
-                color = MaterialTheme.colorScheme.secondary,
+                color = ElementTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
             )
         }

@@ -10,10 +10,12 @@ package io.element.android.libraries.designsystem.theme
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.theme.Theme
 import io.element.android.compound.theme.isDark
+import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.compound.theme.toMaterialColorScheme
 import io.element.android.compound.tokens.generated.compoundColorsDark
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
@@ -29,6 +31,7 @@ import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 @Composable
 fun ElementThemeApp(
     appPreferencesStore: AppPreferencesStore,
+    enterpriseService: EnterpriseService,
     content: @Composable () -> Unit,
 ) {
     /*val theme by remember {
@@ -45,9 +48,13 @@ fun ElementThemeApp(
             }
         )
     }
+    val compoundLight = remember { enterpriseService.semanticColorsLight() }
+    val compoundDark = remember { enterpriseService.semanticColorsDark() }
     ElementTheme(
         darkTheme = theme.isDark(),
         content = content,
+        compoundLight = compoundLight,
+        compoundDark = compoundDark,
         typography = zeroTypography,
         materialColorsDark = compoundColorsDark
             .toMaterialColorScheme()

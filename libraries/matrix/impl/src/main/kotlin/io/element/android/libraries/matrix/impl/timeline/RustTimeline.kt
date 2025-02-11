@@ -49,6 +49,7 @@ import io.element.android.support.zero.data.repository.ConversationRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -181,7 +182,7 @@ class RustTimeline(
                 updatePaginationStatus(direction) { it.copy(isPaginating = true) }
                 when (direction) {
                     Timeline.PaginationDirection.BACKWARDS -> inner.paginateBackwards(PAGINATION_SIZE.toUShort())
-                    Timeline.PaginationDirection.FORWARDS -> inner.focusedPaginateForwards(PAGINATION_SIZE.toUShort())
+                    Timeline.PaginationDirection.FORWARDS -> inner.paginateForwards(PAGINATION_SIZE.toUShort())
                 }
             }.onFailure { error ->
                 if (error is TimelineException.CannotPaginate) {
@@ -298,7 +299,7 @@ class RustTimeline(
         htmlBody: String?,
         intentionalMentions: List<IntentionalMention>,
     ): Result<Unit> = withContext(dispatcher) {
-        runCatching<Unit> {
+        runCatching {
             val editedContent = EditedContent.RoomMessage(
                 content = MessageEventContent.from(
                     body = body,
@@ -326,10 +327,12 @@ class RustTimeline(
                 },
                 mentions = null,
             )
-            inner.edit(
-                newContent = editedContent,
-                eventOrTransactionId = eventOrTransactionId.toRustEventOrTransactionId(),
-            )
+            withContext(Dispatchers.IO) {
+                inner.edit(
+                    newContent = editedContent,
+                    eventOrTransactionId = eventOrTransactionId.toRustEventOrTransactionId(),
+                )
+            }
         }
     }
 
@@ -525,7 +528,7 @@ class RustTimeline(
                 newContent = editedContent,
                 eventOrTransactionId = RustEventOrTransactionId.EventId(pollStartId.value),
             )
-        }.map { }
+        }
     }
 
     override suspend fun sendPollResponse(
