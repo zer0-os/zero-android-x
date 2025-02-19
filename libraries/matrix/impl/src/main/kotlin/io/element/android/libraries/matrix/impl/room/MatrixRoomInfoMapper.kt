@@ -37,7 +37,6 @@ class MatrixRoomInfoMapper {
             topic = it.topic,
             avatarUrl = it.avatarUrl ?: it.heroes.firstOrNull()?.avatarUrl,
             isDirect = it.isDirect,
-            isPublic = it.isPublic,
             joinRule = it.joinRule?.map(),
             isSpace = it.isSpace,
             isTombstoned = it.isTombstoned,

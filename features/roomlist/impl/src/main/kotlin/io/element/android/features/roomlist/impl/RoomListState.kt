@@ -61,7 +61,6 @@ enum class SecurityBannerState {
     None,
     SetUpRecovery,
     RecoveryKeyConfirmation,
-    NeedsNativeSlidingSyncMigration,
 }
 
 @Immutable
