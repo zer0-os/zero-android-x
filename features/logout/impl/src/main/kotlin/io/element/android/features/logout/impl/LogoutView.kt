@@ -46,7 +46,6 @@ fun LogoutView(
     state: LogoutState,
     onChangeRecoveryKeyClick: () -> Unit,
     onBackClick: () -> Unit,
-    onSuccessLogout: (logoutUrlResult: String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val eventSink = state.eventSink
@@ -80,9 +79,6 @@ fun LogoutView(
         },
         onDismissDialog = {
             eventSink(LogoutEvents.CloseDialogs)
-        },
-        onSuccessLogout = {
-            onSuccessLogout(it)
         },
     )
 }
@@ -178,7 +174,6 @@ internal fun LogoutViewPreview(
     LogoutView(
         state,
         onChangeRecoveryKeyClick = {},
-        onSuccessLogout = {},
         onBackClick = {},
     )
 }

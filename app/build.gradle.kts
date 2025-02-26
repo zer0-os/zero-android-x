@@ -10,6 +10,7 @@
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.android.build.gradle.tasks.GenerateBuildConfig
+import config.BuildTimeConfig
 import extension.AssetCopyTask
 import extension.ComponentMergingStrategy
 import extension.GitBranchNameValueSource
@@ -50,10 +51,8 @@ android {
     defaultConfig {
         applicationId = if (CURRENT_APP_TIER == APP_TIER_ZERO) {
             "com.zero.android.messenger"
-        } else if (isEnterpriseBuild) {
-            "io.element.enterprise"
         } else {
-            "io.element.android.x"
+            BuildTimeConfig.APPLICATION_ID
         }
         targetSdk = Versions.TARGET_SDK
         versionCode = Versions.VERSION_CODE
@@ -104,11 +103,7 @@ android {
         }
     }
 
-    val baseAppName = if (isEnterpriseBuild) {
-        "Element Enterprise"
-    } else {
-        "Element X"
-    }
+    val baseAppName = BuildTimeConfig.APPLICATION_NAME
     logger.warnInBox("Building $baseAppName")
 
     buildTypes {
