@@ -184,11 +184,11 @@ fun RoomDetailsView(
                         state.eventSink(RoomDetailsEvent.SetFavorite(it))
                     }
                 )
-                if (state.canShowSecurityAndPrivacy) {
-                    SecurityAndPrivacyItem(
-                        onClick = onSecurityAndPrivacyClick
-                    )
-                }
+//                if (state.canShowSecurityAndPrivacy) {
+//                    SecurityAndPrivacyItem(
+//                        onClick = onSecurityAndPrivacyClick
+//                    )
+//                }
             }
 
             if (state.roomType is RoomDetailsType.Room) {
