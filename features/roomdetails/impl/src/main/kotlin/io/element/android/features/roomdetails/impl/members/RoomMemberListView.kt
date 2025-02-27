@@ -84,7 +84,7 @@ fun RoomMemberListView(
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (!state.isSearchActive) {
+            if (!state.isSearchActive && !state.isRoomAChannel) {
                 RoomMemberListTopBar(
                     canInvite = state.canInvite,
                     onBackClick = navigator::exitRoomMemberList,

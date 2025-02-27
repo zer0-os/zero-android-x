@@ -112,6 +112,7 @@ internal fun aRoomMemberListState(
     searchResults = searchResults,
     isSearchActive = false,
     canInvite = false,
+    isRoomAChannel = false,
     moderationState = moderationState,
     eventSink = {}
 )

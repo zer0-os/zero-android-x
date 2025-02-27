@@ -348,7 +348,7 @@ class RustTimeline(
             inner.sendReply(msg, eventId.value)
         }
         if (result.isSuccess) {
-            zeroConversationRepository?.onNewMessageSent(roomId = matrixRoom.roomId.value)
+            zeroConversationRepository?.onNewMessageSent(roomId = matrixRoom.roomId.value, matrixRoom.isRoomAChannel())
         }
         return@withContext result
     }

@@ -631,6 +631,8 @@ class FakeMatrixRoom(
     override suspend fun fetchDirectZeroUser() {
         // for now, do nothing
     }
+
+    override fun isRoomAChannel(): Boolean = false
 }
 
 fun defaultRoomPowerLevels() = MatrixRoomPowerLevels(

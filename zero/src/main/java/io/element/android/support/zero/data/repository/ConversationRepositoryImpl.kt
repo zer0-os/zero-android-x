@@ -8,11 +8,11 @@ class ConversationRepositoryImpl(
     private val zeroConversationService: ZeroConversationService
 ) : ConversationRepository {
 
-    override suspend fun onNewMessageSent(roomId: String) {
+    override suspend fun onNewMessageSent(roomId: String, isRoomAChannel: Boolean) {
         runCatching {
             val sentAt = System.currentTimeMillis()
             zeroConversationService.notifyMessage(
-                request = ZeroNotifyMessageRequest.newRequest(roomId, sentAt)
+                request = ZeroNotifyMessageRequest.newRequest(roomId, sentAt, isRoomAChannel)
             )
         }
     }

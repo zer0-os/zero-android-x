@@ -145,6 +145,7 @@ class RoomMemberListPresenter @AssistedInject constructor(
             searchResults = searchResults,
             isSearchActive = isSearchActive,
             canInvite = canInvite,
+            isRoomAChannel = room.isRoomAChannel(),
             moderationState = roomModerationState,
             eventSink = { handleEvents(it) },
         )

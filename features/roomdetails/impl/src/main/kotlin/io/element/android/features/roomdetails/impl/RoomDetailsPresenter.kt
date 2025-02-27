@@ -184,6 +184,7 @@ class RoomDetailsPresenter @Inject constructor(
             canShowKnockRequests = canShowKnockRequests,
             knockRequestsCount = knockRequestsCount,
             canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
+            isRoomAChannel = room.isRoomAChannel(),
             eventSink = ::handleEvents,
         )
     }
