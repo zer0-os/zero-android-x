@@ -111,6 +111,7 @@ fun aRoomDetailsState(
     canShowKnockRequests: Boolean = false,
     knockRequestsCount: Int? = null,
     canShowSecurityAndPrivacy: Boolean = true,
+    isRoomAChannel: Boolean = false,
     eventSink: (RoomDetailsEvent) -> Unit = {},
 ) = RoomDetailsState(
     roomId = roomId,
@@ -139,6 +140,7 @@ fun aRoomDetailsState(
     canShowKnockRequests = canShowKnockRequests,
     knockRequestsCount = knockRequestsCount,
     canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
+    isRoomAChannel = isRoomAChannel,
     eventSink = eventSink
 )
 

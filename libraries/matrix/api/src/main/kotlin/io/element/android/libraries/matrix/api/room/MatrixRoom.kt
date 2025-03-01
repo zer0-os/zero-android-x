@@ -458,4 +458,6 @@ interface MatrixRoom : Closeable {
     suspend fun updateJoinRule(joinRule: JoinRule): Result<Unit>
 
     suspend fun fetchDirectZeroUser()
+
+    fun isRoomAChannel(): Boolean
 }

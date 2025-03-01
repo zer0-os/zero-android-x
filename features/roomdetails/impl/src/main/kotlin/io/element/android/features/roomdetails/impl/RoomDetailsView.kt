@@ -111,7 +111,7 @@ fun RoomDetailsView(
         topBar = {
             RoomDetailsTopBar(
                 goBack = goBack,
-                showEdit = state.canEdit,
+                showEdit = state.canEdit && !state.isRoomAChannel,
                 onActionClick = onActionClick
             )
         },
@@ -203,7 +203,7 @@ fun RoomDetailsView(
                             onKnockRequestsClick = onKnockRequestsClick
                         )
                     }*/
-                    if (state.displayRolesAndPermissionsSettings) {
+                    if (state.displayRolesAndPermissionsSettings && !state.isRoomAChannel) {
                         ListItem(
                             headlineContent = { Text(stringResource(R.string.screen_room_details_roles_and_permissions)) },
                             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Admin())),
@@ -236,10 +236,12 @@ fun RoomDetailsView(
                 BlockUserDialogs(roomMemberState)
             }*/
 
-            OtherActionsSection(
-                isDm = state.roomType is RoomDetailsType.Dm,
-                onLeaveRoom = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
-            )
+            if (!state.isRoomAChannel) {
+                OtherActionsSection(
+                    isDm = state.roomType is RoomDetailsType.Dm,
+                    onLeaveRoom = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
+                )
+            }
         }
     }
 }
