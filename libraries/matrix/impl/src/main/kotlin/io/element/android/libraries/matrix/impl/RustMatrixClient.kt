@@ -545,6 +545,13 @@ class RustMatrixClient(
         clientDelegateTaskHandle?.cancelAndDestroy()
         notificationSettingsService.destroy()
         verificationService.destroy()
+
+        sessionDelegate.clearCurrentClient()
+        innerRoomListService.destroy()
+        notificationService.destroy()
+        notificationProcessSetup.destroy()
+        encryptionService.destroy()
+        innerClient.destroy()
     }
 
     override suspend fun getCacheSize(): Long {

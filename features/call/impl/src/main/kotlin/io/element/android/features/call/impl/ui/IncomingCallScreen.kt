@@ -101,7 +101,7 @@ internal fun IncomingCallScreen(
             ActionButton(
                 size = 64.dp,
                 onClick = { onAnswer(notificationData) },
-                icon = CompoundIcons.VoiceCall(),
+                icon = CompoundIcons.VoiceCallSolid(),
                 title = stringResource(CommonStrings.action_accept),
                 backgroundColor = ElementTheme.colors.iconSuccessPrimary,
                 borderColor = ElementTheme.colors.borderSuccessSubtle
