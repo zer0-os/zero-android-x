@@ -65,6 +65,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     api(projects.features.preferences.api)
 
+    implementation(platform(libs.network.okhttp.bom))
+    implementation(libs.network.okhttp)
+
     implementation(projects.zero)
 
     testImplementation(libs.test.junit)

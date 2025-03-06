@@ -57,6 +57,7 @@ fun CreateRoomRootView(
     onOpenDM: (RoomId) -> Unit,
     onInviteFriendsClick: () -> Unit,
     onJoinByAddressClick: () -> Unit,
+    onRoomDirectorySearchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -92,6 +93,7 @@ fun CreateRoomRootView(
                     onNewRoomClick = onNewRoomClick,
                     onInvitePeopleClick = onInviteFriendsClick,
                     onJoinByAddressClick = onJoinByAddressClick,
+                    onRoomDirectorySearchClick = onRoomDirectorySearchClick,
                     onDmClick = onOpenDM,
                 )
             }
@@ -139,7 +141,7 @@ private fun CreateRoomRootViewTopBar(
         title = {
             Text(
                 text = stringResource(id = CommonStrings.action_start_chat),
-                style = ElementTheme.zeroTypography.aliasScreenTitle,
+                style = ElementTheme.typography.aliasScreenTitle,
             )
         },
         navigationIcon = {
@@ -157,6 +159,7 @@ private fun CreateRoomActionButtonsList(
     onNewRoomClick: () -> Unit,
     onInvitePeopleClick: () -> Unit,
     onJoinByAddressClick: () -> Unit,
+    onRoomDirectorySearchClick: () -> Unit,
     onDmClick: (RoomId) -> Unit,
 ) {
     LazyColumn {
@@ -168,7 +171,16 @@ private fun CreateRoomActionButtonsList(
                 onClick = onNewRoomClick,
             )
         }
-        /*item {
+        /*if (state.isRoomDirectorySearchEnabled) {
+            item {
+                CreateRoomActionButton(
+                    iconRes = CompoundDrawables.ic_compound_list_bulleted,
+                    text = stringResource(id = R.string.screen_room_directory_search_title),
+                    onClick = onRoomDirectorySearchClick,
+                )
+            }
+        }
+        item {
             CreateRoomActionButton(
                 iconRes = CompoundDrawables.ic_compound_share_android,
                 text = stringResource(id = CommonStrings.action_invite_friends_to_app, state.applicationName),
@@ -244,5 +256,6 @@ internal fun CreateRoomRootViewPreview(@PreviewParameter(CreateRoomRootStateProv
             onOpenDM = {},
             onJoinByAddressClick = {},
             onInviteFriendsClick = {},
+            onRoomDirectorySearchClick = {},
         )
     }
