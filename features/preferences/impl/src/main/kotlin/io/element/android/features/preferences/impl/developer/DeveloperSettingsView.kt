@@ -21,24 +21,19 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.preferences.impl.R
-import io.element.android.features.preferences.impl.developer.tracing.LogLevelItem
-import io.element.android.features.rageshake.api.preferences.RageshakePreferencesView
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
-import io.element.android.libraries.designsystem.components.preferences.PreferenceDropdown
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
 import io.element.android.libraries.designsystem.components.preferences.PreferenceTextField
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
 import io.element.android.libraries.ui.strings.CommonStrings
-import kotlinx.collections.immutable.toPersistentList
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
 @Composable
@@ -192,9 +187,22 @@ private fun UserAccountCategory(
     }
 
     PreferenceCategory(title = "User Account", showTopDivider = false) {
-        PreferenceText(
-            title = "Delete account",
-            loadingCurrentValue = state.isDeleteAccountInProgress,
+        ListItem(
+            headlineContent = {
+                Text("Delete account")
+            },
+            trailingContent = if (state.isDeleteAccountInProgress) {
+                ListItemContent.Custom {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .progressSemantics()
+                            .size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+            } else {
+                null
+            },
             onClick = {
                 if (state.isDeleteAccountInProgress.not()) {
                     // show delete account confirmation dialog
