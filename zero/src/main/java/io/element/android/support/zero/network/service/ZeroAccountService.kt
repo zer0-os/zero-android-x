@@ -1,6 +1,7 @@
 package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
+import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -12,4 +13,7 @@ interface ZeroAccountService {
 
     @POST(value = "matrix/link-zero-user")
     suspend fun linkZeroUser(@Body payload: LinkZeroUserRequest)
+
+    @POST(value = "matrix/admin/reset-password")
+    suspend fun resetAccountPassword(@Body payload: ResetUserPasswordRequest): Response<ResponseBody>
 }

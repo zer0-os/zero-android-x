@@ -4,7 +4,6 @@ import io.element.android.support.zero.network.model.request.AuthoriseUserReques
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
-import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import io.element.android.support.zero.network.model.response.ApiInviter
 import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
 import io.element.android.support.zero.network.model.response.ZeroNonce
@@ -38,7 +37,4 @@ interface ZeroAuthService {
 
 	@POST(value = "authentication/nonceOrAuthorize")
 	suspend fun nonceOrAuthorise(@Header("Authorization") web3Token: String): ZeroAuthCredentials
-
-	@POST(value = "api/v2/accounts/request-password-reset")
-	suspend fun resetPassword(@Body request: ResetUserPasswordRequest)
 }

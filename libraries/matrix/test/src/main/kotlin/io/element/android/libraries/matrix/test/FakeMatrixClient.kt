@@ -369,5 +369,9 @@ class FakeMatrixClient(
     override suspend fun linkZeroUserIfRequired(): Result<Unit> {
         return Result.success(Unit)
     }
+
+    override suspend fun verifyUserPassword(password: String): Result<Unit> {
+        return Result.success(Unit)
+    }
     //endregion
 }

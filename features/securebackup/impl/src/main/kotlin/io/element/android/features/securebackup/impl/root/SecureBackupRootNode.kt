@@ -35,6 +35,7 @@ class SecureBackupRootNode @AssistedInject constructor(
         fun onChangeClick()
         fun onDisableClick()
         fun onConfirmRecoveryKeyClick()
+        fun onResetRecoveryKeyClick()
     }
 
     private fun onSetupClick() {
@@ -57,6 +58,10 @@ class SecureBackupRootNode @AssistedInject constructor(
         uriHandler.openUri(LearnMoreConfig.SECURE_BACKUP_URL)
     }
 
+    private fun onResetRecoveryKeyClick() {
+        plugins<Callback>().forEach { it.onResetRecoveryKeyClick() }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -69,6 +74,7 @@ class SecureBackupRootNode @AssistedInject constructor(
             onDisableClick = ::onDisableClick,
             onConfirmRecoveryKeyClick = ::onConfirmRecoveryKeyClick,
             onLearnMoreClick = { onLearnMoreClick(uriHandler) },
+            onResetRecoveryKeyClick = ::onResetRecoveryKeyClick,
             modifier = modifier,
         )
     }

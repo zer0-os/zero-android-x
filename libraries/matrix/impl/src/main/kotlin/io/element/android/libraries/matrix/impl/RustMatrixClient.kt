@@ -185,6 +185,7 @@ class RustMatrixClient(
     private val encryptionService = RustEncryptionService(
         client = innerClient,
         syncService = rustSyncService,
+        zeroAccountRepository = zeroAccountRepository,
         sessionCoroutineScope = sessionCoroutineScope,
         dispatchers = dispatchers,
     )
@@ -816,6 +817,13 @@ class RustMatrixClient(
         runCatching {
             val accountRepository = zeroAccountRepository ?: return@runCatching
             accountRepository.linkUserAccount(sessionId.value)
+        }
+    }
+
+    override suspend fun verifyUserPassword(password: String): Result<Unit> = withContext(sessionDispatcher) {
+        runCatching {
+            val accountRepository = zeroAccountRepository ?: return@runCatching
+            accountRepository.verifyUserPassword(password)
         }
     }
     //endregion

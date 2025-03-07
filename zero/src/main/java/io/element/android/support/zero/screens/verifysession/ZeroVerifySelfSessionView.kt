@@ -21,13 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
+import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.support.zero.R
@@ -42,7 +45,8 @@ import io.element.android.support.zero.screens.verifysession.components.TextBack
 @Composable
 fun ZeroVerifySelfSessionView(
     onSkipVerification: () -> Unit = {},
-    onEnterRecoveryKey: () -> Unit = {}
+    onEnterRecoveryKey: () -> Unit = {},
+    onResetRecoveryKey: () -> Unit = {},
 ) {
     var showBackModalCancellation: Boolean by remember { mutableStateOf(false) }
 
@@ -112,6 +116,12 @@ fun ZeroVerifySelfSessionView(
                     onClick = onEnterRecoveryKey
                 )
             }
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 32.dp),
+                text = "Forgot recovery key?",
+                onClick = { onResetRecoveryKey() },
+            )
         }
     }
 }

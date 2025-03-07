@@ -104,7 +104,7 @@ private fun Content() {
                         )
                     },
                 ),
-                InfoListItem(
+                /*InfoListItem(
                     message = stringResource(R.string.screen_encryption_reset_bullet_3),
                     iconComposable = {
                         Icon(
@@ -114,14 +114,14 @@ private fun Content() {
                             tint = ElementTheme.colors.iconSecondary,
                         )
                     },
-                ),
+                ),*/
             ),
         )
 
         Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.screen_encryption_reset_footer),
-            style = ElementTheme.zeroTypography.fontBodyMdMedium,
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            text = "Only reset your identity if you have access to your login password and you’ve lost your recovery key.",
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
             color = ElementTheme.colors.textActionPrimary,
             textAlign = TextAlign.Center,
         )

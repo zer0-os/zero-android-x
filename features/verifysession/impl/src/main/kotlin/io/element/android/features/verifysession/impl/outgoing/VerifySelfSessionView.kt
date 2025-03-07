@@ -155,7 +155,8 @@ fun VerifySelfSessionView(
                     onSkipVerification = {
                         state.eventSink(VerifySelfSessionViewEvents.SkipVerification)
                     },
-                    onEnterRecoveryKey = onEnterRecoveryKey
+                    onEnterRecoveryKey = onEnterRecoveryKey,
+                    onResetRecoveryKey = onResetKey
                 )
             }
         }

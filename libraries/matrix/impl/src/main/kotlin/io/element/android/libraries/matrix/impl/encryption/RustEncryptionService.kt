@@ -20,6 +20,7 @@ import io.element.android.libraries.matrix.api.encryption.IdentityResetHandle
 import io.element.android.libraries.matrix.api.encryption.RecoveryState
 import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.impl.sync.RustSyncService
+import io.element.android.support.zero.data.repository.AccountRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.currentCoroutineContext
@@ -46,6 +47,7 @@ import org.matrix.rustcomponents.sdk.SteadyStateException as RustSteadyStateExce
 internal class RustEncryptionService(
     client: Client,
     syncService: RustSyncService,
+    private val zeroAccountRepository: AccountRepository?,
     sessionCoroutineScope: CoroutineScope,
     private val dispatchers: CoroutineDispatchers,
 ) : EncryptionService {
@@ -197,7 +199,7 @@ internal class RustEncryptionService(
         return runCatching {
             service.resetIdentity()
         }.flatMap { handle ->
-            RustIdentityResetHandleFactory.create(sessionId, handle)
+            RustIdentityResetHandleFactory.create(sessionId, handle, zeroAccountRepository)
         }
     }
 
