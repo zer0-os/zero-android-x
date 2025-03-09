@@ -8,8 +8,6 @@
 package io.element.android.features.preferences.impl.notifications
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.progressSemantics
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,27 +18,22 @@ import androidx.lifecycle.Lifecycle
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.preferences.impl.R
 import io.element.android.libraries.androidutils.system.startNotificationSettingsIntent
-import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.Announcement
 import io.element.android.libraries.designsystem.components.AnnouncementType
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
-import io.element.android.libraries.designsystem.components.dialogs.ListOption
-import io.element.android.libraries.designsystem.components.dialogs.SingleSelectionDialog
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
-import io.element.android.libraries.designsystem.components.preferences.PreferenceText
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
+import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.ui.strings.CommonStrings
-import kotlinx.collections.immutable.toImmutableList
 
 /**
  * A view that allows a user edit their global notification settings.
@@ -109,13 +102,19 @@ private fun NotificationSettingsContentView(
     val context = LocalContext.current
     val systemSettings: NotificationSettingsState.AppSettings = state.appSettings
     if (systemSettings.appNotificationsEnabled && !systemSettings.systemNotificationsEnabled) {
-        PreferenceText(
-            icon = CompoundIcons.NotificationsOffSolid(),
-            title = stringResource(id = R.string.screen_notification_settings_system_notifications_turned_off),
-            subtitle = stringResource(
-                id = R.string.screen_notification_settings_system_notifications_action_required,
-                stringResource(id = R.string.screen_notification_settings_system_notifications_action_required_content_link)
-            ),
+        ListItem(
+            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.NotificationsOffSolid())),
+            headlineContent = {
+                Text(stringResource(id = R.string.screen_notification_settings_system_notifications_turned_off))
+            },
+            supportingContent = {
+                Text(
+                    stringResource(
+                        id = R.string.screen_notification_settings_system_notifications_action_required,
+                        stringResource(id = R.string.screen_notification_settings_system_notifications_action_required_content_link)
+                    )
+                )
+            },
             onClick = {
                 context.startNotificationSettingsIntent()
             }
@@ -131,10 +130,14 @@ private fun NotificationSettingsContentView(
     if (systemSettings.appNotificationsEnabled) {
         /*if (!state.fullScreenIntentPermissionsState.permissionGranted) {
             PreferenceCategory {
-                PreferenceText(
-                    icon = CompoundIcons.VoiceCall(),
-                    title = stringResource(id = R.string.full_screen_intent_banner_title),
-                    subtitle = stringResource(R.string.full_screen_intent_banner_message),
+                ListItem(
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.VoiceCallSolid())),
+                    headlineContent = {
+                        Text(stringResource(id = R.string.full_screen_intent_banner_title))
+                    },
+                    supportingContent = {
+                        Text(stringResource(R.string.full_screen_intent_banner_message))
+                    },
                     onClick = {
                         state.fullScreenIntentPermissionsState.openFullScreenIntentSettings()
                     }
@@ -142,15 +145,22 @@ private fun NotificationSettingsContentView(
             }
         }*/
         PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_notification_section_title)) {
-            PreferenceText(
-                title = stringResource(id = R.string.screen_notification_settings_group_chats),
-                subtitle = getTitleForRoomNotificationMode(mode = matrixSettings.defaultGroupNotificationMode),
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(id = R.string.screen_notification_settings_group_chats))
+                },
+                supportingContent = {
+                    Text(getTitleForRoomNotificationMode(mode = matrixSettings.defaultGroupNotificationMode))
+                },
                 onClick = onGroupChatsClick
             )
-
-            PreferenceText(
-                title = stringResource(id = R.string.screen_notification_settings_direct_chats),
-                subtitle = getTitleForRoomNotificationMode(mode = matrixSettings.defaultOneToOneNotificationMode),
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(id = R.string.screen_notification_settings_direct_chats))
+                },
+                supportingContent = {
+                    Text(getTitleForRoomNotificationMode(mode = matrixSettings.defaultOneToOneNotificationMode))
+                },
                 onClick = onDirectChatsClick
             )
         }
@@ -180,9 +190,10 @@ private fun NotificationSettingsContentView(
             )
         }
         /*PreferenceCategory(title = stringResource(id = R.string.troubleshoot_notifications_entry_point_section)) {
-            PreferenceText(
-                modifier = Modifier,
-                title = stringResource(id = R.string.troubleshoot_notifications_entry_point_title),
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(id = R.string.troubleshoot_notifications_entry_point_title))
+                },
                 onClick = onTroubleshootNotificationsClick
             )
         }
@@ -206,7 +217,7 @@ private fun NotificationSettingsContentView(
                             stringResource(id = CommonStrings.common_error)
                         )
                         is AsyncData.Success -> ListItemContent.Text(
-                            state.currentPushDistributor.dataOrNull() ?: ""
+                            state.currentPushDistributor.dataOrNull()?.name ?: ""
                         )
                     },
                     onClick = {
@@ -219,8 +230,14 @@ private fun NotificationSettingsContentView(
             if (state.showChangePushProviderDialog) {
                 SingleSelectionDialog(
                     title = stringResource(id = R.string.screen_advanced_settings_choose_distributor_dialog_title_android),
-                    options = state.availablePushDistributors.map {
-                        ListOption(title = it)
+                    options = state.availablePushDistributors.map { distributor ->
+                        // If there are several distributors with the same name, use the full name
+                        val title = if (state.availablePushDistributors.count { it.name == distributor.name } > 1) {
+                            distributor.fullName
+                        } else {
+                            distributor.name
+                        }
+                        ListOption(title = title)
                     }.toImmutableList(),
                     initialSelection = state.availablePushDistributors.indexOf(state.currentPushDistributor.dataOrNull()),
                     onSelectOption = { index ->

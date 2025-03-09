@@ -91,6 +91,10 @@ class SecureBackupFlowNode @AssistedInject constructor(
                     override fun onConfirmRecoveryKeyClick() {
                         backstack.push(NavTarget.EnterRecoveryKey)
                     }
+
+                    override fun onResetRecoveryKeyClick() {
+                        backstack.push(NavTarget.ResetIdentity)
+                    }
                 }
                 createNode<SecureBackupRootNode>(buildContext, listOf(callback))
             }

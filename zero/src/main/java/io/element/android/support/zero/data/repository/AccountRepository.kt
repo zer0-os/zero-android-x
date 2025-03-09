@@ -4,4 +4,6 @@ interface AccountRepository {
     suspend fun deleteUserAccount()
 
     suspend fun linkUserAccount(userMatrixId: String)
+
+    suspend fun verifyUserPassword(password: String): Boolean
 }

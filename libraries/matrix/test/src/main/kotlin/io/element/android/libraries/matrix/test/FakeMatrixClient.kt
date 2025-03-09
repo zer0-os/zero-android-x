@@ -49,7 +49,6 @@ import io.element.android.tests.testutils.lambda.lambdaRecorder
 import io.element.android.tests.testutils.simulateLongTask
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,7 +73,7 @@ class FakeMatrixClient(
     private val syncService: FakeSyncService = FakeSyncService(),
     private val encryptionService: FakeEncryptionService = FakeEncryptionService(),
     private val roomDirectoryService: RoomDirectoryService = FakeRoomDirectoryService(),
-    private val accountManagementUrlString: Result<String?> = Result.success(null),
+    private val accountManagementUrlResult: (AccountManagementAction?) -> Result<String?> = { lambdaError() },
     private val resolveRoomAliasResult: (RoomAlias) -> Result<Optional<ResolvedRoomAlias>> = {
         Result.success(
             Optional.of(ResolvedRoomAlias(A_ROOM_ID, emptyList()))
@@ -87,7 +86,10 @@ class FakeMatrixClient(
     private val canDeactivateAccountResult: () -> Boolean = { lambdaError() },
     private val deactivateAccountResult: (String, Boolean) -> Result<Unit> = { _, _ -> lambdaError() },
     private val currentSlidingSyncVersionLambda: () -> Result<SlidingSyncVersion> = { lambdaError() },
-    private val availableSlidingSyncVersionsLambda: () -> Result<List<SlidingSyncVersion>> = { lambdaError() }
+    private val availableSlidingSyncVersionsLambda: () -> Result<List<SlidingSyncVersion>> = { lambdaError() },
+    private val ignoreUserResult: (UserId) -> Result<Unit> = { lambdaError() },
+    private var unIgnoreUserResult: (UserId) -> Result<Unit> = { Result.success(Unit) },
+    override val ignoredUsersFlow: StateFlow<ImmutableList<UserId>> = MutableStateFlow(persistentListOf()),
 ) : MatrixClient {
     var setDisplayNameCalled: Boolean = false
         private set
@@ -98,10 +100,7 @@ class FakeMatrixClient(
 
     private val _userProfile: MutableStateFlow<MatrixUser> = MutableStateFlow(MatrixUser(sessionId, userDisplayName, userAvatarUrl))
     override val userProfile: StateFlow<MatrixUser> = _userProfile
-    override val ignoredUsersFlow: MutableStateFlow<ImmutableList<UserId>> = MutableStateFlow(persistentListOf())
 
-    private var ignoreUserResult: Result<Unit> = Result.success(Unit)
-    private var unignoreUserResult: Result<Unit> = Result.success(Unit)
     private var createRoomResult: Result<RoomId> = Result.success(A_ROOM_ID)
     private var createDmResult: Result<RoomId> = Result.success(A_ROOM_ID)
     private var findDmResult: RoomId? = A_ROOM_ID
@@ -140,11 +139,11 @@ class FakeMatrixClient(
     }
 
     override suspend fun ignoreUser(userId: UserId): Result<Unit> = simulateLongTask {
-        return ignoreUserResult
+        return ignoreUserResult(userId)
     }
 
     override suspend fun unignoreUser(userId: UserId): Result<Unit> = simulateLongTask {
-        return unignoreUserResult
+        return unIgnoreUserResult(userId)
     }
 
     override suspend fun createRoom(createRoomParams: CreateRoomParameters): Result<RoomId> = simulateLongTask {
@@ -193,8 +192,8 @@ class FakeMatrixClient(
         return Result.success(result)
     }
 
-    override suspend fun getAccountManagementUrl(action: AccountManagementAction?): Result<String?> {
-        return accountManagementUrlString
+    override suspend fun getAccountManagementUrl(action: AccountManagementAction?): Result<String?> = simulateLongTask {
+        accountManagementUrlResult(action)
     }
 
     override suspend fun uploadMedia(
@@ -244,10 +243,6 @@ class FakeMatrixClient(
         return RoomMembershipObserver()
     }
 
-    suspend fun emitIgnoreUserList(users: List<UserId>) {
-        ignoredUsersFlow.emit(users.toImmutableList())
-    }
-
     // Mocks
 
     fun givenCreateRoomResult(result: Result<RoomId>) {
@@ -256,14 +251,6 @@ class FakeMatrixClient(
 
     fun givenCreateDmResult(result: Result<RoomId>) {
         createDmResult = result
-    }
-
-    fun givenIgnoreUserResult(result: Result<Unit>) {
-        ignoreUserResult = result
-    }
-
-    fun givenUnignoreUserResult(result: Result<Unit>) {
-        unignoreUserResult = result
     }
 
     fun givenFindDmResult(result: RoomId?) {
@@ -380,6 +367,10 @@ class FakeMatrixClient(
     }
 
     override suspend fun linkZeroUserIfRequired(): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override suspend fun verifyUserPassword(password: String): Result<Unit> {
         return Result.success(Unit)
     }
     //endregion

@@ -11,6 +11,7 @@ import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.encryption.IdentityOidcResetHandle
 import io.element.android.libraries.matrix.api.encryption.IdentityPasswordResetHandle
 import io.element.android.libraries.matrix.api.encryption.IdentityResetHandle
+import io.element.android.support.zero.data.repository.AccountRepository
 import org.matrix.rustcomponents.sdk.AuthData
 import org.matrix.rustcomponents.sdk.AuthDataPasswordDetails
 import org.matrix.rustcomponents.sdk.CrossSigningResetAuthType
@@ -18,14 +19,15 @@ import org.matrix.rustcomponents.sdk.CrossSigningResetAuthType
 object RustIdentityResetHandleFactory {
     fun create(
         userId: UserId,
-        identityResetHandle: org.matrix.rustcomponents.sdk.IdentityResetHandle?
+        identityResetHandle: org.matrix.rustcomponents.sdk.IdentityResetHandle?,
+        zeroAccountRepository: AccountRepository?,
     ): Result<IdentityResetHandle?> {
         return runCatching {
             identityResetHandle?.let {
                 when (val authType = identityResetHandle.authType()) {
                     is CrossSigningResetAuthType.Oidc -> RustOidcIdentityResetHandle(identityResetHandle, authType.info.approvalUrl)
                     // User interactive authentication (user + password)
-                    CrossSigningResetAuthType.Uiaa -> RustPasswordIdentityResetHandle(userId, identityResetHandle)
+                    CrossSigningResetAuthType.Uiaa -> RustPasswordIdentityResetHandle(userId, identityResetHandle, zeroAccountRepository)
                 }
             }
         }
@@ -35,9 +37,20 @@ object RustIdentityResetHandleFactory {
 class RustPasswordIdentityResetHandle(
     private val userId: UserId,
     private val identityResetHandle: org.matrix.rustcomponents.sdk.IdentityResetHandle,
+    private val zeroAccountRepository: AccountRepository?,
 ) : IdentityPasswordResetHandle {
     override suspend fun resetPassword(password: String): Result<Unit> {
-        return runCatching { identityResetHandle.reset(AuthData.Password(AuthDataPasswordDetails(userId.value, password))) }
+        return runCatching {
+            val accountRepository = zeroAccountRepository ?: return@runCatching
+            val isPasswordVerified = accountRepository.verifyUserPassword(password)
+            if (isPasswordVerified) {
+                identityResetHandle.reset(
+                    AuthData.Password(AuthDataPasswordDetails(userId.value, password))
+                )
+            } else {
+                throw Exception("Incorrect password.")
+            }
+        }
     }
 
     override suspend fun cancel() {

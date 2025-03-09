@@ -20,6 +20,7 @@ import io.element.android.libraries.matrix.api.encryption.IdentityResetHandle
 import io.element.android.libraries.matrix.api.encryption.RecoveryState
 import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.impl.sync.RustSyncService
+import io.element.android.support.zero.data.repository.AccountRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.currentCoroutineContext
@@ -46,6 +47,7 @@ import org.matrix.rustcomponents.sdk.SteadyStateException as RustSteadyStateExce
 internal class RustEncryptionService(
     client: Client,
     syncService: RustSyncService,
+    private val zeroAccountRepository: AccountRepository?,
     sessionCoroutineScope: CoroutineScope,
     private val dispatchers: CoroutineDispatchers,
 ) : EncryptionService {
@@ -186,18 +188,18 @@ internal class RustEncryptionService(
     }
 
     override suspend fun deviceCurve25519(): String? {
-        return service.curve25519Key()
+        return runCatching { service.curve25519Key() }.getOrNull()
     }
 
     override suspend fun deviceEd25519(): String? {
-        return service.ed25519Key()
+        return runCatching { service.ed25519Key() }.getOrNull()
     }
 
     override suspend fun startIdentityReset(): Result<IdentityResetHandle?> {
         return runCatching {
             service.resetIdentity()
         }.flatMap { handle ->
-            RustIdentityResetHandleFactory.create(sessionId, handle)
+            RustIdentityResetHandleFactory.create(sessionId, handle, zeroAccountRepository)
         }
     }
 
@@ -218,5 +220,9 @@ internal class RustEncryptionService(
             userId = userId.value,
             // requestFromHomeserverIfNeeded = true,
         ) ?: error("User identity not found")
+    }
+
+    fun destroy() {
+        service.destroy()
     }
 }

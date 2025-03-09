@@ -1,6 +1,7 @@
 package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
+import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroUserService
 
@@ -23,5 +24,11 @@ class AccountRepositoryImpl(
                 zeroAccountService.linkZeroUser(payload)
             }
         }
+    }
+
+    override suspend fun verifyUserPassword(password: String): Boolean {
+        return runCatching {
+            zeroAccountService.resetAccountPassword(ResetUserPasswordRequest(password)).isSuccessful
+        }.getOrDefault(false)
     }
 }

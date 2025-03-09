@@ -185,6 +185,8 @@ interface MatrixClient : Closeable {
     suspend fun deleteUserAccount(): Result<Unit>
 
     suspend fun linkZeroUserIfRequired(): Result<Unit>
+
+    suspend fun verifyUserPassword(password: String): Result<Unit>
 }
 
 /**

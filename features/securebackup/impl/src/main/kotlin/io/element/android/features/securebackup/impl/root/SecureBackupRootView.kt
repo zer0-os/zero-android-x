@@ -7,6 +7,7 @@
 
 package io.element.android.features.securebackup.impl.root
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.runtime.Composable
@@ -43,6 +44,7 @@ fun SecureBackupRootView(
     onDisableClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onLearnMoreClick: () -> Unit,
+    onResetRecoveryKeyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
@@ -186,28 +188,53 @@ fun SecureBackupRootView(
                 )
             }
             RecoveryState.INCOMPLETE ->
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_confirm),
-                        )
-                    },
-                    supportingContent = {
-                        Text(
-                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_confirm_description),
-                        )
-                    },
-                    trailingContent = ListItemContent.Badge,
-                    enabled = state.isKeyStorageEnabled,
-                    alwaysClickable = true,
-                    onClick = {
-                        if (state.isKeyStorageEnabled) {
-                            onConfirmRecoveryKeyClick()
-                        } else {
-                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
-                        }
-                    },
-                )
+                Column {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.screen_chat_backup_recovery_action_confirm),
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(id = R.string.screen_chat_backup_recovery_action_confirm_description),
+                            )
+                        },
+                        trailingContent = ListItemContent.Badge,
+                        enabled = state.isKeyStorageEnabled,
+                        alwaysClickable = true,
+                        onClick = {
+                            if (state.isKeyStorageEnabled) {
+                                onConfirmRecoveryKeyClick()
+                            } else {
+                                state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
+                            }
+                        },
+                    )
+
+                    HorizontalDivider()
+
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = "Forgot recovery key?",
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Reset your identity and create a new recovery key in case you lost your current one.",
+                            )
+                        },
+                        alwaysClickable = true,
+                        onClick = {
+                            if (state.isKeyStorageEnabled) {
+                                onResetRecoveryKeyClick()
+                            } else {
+                                state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
+                            }
+                        },
+                    )
+                }
         }
     }
 
@@ -249,5 +276,6 @@ internal fun SecureBackupRootViewPreview(
         onDisableClick = {},
         onConfirmRecoveryKeyClick = {},
         onLearnMoreClick = {},
+        onResetRecoveryKeyClick = {},
     )
 }

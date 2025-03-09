@@ -7,6 +7,8 @@
 
 package io.element.android.features.preferences.impl.developer
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -16,23 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.preferences.impl.R
-import io.element.android.features.preferences.impl.developer.tracing.LogLevelItem
-import io.element.android.features.rageshake.api.preferences.RageshakePreferencesView
+import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
-import io.element.android.libraries.designsystem.components.preferences.PreferenceDropdown
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
-import io.element.android.libraries.designsystem.components.preferences.PreferenceText
 import io.element.android.libraries.designsystem.components.preferences.PreferenceTextField
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
+import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
 import io.element.android.libraries.ui.strings.CommonStrings
-import kotlinx.collections.immutable.toPersistentList
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
 @Composable
@@ -64,13 +65,15 @@ fun DeveloperSettingsView(
                 selectedOption = state.tracingLogLevel.dataOrNull(),
                 options = LogLevelItem.entries.toPersistentList(),
                 onSelectOption = { logLevel ->
-                     state.eventSink(DeveloperSettingsEvents.SetTracingLogLevel(logLevel))
+                    state.eventSink(DeveloperSettingsEvents.SetTracingLogLevel(logLevel))
                 }
             )
         }
         PreferenceCategory(title = "Showkase") {
-            PreferenceText(
-                title = "Open Showkase browser",
+            ListItem(
+                headlineContent = {
+                    Text("Open Showkase browser")
+                },
                 onClick = onOpenShowkase
             )
         }
@@ -78,8 +81,10 @@ fun DeveloperSettingsView(
             state = state.rageshakeState,
         )
         PreferenceCategory(title = "Crash", showTopDivider = false) {
-            PreferenceText(
-                title = "Crash the app 💥",
+            ListItem(
+                headlineContent = {
+                    Text("Crash the app 💥")
+                },
                 onClick = { error("This crash is a test.") }
             )
         }*/
@@ -87,10 +92,22 @@ fun DeveloperSettingsView(
 
         val cache = state.cacheSize
         PreferenceCategory(title = "Cache", showTopDivider = false) {
-            PreferenceText(
-                title = "Clear cache",
-                currentValue = cache.dataOrNull(),
-                loadingCurrentValue = state.cacheSize.isLoading() || state.clearCacheAction.isLoading(),
+            ListItem(
+                headlineContent = {
+                    Text("Clear cache")
+                },
+                trailingContent = if (state.cacheSize.isLoading() || state.clearCacheAction.isLoading()) {
+                    ListItemContent.Custom {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .progressSemantics()
+                                .size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
+                } else {
+                    ListItemContent.Text(cache.dataOrNull().orEmpty())
+                },
                 onClick = {
                     if (state.clearCacheAction.isLoading().not()) {
                         state.eventSink(DeveloperSettingsEvents.ClearCache)
@@ -170,9 +187,22 @@ private fun UserAccountCategory(
     }
 
     PreferenceCategory(title = "User Account", showTopDivider = false) {
-        PreferenceText(
-            title = "Delete account",
-            loadingCurrentValue = state.isDeleteAccountInProgress,
+        ListItem(
+            headlineContent = {
+                Text("Delete account")
+            },
+            trailingContent = if (state.isDeleteAccountInProgress) {
+                ListItemContent.Custom {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .progressSemantics()
+                            .size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+            } else {
+                null
+            },
             onClick = {
                 if (state.isDeleteAccountInProgress.not()) {
                     // show delete account confirmation dialog
