@@ -31,4 +31,10 @@ class AccountRepositoryImpl(
             zeroAccountService.resetAccountPassword(ResetUserPasswordRequest(password)).isSuccessful
         }.getOrDefault(false)
     }
+
+    override suspend fun fetchUserZIds(): List<String> {
+        return runCatching {
+            zeroAccountService.fetchUserZIds()
+        }.getOrDefault(emptyList())
+    }
 }

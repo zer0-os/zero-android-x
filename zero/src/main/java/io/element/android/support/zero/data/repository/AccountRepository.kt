@@ -6,4 +6,6 @@ interface AccountRepository {
     suspend fun linkUserAccount(userMatrixId: String)
 
     suspend fun verifyUserPassword(password: String): Boolean
+
+    suspend fun fetchUserZIds(): List<String>
 }

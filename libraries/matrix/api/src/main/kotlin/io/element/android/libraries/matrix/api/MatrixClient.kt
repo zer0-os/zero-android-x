@@ -59,6 +59,7 @@ interface MatrixClient : Closeable {
     val shouldShowNewRewardsIntimation: StateFlow<Boolean>
     val userRewards: StateFlow<ZeroUserRewards>
     val messengerInvite: StateFlow<ZeroMessengerInvite>
+    val userZIds: StateFlow<List<String>>
 
     suspend fun getRoom(roomId: RoomId): MatrixRoom?
     suspend fun getPendingRoom(roomId: RoomId): RoomPreview?
@@ -70,6 +71,7 @@ interface MatrixClient : Closeable {
     suspend fun getProfile(userId: UserId): Result<MatrixUser>
     suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults>
     suspend fun setDisplayName(displayName: String): Result<Unit>
+    suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit>
     suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit>
     suspend fun removeAvatar(): Result<Unit>
     suspend fun joinRoom(roomId: RoomId): Result<RoomSummary?>
@@ -187,6 +189,8 @@ interface MatrixClient : Closeable {
     suspend fun linkZeroUserIfRequired(): Result<Unit>
 
     suspend fun verifyUserPassword(password: String): Result<Unit>
+
+    suspend fun getUserZIds()
 }
 
 /**
