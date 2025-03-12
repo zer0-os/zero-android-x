@@ -41,11 +41,11 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.InvisibleButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.ui.strings.CommonStrings
-import io.element.android.support.zero.screens.verifysession.ZeroVerifySelfSessionView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,8 +72,7 @@ fun VerifySelfSessionView(
     }
 
     BackHandler {
-        //cancelOrResetFlow()
-        state.eventSink(VerifySelfSessionViewEvents.SkipVerification)
+        cancelOrResetFlow()
     }
 
     if (step is Step.Loading) {
@@ -95,14 +94,14 @@ fun VerifySelfSessionView(
             modifier = modifier,
             paddingValues = pagePaddingValues,
             topBar = {
-                /*TopAppBar(
+                TopAppBar(
                     title = {},
                     navigationIcon = if (step != Step.Completed) {
                         { BackButton(onClick = ::cancelOrResetFlow) }
                     } else {
                         {}
                     }
-                )*/
+                )
             },
             header = {
                 if (step !is Step.Initial) {
@@ -121,20 +120,10 @@ fun VerifySelfSessionView(
                 }
             }
         ) {
-            if (step !is Step.Initial) {
-                VerifySelfSessionContent(
-                    flowState = step,
-                    request = state.request,onLearnMoreClick = onLearnMoreClick,
-                )
-            } else {
-                ZeroVerifySelfSessionView(
-                    onSkipVerification = {
-                        state.eventSink(VerifySelfSessionViewEvents.SkipVerification)
-                    },
-                    onEnterRecoveryKey = onEnterRecoveryKey,
-                    onResetRecoveryKey = onResetKey
-                )
-            }
+            VerifySelfSessionContent(
+                flowState = step,
+                request = state.request,onLearnMoreClick = onLearnMoreClick,
+            )
         }
     }
 }

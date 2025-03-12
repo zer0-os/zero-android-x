@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.screens.verifysession.ZeroVerifySelfSessionView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +44,7 @@ fun ChooseSelfVerificationModeView(
     onUseAnotherDevice: () -> Unit,
     onUseRecoveryKey: () -> Unit,
     onResetKey: () -> Unit,
+    onSkipVerification: () -> Unit,
     onLearnMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,7 +53,7 @@ fun ChooseSelfVerificationModeView(
         activity?.finish()
     }
 
-    HeaderFooterPage(
+    /*HeaderFooterPage(
         modifier = modifier,
         topBar = {
             TopAppBar(
@@ -109,7 +111,12 @@ fun ChooseSelfVerificationModeView(
                 style = ElementTheme.typography.fontBodyLgMedium
             )
         }
-    }
+    }*/
+    ZeroVerifySelfSessionView(
+        onSkipVerification = onSkipVerification,
+        onEnterRecoveryKey = onUseRecoveryKey,
+        onResetRecoveryKey = onResetKey
+    )
 }
 
 @PreviewsDayNight
@@ -122,6 +129,7 @@ internal fun ChooseSelfVerificationModeViewPreview(
         onUseAnotherDevice = {},
         onUseRecoveryKey = {},
         onResetKey = {},
+        onSkipVerification = {},
         onLearnMore = {},
     )
 }

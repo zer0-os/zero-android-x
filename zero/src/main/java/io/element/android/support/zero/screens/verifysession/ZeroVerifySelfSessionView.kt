@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -52,7 +53,10 @@ fun ZeroVerifySelfSessionView(
 
     if (showBackModalCancellation) {
         BackupModalCancellationDialog(
-            onContinue = onSkipVerification,
+            onContinue = {
+                showBackModalCancellation = false
+                onSkipVerification()
+            },
             onDismiss = {
                 showBackModalCancellation = false
             }
@@ -63,6 +67,7 @@ fun ZeroVerifySelfSessionView(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .statusBarsPadding()
     ) {
         Box {
             Image(

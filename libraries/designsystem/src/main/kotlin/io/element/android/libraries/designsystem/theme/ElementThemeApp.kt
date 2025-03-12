@@ -81,7 +81,8 @@ fun ElementThemeApp(
             darkTheme = theme.isDark(),
             content = content,
             compoundLight = compoundLight,
-            compoundDark = compoundDark,
+            compoundDark = compoundDark
+                .copy(bgCanvasDefault = Color.Black),
             typography = zeroTypography,
             materialColorsDark = compoundColorsDark
                 .toMaterialColorScheme()

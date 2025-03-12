@@ -109,6 +109,11 @@ class FtueFlowNode @AssistedInject constructor(
                     override fun onDone() {
                         moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
                     }
+
+                    override fun onSkipFlow() {
+                        ftueState.setSessionVerificationSkipped()
+                        moveToNextStepIfNeeded(shouldUpdateStateIfNull = true)
+                    }
                 }
                 createNode<FtueSessionVerificationFlowNode>(buildContext, listOf(callback))
             }

@@ -57,6 +57,8 @@ class DefaultFtueService @Inject constructor(
         .map { it != SessionVerifiedStatus.Unknown }
         .distinctUntilChanged()
 
+    private var isSessionVerificationSkipped: Boolean = false
+
     override suspend fun reset() {
         analyticsService.reset()
         if (sdkVersionProvider.isAtLeast(Build.VERSION_CODES.TIRAMISU)) {
@@ -120,7 +122,7 @@ class DefaultFtueService @Inject constructor(
         // Wait until the session verification status is known
         isVerificationStatusKnown.filter { it }.first()
 
-        return sessionVerificationService.sessionVerifiedStatus.value == SessionVerifiedStatus.NotVerified && !canSkipVerification()
+        return sessionVerificationService.sessionVerifiedStatus.value == SessionVerifiedStatus.NotVerified && !canSkipVerification() && !isSessionVerificationSkipped
     }
 
     private suspend fun canSkipVerification(): Boolean {
@@ -163,6 +165,10 @@ class DefaultFtueService @Inject constructor(
 
     private fun checkAndLinkZeroUser() {
         withIOScope { client.linkZeroUserIfRequired() }
+    }
+
+    fun setSessionVerificationSkipped() {
+        isSessionVerificationSkipped = true
     }
 }
 

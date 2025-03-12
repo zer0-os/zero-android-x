@@ -31,6 +31,7 @@ class ChooseSelfVerificationModeNode @AssistedInject constructor(
         fun onUseAnotherDevice()
         fun onUseRecoveryKey()
         fun onResetKey()
+        fun onSkipVerification()
         fun onLearnMoreAboutEncryption()
     }
 
@@ -45,6 +46,7 @@ class ChooseSelfVerificationModeNode @AssistedInject constructor(
             onUseAnotherDevice = callback::onUseAnotherDevice,
             onUseRecoveryKey = callback::onUseRecoveryKey,
             onResetKey = callback::onResetKey,
+            onSkipVerification = callback::onSkipVerification,
             onLearnMore = callback::onLearnMoreAboutEncryption,
             modifier = modifier,
         )

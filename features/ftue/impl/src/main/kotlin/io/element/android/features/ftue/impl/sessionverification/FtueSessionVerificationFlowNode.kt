@@ -66,6 +66,7 @@ class FtueSessionVerificationFlowNode @AssistedInject constructor(
 
     interface Callback : Plugin {
         fun onDone()
+        fun onSkipFlow()
     }
 
     private val secureBackupEntryPointCallback = object : SecureBackupEntryPoint.Callback {
@@ -91,6 +92,10 @@ class FtueSessionVerificationFlowNode @AssistedInject constructor(
 
                     override fun onResetKey() {
                         backstack.push(NavTarget.ResetIdentity)
+                    }
+
+                    override fun onSkipVerification() {
+                        plugins<Callback>().forEach { it.onSkipFlow() }
                     }
 
                     override fun onLearnMoreAboutEncryption() {
