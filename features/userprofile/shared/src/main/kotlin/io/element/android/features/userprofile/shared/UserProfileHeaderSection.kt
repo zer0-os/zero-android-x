@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
 import io.element.android.libraries.designsystem.components.avatar.Avatar
@@ -30,6 +30,8 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.ButtonSize
+import io.element.android.libraries.designsystem.theme.components.OutlinedButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.UserId
@@ -43,9 +45,10 @@ fun UserProfileHeaderSection(
     avatarUrl: String?,
     userId: UserId,
     userName: String?,
+    verificationState: UserProfileVerificationState,
     primaryZeroId: String?,
-    isUserVerified: AsyncData<Boolean>,
     openAvatarPreview: (url: String) -> Unit,
+    withdrawVerificationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -78,17 +81,38 @@ fun UserProfileHeaderSection(
                 textAlign = TextAlign.Center,
             )
         }
-        /*if (isUserVerified.dataOrNull() == true) {
-            MatrixBadgeRowMolecule(
-                data = listOf(
-                    MatrixBadgeAtom.MatrixBadgeData(
-                        text = stringResource(CommonStrings.common_verified),
-                        icon = CompoundIcons.Verified(),
-                        type = MatrixBadgeAtom.Type.Positive,
-                    )
-                ).toImmutableList(),
-            )
-        }*/
+        when (verificationState) {
+            UserProfileVerificationState.UNKNOWN, UserProfileVerificationState.UNVERIFIED -> Unit
+            UserProfileVerificationState.VERIFIED -> {
+                MatrixBadgeRowMolecule(
+                    data = listOf(
+                        MatrixBadgeAtom.MatrixBadgeData(
+                            text = stringResource(CommonStrings.common_verified),
+                            icon = CompoundIcons.Verified(),
+                            type = MatrixBadgeAtom.Type.Positive,
+                        )
+                    ).toImmutableList(),
+                )
+            }
+            UserProfileVerificationState.VERIFICATION_VIOLATION -> {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(CommonStrings.crypto_identity_change_profile_pin_violation, userName ?: userId.value),
+                    color = ElementTheme.colors.textCriticalPrimary,
+                    style = ElementTheme.typography.fontBodyMdMedium,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    size = ButtonSize.MediumLowPadding,
+                    text = stringResource(CommonStrings.crypto_identity_change_withdraw_verification_action),
+                    onClick = withdrawVerificationClick,
+                )
+            }
+        }
         Spacer(Modifier.height(40.dp))
     }
 }
@@ -100,8 +124,23 @@ internal fun UserProfileHeaderSectionPreview() = ElementPreview {
         avatarUrl = null,
         userId = UserId("@alice:example.com"),
         userName = "Alice",
+        verificationState = UserProfileVerificationState.VERIFIED,
         primaryZeroId = null,
-        isUserVerified = AsyncData.Success(true),
         openAvatarPreview = {},
+        withdrawVerificationClick = {},
+    )
+}
+
+@PreviewsDayNight
+@Composable
+internal fun UserProfileHeaderSectionWithVerificationViolationPreview() = ElementPreview {
+    UserProfileHeaderSection(
+        avatarUrl = null,
+        userId = UserId("@alice:example.com"),
+        userName = "Alice",
+        verificationState = UserProfileVerificationState.VERIFICATION_VIOLATION,
+        primaryZeroId = null,
+        openAvatarPreview = {},
+        withdrawVerificationClick = {},
     )
 }

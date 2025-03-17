@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -33,7 +34,6 @@ import io.element.android.features.messages.impl.actionlist.model.TimelineItemAc
 import io.element.android.features.messages.impl.crypto.identity.IdentityChangeState
 import io.element.android.features.messages.impl.messagecomposer.MessageComposerEvents
 import io.element.android.features.messages.impl.messagecomposer.MessageComposerState
-import io.element.android.features.messages.impl.messagecomposer.observeRoomMemberIdentityStateChange
 import io.element.android.features.messages.impl.pinned.banner.PinnedMessagesBannerState
 import io.element.android.features.messages.impl.timeline.TimelineController
 import io.element.android.features.messages.impl.timeline.TimelineEvents
@@ -61,6 +61,8 @@ import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.designsystem.utils.snackbar.collectSnackbarMessageAsState
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.featureflag.api.FeatureFlags
+import io.element.android.libraries.matrix.api.encryption.EncryptionService
+import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.room.MatrixRoom
 import io.element.android.libraries.matrix.api.room.MatrixRoomInfo
@@ -80,7 +82,6 @@ import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
 import io.element.android.libraries.textcomposer.model.MessageComposerMode
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -111,6 +112,7 @@ class MessagesPresenter @AssistedInject constructor(
     private val timelineController: TimelineController,
     private val permalinkParser: PermalinkParser,
     private val analyticsService: AnalyticsService,
+    private val encryptionService: EncryptionService,
 ) : Presenter<MessagesState> {
     @AssistedFactory
     interface Factory {
@@ -159,9 +161,6 @@ class MessagesPresenter @AssistedInject constructor(
         var hasDismissedInviteDialog by rememberSaveable {
             mutableStateOf(false)
         }
-        val roomMemberIdentityStateChanges by produceState(persistentListOf()) {
-            observeRoomMemberIdentityStateChange(room)
-        }
         LaunchedEffect(Unit) {
             // Remove the unread flag on entering but don't send read receipts
             // as those will be handled by the timeline.
@@ -188,6 +187,22 @@ class MessagesPresenter @AssistedInject constructor(
         var enableVoiceMessages by remember { mutableStateOf(false) }
         LaunchedEffect(featureFlagsService) {
             enableVoiceMessages = featureFlagsService.isFeatureEnabled(FeatureFlags.VoiceMessages)
+        }
+
+        var dmUserVerificationState by remember { mutableStateOf<IdentityState?>(null) }
+
+        val membersState by room.membersStateFlow.collectAsState()
+        val dmRoomMember by room.getDirectRoomMember(membersState)
+
+        // TODO use `RoomInfo.isEncrypted` as a key here once it's available
+        LifecycleResumeEffect(dmRoomMember) {
+            if (room.isEncrypted) {
+                val dmRoomMemberId = dmRoomMember?.userId
+                localCoroutineScope.launch {
+                    dmRoomMemberId?.let { dmUserVerificationState = encryptionService.getUserIdentity(it).getOrNull() }
+                }
+            }
+            onPauseOrDispose {}
         }
 
         fun handleEvents(event: MessagesEvents) {
@@ -223,7 +238,6 @@ class MessagesPresenter @AssistedInject constructor(
             roomSubTitle = roomSubTitle,
             heroes = heroes,
             composerState = composerState,
-            roomMemberIdentityStateChanges = roomMemberIdentityStateChanges,
             userEventPermissions = userEventPermissions,
             voiceMessageComposerState = voiceMessageComposerState,
             timelineState = timelineState,
@@ -242,6 +256,7 @@ class MessagesPresenter @AssistedInject constructor(
             appName = buildMeta.applicationName,
             roomCallState = roomCallState,
             pinnedMessagesBannerState = pinnedMessagesBannerState,
+            dmUserVerificationState = dmUserVerificationState,
             eventSink = { handleEvents(it) }
         )
     }

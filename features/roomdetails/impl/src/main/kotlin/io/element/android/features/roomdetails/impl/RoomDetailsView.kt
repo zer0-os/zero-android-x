@@ -40,6 +40,10 @@ import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
+import io.element.android.features.roomcall.api.hasPermissionToJoin
+import io.element.android.features.userprofile.api.UserProfileVerificationState
+import io.element.android.features.userprofile.shared.blockuser.BlockUserDialogs
+import io.element.android.features.userprofile.shared.blockuser.BlockUserSection
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
@@ -190,7 +194,10 @@ fun RoomDetailsView(
 //                }
 
                 state.roomMemberDetailsState?.let { dmMemberDetails ->
-                    ProfileItem(onClick = { onProfileClick(dmMemberDetails.userId) })
+                    ProfileItem(
+                        verificationState = dmMemberDetails.verificationState,
+                        onClick = { onProfileClick(dmMemberDetails.userId) }
+                    )
                 }
             }
 
@@ -198,6 +205,7 @@ fun RoomDetailsView(
                 PreferenceCategory {
                     MembersItem(
                         memberCount = state.memberCount,
+                        hasVerificationViolations = state.hasMemberVerificationViolations,
                         openRoomMemberList = openRoomMemberList,
                     )
                     /*if (state.canShowKnockRequests) {
@@ -572,11 +580,23 @@ private fun FavoriteItem(
 
 @Composable
 private fun ProfileItem(
+    verificationState: UserProfileVerificationState,
     onClick: () -> Unit,
 ) {
     ListItem(
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.UserProfile())),
         headlineContent = { Text(stringResource(id = R.string.screen_room_details_profile_row_title)) },
+        trailingContent = when (verificationState) {
+            UserProfileVerificationState.VERIFIED -> ListItemContent.Icon(
+                iconSource = IconSource.Vector(CompoundIcons.Verified()),
+                tintColor = ElementTheme.colors.iconSuccessPrimary,
+            )
+            UserProfileVerificationState.VERIFICATION_VIOLATION -> ListItemContent.Icon(
+                iconSource = IconSource.Vector(CompoundIcons.ErrorSolid()),
+                tintColor = ElementTheme.colors.iconCriticalPrimary,
+            )
+            else -> null
+        },
         onClick = onClick,
     )
 }
@@ -584,12 +604,20 @@ private fun ProfileItem(
 @Composable
 private fun MembersItem(
     memberCount: Long,
+    hasVerificationViolations: Boolean,
     openRoomMemberList: () -> Unit,
 ) {
     ListItem(
         headlineContent = { Text(stringResource(CommonStrings.common_people)) },
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.User())),
-        trailingContent = ListItemContent.Text(memberCount.toString()),
+        trailingContent = if (hasVerificationViolations) {
+            ListItemContent.Icon(
+                iconSource = IconSource.Vector(CompoundIcons.ErrorSolid()),
+                tintColor = ElementTheme.colors.textCriticalPrimary,
+            )
+        } else {
+            ListItemContent.Text(memberCount.toString())
+        },
         onClick = openRoomMemberList,
     )
 }
