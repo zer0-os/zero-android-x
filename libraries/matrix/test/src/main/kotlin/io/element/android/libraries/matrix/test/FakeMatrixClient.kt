@@ -209,6 +209,12 @@ class FakeMatrixClient(
         return setDisplayNameResult
     }
 
+    override suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit> =
+        simulateLongTask {
+            setDisplayNameCalled = true
+            return setDisplayNameResult
+        }
+
     override suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit> = simulateLongTask {
         uploadAvatarCalled = true
         return uploadAvatarResult
@@ -373,5 +379,9 @@ class FakeMatrixClient(
     override suspend fun verifyUserPassword(password: String): Result<Unit> {
         return Result.success(Unit)
     }
+
+    override val userZIds: StateFlow<List<String>> = MutableStateFlow(emptyList())
+
+    override suspend fun getUserZIds() {}
     //endregion
 }

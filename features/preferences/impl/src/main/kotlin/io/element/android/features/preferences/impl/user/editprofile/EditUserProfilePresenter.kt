@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,9 @@ class EditUserProfilePresenter @AssistedInject constructor(
         val cameraPermissionState = cameraPermissionPresenter.present()
         var userAvatarUri by rememberSaveable { mutableStateOf(matrixUser.avatarUrl?.let { Uri.parse(it) }) }
         var userDisplayName by rememberSaveable { mutableStateOf(matrixUser.displayName) }
+        var userPrimaryZId by rememberSaveable { mutableStateOf(matrixUser.primaryZeroId) }
+        val userZIds = matrixClient.userZIds.collectAsState()
+
         val cameraPhotoPicker = mediaPickerProvider.registerCameraPhotoPicker(
             onResult = { uri ->
                 if (uri != null) {
@@ -87,6 +91,10 @@ class EditUserProfilePresenter @AssistedInject constructor(
             }
         }
 
+        LaunchedEffect(Unit) {
+            matrixClient.getUserZIds()
+        }
+
         LaunchedEffect(cameraPermissionState.permissionGranted) {
             if (cameraPermissionState.permissionGranted && pendingPermissionRequest) {
                 pendingPermissionRequest = false
@@ -98,7 +106,7 @@ class EditUserProfilePresenter @AssistedInject constructor(
         val localCoroutineScope = rememberCoroutineScope()
         fun handleEvents(event: EditUserProfileEvents) {
             when (event) {
-                is EditUserProfileEvents.Save -> localCoroutineScope.saveChanges(userDisplayName, userAvatarUri, matrixUser, saveAction)
+                is EditUserProfileEvents.Save -> localCoroutineScope.saveChanges(userDisplayName, userAvatarUri, userPrimaryZId, matrixUser, saveAction)
                 is EditUserProfileEvents.HandleAvatarAction -> {
                     when (event.action) {
                         AvatarAction.ChoosePhoto -> galleryImagePicker.launch()
@@ -116,13 +124,15 @@ class EditUserProfilePresenter @AssistedInject constructor(
                 }
 
                 is EditUserProfileEvents.UpdateDisplayName -> userDisplayName = event.name
+                is EditUserProfileEvents.UpdatePrimaryZId -> userPrimaryZId = event.zid
                 EditUserProfileEvents.CancelSaveChanges -> saveAction.value = AsyncAction.Uninitialized
             }
         }
 
-        val canSave = remember(userDisplayName, userAvatarUri) {
+        val canSave = remember(userDisplayName, userAvatarUri, userPrimaryZId) {
             val hasProfileChanged = hasDisplayNameChanged(userDisplayName, matrixUser) ||
-                hasAvatarUrlChanged(userAvatarUri, matrixUser)
+                hasAvatarUrlChanged(userAvatarUri, matrixUser) ||
+                hasPrimaryZIdChanged(userPrimaryZId, matrixUser)
             !userDisplayName.isNullOrBlank() && hasProfileChanged
         }
 
@@ -130,6 +140,13 @@ class EditUserProfilePresenter @AssistedInject constructor(
             userId = matrixUser.userId,
             displayName = userDisplayName.orEmpty(),
             userAvatarUrl = userAvatarUri,
+            primaryZId = userPrimaryZId,
+            userZIds = mutableListOf<String>().apply {
+                addAll(userZIds.value)
+                if (userZIds.value.isNotEmpty()) {
+                    add(EditUserProfileState.PRIMARY_ZERO_ID_NONE)
+                }
+            },
             avatarActions = avatarActions,
             saveButtonEnabled = canSave && saveAction.value !is AsyncAction.Loading,
             saveAction = saveAction.value,
@@ -145,16 +162,24 @@ class EditUserProfilePresenter @AssistedInject constructor(
         // Need to call `toUri()?.toString()` to make the test pass (we mockk Uri)
         avatarUri?.toString()?.trim() != currentUser.avatarUrl?.toUri()?.toString()?.trim()
 
+    private fun hasPrimaryZIdChanged(selectedZId: String?, currentUser: MatrixUser) =
+        selectedZId?.trim() != currentUser.primaryZeroId?.trim()
+
     private fun CoroutineScope.saveChanges(
         name: String?,
         avatarUri: Uri?,
+        primaryZId: String?,
         currentUser: MatrixUser,
         action: MutableState<AsyncAction<Unit>>,
     ) = launch {
         val results = mutableListOf<Result<Unit>>()
         suspend {
-            if (!name.isNullOrEmpty() && name.trim() != currentUser.displayName.orEmpty().trim()) {
-                results.add(matrixClient.setDisplayName(name).onFailure {
+            if (!name.isNullOrEmpty() &&
+                (hasDisplayNameChanged(name, currentUser) || hasPrimaryZIdChanged(primaryZId, currentUser))
+            ) {
+                val selectedZId = if (primaryZId == EditUserProfileState.PRIMARY_ZERO_ID_NONE) ""
+                else (primaryZId ?: "")
+                results.add(matrixClient.setDisplayNameOrZid(name, selectedZId).onFailure {
                     Timber.e(it, "Failed to set user's display name")
                 })
             }

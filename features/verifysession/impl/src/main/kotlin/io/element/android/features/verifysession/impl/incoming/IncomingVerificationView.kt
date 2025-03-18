@@ -27,18 +27,20 @@ import io.element.android.features.verifysession.impl.incoming.IncomingVerificat
 import io.element.android.features.verifysession.impl.incoming.ui.SessionDetailsView
 import io.element.android.features.verifysession.impl.ui.VerificationBottomMenu
 import io.element.android.features.verifysession.impl.ui.VerificationContentVerifying
+import io.element.android.features.verifysession.impl.ui.VerificationUserProfileContent
 import io.element.android.libraries.designsystem.atomic.pages.HeaderFooterPage
 import io.element.android.libraries.designsystem.components.BigIcon
 import io.element.android.libraries.designsystem.components.PageTitle
+import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
-import io.element.android.libraries.designsystem.theme.components.InvisibleButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.verification.SessionVerificationData
+import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.ui.strings.CommonStrings
 
 /**
@@ -60,10 +62,17 @@ fun IncomingVerificationView(
         topBar = {
             TopAppBar(
                 title = {},
+                navigationIcon = {
+                    when {
+                        step is Step.Initial && !step.isWaiting -> Unit
+                        step is Step.Completed -> Unit
+                        else -> BackButton(onClick = { state.eventSink(IncomingVerificationViewEvents.GoBack) })
+                    }
+                }
             )
         },
         header = {
-            IncomingVerificationHeader(step = step)
+            IncomingVerificationHeader(step = step, request = state.request)
         },
         footer = {
             IncomingVerificationBottomMenu(
@@ -73,37 +82,58 @@ fun IncomingVerificationView(
     ) {
         IncomingVerificationContent(
             step = step,
+            request = state.request,
         )
     }
 }
 
 @Composable
-private fun IncomingVerificationHeader(step: Step) {
+private fun IncomingVerificationHeader(step: Step, request: VerificationRequest.Incoming) {
     val iconStyle = when (step) {
         Step.Canceled -> BigIcon.Style.AlertSolid
-        is Step.Initial -> BigIcon.Style.Default(CompoundIcons.LockSolid())
-        is Step.Verifying -> BigIcon.Style.Default(CompoundIcons.Reaction())
+        is Step.Initial -> if (step.isWaiting) {
+            BigIcon.Style.Loading
+        } else {
+            when (request) {
+                is VerificationRequest.Incoming.OtherSession -> BigIcon.Style.Default(CompoundIcons.LockSolid())
+                is VerificationRequest.Incoming.User -> BigIcon.Style.Default(CompoundIcons.UserProfileSolid())
+            }
+        }
+        is Step.Verifying -> if (step.isWaiting) {
+            BigIcon.Style.Loading
+        } else {
+            BigIcon.Style.Default(CompoundIcons.ReactionSolid())
+        }
         Step.Completed -> BigIcon.Style.SuccessSolid
         Step.Failure -> BigIcon.Style.AlertSolid
     }
     val titleTextId = when (step) {
-        Step.Canceled -> R.string.screen_session_verification_request_failure_title
+        Step.Canceled -> CommonStrings.common_verification_failed
         is Step.Initial -> R.string.screen_session_verification_request_title
         is Step.Verifying -> when (step.data) {
             is SessionVerificationData.Decimals -> R.string.screen_session_verification_compare_numbers_title
             is SessionVerificationData.Emojis -> R.string.screen_session_verification_compare_emojis_title
         }
-        Step.Completed -> R.string.screen_session_verification_request_success_title
+        Step.Completed -> CommonStrings.common_verification_complete
         Step.Failure -> R.string.screen_session_verification_request_failure_title
     }
     val subtitleTextId = when (step) {
         Step.Canceled -> R.string.screen_session_verification_request_failure_subtitle
-        is Step.Initial -> R.string.screen_session_verification_request_subtitle
+        is Step.Initial -> when (request) {
+            is VerificationRequest.Incoming.OtherSession -> R.string.screen_session_verification_request_subtitle
+            is VerificationRequest.Incoming.User -> R.string.screen_session_verification_user_responder_subtitle
+        }
         is Step.Verifying -> when (step.data) {
             is SessionVerificationData.Decimals -> R.string.screen_session_verification_compare_numbers_subtitle
-            is SessionVerificationData.Emojis -> R.string.screen_session_verification_compare_emojis_subtitle
+            is SessionVerificationData.Emojis -> when (request) {
+                is VerificationRequest.Incoming.OtherSession -> R.string.screen_session_verification_compare_emojis_subtitle
+                is VerificationRequest.Incoming.User -> R.string.screen_session_verification_compare_emojis_user_subtitle
+            }
         }
-        Step.Completed -> R.string.screen_session_verification_request_success_subtitle
+        Step.Completed -> when (request) {
+            is VerificationRequest.Incoming.OtherSession -> R.string.screen_session_verification_complete_subtitle
+            is VerificationRequest.Incoming.User -> R.string.screen_session_verification_complete_user_subtitle
+        }
         Step.Failure -> R.string.screen_session_verification_request_failure_subtitle
     }
     PageTitle(
@@ -116,9 +146,10 @@ private fun IncomingVerificationHeader(step: Step) {
 @Composable
 private fun IncomingVerificationContent(
     step: Step,
+    request: VerificationRequest.Incoming,
 ) {
     when (step) {
-        is Step.Initial -> ContentInitial(step)
+        is Step.Initial -> ContentInitial(step, request)
         is Step.Verifying -> VerificationContentVerifying(step.data)
         else -> Unit
     }
@@ -127,24 +158,40 @@ private fun IncomingVerificationContent(
 @Composable
 private fun ContentInitial(
     initialIncoming: Step.Initial,
+    request: VerificationRequest.Incoming,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        SessionDetailsView(
-            deviceName = initialIncoming.deviceDisplayName,
-            deviceId = initialIncoming.deviceId,
-            signInFormattedTimestamp = initialIncoming.formattedSignInTime,
-        )
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 16.dp),
-            text = stringResource(R.string.screen_session_verification_request_footer),
-            style = ElementTheme.zeroTypography.fontBodyMdMedium,
-            textAlign = TextAlign.Center,
-        )
+    when (request) {
+        is VerificationRequest.Incoming.OtherSession -> {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                SessionDetailsView(
+                    deviceName = initialIncoming.deviceDisplayName,
+                    deviceId = initialIncoming.deviceId,
+                    signInFormattedTimestamp = initialIncoming.formattedSignInTime,
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp),
+                    text = stringResource(R.string.screen_session_verification_request_footer),
+                    style = ElementTheme.zeroTypography.fontBodyMdMedium,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+        is VerificationRequest.Incoming.User -> {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+            ) {
+                VerificationUserProfileContent(
+                    userId = request.details.senderProfile.userId,
+                    displayName = request.details.senderProfile.displayName,
+                    avatarUrl = request.details.senderProfile.avatarUrl,
+                )
+            }
+        }
     }
 }
 
@@ -158,16 +205,7 @@ private fun IncomingVerificationBottomMenu(
     when (step) {
         is Step.Initial -> {
             if (step.isWaiting) {
-                VerificationBottomMenu {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.screen_identity_waiting_on_other_device),
-                        onClick = {},
-                        enabled = false,
-                        showProgress = true,
-                    )
-                    InvisibleButton()
-                }
+                // Show nothing
             } else {
                 VerificationBottomMenu {
                     Button(
@@ -185,16 +223,7 @@ private fun IncomingVerificationBottomMenu(
         }
         is Step.Verifying -> {
             if (step.isWaiting) {
-                VerificationBottomMenu {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.screen_session_verification_positive_button_verifying_ongoing),
-                        onClick = {},
-                        enabled = false,
-                        showProgress = true,
-                    )
-                    InvisibleButton()
-                }
+                // Show nothing
             } else {
                 VerificationBottomMenu {
                     Button(

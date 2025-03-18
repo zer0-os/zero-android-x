@@ -29,7 +29,6 @@ dependencies {
     //implementation(libs.sqlcipher)
     implementation(libs.sqlcipher.android)
     implementation(libs.sqlite)
-    implementation(libs.androidx.security.crypto)
     implementation(projects.libraries.di)
     implementation(libs.sqldelight.coroutines)
 

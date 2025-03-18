@@ -69,6 +69,7 @@ class MainActivity : NodeActivity() {
         ElementThemeApp(
             appPreferencesStore = appBindings.preferencesStore(),
             enterpriseService = appBindings.enterpriseService(),
+            buildMeta = appBindings.buildMeta()
         ) {
             CompositionLocalProvider(
                 LocalSnackbarDispatcher provides appBindings.snackbarDispatcher(),

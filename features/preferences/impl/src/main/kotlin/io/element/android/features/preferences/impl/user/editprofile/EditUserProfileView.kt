@@ -9,7 +9,6 @@ package io.element.android.features.preferences.impl.user.editprofile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -33,10 +31,11 @@ import io.element.android.libraries.designsystem.components.async.AsyncActionVie
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.button.BackButton
+import io.element.android.libraries.designsystem.components.preferences.DropdownOption
+import io.element.android.libraries.designsystem.components.preferences.PreferenceDropDownSimple
 import io.element.android.libraries.designsystem.modifiers.clearFocusOnTap
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.aliasScreenTitle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
@@ -47,6 +46,7 @@ import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.EditableAvatarView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,6 +119,23 @@ fun EditUserProfileView(
                 placeholder = stringResource(CommonStrings.common_room_name_placeholder),
                 singleLine = true,
                 onValueChange = { state.eventSink(EditUserProfileEvents.UpdateDisplayName(it)) },
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+            PreferenceDropDownSimple(
+                title = "Primary ZId",
+                selectedOption = object : DropdownOption {
+                    override val text = state.primaryZId ?: EditUserProfileState.PRIMARY_ZERO_ID_NONE
+                },
+                options = state.userZIds.map { zid ->
+                    object : DropdownOption {
+                        override val text = zid
+                    }
+                }.toImmutableList(),
+                enabled = state.userZIds.isNotEmpty(),
+                onOptionSelected = { option ->
+                    state.eventSink(EditUserProfileEvents.UpdatePrimaryZId(option.text))
+                }
             )
         }
 

@@ -254,6 +254,9 @@ class RustMatrixClient(
 
     override val userProfile: StateFlow<MatrixUser> = _userProfile
 
+    private val _userZIds: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
+    override val userZIds: StateFlow<List<String>> = _userZIds
+
     override val ignoredUsersFlow = mxCallbackFlow<ImmutableList<UserId>> {
         innerClient.subscribeToIgnoredUsers(object : IgnoredUsersListener {
             override fun call(ignoredUserIds: List<String>) {
@@ -425,6 +428,15 @@ class RustMatrixClient(
             val result = runCatching { innerClient.setDisplayName(displayName) }
             if (result.isSuccess) {
                 zeroUserRepository?.updateUserProfile(userName = displayName)
+            }
+            result
+        }
+
+    override suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit> =
+        withContext(sessionDispatcher) {
+            val result = runCatching { innerClient.setDisplayName(displayName) }
+            if (result.isSuccess) {
+                zeroUserRepository?.updateUserProfile(userName = displayName, profileZId = primaryZId)
             }
             result
         }
@@ -825,6 +837,13 @@ class RustMatrixClient(
             val accountRepository = zeroAccountRepository ?: return@runCatching
             accountRepository.verifyUserPassword(password)
         }
+    }
+
+    override suspend fun getUserZIds() {
+        val userZIds = runCatching {
+            zeroAccountRepository?.fetchUserZIds() ?: emptyList()
+        }.getOrElse { emptyList() }
+        _userZIds.emit(userZIds)
     }
     //endregion
 }

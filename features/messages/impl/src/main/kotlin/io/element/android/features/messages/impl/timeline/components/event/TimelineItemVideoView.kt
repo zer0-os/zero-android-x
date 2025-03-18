@@ -75,6 +75,7 @@ fun TimelineItemVideoView(
     onLongClick: (() -> Unit)?,
     onShowContentClick: () -> Unit,
     onLinkClick: (String) -> Unit,
+    onLinkLongClick: (String) -> Unit,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -148,6 +149,7 @@ fun TimelineItemVideoView(
                         .widthIn(min = MIN_HEIGHT_IN_DP.dp * aspectRatio, max = MAX_HEIGHT_IN_DP.dp * aspectRatio),
                     text = caption,
                     onLinkClickedListener = onLinkClick,
+                    onLinkLongClickedListener = onLinkLongClick,
                     style = ElementRichTextEditorStyle.textStyle(),
                     releaseOnDetach = false,
                     onTextLayout = ContentAvoidingLayout.measureLegacyLastTextLine(onContentLayoutChange = onContentLayoutChange),
@@ -167,6 +169,7 @@ internal fun TimelineItemVideoViewPreview(@PreviewParameter(TimelineItemVideoCon
         onContentClick = {},
         onLongClick = {},
         onLinkClick = {},
+        onLinkLongClick = {},
         onContentLayoutChange = {},
     )
 }
@@ -181,6 +184,7 @@ internal fun TimelineItemVideoViewHideMediaContentPreview() = ElementPreview {
         onContentClick = {},
         onLongClick = {},
         onLinkClick = {},
+        onLinkLongClick = {},
         onContentLayoutChange = {},
     )
 }

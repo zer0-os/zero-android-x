@@ -18,9 +18,15 @@ data class EditUserProfileState(
     val userId: UserId,
     val displayName: String,
     val userAvatarUrl: Uri?,
+    val primaryZId: String?,
+    val userZIds: List<String>,
     val avatarActions: ImmutableList<AvatarAction>,
     val saveButtonEnabled: Boolean,
     val saveAction: AsyncAction<Unit>,
     val cameraPermissionState: PermissionsState,
     val eventSink: (EditUserProfileEvents) -> Unit
-)
+) {
+    companion object {
+        const val PRIMARY_ZERO_ID_NONE = "None (wallet address)"
+    }
+}

@@ -47,6 +47,7 @@ import io.element.android.wysiwyg.compose.EditorStyledText
 fun TimelineItemTextView(
     content: TimelineItemTextBasedContent,
     onLinkClick: (String) -> Unit,
+    onLinkLongClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit = {},
 ) {
@@ -65,6 +66,7 @@ fun TimelineItemTextView(
             EditorStyledText(
                 text = body,
                 onLinkClickedListener = onLinkClick,
+                onLinkLongClickedListener = onLinkLongClick,
                 style = ElementRichTextEditorStyle.textStyle(),
                 onTextLayout = ContentAvoidingLayout.measureLegacyLastTextLine(onContentLayoutChange = onContentLayoutChange),
                 releaseOnDetach = false,
@@ -116,6 +118,7 @@ internal fun TimelineItemTextViewPreview(
     TimelineItemTextView(
         content = content,
         onLinkClick = {},
+        onLinkLongClick = {},
     )
 }
 
@@ -128,6 +131,7 @@ internal fun TimelineItemTextViewWithLinkifiedUrlPreview() = ElementPreview {
     TimelineItemTextView(
         content = content,
         onLinkClick = {},
+        onLinkLongClick = {},
     )
 }
 
@@ -140,5 +144,6 @@ internal fun TimelineItemTextViewWithLinkifiedUrlAndNestedParenthesisPreview() =
     TimelineItemTextView(
         content = content,
         onLinkClick = {},
+        onLinkLongClick = {},
     )
 }

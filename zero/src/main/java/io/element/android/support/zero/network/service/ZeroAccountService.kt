@@ -5,6 +5,7 @@ import io.element.android.support.zero.network.model.request.ResetUserPasswordRe
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ZeroAccountService {
@@ -16,4 +17,7 @@ interface ZeroAccountService {
 
     @POST(value = "matrix/admin/reset-password")
     suspend fun resetAccountPassword(@Body payload: ResetUserPasswordRequest): Response<ResponseBody>
+
+    @GET("api/v2/users/zids")
+    suspend fun fetchUserZIds(): List<String>
 }
