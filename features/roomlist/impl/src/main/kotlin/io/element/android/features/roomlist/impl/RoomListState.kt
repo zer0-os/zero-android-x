@@ -12,6 +12,7 @@ import io.element.android.features.invite.api.response.AcceptDeclineInviteState
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
+import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
@@ -41,7 +42,7 @@ data class RoomListState(
 ) {
     //val displayFilters = contentState is RoomListContentState.Rooms
     val displayFilters = false //Hiding room list filters for now
-    val displayActions = true
+    private val displayActions = true
 
     sealed interface ContextMenu {
         data object Hidden : ContextMenu
@@ -54,6 +55,11 @@ data class RoomListState(
             val eventCacheFeatureFlagEnabled: Boolean,
             val hasNewContent: Boolean,
         ) : ContextMenu
+    }
+
+    fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {
+        return displayActions &&
+            selectedHomeTab in listOf(HomeScreenTab.CHAT)
     }
 }
 

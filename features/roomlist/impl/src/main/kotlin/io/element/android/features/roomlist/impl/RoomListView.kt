@@ -9,6 +9,8 @@ package io.element.android.features.roomlist.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -25,9 +29,11 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
+import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
 import io.element.android.features.roomlist.impl.components.RoomListTopBar
+import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchView
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -113,6 +119,8 @@ private fun RoomListScaffold(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(appBarState)
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
 
+    val selectedNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -124,7 +132,7 @@ private fun RoomListScaffold(
                 onMenuActionClick = onMenuActionClick,
                 onOpenSettings = onOpenSettings,
                 scrollBehavior = scrollBehavior,
-                displayMenuItems = state.displayActions,
+                displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
                 displayFilters = state.displayFilters,
                 filtersState = state.filtersState,
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
@@ -135,10 +143,9 @@ private fun RoomListScaffold(
             )
         },
         content = { padding ->
-            RoomListContentView(
-                contentState = state.contentState,
-                filtersState = state.filtersState,
-                eventSink = state.eventSink,
+            HomeScreenContent(
+                state = state,
+                selectedHomeScreenTab = selectedNavigationTab.value,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = ::onRoomClick,
@@ -149,7 +156,7 @@ private fun RoomListScaffold(
             )
         },
         floatingActionButton = {
-            if (state.displayActions) {
+            if (state.shouldDisplayActions(selectedNavigationTab.value)) {
                 FloatingActionButton(
                     containerColor = ElementTheme.colors.iconPrimary,
                     onClick = onCreateRoomClick
@@ -163,7 +170,44 @@ private fun RoomListScaffold(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            HomeScreenTabView(
+                selectedNavigationTab = selectedNavigationTab.value,
+                onTabSelected = { tab ->
+                    selectedNavigationTab.value = tab
+                }
+            )
+        }
     )
+}
+
+@Composable
+internal fun HomeScreenContent(
+    state: RoomListState,
+    selectedHomeScreenTab: HomeScreenTab,
+    onSetUpRecoveryClick: () -> Unit,
+    onConfirmRecoveryKeyClick: () -> Unit,
+    onRoomClick: (RoomListRoomSummary) -> Unit,
+    onCreateRoomClick: () -> Unit,
+    modifier: Modifier,
+) {
+    when (selectedHomeScreenTab) {
+        HomeScreenTab.CHAT -> {
+            RoomListContentView(
+                contentState = state.contentState,
+                filtersState = state.filtersState,
+                eventSink = state.eventSink,
+                onSetUpRecoveryClick = onSetUpRecoveryClick,
+                onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
+                onRoomClick = onRoomClick,
+                onCreateRoomClick = onCreateRoomClick,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.CHANNEL -> {
+            Column {  }
+        }
+    }
 }
 
 internal fun RoomListRoomSummary.contentType() = displayType.ordinal

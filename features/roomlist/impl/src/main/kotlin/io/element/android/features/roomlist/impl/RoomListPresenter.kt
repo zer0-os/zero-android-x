@@ -251,7 +251,9 @@ class RoomListPresenter @Inject constructor(
                 RoomListContentState.Rooms(
                     securityBannerState = securityBannerState,
                     fullScreenIntentPermissionsState = fullScreenIntentPermissionsPresenter.present(),
-                    summaries = roomSummaries.dataOrNull().orEmpty().toPersistentList()
+                    summaries = roomSummaries.dataOrNull().orEmpty()
+                        .filter { !it.isAChannel }
+                        .toPersistentList()
                 )
             }
         }
