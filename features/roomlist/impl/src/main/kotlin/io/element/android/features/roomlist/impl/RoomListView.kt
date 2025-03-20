@@ -9,8 +9,6 @@ package io.element.android.features.roomlist.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,7 +17,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -29,6 +30,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
+import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
 import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
@@ -36,6 +38,9 @@ import io.element.android.features.roomlist.impl.components.RoomListTopBar
 import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchView
+import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.components.ProgressDialog
+import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.FloatingActionButton
@@ -44,6 +49,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun RoomListView(
@@ -58,6 +64,11 @@ fun RoomListView(
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
+    val resolvedChannelRoomId by remember(state.resolvedChannelRoom) {
+        derivedStateOf { state.resolvedChannelRoom }
+    }
+    resolvedChannelRoomId?.let { onRoomClick(it) }
+
     ConnectivityIndicatorContainer(
         modifier = modifier,
         isOnline = state.hasNetworkConnection,
@@ -95,6 +106,17 @@ fun RoomListView(
                     .background(ElementTheme.colors.bgCanvasDefault)
             )
             acceptDeclineInviteView()
+
+            if (state.genericActionState is AsyncData.Loading) {
+                ProgressDialog()
+            }
+
+            if (state.genericActionState is AsyncData.Failure) {
+                ErrorDialog(
+                    content = stringResource(CommonStrings.error_unknown),
+                    onSubmit = { state.eventSink(RoomListEvents.HideError) }
+                )
+            }
         }
     }
 }
@@ -205,7 +227,11 @@ internal fun HomeScreenContent(
             )
         }
         HomeScreenTab.CHANNEL -> {
-            Column {  }
+            HomeChannelListContentView(
+                contentState = state.channelContentState,
+                eventSink = state.eventSink,
+                modifier = modifier
+            )
         }
     }
 }

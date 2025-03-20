@@ -22,9 +22,11 @@ import io.element.android.features.roomlist.impl.model.aRoomListRoomSummary
 import io.element.android.features.roomlist.impl.model.anInviteSender
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
 import io.element.android.features.roomlist.impl.search.aRoomListSearchState
+import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -53,11 +55,14 @@ internal fun aRoomListState(
     showAvatarIndicator: Boolean = false,
     hasNetworkConnection: Boolean = true,
     snackbarMessage: SnackbarMessage? = null,
+    genericActionState: AsyncData<Unit> = AsyncData.Uninitialized,
     contextMenu: RoomListState.ContextMenu = RoomListState.ContextMenu.Hidden,
     leaveRoomState: LeaveRoomState = aLeaveRoomState(),
     searchState: RoomListSearchState = aRoomListSearchState(),
     filtersState: RoomListFiltersState = aRoomListFiltersState(),
     contentState: RoomListContentState = aRoomsContentState(),
+    channelContentState: ChannelListContentState = aPlaceholderChannelListContentState(),
+    resolvedChannelRoom: RoomId? = null,
     acceptDeclineInviteState: AcceptDeclineInviteState = anAcceptDeclineInviteState(),
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
     eventSink: (RoomListEvents) -> Unit = {}
@@ -66,11 +71,14 @@ internal fun aRoomListState(
     showAvatarIndicator = showAvatarIndicator,
     hasNetworkConnection = hasNetworkConnection,
     snackbarMessage = snackbarMessage,
+    genericActionState = genericActionState,
     contextMenu = contextMenu,
     leaveRoomState = leaveRoomState,
     filtersState = filtersState,
     searchState = searchState,
     contentState = contentState,
+    channelContentState = channelContentState,
+    resolvedChannelRoom = resolvedChannelRoom,
     acceptDeclineInviteState = acceptDeclineInviteState,
     directLogoutState = directLogoutState,
     eventSink = eventSink,

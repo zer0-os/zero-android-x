@@ -48,8 +48,8 @@ import org.matrix.rustcomponents.sdk.SteadyStateException as RustSteadyStateExce
 internal class RustEncryptionService(
     client: Client,
     syncService: RustSyncService,
-    private val zeroAccountRepository: AccountRepository?,
     sessionCoroutineScope: CoroutineScope,
+    private val zeroAccountRepository: AccountRepository?,
     private val dispatchers: CoroutineDispatchers,
 ) : EncryptionService {
     private val service: Encryption = client.encryption()
