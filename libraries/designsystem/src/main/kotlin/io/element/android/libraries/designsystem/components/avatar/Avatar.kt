@@ -154,7 +154,7 @@ private fun ZeroPlaceholderImage(
         painter = painterResource(id = R.drawable.ic_zero_avatar_default),
         contentDescription = "zero_placeholder_image",
         modifier = modifier.size(size)
-            .background(Color.Black)
+            .background(Color(0xFF1A1B1F))
             .padding(8.dp)
     )
 }

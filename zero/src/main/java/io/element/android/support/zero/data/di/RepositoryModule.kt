@@ -11,6 +11,8 @@ import io.element.android.support.zero.data.repository.AccountRepository
 import io.element.android.support.zero.data.repository.AccountRepositoryImpl
 import io.element.android.support.zero.data.repository.AuthRepository
 import io.element.android.support.zero.data.repository.AuthRepositoryImpl
+import io.element.android.support.zero.data.repository.ChannelRepository
+import io.element.android.support.zero.data.repository.ChannelRepositoryImpl
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.ConversationRepositoryImpl
 import io.element.android.support.zero.data.repository.InviteRepository
@@ -19,8 +21,10 @@ import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
+import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
+import io.element.android.support.zero.network.service.ZeroChannelService
 import io.element.android.support.zero.network.service.ZeroConversationService
 import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
@@ -30,6 +34,26 @@ import io.element.android.support.zero.network.service.ZeroUserService
 @Module
 @ContributesTo(AppScope::class)
 object RepositoryModule {
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindCoreRepository(
+        authRepository: AuthRepository,
+        accountRepository: AccountRepository,
+        conversationRepository: ConversationRepository,
+        channelRepository: ChannelRepository,
+        inviteRepository: InviteRepository,
+        rewardsRepository: RewardsRepository,
+        userRepository: UserRepository
+    ): ZeroCoreRepository = ZeroCoreRepository(
+        auth = authRepository,
+        account = accountRepository,
+        channel = channelRepository,
+        conversation = conversationRepository,
+        invite = inviteRepository,
+        rewards = rewardsRepository,
+        user = userRepository
+    )
 
     @Provides
     @SingleIn(AppScope::class)
@@ -72,4 +96,10 @@ object RepositoryModule {
         zeroAccountService: ZeroAccountService,
         zeroUserService: ZeroUserService,
     ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindChannelRepository(
+        zeroChannelService: ZeroChannelService
+    ): ChannelRepository = ChannelRepositoryImpl(zeroChannelService)
 }

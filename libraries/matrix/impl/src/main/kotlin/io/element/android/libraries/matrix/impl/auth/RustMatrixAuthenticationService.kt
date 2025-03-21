@@ -39,13 +39,11 @@ import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.data.model.AuthSSOToken
-import io.element.android.support.zero.data.repository.AuthRepository
-import io.element.android.support.zero.data.repository.InviteRepository
+import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.Client
@@ -69,8 +67,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     private val rustMatrixClientFactory: RustMatrixClientFactory,
     private val passphraseGenerator: PassphraseGenerator,
     private val oidcConfigurationProvider: OidcConfigurationProvider,
-    private val authRepository: AuthRepository?,
-    private val inviteRepository: InviteRepository?,
+    private val zeroCoreRepository: ZeroCoreRepository?,
 ) : MatrixAuthenticationService {
     // Passphrase which will be used for new sessions. Existing sessions will use the passphrase
     // stored in the SessionData.
@@ -180,7 +177,7 @@ class RustMatrixAuthenticationService @Inject constructor(
         }
 
     override suspend fun loginWithZero(username: String, password: String): Result<SessionId> {
-        val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
         return executeZeroAuthFlow(
             executeCall = {
                 authRepository.login(username, password)
@@ -189,7 +186,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     }
 
     override suspend fun loginWithWeb3(web3Token: String): Result<SessionId> {
-        val authRepository = authRepository ?: error("Cannot login with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
         return executeZeroAuthFlow(
             executeCall = {
                 authRepository.loginWithWallet(web3Token)
@@ -369,14 +366,14 @@ class RustMatrixAuthenticationService @Inject constructor(
     override suspend fun validateInviteCode(inviteCode: String): Result<Boolean> =
         withContext(coroutineDispatchers.io) {
             runCatching {
-                inviteRepository?.validateInvite(inviteCode) ?: false
+                zeroCoreRepository?.invite?.validateInvite(inviteCode) ?: false
             }.mapFailure {
                 it.mapAuthenticationException()
             }
         }
 
     override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> {
-        val authRepository = authRepository ?: error("Cannot sing-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sing-up with zero, check instantiation")
         return executeZeroAuthFlow(
             fromCreateAccountFlow = true,
             executeCall = {
@@ -386,7 +383,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     }
 
     override suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId> {
-        val authRepository = authRepository ?: error("Cannot sign-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
         return executeZeroAuthFlow(
             fromCreateAccountFlow = true,
             executeCall = {
@@ -401,7 +398,7 @@ class RustMatrixAuthenticationService @Inject constructor(
     ): Result<SessionId> =
         withContext(coroutineDispatchers.io) {
             runCatching {
-                val authRepository = authRepository ?: error("Cannot execute auth with zero, check instantiation")
+                val authRepository = zeroCoreRepository?.auth ?: error("Cannot execute auth with zero, check instantiation")
                 val client = currentClient ?: error("You need to call `setHomeserver()` first")
                 val currentSessionPaths = sessionPaths ?: error("You need to call `setHomeserver()` first")
 
@@ -435,6 +432,7 @@ class RustMatrixAuthenticationService @Inject constructor(
         fromCreateAccountFlow: Boolean = false,
         userMatrixId: String,
     ) {
-        authRepository?.linkZeroUser(fromCreateAccountFlow, userMatrixId)
+        zeroCoreRepository
+            ?.auth?.linkZeroUser(fromCreateAccountFlow, userMatrixId)
     }
 }

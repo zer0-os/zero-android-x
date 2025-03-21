@@ -34,7 +34,9 @@ import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.roomlist.impl.datasource.RoomListDataSource
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
+import io.element.android.features.roomlist.impl.model.HomeScreenChannel
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
+import io.element.android.features.roomlist.impl.model.channelId
 import io.element.android.features.roomlist.impl.search.RoomListSearchEvents
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
 import io.element.android.libraries.architecture.AsyncData
@@ -46,10 +48,13 @@ import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsState
 import io.element.android.libraries.indicator.api.IndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.encryption.EncryptionService
 import io.element.android.libraries.matrix.api.encryption.RecoveryState
 import io.element.android.libraries.matrix.api.roomlist.RoomList
+import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.isOnline
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
@@ -58,20 +63,26 @@ import io.element.android.libraries.preferences.api.store.SessionPreferencesStor
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import io.element.android.support.zero.common.extension.withScope
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.jvm.optionals.getOrNull
 
 private const val EXTENDED_RANGE_SIZE = 40
 private const val SUBSCRIBE_TO_VISIBLE_ROOMS_DEBOUNCE_IN_MILLIS = 300L
@@ -96,6 +107,8 @@ class RoomListPresenter @Inject constructor(
 ) : Presenter<RoomListState> {
     private val encryptionService: EncryptionService = client.encryptionService()
 
+    private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
+
     @Composable
     override fun present(): RoomListState {
         val coroutineScope = rememberCoroutineScope()
@@ -110,12 +123,12 @@ class RoomListPresenter @Inject constructor(
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
         val userRewards = client.userRewards.collectAsState()
 
+        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
+        val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
+
         LaunchedEffect(Unit) {
             roomListDataSource.launchIn(this)
-            // Force a refresh of the profile
-            client.getUserProfile()
-            // Fetch user rewards
-            client.getUserRewards(shouldCheckRewardsIntimation = true)
+            coroutineScope.fetchInitialData()
         }
 
         var securityBannerDismissed by rememberSaveable { mutableStateOf(false) }
@@ -165,6 +178,8 @@ class RoomListPresenter @Inject constructor(
                         }, 3_000)
                     }
                 }
+                RoomListEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
+                is RoomListEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
             }
         }
 
@@ -172,16 +187,24 @@ class RoomListPresenter @Inject constructor(
 
         val contentState = roomListContentState(securityBannerDismissed)
 
+        val channelContentState = channelListContentState()
+        createChannelRoomMap(
+            (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
+        )
+
         return RoomListState(
             matrixUser = matrixUser.value,
             showAvatarIndicator = showAvatarIndicator,
             snackbarMessage = snackbarMessage,
             hasNetworkConnection = isOnline,
+            genericActionState = genericActionState.value,
             contextMenu = contextMenu.value,
             leaveRoomState = leaveRoomState,
             filtersState = filtersState,
             searchState = searchState,
             contentState = contentState,
+            channelContentState = channelContentState,
+            resolvedChannelRoom = resolvedChannelRoomId.value,
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
             eventSink = ::handleEvents,
@@ -347,6 +370,94 @@ class RoomListPresenter @Inject constructor(
             }
             roomListDataSource.subscribeToVisibleRooms(roomIds)
         }
+    }
+
+    private fun CoroutineScope.fetchInitialData() = launch {
+        awaitAll(
+            // Force a refresh of the profile
+            async { client.getUserProfile() },
+            // Fetch user rewards
+            async { client.getUserRewards(shouldCheckRewardsIntimation = true) },
+            // Fetch home channels
+            async { client.getUserZIds() }
+        )
+    }
+
+    @Composable
+    private fun channelListContentState(): ChannelListContentState {
+        val homeChannelsState by produceState(initialValue = AsyncData.Loading()) {
+            client.userZIds.collect {
+                value = AsyncData.Success(it)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (homeChannelsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                homeChannelsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> ChannelListContentState.Empty
+            showSkeleton -> ChannelListContentState.Skeleton(20)
+            else -> {
+                val mappedChannels = homeChannelsState.dataOrNull()
+                    .orEmpty()
+                    .sorted()
+                    .map { HomeScreenChannel(channelFullName = it) }
+                    .distinctBy { it.channelId() }
+                    .toPersistentList()
+                ChannelListContentState.Channels(mappedChannels)
+            }
+        }
+    }
+
+    private fun createChannelRoomMap(channels: List<HomeScreenChannel>) = withScope(Dispatchers.IO) {
+        for (channel in channels) {
+            channel.channelId()?.let { channelId ->
+                val roomSummary = client.getRoomSummaryFlow(RoomAlias(channelId).toRoomIdOrAlias())
+                    .firstOrNull()
+                    ?.getOrNull()
+                roomSummary?.let { summary ->
+                    channel.notificationsCount = summary.info.numUnreadMessages.toInt()
+                    channelRoomMap.put(channelId, summary)
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.openChannel(
+        channel: HomeScreenChannel,
+        resolvedChannelRoomId: MutableState<RoomId?>,
+        genericActionState: MutableState<AsyncData<Unit>>
+    ) = launch {
+        genericActionState.value = AsyncData.Uninitialized
+        val channelId = channel.channelId() ?: return@launch
+        channelRoomMap[channelId]?.let { roomSummary ->
+            resolvedChannelRoomId.value = roomSummary.roomId
+            return@launch
+        }
+        genericActionState.value = AsyncData.Loading()
+        client.resolveRoomAlias(RoomAlias(channelId)).getOrNull()?.getOrNull()?.roomId?.let { roomId ->
+            resolvedChannelRoomId.value = roomId
+            genericActionState.value = AsyncData.Success(Unit)
+            return@launch
+        }
+        client.joinZeroChannel(channelId)
+            .onSuccess { roomId ->
+                roomId?.let {
+                    genericActionState.value = AsyncData.Success(Unit)
+                    resolvedChannelRoomId.value = RoomId(roomId)
+                } ?: run {
+                    genericActionState.value = AsyncData.Failure(Throwable("RoomId not found"))
+                }
+            }
+            .onFailure { failure ->
+                genericActionState.value = AsyncData.Failure(failure)
+            }
     }
 }
 

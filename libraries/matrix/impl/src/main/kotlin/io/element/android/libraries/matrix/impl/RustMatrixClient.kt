@@ -8,7 +8,6 @@
 package io.element.android.libraries.matrix.impl
 
 import io.element.android.libraries.androidutils.file.getSizeOfFiles
-import io.element.android.libraries.androidutils.file.safeDelete
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.coroutine.childScope
@@ -88,12 +87,7 @@ import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.data.model.UserRewards
-import io.element.android.support.zero.data.repository.AccountRepository
-import io.element.android.support.zero.data.repository.AuthRepository
-import io.element.android.support.zero.data.repository.ConversationRepository
-import io.element.android.support.zero.data.repository.InviteRepository
-import io.element.android.support.zero.data.repository.RewardsRepository
-import io.element.android.support.zero.data.repository.UserRepository
+import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -154,12 +148,7 @@ class RustMatrixClient(
     clock: SystemClock,
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     featureFlagService: FeatureFlagService,
-    zeroConversationRepository: ConversationRepository?,
-    private val zeroAuthRepository: AuthRepository?,
-    private val zeroUserRepository: UserRepository?,
-    private val zeroRewardsRepository: RewardsRepository?,
-    private val zeroInviteRepository: InviteRepository?,
-    private val zeroAccountRepository: AccountRepository?,
+    val zeroCoreRepository: ZeroCoreRepository?
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
     override val deviceId: DeviceId = DeviceId(innerClient.deviceId())
@@ -180,13 +169,12 @@ class RustMatrixClient(
     private val notificationProcessSetup = NotificationProcessSetup.SingleProcess(innerSyncService)
     private val innerNotificationClient = runBlocking { innerClient.notificationClient(notificationProcessSetup) }
     private val notificationService = RustNotificationService(innerNotificationClient, dispatchers, clock)
-    private val notificationSettingsService = RustNotificationSettingsService(innerClient, dispatchers)
-        .apply { start() }
+    private val notificationSettingsService = RustNotificationSettingsService(innerClient, sessionCoroutineScope, dispatchers)
     private val encryptionService = RustEncryptionService(
         client = innerClient,
         syncService = rustSyncService,
-        zeroAccountRepository = zeroAccountRepository,
         sessionCoroutineScope = sessionCoroutineScope,
+        zeroAccountRepository = zeroCoreRepository?.account,
         dispatchers = dispatchers,
     )
 
@@ -231,8 +219,8 @@ class RustMatrixClient(
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         featureFlagService = featureFlagService,
         roomMembershipObserver = roomMembershipObserver,
-        zeroConversationRepository = zeroConversationRepository,
-        zeroUserRepository = zeroUserRepository,
+        zeroConversationRepository = zeroCoreRepository?.conversation,
+        zeroUserRepository = zeroCoreRepository?.user,
     )
 
     override val mediaLoader: MatrixMediaLoader = RustMediaLoader(
@@ -248,7 +236,7 @@ class RustMatrixClient(
             userId = sessionId,
             // TODO cache for displayName?
             displayName = null,
-            avatarUrl = innerClient.cachedAvatarUrl(),
+            avatarUrl = null,
         )
     )
 
@@ -272,6 +260,9 @@ class RustMatrixClient(
         sessionDelegate.bindClient(this)
 
         sessionCoroutineScope.launch {
+            // Start notification settings
+            notificationSettingsService.start()
+
             // Force a refresh of the profile
             getUserProfile()
         }
@@ -394,7 +385,7 @@ class RustMatrixClient(
         runCatching {
             val profiles = awaitAll(
                 async { innerClient.getProfile(userId.value) },
-                async { zeroUserRepository?.getUser(userId.value)?.firstOrNull() }
+                async { zeroCoreRepository?.user?.getUser(userId.value)?.firstOrNull() }
             )
             val matrixProfile = profiles.first() as UserProfile
             val zeroUser = profiles.getOrNull(1) as? ZeroUser
@@ -408,7 +399,7 @@ class RustMatrixClient(
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> =
         withContext(sessionDispatcher) {
             runCatching {
-                zeroUserRepository?.let { userRepo ->
+                zeroCoreRepository?.user?.let { userRepo ->
                     val zeroSearchResults = userRepo.getUsers(filterName = searchTerm).firstOrNull() ?: emptyList()
                     val matrixUserProfiles = zeroSearchResults.map { zeroUser ->
                         UserProfileMapper.map(innerClient.getProfile(zeroUser.matrixId), zeroUser)
@@ -427,7 +418,7 @@ class RustMatrixClient(
         withContext(sessionDispatcher) {
             val result = runCatching { innerClient.setDisplayName(displayName) }
             if (result.isSuccess) {
-                zeroUserRepository?.updateUserProfile(userName = displayName)
+                zeroCoreRepository?.user?.updateUserProfile(userName = displayName)
             }
             result
         }
@@ -436,7 +427,7 @@ class RustMatrixClient(
         withContext(sessionDispatcher) {
             val result = runCatching { innerClient.setDisplayName(displayName) }
             if (result.isSuccess) {
-                zeroUserRepository?.updateUserProfile(userName = displayName, profileZId = primaryZId)
+                zeroCoreRepository?.user?.updateUserProfile(userName = displayName, profileZId = primaryZId)
             }
             result
         }
@@ -446,7 +437,7 @@ class RustMatrixClient(
             val result = runCatching { innerClient.uploadAvatar(mimeType, data) }
             if (result.isSuccess) {
                 innerClient.avatarUrl()?.let {
-                    zeroUserRepository?.updateUserProfile(avatarUrl = it)
+                    zeroCoreRepository?.user?.updateUserProfile(avatarUrl = it)
                 }
             }
             result
@@ -555,18 +546,18 @@ class RustMatrixClient(
         appCoroutineScope.launch {
             roomFactory.destroy()
             rustSyncService.destroy()
+            notificationSettingsService.destroy()
         }
         sessionCoroutineScope.cancel()
         clientDelegateTaskHandle?.cancelAndDestroy()
-        notificationSettingsService.destroy()
         verificationService.destroy()
 
         sessionDelegate.clearCurrentClient()
-        innerRoomListService.destroy()
-        notificationService.destroy()
+        innerRoomListService.close()
+        notificationService.close()
         notificationProcessSetup.destroy()
-        encryptionService.destroy()
-        innerClient.destroy()
+        encryptionService.close()
+        innerClient.close()
     }
 
     override suspend fun getCacheSize(): Long {
@@ -574,8 +565,8 @@ class RustMatrixClient(
     }
 
     override suspend fun clearCache() {
+        innerClient.clearCaches()
         close()
-        deleteSessionDirectory(deleteCryptoDb = false)
     }
 
     override suspend fun logout(userInitiated: Boolean, ignoreSdkError: Boolean) {
@@ -585,7 +576,7 @@ class RustMatrixClient(
         clientDelegateTaskHandle = null
         withContext(sessionDispatcher) {
             if (userInitiated) {
-                zeroAuthRepository?.logout()
+                zeroCoreRepository?.auth?.logout()
                 try {
                     innerClient.logout()
                 } catch (failure: Throwable) {
@@ -601,7 +592,7 @@ class RustMatrixClient(
             }
             close()
 
-            deleteSessionDirectory(deleteCryptoDb = true)
+            deleteSessionDirectory()
             if (userInitiated) {
                 sessionStore.removeSession(sessionId.value)
             }
@@ -651,7 +642,7 @@ class RustMatrixClient(
                 }
             }
             close()
-            deleteSessionDirectory(deleteCryptoDb = true)
+            deleteSessionDirectory()
             sessionStore.removeSession(sessionId.value)
         }.onFailure {
             Timber.e(it, "Failed to deactivate account")
@@ -739,55 +730,39 @@ class RustMatrixClient(
         }
     }
 
-    private suspend fun deleteSessionDirectory(
-        deleteCryptoDb: Boolean = false,
-    ): Boolean = withContext(sessionDispatcher) {
-        val sessionPaths = sessionPathsProvider.provides(sessionId) ?: return@withContext false
-        // Always delete the cache directory
-        sessionPaths.cacheDirectory.deleteRecursively()
-        if (deleteCryptoDb) {
-            // Delete the folder and all its content
-            sessionPaths.fileDirectory.deleteRecursively()
-        } else {
-            // Do not delete the crypto database files.
-            sessionPaths.fileDirectory.listFiles().orEmpty()
-                .filterNot { it.name.contains("matrix-sdk-crypto") }
-                .forEach { file ->
-                    Timber.w("Deleting file ${file.name}...")
-                    file.safeDelete()
-                }
-            true
-        }
+    private suspend fun deleteSessionDirectory() = withContext(sessionDispatcher) {
+        // Delete all the files for this session
+        sessionPathsProvider.provides(sessionId)?.deleteRecursively()
     }
 
     //region ZERO
     override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
-        zeroRewardsRepository?.shouldShowNewRewardsIntimation ?: MutableStateFlow(false)
+        zeroCoreRepository?.rewards?.shouldShowNewRewardsIntimation ?: MutableStateFlow(false)
 
     override val userRewards: StateFlow<ZeroUserRewards> =
-        (zeroRewardsRepository?.userRewards ?: MutableStateFlow(UserRewards.empty()))
+        (zeroCoreRepository?.rewards?.userRewards ?: MutableStateFlow(UserRewards.empty()))
             .mapState { it.map() }
 
     override suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean) {
-        zeroRewardsRepository?.getMyRewards(shouldCheckRewardsIntimation)
+        zeroCoreRepository?.rewards?.getMyRewards(shouldCheckRewardsIntimation)
     }
 
     override fun dismissRewardsIntimation() {
         withSameScope {
-            zeroRewardsRepository?.dismissRewardsIntimation()
+            zeroCoreRepository?.rewards?.dismissRewardsIntimation()
         }
     }
 
     override val messengerInvite: StateFlow<ZeroMessengerInvite> =
-        (zeroInviteRepository?.messengerInvite ?: MutableStateFlow(MessengerInvite.empty()))
+        (zeroCoreRepository?.invite?.messengerInvite ?: MutableStateFlow(MessengerInvite.empty()))
             .mapState { it.map() }
 
     override suspend fun getZeroMessengerInvite() {
-        zeroInviteRepository?.fetchMessengerInvite()
+        zeroCoreRepository?.invite?.fetchMessengerInvite()
     }
 
     override suspend fun isZeroProfileCompletionPending(): Boolean {
-        return zeroUserRepository?.getCurrentUser()
+        return zeroCoreRepository?.user?.getCurrentUser()
             ?.firstOrNull()?.let { user ->
                 user.name.isBlank() || user.nameIsMatrixHex()
             } ?: false
@@ -808,7 +783,7 @@ class RustMatrixClient(
             }
             val responses = updateProfileRequests.awaitAll()
             val avatarUrl = innerClient.getProfile(sessionId.value).avatarUrl
-            val inviterFlow = zeroAuthRepository?.completeSignUp(
+            val inviterFlow = zeroCoreRepository?.auth?.completeSignUp(
                 inviteCode = inviteCode, displayName = displayName, avatarUrl = avatarUrl
             )
             val inviterId = inviterFlow?.firstOrNull()?.matrixId
@@ -820,30 +795,36 @@ class RustMatrixClient(
 
     override suspend fun deleteUserAccount(): Result<Unit> = withContext(sessionDispatcher) {
         runCatching {
-            val accountRepository = zeroAccountRepository ?: return@runCatching
+            val accountRepository = zeroCoreRepository?.account ?: return@runCatching
             accountRepository.deleteUserAccount()
         }
     }
 
     override suspend fun linkZeroUserIfRequired(): Result<Unit> = withContext(sessionDispatcher) {
         runCatching {
-            val accountRepository = zeroAccountRepository ?: return@runCatching
+            val accountRepository = zeroCoreRepository?.account ?: return@runCatching
             accountRepository.linkUserAccount(sessionId.value)
         }
     }
 
     override suspend fun verifyUserPassword(password: String): Result<Unit> = withContext(sessionDispatcher) {
         runCatching {
-            val accountRepository = zeroAccountRepository ?: return@runCatching
+            val accountRepository = zeroCoreRepository?.account ?: return@runCatching
             accountRepository.verifyUserPassword(password)
         }
     }
 
     override suspend fun getUserZIds() {
         val userZIds = runCatching {
-            zeroAccountRepository?.fetchUserZIds() ?: emptyList()
+            zeroCoreRepository?.account?.fetchUserZIds() ?: emptyList()
         }.getOrElse { emptyList() }
         _userZIds.emit(userZIds)
+    }
+
+    override suspend fun joinZeroChannel(channelId: String): Result<String?> = withContext(sessionDispatcher){
+        runCatching {
+            zeroCoreRepository?.channel?.joinChannel(channelId)
+        }
     }
     //endregion
 }

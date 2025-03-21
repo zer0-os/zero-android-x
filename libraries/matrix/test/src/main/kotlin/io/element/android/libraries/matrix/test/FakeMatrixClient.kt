@@ -170,7 +170,7 @@ class FakeMatrixClient(
         return 0
     }
 
-    override suspend fun clearCache() {
+    override suspend fun clearCache() = simulateLongTask {
         clearCacheLambda()
     }
 
@@ -383,5 +383,9 @@ class FakeMatrixClient(
     override val userZIds: StateFlow<List<String>> = MutableStateFlow(emptyList())
 
     override suspend fun getUserZIds() {}
+
+    override suspend fun joinZeroChannel(channelId: String): Result<String?> {
+        return Result.success("")
+    }
     //endregion
 }

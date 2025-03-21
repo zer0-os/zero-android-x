@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -89,9 +90,9 @@ fun RoomMemberListView(
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (!state.isSearchActive && !state.isRoomAChannel) {
+            if (!state.isSearchActive) {
                 RoomMemberListTopBar(
-                    canInvite = state.canInvite,
+                    canInvite = state.canInvite && !state.isRoomAChannel,
                     onBackClick = navigator::exitRoomMemberList,
                     onInviteClick = navigator::openInviteMembers,
                 )
@@ -320,6 +321,7 @@ private fun RoomMemberListItem(
                 when (roomMemberWithIdentity.identityState) {
                     IdentityState.Verified -> {
                         Icon(
+                            modifier = Modifier.size(20.dp),
                             imageVector = CompoundIcons.Verified(),
                             contentDescription = stringResource(CommonStrings.common_verified),
                             tint = ElementTheme.colors.iconSuccessPrimary
@@ -327,6 +329,7 @@ private fun RoomMemberListItem(
                     }
                     IdentityState.VerificationViolation -> {
                         Icon(
+                            modifier = Modifier.size(20.dp),
                             imageVector = CompoundIcons.ErrorSolid(),
                             contentDescription = stringResource(
                                 CommonStrings.crypto_identity_change_profile_pin_violation,

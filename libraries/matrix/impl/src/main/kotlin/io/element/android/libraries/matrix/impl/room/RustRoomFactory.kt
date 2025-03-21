@@ -108,10 +108,10 @@ class RustRoomFactory(
                 return@withContext null
             }
             val liveTimeline = roomReferences.fullRoom.timeline()
+            val initialRoomInfo = roomReferences.fullRoom.roomInfo()
             RustMatrixRoom(
                 sessionId = sessionId,
                 deviceId = deviceId,
-                roomListItem = roomReferences.roomListItem,
                 innerRoom = roomReferences.fullRoom,
                 innerTimeline = liveTimeline,
                 sessionCoroutineScope = sessionCoroutineScope,
@@ -123,6 +123,7 @@ class RustRoomFactory(
                 matrixRoomInfoMapper = matrixRoomInfoMapper,
                 featureFlagService = featureFlagService,
                 roomMembershipObserver = roomMembershipObserver,
+                initialRoomInfo = matrixRoomInfoMapper.map(initialRoomInfo),
                 zeroConversationRepository = zeroConversationRepository,
                 zeroUserRepository = zeroUserRepository
             )
@@ -166,7 +167,7 @@ class RustRoomFactory(
             Timber.d("Room not found for $roomId")
             return@withContext null
         }
-        roomListItem.invitedRoom().leave()
+        roomListItem.previewRoom(emptyList()).leave()
     }
 
     private suspend fun getRoomReferences(roomId: RoomId): RustRoomReferences? {

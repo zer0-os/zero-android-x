@@ -12,8 +12,10 @@ import io.element.android.features.invite.api.response.AcceptDeclineInviteState
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
+import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
+import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsState
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -27,11 +29,14 @@ data class RoomListState(
     val showAvatarIndicator: Boolean,
     val hasNetworkConnection: Boolean,
     val snackbarMessage: SnackbarMessage?,
+    val genericActionState: AsyncData<Unit>,
     val contextMenu: ContextMenu,
     val leaveRoomState: LeaveRoomState,
     val filtersState: RoomListFiltersState,
     val searchState: RoomListSearchState,
     val contentState: RoomListContentState,
+    val channelContentState: ChannelListContentState,
+    val resolvedChannelRoom: RoomId?,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,
     val eventSink: (RoomListEvents) -> Unit,
@@ -41,7 +46,7 @@ data class RoomListState(
 ) {
     //val displayFilters = contentState is RoomListContentState.Rooms
     val displayFilters = false //Hiding room list filters for now
-    val displayActions = true
+    private val displayActions = true
 
     sealed interface ContextMenu {
         data object Hidden : ContextMenu
@@ -54,6 +59,11 @@ data class RoomListState(
             val eventCacheFeatureFlagEnabled: Boolean,
             val hasNewContent: Boolean,
         ) : ContextMenu
+    }
+
+    fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {
+        return displayActions &&
+            selectedHomeTab in listOf(HomeScreenTab.CHAT)
     }
 }
 
@@ -69,6 +79,7 @@ sealed interface RoomListContentState {
     data class Empty(
         val securityBannerState: SecurityBannerState,
     ) : RoomListContentState
+
     data class Rooms(
         val securityBannerState: SecurityBannerState,
         val fullScreenIntentPermissionsState: FullScreenIntentPermissionsState,

@@ -42,7 +42,7 @@ fun TestScope.createRustMatrixClientFactory(
 ) = RustMatrixClientFactory(
     baseDirectory = baseDirectory,
     cacheDirectory = cacheDirectory,
-    appCoroutineScope = this,
+    appCoroutineScope = backgroundScope,
     coroutineDispatchers = testCoroutineDispatchers(),
     sessionStore = sessionStore,
     userAgentProvider = SimpleUserAgentProvider(),
@@ -53,10 +53,5 @@ fun TestScope.createRustMatrixClientFactory(
     featureFlagService = FakeFeatureFlagService(),
     timelineEventTypeFilterFactory = FakeTimelineEventTypeFilterFactory(),
     clientBuilderProvider = FakeClientBuilderProvider(),
-    zeroConversationRepository = null,
-    zeroAuthRepository = null,
-    zeroUserRepository = null,
-    zeroRewardsRepository = null,
-    zeroInviteRepository = null,
-    zeroAccountRepository = null,
+    zeroCoreRepository = null
 )

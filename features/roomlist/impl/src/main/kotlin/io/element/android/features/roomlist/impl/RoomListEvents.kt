@@ -7,6 +7,7 @@
 
 package io.element.android.features.roomlist.impl
 
+import io.element.android.features.roomlist.impl.model.HomeScreenChannel
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.libraries.matrix.api.core.RoomId
 
@@ -18,7 +19,8 @@ sealed interface RoomListEvents {
     data class AcceptInvite(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
     data class DeclineInvite(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
     data class ShowContextMenu(val roomListRoomSummary: RoomListRoomSummary) : RoomListEvents
-    data class DismissRewardsIntimation(val immediate: Boolean = true): RoomListEvents
+    data class DismissRewardsIntimation(val immediate: Boolean = true) : RoomListEvents
+    data object HideError : RoomListEvents
 
     sealed interface ContextMenuEvents : RoomListEvents
     data object HideContextMenu : ContextMenuEvents
@@ -27,4 +29,7 @@ sealed interface RoomListEvents {
     data class MarkAsUnread(val roomId: RoomId) : ContextMenuEvents
     data class SetRoomIsFavorite(val roomId: RoomId, val isFavorite: Boolean) : ContextMenuEvents
     data class ClearCacheOfRoom(val roomId: RoomId) : ContextMenuEvents
+
+    sealed interface ChannelEvents : RoomListEvents
+    data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
 }

@@ -191,6 +191,8 @@ interface MatrixClient : Closeable {
     suspend fun verifyUserPassword(password: String): Result<Unit>
 
     suspend fun getUserZIds()
+
+    suspend fun joinZeroChannel(channelId: String): Result<String?>
 }
 
 /**

@@ -17,6 +17,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -25,11 +30,18 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
+import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
+import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
+import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
 import io.element.android.features.roomlist.impl.components.RoomListTopBar
+import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchView
+import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.components.ProgressDialog
+import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.FloatingActionButton
@@ -38,6 +50,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun RoomListView(
@@ -52,6 +65,11 @@ fun RoomListView(
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
+    val resolvedChannelRoomId by remember(state.resolvedChannelRoom) {
+        derivedStateOf { state.resolvedChannelRoom }
+    }
+    resolvedChannelRoomId?.let { onRoomClick(it) }
+
     ConnectivityIndicatorContainer(
         modifier = modifier,
         isOnline = state.hasNetworkConnection,
@@ -89,6 +107,17 @@ fun RoomListView(
                     .background(ElementTheme.colors.bgCanvasDefault)
             )
             acceptDeclineInviteView()
+
+            if (state.genericActionState is AsyncData.Loading) {
+                ProgressDialog()
+            }
+
+            if (state.genericActionState is AsyncData.Failure) {
+                ErrorDialog(
+                    content = stringResource(CommonStrings.error_unknown),
+                    onSubmit = { state.eventSink(RoomListEvents.HideError) }
+                )
+            }
         }
     }
 }
@@ -113,6 +142,8 @@ private fun RoomListScaffold(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(appBarState)
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
 
+    val selectedNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -124,7 +155,7 @@ private fun RoomListScaffold(
                 onMenuActionClick = onMenuActionClick,
                 onOpenSettings = onOpenSettings,
                 scrollBehavior = scrollBehavior,
-                displayMenuItems = state.displayActions,
+                displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
                 displayFilters = state.displayFilters,
                 filtersState = state.filtersState,
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
@@ -135,10 +166,9 @@ private fun RoomListScaffold(
             )
         },
         content = { padding ->
-            RoomListContentView(
-                contentState = state.contentState,
-                filtersState = state.filtersState,
-                eventSink = state.eventSink,
+            HomeScreenContent(
+                state = state,
+                selectedHomeScreenTab = selectedNavigationTab.value,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = ::onRoomClick,
@@ -149,7 +179,7 @@ private fun RoomListScaffold(
             )
         },
         floatingActionButton = {
-            if (state.displayActions) {
+            if (state.shouldDisplayActions(selectedNavigationTab.value)) {
                 FloatingActionButton(
                     containerColor = ElementTheme.colors.iconPrimary,
                     onClick = onCreateRoomClick
@@ -163,7 +193,60 @@ private fun RoomListScaffold(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            HomeScreenTabView(
+                selectedNavigationTab = selectedNavigationTab.value,
+                onTabSelected = { tab ->
+                    selectedNavigationTab.value = tab
+                }
+            )
+        }
     )
+}
+
+@Composable
+internal fun HomeScreenContent(
+    state: RoomListState,
+    selectedHomeScreenTab: HomeScreenTab,
+    onSetUpRecoveryClick: () -> Unit,
+    onConfirmRecoveryKeyClick: () -> Unit,
+    onRoomClick: (RoomListRoomSummary) -> Unit,
+    onCreateRoomClick: () -> Unit,
+    modifier: Modifier,
+) {
+    fun onNotificationClick(room: RoomListRoomSummary) {
+        onRoomClick(room)
+    }
+
+    when (selectedHomeScreenTab) {
+        HomeScreenTab.CHAT -> {
+            RoomListContentView(
+                contentState = state.contentState,
+                filtersState = state.filtersState,
+                eventSink = state.eventSink,
+                onSetUpRecoveryClick = onSetUpRecoveryClick,
+                onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
+                onRoomClick = onRoomClick,
+                onCreateRoomClick = onCreateRoomClick,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.CHANNEL -> {
+            HomeChannelListContentView(
+                contentState = state.channelContentState,
+                eventSink = state.eventSink,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.NOTIFICATION -> {
+            HomeNotificationListContentView(
+                contentState = state.contentState,
+                eventSink = state.eventSink,
+                onNotificationClick = ::onNotificationClick,
+                modifier = modifier
+            )
+        }
+    }
 }
 
 internal fun RoomListRoomSummary.contentType() = displayType.ordinal

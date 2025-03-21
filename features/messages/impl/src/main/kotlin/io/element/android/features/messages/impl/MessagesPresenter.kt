@@ -128,7 +128,7 @@ class MessagesPresenter @AssistedInject constructor(
     override fun present(): MessagesState {
         htmlConverterProvider.Update(currentUserId = room.sessionId)
 
-        val roomInfo by room.roomInfoFlow.collectAsState(null)
+        val roomInfo by room.roomInfoFlow.collectAsState()
         val localCoroutineScope = rememberCoroutineScope()
         val composerState = composerPresenter.present()
         val voiceMessageComposerState = voiceMessageComposerPresenter.present()
@@ -148,14 +148,14 @@ class MessagesPresenter @AssistedInject constructor(
         val userEventPermissions by userEventPermissions(syncUpdateFlow.value)
 
         val roomName: AsyncData<String> by remember {
-            derivedStateOf { roomInfo?.name?.let { AsyncData.Success(it) } ?: AsyncData.Uninitialized }
+            derivedStateOf { roomInfo.name?.let { AsyncData.Success(it) } ?: AsyncData.Uninitialized }
         }
         val roomAvatar: AsyncData<AvatarData> by remember {
-            derivedStateOf { roomInfo?.avatarData()?.let { AsyncData.Success(it) } ?: AsyncData.Uninitialized }
+            derivedStateOf { AsyncData.Success(roomInfo.avatarData()) }
         }
         val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.primaryZeroId } }
         val heroes by remember {
-            derivedStateOf { roomInfo?.heroes().orEmpty().toPersistentList() }
+            derivedStateOf { roomInfo.heroes().toPersistentList() }
         }
 
         var hasDismissedInviteDialog by rememberSaveable {
@@ -167,6 +167,11 @@ class MessagesPresenter @AssistedInject constructor(
             withContext(dispatchers.io) {
                 room.setUnreadFlag(isUnread = false)
 
+                // If for some reason the encryption state is unknown, fetch it
+                if (roomInfo.isEncrypted == null) {
+                    room.getUpdatedIsEncrypted()
+                }
+
                 if (room.isOneToOne) {
                     room.fetchDirectZeroUser()
                 }
@@ -175,9 +180,10 @@ class MessagesPresenter @AssistedInject constructor(
 
         val inviteProgress = remember { mutableStateOf<AsyncData<Unit>>(AsyncData.Uninitialized) }
         var showReinvitePrompt by remember { mutableStateOf(false) }
-        LaunchedEffect(hasDismissedInviteDialog, composerState.textEditorState.hasFocus(), syncUpdateFlow.value) {
+        val composerHasFocus by remember { derivedStateOf { composerState.textEditorState.hasFocus() } }
+        LaunchedEffect(hasDismissedInviteDialog, composerHasFocus, roomInfo) {
             withContext(dispatchers.io) {
-                showReinvitePrompt = !hasDismissedInviteDialog && composerState.textEditorState.hasFocus() && room.isDm && room.activeMemberCount == 1L
+                showReinvitePrompt = !hasDismissedInviteDialog && composerHasFocus && roomInfo.isDm && roomInfo.activeMembersCount == 1L
             }
         }
         val isOnline by syncService.isOnline().collectAsState()
@@ -193,13 +199,16 @@ class MessagesPresenter @AssistedInject constructor(
 
         val membersState by room.membersStateFlow.collectAsState()
         val dmRoomMember by room.getDirectRoomMember(membersState)
+        val roomMemberIdentityStateChanges = identityChangeState.roomMemberIdentityStateChanges
 
-        // TODO use `RoomInfo.isEncrypted` as a key here once it's available
-        LifecycleResumeEffect(dmRoomMember) {
-            if (room.isEncrypted) {
+        LifecycleResumeEffect(dmRoomMember, roomInfo.isEncrypted) {
+            if (roomInfo.isEncrypted == true) {
                 val dmRoomMemberId = dmRoomMember?.userId
                 localCoroutineScope.launch {
-                    dmRoomMemberId?.let { dmUserVerificationState = encryptionService.getUserIdentity(it).getOrNull() }
+                    dmRoomMemberId?.let { userId ->
+                        dmUserVerificationState = roomMemberIdentityStateChanges.find { it.identityRoomMember.userId == userId }?.identityState
+                            ?: encryptionService.getUserIdentity(userId).getOrNull()
+                    }
                 }
             }
             onPauseOrDispose {}
@@ -278,7 +287,7 @@ class MessagesPresenter @AssistedInject constructor(
         return AvatarData(
             id = id.value,
             name = name,
-            url = avatarUrl ?: room.avatarUrl,
+            url = avatarUrl ?: room.info().avatarUrl,
             size = AvatarSize.TimelineRoom
         )
     }

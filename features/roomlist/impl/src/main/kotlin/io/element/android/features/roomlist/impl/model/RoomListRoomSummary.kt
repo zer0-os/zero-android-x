@@ -13,6 +13,7 @@ import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.matrix.ui.model.InviteSender
+import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -47,4 +48,6 @@ data class RoomListRoomSummary(
         numberOfUnreadNotifications > 0 ||
         isMarkedUnread ||
         displayType == RoomSummaryDisplayType.INVITE
+
+    val isAChannel = name?.startsWith(ZERO_CHANNEL_PREFIX) == true
 }

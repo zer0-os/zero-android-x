@@ -26,6 +26,7 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.messages.impl.timeline.TimelineEvents
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
 import io.element.android.features.messages.impl.timeline.model.event.isEdited
+import io.element.android.features.messages.impl.timeline.model.event.isRedacted
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -55,7 +56,8 @@ fun TimelineEventTimestampView(
     val formattedTime = event.sentTime
     val hasEncryptionCritical = event.messageShield?.isCritical.orFalse()
     val isMessageEdited = event.content.isEdited()
-    // val tint = if (hasError || hasEncryptionCritical) ElementTheme.colors.textCriticalPrimary else ElementTheme.colors.textSecondary
+    val isMessageRedacted = event.content.isRedacted()
+    // val tint = if (hasError || hasEncryptionCritical && !isMessageRedacted) ElementTheme.colors.textCriticalPrimary else ElementTheme.colors.textSecondary
     val tint = ElementTheme.colors.textSecondary
     Row(
         modifier = Modifier
@@ -90,19 +92,22 @@ fun TimelineEventTimestampView(
                         },
             )
         }
-        /*event.messageShield?.let { shield ->
-            Spacer(modifier = Modifier.width(2.dp))
-            Icon(
-                imageVector = shield.toIcon(),
-                contentDescription = shield.toText(),
-                modifier = Modifier
+
+        /*if (!isMessageRedacted) {
+            event.messageShield?.let { shield ->
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    imageVector = shield.toIcon(),
+                    contentDescription = shield.toText(),
+                    modifier = Modifier
                         .size(15.dp)
                         .clickable {
                             eventSink(TimelineEvents.ShowShieldDialog(shield))
                         },
-                tint = shield.toIconColor(),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
+                    tint = shield.toIconColor(),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
         }*/
     }
 }
