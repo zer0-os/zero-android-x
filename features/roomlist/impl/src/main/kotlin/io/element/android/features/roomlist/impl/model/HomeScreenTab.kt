@@ -16,7 +16,7 @@ enum class HomeScreenTab(
 ) {
     CHAT("Chat", R.drawable.home_tab_chat_icon),
     CHANNEL("Channels", R.drawable.home_tab_channel_icon),
-    /*FEED("Feed", R.drawable.home_tab_feed_icon),
+    // FEED("Feed", R.drawable.home_tab_feed_icon),
     NOTIFICATION("Notifications", R.drawable.home_tab_notification_icon),
-    PROFILE("Profile", R.drawable.home_tab_profile_icon),*/
+    // PROFILE("Profile", R.drawable.home_tab_profile_icon),
 }

@@ -36,7 +36,7 @@ fun HomeChannelRow(
     Row(
         modifier = Modifier
             .clickable { onChannelClick() }
-            .padding(24.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val channelDisplayName = buildAnnotatedString {
@@ -57,6 +57,9 @@ fun HomeChannelRow(
         )
 
         if (channel.notificationsCount > 0) {
+            val notificationCountText = if (channel.notificationsCount > 99) {
+                "99+"
+            } else channel.notificationsCount.toString()
             Text(
                 modifier = Modifier
                     .background(
@@ -64,7 +67,7 @@ fun HomeChannelRow(
                         shape = CircleShape
                     )
                     .padding(6.dp),
-                text = " ${channel.notificationsCount} ",
+                text = " $notificationCountText ",
                 style = ElementTheme.zeroTypography.fontBodySmMedium,
                 color = ElementTheme.colors.zeroBrandColor
             )

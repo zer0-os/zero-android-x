@@ -26,7 +26,9 @@ fun HomeScreenTabView(
     selectedNavigationTab: HomeScreenTab = HomeScreenTab.CHAT,
     onTabSelected: (HomeScreenTab) -> Unit = {}
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color(0xFF1A1B1F)
+    ) {
         HomeScreenTab.entries.forEachIndexed { _, homeScreenTab ->
             NavigationBarItem(
                 selected = selectedNavigationTab == homeScreenTab,
@@ -40,7 +42,7 @@ fun HomeScreenTabView(
                 alwaysShowLabel = false,
                 colors = NavigationBarItemDefaults.colors().copy(
                     selectedIconColor = ElementTheme.colors.zeroBrandColor,
-                    selectedIndicatorColor = Color.Transparent
+                    selectedIndicatorColor = Color.Transparent,
                 )
             )
         }

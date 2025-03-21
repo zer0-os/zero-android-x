@@ -225,7 +225,7 @@ private fun RoomsViewList(
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.
         itemsIndexed(
-            items = state.summaries,
+            items = state.summaries.filter { !it.isAChannel },
             contentType = { _, room -> room.contentType() },
         ) { index, room ->
             RoomSummaryRow(

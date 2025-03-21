@@ -31,6 +31,7 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
+import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
 import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
@@ -213,6 +214,10 @@ internal fun HomeScreenContent(
     onCreateRoomClick: () -> Unit,
     modifier: Modifier,
 ) {
+    fun onNotificationClick(room: RoomListRoomSummary) {
+        onRoomClick(room)
+    }
+
     when (selectedHomeScreenTab) {
         HomeScreenTab.CHAT -> {
             RoomListContentView(
@@ -230,6 +235,14 @@ internal fun HomeScreenContent(
             HomeChannelListContentView(
                 contentState = state.channelContentState,
                 eventSink = state.eventSink,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.NOTIFICATION -> {
+            HomeNotificationListContentView(
+                contentState = state.contentState,
+                eventSink = state.eventSink,
+                onNotificationClick = ::onNotificationClick,
                 modifier = modifier
             )
         }
