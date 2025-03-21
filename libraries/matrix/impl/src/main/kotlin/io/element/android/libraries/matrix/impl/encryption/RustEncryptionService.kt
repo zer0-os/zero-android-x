@@ -234,7 +234,7 @@ internal class RustEncryptionService(
         ) ?: error("User identity not found")
     }
 
-    fun destroy() {
-        service.destroy()
+    fun close() {
+        service.close()
     }
 }

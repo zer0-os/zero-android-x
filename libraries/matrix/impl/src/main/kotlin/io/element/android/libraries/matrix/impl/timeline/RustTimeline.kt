@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
@@ -216,19 +217,19 @@ class RustTimeline(
         _timelineItems,
         backPaginationStatus,
         forwardPaginationStatus,
-        matrixRoom.roomInfoFlow.map { it.creator },
+        matrixRoom.roomInfoFlow.map { it.creator to it.isDm }.distinctUntilChanged(),
         isTimelineInitialized,
     ) { timelineItems,
         backwardPaginationStatus,
         forwardPaginationStatus,
-        roomCreator,
+        (roomCreator, isDm),
         isTimelineInitialized ->
         withContext(dispatcher) {
             timelineItems
                 .let { items ->
                     roomBeginningPostProcessor.process(
                         items = items,
-                        isDm = matrixRoom.isDm,
+                        isDm = isDm,
                         roomCreator = roomCreator,
                         hasMoreToLoadBackwards = backwardPaginationStatus.hasMoreToLoad,
                     )
