@@ -15,6 +15,8 @@ import io.element.android.support.zero.data.repository.ChannelRepository
 import io.element.android.support.zero.data.repository.ChannelRepositoryImpl
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.ConversationRepositoryImpl
+import io.element.android.support.zero.data.repository.FeedRepository
+import io.element.android.support.zero.data.repository.FeedRepositoryImpl
 import io.element.android.support.zero.data.repository.InviteRepository
 import io.element.android.support.zero.data.repository.InviteRepositoryImpl
 import io.element.android.support.zero.data.repository.RewardsRepository
@@ -26,6 +28,7 @@ import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroChannelService
 import io.element.android.support.zero.network.service.ZeroConversationService
+import io.element.android.support.zero.network.service.ZeroFeedService
 import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroRewardService
@@ -42,14 +45,16 @@ object RepositoryModule {
         accountRepository: AccountRepository,
         conversationRepository: ConversationRepository,
         channelRepository: ChannelRepository,
+        feedRepository: FeedRepository,
         inviteRepository: InviteRepository,
         rewardsRepository: RewardsRepository,
-        userRepository: UserRepository
+        userRepository: UserRepository,
     ): ZeroCoreRepository = ZeroCoreRepository(
         auth = authRepository,
         account = accountRepository,
         channel = channelRepository,
         conversation = conversationRepository,
+        feed = feedRepository,
         invite = inviteRepository,
         rewards = rewardsRepository,
         user = userRepository
@@ -102,4 +107,10 @@ object RepositoryModule {
     fun bindChannelRepository(
         zeroChannelService: ZeroChannelService
     ): ChannelRepository = ChannelRepositoryImpl(zeroChannelService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindFeedRepository(
+        zeroFeedService: ZeroFeedService
+    ): FeedRepository = FeedRepositoryImpl(zeroFeedService)
 }

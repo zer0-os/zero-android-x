@@ -1,0 +1,61 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.support.zero.data.repository
+
+import io.element.android.support.zero.network.model.response.ApiFeed
+import io.element.android.support.zero.network.service.ZeroFeedService
+
+class FeedRepositoryImpl(
+    private val zeroFeedService: ZeroFeedService
+) : FeedRepository {
+
+    override suspend fun fetchAllFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
+        return runCatching {
+            zeroFeedService.fetchAllFeeds(
+                limit = limit,
+                skip = skip,
+                includeReplies = includeReplies.toString(),
+                includeMeows = includeMeows.toString()
+            ).feeds
+        }.getOrDefault(emptyList())
+    }
+
+    override suspend fun fetchAllMyFeeds(primaryZId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
+        return runCatching {
+            zeroFeedService.fetchMyFeeds(
+                primaryZId = primaryZId,
+                limit = limit,
+                skip = skip,
+                includeReplies = includeReplies.toString(),
+                includeMeows = includeMeows.toString()
+            ).feeds
+        }.getOrDefault(emptyList())
+    }
+
+    override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeows: Boolean): ApiFeed? {
+        return runCatching {
+            zeroFeedService.fetchFeedDetails(
+                feedId = feedId,
+                includeReplies = includeReplies.toString(),
+                includeMeows = includeMeows.toString()
+            ).feed
+        }.getOrDefault(null)
+    }
+
+    override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
+        return runCatching {
+            zeroFeedService.fetchFeedReplies(
+                feedId = feedId,
+                limit = limit,
+                skip = skip,
+                includeReplies = includeReplies.toString(),
+                includeMeows = includeMeows.toString()
+            ).feedReplies
+        }.getOrDefault(emptyList())
+    }
+}

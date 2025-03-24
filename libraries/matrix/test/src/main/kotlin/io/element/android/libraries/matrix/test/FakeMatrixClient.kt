@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
@@ -387,5 +388,21 @@ class FakeMatrixClient(
     override suspend fun joinZeroChannel(channelId: String): Result<String?> {
         return Result.success("")
     }
+
+    override val allFeeds: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+
+    override suspend fun fetchAllFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
+
+    override val allMyFeeds: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+
+    override suspend fun fetchAllMyFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
+
+    override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?> {
+        return Result.success(ZeroFeed.placeholder())
+    }
+
+    override val feedReplies: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+
+    override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
     //endregion
 }
