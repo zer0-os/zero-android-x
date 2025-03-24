@@ -9,8 +9,11 @@ package io.element.android.features.roomlist.impl.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,36 +43,37 @@ fun HomeChannelRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val channelDisplayName = buildAnnotatedString {
+            append(ZERO_CHANNEL_PREFIX)
             withStyle(
-                SpanStyle(
-                    color = ElementTheme.colors.textSecondary
-                )
+                if (channel.notificationsCount > 0) {
+                    SpanStyle(
+                        color = ElementTheme.colors.textPrimary
+                    )
+                } else {
+                    SpanStyle(
+                        color = ElementTheme.colors.textSecondary
+                    )
+                }
             ) {
-                append(ZERO_CHANNEL_PREFIX)
+                append(channel.displayTitle ?: "")
             }
-            append(channel.displayTitle ?: "")
         }
         Text(
             modifier = Modifier.weight(1f),
             text = channelDisplayName,
             style = ElementTheme.zeroTypography.fontBodyLgMedium,
-            color = ElementTheme.colors.textPrimary
+            color = ElementTheme.colors.textSecondary
         )
 
         if (channel.notificationsCount > 0) {
-            val notificationCountText = if (channel.notificationsCount > 99) {
-                "99+"
-            } else channel.notificationsCount.toString()
-            Text(
+            Box(
                 modifier = Modifier
                     .background(
-                        color = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f),
+                        color = ElementTheme.colors.zeroBrandColor,
                         shape = CircleShape
                     )
-                    .padding(6.dp),
-                text = " $notificationCountText ",
-                style = ElementTheme.zeroTypography.fontBodySmMedium,
-                color = ElementTheme.colors.zeroBrandColor
+                    .width(6.dp)
+                    .height(6.dp)
             )
         }
     }
