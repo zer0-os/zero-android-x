@@ -32,4 +32,12 @@ sealed interface RoomListEvents {
 
     sealed interface ChannelEvents : RoomListEvents
     data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
+
+    sealed interface HomeFeedEvents: RoomListEvents
+    data class LoadMoreFeeds(val skip: Int): HomeFeedEvents
+    data object RefreshFeeds: HomeFeedEvents
+
+    sealed interface HomeProfileEvents: RoomListEvents
+    data class LoadMoreMyFeeds(val skip: Int): HomeProfileEvents
+    data object RefreshMyFeeds: HomeFeedEvents
 }

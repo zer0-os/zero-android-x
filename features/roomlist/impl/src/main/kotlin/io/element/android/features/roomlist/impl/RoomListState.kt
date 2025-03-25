@@ -36,6 +36,8 @@ data class RoomListState(
     val searchState: RoomListSearchState,
     val contentState: RoomListContentState,
     val channelContentState: ChannelListContentState,
+    val allFeedsContentState: FeedListContentState,
+    val myFeedsContentState: FeedListContentState,
     val resolvedChannelRoom: RoomId?,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,

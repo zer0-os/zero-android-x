@@ -398,7 +398,7 @@ class FakeMatrixClient(
     override suspend fun fetchAllMyFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
 
     override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?> {
-        return Result.success(ZeroFeed.placeholder())
+        return Result.success(ZeroFeed.placeholder)
     }
 
     override val feedReplies: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())

@@ -31,7 +31,9 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
+import io.element.android.features.roomlist.impl.components.HomeFeedListContentView
 import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
+import io.element.android.features.roomlist.impl.components.HomeProfileContentView
 import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
@@ -238,11 +240,31 @@ internal fun HomeScreenContent(
                 modifier = modifier
             )
         }
+        HomeScreenTab.FEED -> {
+            HomeFeedListContentView(
+                contentState = state.allFeedsContentState,
+                eventSink = state.eventSink,
+                onFeedClick = {
+
+                },
+                modifier = modifier
+            )
+        }
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
                 contentState = state.contentState,
                 eventSink = state.eventSink,
                 onNotificationClick = ::onNotificationClick,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.PROFILE -> {
+            HomeProfileContentView(
+                contentState = state.myFeedsContentState,
+                eventSink = state.eventSink,
+                onFeedClick = {
+
+                },
                 modifier = modifier
             )
         }

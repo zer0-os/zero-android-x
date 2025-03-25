@@ -35,7 +35,7 @@ data class ZeroFeed(
 ) : Parcelable {
 
     companion object {
-        fun placeholder() = ZeroFeed(
+        val placeholder = ZeroFeed(
             id = UUID.randomUUID().toString(),
             userId = UUID.randomUUID().toString(),
             zid = UUID.randomUUID().toString(),
