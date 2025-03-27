@@ -87,7 +87,7 @@ import kotlin.jvm.optionals.getOrNull
 
 private const val EXTENDED_RANGE_SIZE = 40
 private const val SUBSCRIBE_TO_VISIBLE_ROOMS_DEBOUNCE_IN_MILLIS = 300L
-private const val HOME_FEED_PAGE_SIZE = 10
+private const val HOME_FEED_PAGE_SIZE = 15
 
 class RoomListPresenter @Inject constructor(
     private val client: MatrixClient,

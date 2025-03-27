@@ -28,6 +28,8 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.messages.impl.actionlist.ActionListEvents
 import io.element.android.features.messages.impl.actionlist.ActionListView
 import io.element.android.features.messages.impl.actionlist.model.TimelineItemAction
+import io.element.android.features.messages.impl.link.LinkEvents
+import io.element.android.features.messages.impl.link.LinkView
 import io.element.android.features.messages.impl.timeline.components.TimelineItemRow
 import io.element.android.features.messages.impl.timeline.components.event.TimelineItemEventContentView
 import io.element.android.features.messages.impl.timeline.components.layout.ContentAvoidingLayoutData
@@ -51,6 +53,7 @@ import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.compose.LocalAnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import io.element.android.wysiwyg.link.Link
 
 @Composable
 fun PinnedMessagesListView(
@@ -58,8 +61,8 @@ fun PinnedMessagesListView(
     onBackClick: () -> Unit,
     onEventClick: (event: TimelineItem.Event) -> Unit,
     onUserDataClick: (UserId) -> Unit,
-    onLinkClick: (String) -> Unit,
-    onLinkLongClick: (String) -> Unit,
+    onLinkClick: (Link) -> Unit,
+    onLinkLongClick: (Link) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -114,8 +117,8 @@ private fun PinnedMessagesListContent(
     state: PinnedMessagesListState,
     onEventClick: (event: TimelineItem.Event) -> Unit,
     onUserDataClick: (UserId) -> Unit,
-    onLinkClick: (String) -> Unit,
-    onLinkLongClick: (String) -> Unit,
+    onLinkClick: (Link) -> Unit,
+    onLinkLongClick: (Link) -> Unit,
     onErrorDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -170,8 +173,8 @@ private fun PinnedMessagesListLoaded(
     state: PinnedMessagesListState.Filled,
     onEventClick: (event: TimelineItem.Event) -> Unit,
     onUserDataClick: (UserId) -> Unit,
-    onLinkClick: (String) -> Unit,
-    onLinkLongClick: (String) -> Unit,
+    onLinkClick: (Link) -> Unit,
+    onLinkLongClick: (Link) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onActionSelected(timelineItemAction: TimelineItemAction, event: TimelineItem.Event) {
@@ -221,7 +224,9 @@ private fun PinnedMessagesListLoaded(
                 isLastOutgoingMessage = false,
                 focusedEventId = null,
                 onUserDataClick = onUserDataClick,
-                onLinkClick = onLinkClick,
+                onLinkClick = { link ->
+                    state.linkState.eventSink(LinkEvents.OnLinkClick(link))
+                },
                 onLinkLongClick = onLinkLongClick,
                 onContentClick = onEventClick,
                 onLongClick = ::onMessageLongClick,
@@ -239,7 +244,9 @@ private fun PinnedMessagesListLoaded(
                         timelineProtectionState = state.timelineProtectionState,
                         onContentClick = { onEventClick(event) },
                         onLongClick = { onMessageLongClick(event) },
-                        onLinkClick = onLinkClick,
+                        onLinkClick = { link ->
+                            state.linkState.eventSink(LinkEvents.OnLinkClick(link))
+                        },
                         onLinkLongClick = onLinkLongClick,
                         modifier = contentModifier,
                         onContentLayoutChange = onContentLayoutChange
@@ -248,6 +255,10 @@ private fun PinnedMessagesListLoaded(
             )
         }
     }
+    LinkView(
+        state.linkState,
+        onLinkValid = onLinkClick,
+    )
 }
 
 @Composable
@@ -255,8 +266,8 @@ private fun TimelineItemEventContentViewWrapper(
     event: TimelineItem.Event,
     timelineProtectionState: TimelineProtectionState,
     onContentClick: () -> Unit,
-    onLinkClick: (String) -> Unit,
-    onLinkLongClick: (String) -> Unit,
+    onLinkClick: (Link) -> Unit,
+    onLinkLongClick: (Link) -> Unit,
     onLongClick: (() -> Unit)?,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,

@@ -28,6 +28,5 @@ data class DeveloperSettingsState(
 
 data class CustomElementCallBaseUrlState(
     val baseUrl: String?,
-    val defaultUrl: String,
     val validator: (String?) -> Boolean,
 )

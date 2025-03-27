@@ -120,8 +120,7 @@ class DeveloperSettingsPresenter @Inject constructor(
                     triggerClearCache = { handleEvents(DeveloperSettingsEvents.ClearCache) }
                 )
                 is DeveloperSettingsEvents.SetCustomElementCallBaseUrl -> coroutineScope.launch {
-                    // If the URL is either empty or the default one, we want to save 'null' to remove the custom URL
-                    val urlToSave = event.baseUrl.takeIf { !it.isNullOrEmpty() && it != ElementCallConfig.DEFAULT_BASE_URL }
+                    val urlToSave = event.baseUrl.takeIf { !it.isNullOrEmpty() }
                     appPreferencesStore.setCustomElementCallBaseUrl(urlToSave)
                 }
                 DeveloperSettingsEvents.ClearCache -> coroutineScope.clearCache(clearCacheAction)
@@ -144,7 +143,6 @@ class DeveloperSettingsPresenter @Inject constructor(
             rageshakeState = rageshakeState,
             customElementCallBaseUrlState = CustomElementCallBaseUrlState(
                 baseUrl = customElementCallBaseUrl,
-                defaultUrl = ElementCallConfig.DEFAULT_BASE_URL,
                 validator = ::customElementCallUrlValidator,
             ),
             hideImagesAndVideos = hideImagesAndVideos,

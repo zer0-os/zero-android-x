@@ -133,7 +133,6 @@ class DeveloperSettingsPresenterTest {
             }
             awaitItem().also { state ->
                 assertThat(state.customElementCallBaseUrlState.baseUrl).isEqualTo("https://call.element.ahoy")
-                assertThat(state.customElementCallBaseUrlState.defaultUrl).isEqualTo(ElementCallConfig.DEFAULT_BASE_URL)
             }
         }
     }
