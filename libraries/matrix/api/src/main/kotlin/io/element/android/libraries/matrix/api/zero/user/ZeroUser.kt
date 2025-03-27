@@ -12,3 +12,7 @@ fun ZeroUser.nameIsMatrixHex(): Boolean {
     val regex = "^[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+$".toRegex()
     return name.matches(regex)
 }
+
+fun ZeroUser.primaryZIdCoreChannel(): String? {
+    return primaryZeroId?.split(".")?.firstOrNull()
+}

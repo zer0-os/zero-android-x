@@ -201,14 +201,14 @@ interface MatrixClient : Closeable {
 
     suspend fun fetchAllFeeds(limit: Int,
                               skip: Int,
-                              includeReplies: Boolean,
-                              includeMeow: Boolean
+                              includeReplies: Boolean = true,
+                              includeMeow: Boolean = true
     )
 
     suspend fun fetchAllMyFeeds(limit: Int,
                                 skip: Int,
-                                includeReplies: Boolean,
-                                includeMeow: Boolean
+                                includeReplies: Boolean = true,
+                                includeMeow: Boolean = true
     )
 
     suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?>
@@ -217,8 +217,8 @@ interface MatrixClient : Closeable {
         feedId: String,
         limit: Int,
         skip: Int,
-        includeReplies: Boolean,
-        includeMeow: Boolean
+        includeReplies: Boolean = true,
+        includeMeow: Boolean = true
     )
 }
 

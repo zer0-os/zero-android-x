@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import java.util.Collections
 import kotlin.math.PI
@@ -31,7 +32,7 @@ import kotlin.math.sin
 @Composable
 fun CompositeAvatar(
     avatarData: AvatarData,
-    heroes: ImmutableList<AvatarData>,
+    heroes: ImmutableList<AvatarData> = persistentListOf(),
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
 ) {

@@ -81,7 +81,7 @@ fun HomeChannelRow(
 
 @PreviewsDayNight
 @Composable
-fun HomeChannelRowPreview() = ElementPreview {
+internal fun HomeChannelRowPreview() = ElementPreview {
     HomeChannelRow(
         channel = HomeScreenChannel.placeHolder,
         onChannelClick = {}

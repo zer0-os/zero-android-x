@@ -58,6 +58,7 @@ import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.isOnline
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
@@ -86,6 +87,7 @@ import kotlin.jvm.optionals.getOrNull
 
 private const val EXTENDED_RANGE_SIZE = 40
 private const val SUBSCRIBE_TO_VISIBLE_ROOMS_DEBOUNCE_IN_MILLIS = 300L
+private const val HOME_FEED_PAGE_SIZE = 10
 
 class RoomListPresenter @Inject constructor(
     private val client: MatrixClient,
@@ -108,6 +110,9 @@ class RoomListPresenter @Inject constructor(
     private val encryptionService: EncryptionService = client.encryptionService()
 
     private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
+
+    private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
+    private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
 
     @Composable
     override fun present(): RoomListState {
@@ -180,9 +185,21 @@ class RoomListPresenter @Inject constructor(
                 }
                 RoomListEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
                 is RoomListEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
-                is RoomListEvents.LoadMoreFeeds -> coroutineScope.loadMoreHomeFeeds(event.skip)
+                is RoomListEvents.LoadMoreFeeds -> {
+                    _allFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreHomeFeeds(event.currentFeeds.size)
+                }
                 RoomListEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds()
-                is RoomListEvents.LoadMoreMyFeeds -> coroutineScope.loadMoreMyFeeds(event.skip)
+                is RoomListEvents.LoadMoreMyFeeds -> {
+                    _myFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
+                }
                 RoomListEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
             }
         }
@@ -390,9 +407,9 @@ class RoomListPresenter @Inject constructor(
             // Fetch home channels
             async { client.getUserZIds() },
             // Fetch all home feeds
-            async { client.fetchAllFeeds(limit = 10, skip = 0, includeReplies = true, includeMeow = true) },
+            async { client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
             // Fetch all my feeds
-            async { client.fetchAllMyFeeds(limit = 10, skip = 0, includeReplies = true, includeMeow = true) },
+            async { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
     }
 
@@ -432,7 +449,11 @@ class RoomListPresenter @Inject constructor(
     private fun allFeedsListContentState(): FeedListContentState {
         val homeFeedsState by produceState(initialValue = AsyncData.Loading()) {
             client.allFeeds.collect {
-                value = AsyncData.Success(it)
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_allFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
             }
         }
         val showEmpty by remember {
@@ -447,7 +468,7 @@ class RoomListPresenter @Inject constructor(
         }
         return when {
             showEmpty -> FeedListContentState.Empty
-            showSkeleton -> FeedListContentState.Skeleton(20)
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
             else -> {
                 val mappedChannels = homeFeedsState.dataOrNull()
                     .orEmpty()
@@ -461,7 +482,11 @@ class RoomListPresenter @Inject constructor(
     private fun allMyFeedsListContentState(): FeedListContentState {
         val myFeedsState by produceState(initialValue = AsyncData.Loading()) {
             client.allMyFeeds.collect {
-                value = AsyncData.Success(it)
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_myFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
             }
         }
         val showEmpty by remember {
@@ -476,7 +501,7 @@ class RoomListPresenter @Inject constructor(
         }
         return when {
             showEmpty -> FeedListContentState.Empty
-            showSkeleton -> FeedListContentState.Skeleton(20)
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
             else -> {
                 val mappedChannels = myFeedsState.dataOrNull()
                     .orEmpty()
@@ -532,19 +557,21 @@ class RoomListPresenter @Inject constructor(
     }
 
     private fun CoroutineScope.loadMoreHomeFeeds(skip: Int) = launch {
-        client.fetchAllMyFeeds(limit = 10, skip = skip, includeReplies = true, includeMeow = true)
+        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
     }
 
     private fun CoroutineScope.forceRefreshHomeFeeds() = launch {
-        client.fetchAllFeeds(limit = 10, skip = 0, includeReplies = true, includeMeow = true)
+        _allFeeds.clear()
+        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
     }
 
     private fun CoroutineScope.loadMoreMyFeeds(skip: Int) = launch {
-        client.fetchAllMyFeeds(limit = 10, skip = skip, includeReplies = true, includeMeow = true)
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
     }
 
     private fun CoroutineScope.forceRefreshMyFeeds() = launch {
-        client.fetchAllMyFeeds(limit = 10, skip = 0, includeReplies = true, includeMeow = true)
+        _myFeeds.clear()
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
     }
 }
 

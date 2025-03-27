@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.repository
 
+import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.network.model.response.ApiFeed
 import io.element.android.support.zero.network.service.ZeroFeedService
 
@@ -28,7 +29,7 @@ class FeedRepositoryImpl(
     override suspend fun fetchAllMyFeeds(primaryZId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
         return runCatching {
             zeroFeedService.fetchMyFeeds(
-                primaryZId = primaryZId,
+                primaryZId = primaryZId.replace(ZERO_CHANNEL_PREFIX, ""),
                 limit = limit,
                 skip = skip,
                 includeReplies = includeReplies.toString(),

@@ -33,7 +33,6 @@ import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorCo
 import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
 import io.element.android.features.roomlist.impl.components.HomeFeedListContentView
 import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
-import io.element.android.features.roomlist.impl.components.HomeProfileContentView
 import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
 import io.element.android.features.roomlist.impl.components.RoomListMenuAction
@@ -244,6 +243,8 @@ internal fun HomeScreenContent(
             HomeFeedListContentView(
                 contentState = state.allFeedsContentState,
                 eventSink = state.eventSink,
+                zeroUserRewards = state.userRewards,
+                isProfileFeedList = false,
                 onFeedClick = {
 
                 },
@@ -259,9 +260,11 @@ internal fun HomeScreenContent(
             )
         }
         HomeScreenTab.PROFILE -> {
-            HomeProfileContentView(
+            HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
                 eventSink = state.eventSink,
+                zeroUserRewards = state.userRewards,
+                isProfileFeedList = true,
                 onFeedClick = {
 
                 },

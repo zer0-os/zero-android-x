@@ -24,9 +24,9 @@ interface ZeroFeedService {
         @Query("include_meows") includeMeows: String = "true",
     ): ApiFeeds
 
-    @GET(value = "api/v2/posts/{primary_zId}")
+    @GET(value = "api/v2/posts/channel/{primary_zId}")
     suspend fun fetchMyFeeds(
-        @Path("{primary_zId}") primaryZId: String,
+        @Path("primary_zId") primaryZId: String,
         @Query("limit") limit: Int = 10,
         @Query("skip") skip: Int = 0,
         @Query("include_replies") includeReplies: String = "true",
@@ -35,14 +35,14 @@ interface ZeroFeedService {
 
     @GET(value = "api/v2/posts/{feed_id}")
     suspend fun fetchFeedDetails(
-        @Path("{feed_id}") feedId: String,
+        @Path("feed_id") feedId: String,
         @Query("include_replies") includeReplies: String = "true",
         @Query("include_meows") includeMeows: String = "true",
     ): ApiFeedDetails
 
     @GET(value = "api/v2/posts/{feed_id}/replies")
     suspend fun fetchFeedReplies(
-        @Path("{feed_id}") feedId: String,
+        @Path("feed_id") feedId: String,
         @Query("limit") limit: Int = 10,
         @Query("skip") skip: Int = 0,
         @Query("include_replies") includeReplies: String = "true",
