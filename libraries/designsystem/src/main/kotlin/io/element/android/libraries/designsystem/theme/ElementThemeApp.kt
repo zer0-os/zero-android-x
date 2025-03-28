@@ -22,6 +22,7 @@ import io.element.android.compound.tokens.generated.compoundColorsDark
 import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.core.meta.BuildType
+import io.element.android.libraries.designsystem.theme.zero.color.ZeroNewBackground
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 
@@ -82,14 +83,14 @@ fun ElementThemeApp(
             content = content,
             compoundLight = compoundLight,
             compoundDark = compoundDark
-                .copy(bgCanvasDefault = Color.Black),
+                .copy(bgCanvasDefault = Color.ZeroNewBackground),
             typography = zeroTypography,
             materialColorsDark = compoundColorsDark
                 .toMaterialColorScheme()
                 .copy(
-                    background = Color.Black,
-                    primaryContainer = Color.Black,
-                    surface = Color.Black
+                    background = Color.ZeroNewBackground,
+                    primaryContainer = Color.ZeroNewBackground,
+                    surface = Color.ZeroNewBackground
                 )
         )
     }

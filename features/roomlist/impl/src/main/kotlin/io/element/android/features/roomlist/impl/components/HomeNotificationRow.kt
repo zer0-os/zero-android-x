@@ -55,7 +55,7 @@ fun HomeNotificationRow(
                 }
                 else -> {
                     appendNotificationContent(room.numberOfUnreadMessages.toString())
-                    append(" unread message")
+                    append(" message")
                     if (room.numberOfUnreadMessages > 1) append("s")
                     append(" in ")
                     if (isRoomDM) {

@@ -23,18 +23,12 @@ import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
-import io.element.android.support.zero.data.repository.AccountRepository
-import io.element.android.support.zero.data.repository.AuthRepository
-import io.element.android.support.zero.data.repository.ChannelRepository
-import io.element.android.support.zero.data.repository.ConversationRepository
-import io.element.android.support.zero.data.repository.InviteRepository
-import io.element.android.support.zero.data.repository.RewardsRepository
-import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.Client
 import org.matrix.rustcomponents.sdk.ClientBuilder
+import org.matrix.rustcomponents.sdk.RequestConfig
 import org.matrix.rustcomponents.sdk.Session
 import org.matrix.rustcomponents.sdk.SlidingSyncVersion
 import org.matrix.rustcomponents.sdk.SlidingSyncVersionBuilder
@@ -110,6 +104,14 @@ class RustMatrixClientFactory @Inject constructor(
         slidingSyncType: ClientBuilderSlidingSync,
     ): ClientBuilder {
         return clientBuilderProvider.provide()
+            .requestConfig(
+                RequestConfig(
+                    retryLimit = null,
+                    timeout = 25000u,
+                    maxConcurrentRequests = null,
+                    retryTimeout = null
+                )
+            )
             .sessionPaths(
                 dataPath = sessionPaths.fileDirectory.absolutePath,
                 cachePath = sessionPaths.cacheDirectory.absolutePath,
