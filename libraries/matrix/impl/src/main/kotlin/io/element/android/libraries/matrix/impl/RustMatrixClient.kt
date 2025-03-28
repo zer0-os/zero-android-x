@@ -879,6 +879,25 @@ class RustMatrixClient(
         }.getOrElse { emptyList() }
         _feedReplies.emit(feedReplies)
     }
+
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {
+        val feedRepo = zeroCoreRepository?.feed ?: return
+        runCatching {
+            val updatedFeed = feedRepo
+                .addMeowToFeed(feedId = feed.id, meowAmount)
+                ?.toModel()
+           if (updatedFeed != null) {
+               val existingList = _allFeeds.value.toMutableList()
+               existingList.indexOfFirst { it.id == feed.id }
+                   .takeIf { it >= 0 }
+                   ?.let { index ->
+                       existingList[index] = updatedFeed
+                       _allFeeds.emit(existingList)
+                   }
+           }
+        }
+    }
+
     //endregion
 }
 

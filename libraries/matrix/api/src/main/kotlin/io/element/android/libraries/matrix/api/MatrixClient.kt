@@ -220,6 +220,8 @@ interface MatrixClient : Closeable {
         includeReplies: Boolean = true,
         includeMeow: Boolean = true
     )
+
+    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int)
 }
 
 /**

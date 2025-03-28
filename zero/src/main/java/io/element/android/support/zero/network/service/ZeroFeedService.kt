@@ -7,10 +7,15 @@
 
 package io.element.android.support.zero.network.service
 
+import io.element.android.support.zero.network.model.request.MeowFeedRequest
 import io.element.android.support.zero.network.model.response.ApiFeedDetails
 import io.element.android.support.zero.network.model.response.ApiFeedReplies
 import io.element.android.support.zero.network.model.response.ApiFeeds
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -48,4 +53,10 @@ interface ZeroFeedService {
         @Query("include_replies") includeReplies: String = "true",
         @Query("include_meows") includeMeows: String = "true",
     ): ApiFeedReplies
+
+    @POST(value = "api/v2/posts/post/{feed_id}/meow")
+    suspend fun meowFeed(
+        @Path("feed_id") feedId: String,
+        @Body request: MeowFeedRequest
+    ): Response<ResponseBody>
 }

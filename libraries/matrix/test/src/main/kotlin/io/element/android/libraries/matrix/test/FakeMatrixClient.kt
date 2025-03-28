@@ -404,5 +404,8 @@ class FakeMatrixClient(
     override val feedReplies: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
 
     override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
+
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {}
+
     //endregion
 }

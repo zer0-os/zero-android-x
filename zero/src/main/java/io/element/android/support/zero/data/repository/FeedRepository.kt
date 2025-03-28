@@ -39,4 +39,6 @@ interface FeedRepository {
         includeReplies: Boolean = true,
         includeMeows: Boolean = true
     ): List<ApiFeed>
+
+    suspend fun addMeowToFeed(feedId: String, meowAmount: Int): ApiFeed?
 }

@@ -37,6 +37,7 @@ sealed interface RoomListEvents {
     sealed interface HomeFeedEvents: RoomListEvents
     data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>): HomeFeedEvents
     data object RefreshFeeds: HomeFeedEvents
+    data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int): HomeFeedEvents
 
     sealed interface HomeProfileEvents: RoomListEvents
     data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>): HomeProfileEvents

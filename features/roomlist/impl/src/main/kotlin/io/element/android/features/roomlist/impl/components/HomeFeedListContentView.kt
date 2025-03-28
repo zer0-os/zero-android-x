@@ -160,7 +160,10 @@ private fun FeedsViewList(
                     feed = feed,
                     zeroUserRewards = zeroUserRewards,
                     isProfileFeed = isProfileFeedList,
-                    onFeedClick = { onFeedClick(feed) }
+                    onFeedClick = { onFeedClick(feed) },
+                    onAddMeowToFeed = { meowCount ->
+                        eventSink(RoomListEvents.AddMeowToFeed(feed, meowCount))
+                    }
                 )
                 if (index != state.feeds.lastIndex) {
                     HorizontalDivider()

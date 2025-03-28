@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,7 @@ fun HomeFeedRow(
     zeroUserRewards: ZeroUserRewards,
     isProfileFeed: Boolean = false,
     onFeedClick: () -> Unit,
+    onAddMeowToFeed: (Int) -> Unit,
 ) {
     val context = LocalContext.current
     val openArweaveLink: () -> Unit = {
@@ -78,36 +80,35 @@ fun HomeFeedRow(
                 .fillMaxWidth()
                 .padding(start = 16.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(Modifier.weight(1f)) {
-                    Text(
-                        modifier = Modifier.weight(1f, false),
-                        text = feed.user.profileSummary.name,
-                        style = ElementTheme.typography.fontBodyMdMedium,
-                        color = ElementTheme.colors.textPrimary,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = " • ",
-                        style = ElementTheme.typography.fontBodyMdRegular,
-                        color = ElementTheme.colors.textSecondary,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = feed.updatedAtTimeAgo(),
-                        style = ElementTheme.typography.fontBodyMdRegular,
-                        color = ElementTheme.colors.textSecondary,
-                        maxLines = 1
-                    )
-                }
+            Row {
+                Text(
+                    text = feed.user.profileSummary.name,
+                    style = ElementTheme.typography.fontBodyMdMedium,
+                    color = ElementTheme.colors.textPrimary,
+                    maxLines = 1
+                )
+                Text(
+                    text = " • ",
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1
+                )
+                Text(
+                    text = feed.updatedAtTimeAgo(),
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1
+                )
                 Spacer(Modifier.width(8.dp))
                 if (!feed.worldZid.isNullOrBlank() && feed.worldZid != feed.zid) {
                     Text(
+                        modifier = Modifier.weight(1f),
                         text = "$ZERO_CHANNEL_PREFIX${feed.worldZid ?: "{world_id_here}"}",
                         style = ElementTheme.typography.fontBodyMdRegular,
                         color = ElementTheme.colors.textSecondary,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.End
                     )
                 }
             }
@@ -128,18 +129,19 @@ fun HomeFeedRow(
             Spacer(Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
                 Row(Modifier.weight(1f)) {
-                    FeedActionIcon(
+                    FeedActionButton(
                         iconResId = R.drawable.ic_post_reply,
                         supportingText = (feed.replies?.count() ?: 0).toString()
                     )
                     Spacer(Modifier.width(60.dp))
-                    FeedActionIcon(
-                        iconResId = R.drawable.ic_post_meow,
-                        supportingText = feed.totalMeowCount(zeroUserRewards.decimals),
-                        highlighted = !feed.meows.isNullOrEmpty()
+                    FeedMeowActionButton(
+                        meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
+                        highlighted = !feed.meows.isNullOrEmpty(),
+                        enabled = !isProfileFeed,
+                        onAddMeowToFeed = onAddMeowToFeed
                     )
                 }
-                FeedActionIcon(
+                FeedActionButton(
                     iconResId = R.drawable.ic_post_arweave,
                     onClick = openArweaveLink
                 )
@@ -149,7 +151,7 @@ fun HomeFeedRow(
 }
 
 @Composable
-private fun FeedActionIcon(
+private fun FeedActionButton(
     @DrawableRes iconResId: Int,
     supportingText: String? = null,
     highlighted: Boolean = false,
@@ -215,6 +217,7 @@ internal fun HomeFeedRowPreview() = ElementPreview {
     HomeFeedRow(
         feed = ZeroFeed.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
-        onFeedClick = {}
+        onFeedClick = {},
+        onAddMeowToFeed = {}
     )
 }

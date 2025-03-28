@@ -201,6 +201,7 @@ class RoomListPresenter @Inject constructor(
                     coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
                 }
                 RoomListEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
+                is RoomListEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount)
             }
         }
 
@@ -572,6 +573,10 @@ class RoomListPresenter @Inject constructor(
     private fun CoroutineScope.forceRefreshMyFeeds() = launch {
         _myFeeds.clear()
         client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
+    }
+
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
+        client.addMeowToFeed(feed, meowCount)
     }
 }
 

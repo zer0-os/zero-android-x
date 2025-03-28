@@ -8,6 +8,7 @@
 package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.network.model.request.MeowFeedRequest
 import io.element.android.support.zero.network.model.response.ApiFeed
 import io.element.android.support.zero.network.service.ZeroFeedService
 
@@ -58,5 +59,16 @@ class FeedRepositoryImpl(
                 includeMeows = includeMeows.toString()
             ).feedReplies
         }.getOrDefault(emptyList())
+    }
+
+    override suspend fun addMeowToFeed(feedId: String, meowAmount: Int): ApiFeed? {
+        return runCatching {
+            val result = zeroFeedService.meowFeed(feedId, MeowFeedRequest(amount = meowAmount))
+            if (result.isSuccessful) {
+                zeroFeedService.fetchFeedDetails(feedId).feed
+            } else {
+                null
+            }
+        }.getOrNull()
     }
 }
