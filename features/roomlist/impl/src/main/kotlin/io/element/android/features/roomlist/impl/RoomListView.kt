@@ -159,6 +159,7 @@ private fun RoomListScaffold(
                 displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
                 displayFilters = state.displayFilters,
                 filtersState = state.filtersState,
+                canReportBug = state.canReportBug,
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
                 userRewards = state.userRewards,
                 onDismissRewardsTooltip = { immediate ->
