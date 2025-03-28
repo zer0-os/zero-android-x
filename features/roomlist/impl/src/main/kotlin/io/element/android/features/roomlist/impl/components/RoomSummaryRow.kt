@@ -213,7 +213,8 @@ private fun NameAndTimestampRow(
             style = ElementTheme.zeroTypography.fontBodyLgMedium,
             text = name ?: stringResource(id = CommonStrings.common_no_room_name),
             fontStyle = FontStyle.Italic.takeIf { name == null },
-            color = ElementTheme.roomListRoomName(),
+            color = if (isHighlighted) ElementTheme.colors.textPrimary
+            else ElementTheme.colors.textSecondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

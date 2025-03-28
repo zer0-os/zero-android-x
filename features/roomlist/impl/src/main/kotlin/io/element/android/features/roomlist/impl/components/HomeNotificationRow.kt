@@ -58,9 +58,6 @@ fun HomeNotificationRow(
                     append(" message")
                     if (room.numberOfUnreadMessages > 1) append("s")
                     append(" in ")
-                    if (isRoomDM) {
-                        append("your conversation with ")
-                    }
                     appendNotificationContent(room.name)
                     append(".")
                 }
