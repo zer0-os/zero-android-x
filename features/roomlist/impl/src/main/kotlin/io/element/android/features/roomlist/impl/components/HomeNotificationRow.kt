@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -45,28 +45,20 @@ fun HomeNotificationRow(
             when (room.displayType) {
                 RoomSummaryDisplayType.INVITE -> {
                     if (isRoomDM) {
-                        appendSemiBold(room.name)
+                        appendNotificationContent(room.name)
                         append(" invited you to chat.")
                     } else {
                         append("You are invited to join ")
-                        appendSemiBold(room.name)
+                        appendNotificationContent(room.name)
                         append(".")
                     }
                 }
                 else -> {
-                    appendSemiBold(room.numberOfUnreadMessages.toString())
-                    append(" unread message")
+                    appendNotificationContent(room.numberOfUnreadMessages.toString())
+                    append(" message")
                     if (room.numberOfUnreadMessages > 1) append("s")
                     append(" in ")
-                    if (isRoomDM) {
-                        append("your conversation with ")
-                    } else {
-                        append("the ")
-                        appendSemiBold(room.name)
-                        append(if (room.isAChannel) " feed channel." else " channel.")
-                        return@buildAnnotatedString
-                    }
-                    appendSemiBold(room.name)
+                    appendNotificationContent(room.name)
                     append(".")
                 }
             }
@@ -89,12 +81,13 @@ fun HomeNotificationRow(
         Text(
             text = notificationText(),
             style = ElementTheme.zeroTypography.fontBodyMdRegular,
+            color = ElementTheme.colors.textSecondary
         )
     }
 }
 
-private fun AnnotatedString.Builder.appendSemiBold(text: String?) {
-    withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
+private fun AnnotatedString.Builder.appendNotificationContent(text: String?) {
+    withStyle(SpanStyle(color = Color.White)) {
         append(text ?: "")
     }
 }

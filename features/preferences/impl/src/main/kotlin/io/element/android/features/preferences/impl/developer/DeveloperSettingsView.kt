@@ -7,6 +7,7 @@
 
 package io.element.android.features.preferences.impl.developer
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +34,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
+import io.element.android.libraries.matrix.api.tracing.TraceLogPack
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
@@ -58,6 +60,7 @@ fun DeveloperSettingsView(
             FeatureListContent(state)
         }
         ElementCallCategory(state = state)
+
         PreferenceCategory(title = "Rust SDK") {
             PreferenceDropdown(
                 title = "Tracing log level",
@@ -69,6 +72,22 @@ fun DeveloperSettingsView(
                 }
             )
         }
+        PreferenceCategory(title = "Enable trace logs per SDK feature") {
+            Text(
+                text = "Requires app reboot",
+                style = ElementTheme.typography.fontBodyMdRegular,
+                color = ElementTheme.colors.textSecondary,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+            )
+            for (logPack in TraceLogPack.entries) {
+                PreferenceSwitch(
+                    title = logPack.title,
+                    isChecked = state.tracingLogPacks.contains(logPack),
+                    onCheckedChange = { isChecked -> state.eventSink(DeveloperSettingsEvents.ToggleTracingLogPack(logPack, isChecked)) }
+                )
+            }
+        }
+
         PreferenceCategory(title = "Showkase") {
             ListItem(
                 headlineContent = {
@@ -140,22 +159,20 @@ private fun ElementCallCategory(
 ) {
     PreferenceCategory(title = "Element Call", showTopDivider = true) {
         val callUrlState = state.customElementCallBaseUrlState
-        fun isUsingDefaultUrl(value: String?): Boolean {
-            return value.isNullOrEmpty() || value == callUrlState.defaultUrl
-        }
 
-        val supportingText = if (isUsingDefaultUrl(callUrlState.baseUrl)) {
+        val supportingText = if (callUrlState.baseUrl.isNullOrEmpty()) {
             stringResource(R.string.screen_advanced_settings_element_call_base_url_description)
         } else {
             callUrlState.baseUrl
         }
         PreferenceTextField(
             headline = stringResource(R.string.screen_advanced_settings_element_call_base_url),
-            value = callUrlState.baseUrl ?: callUrlState.defaultUrl,
+            value = callUrlState.baseUrl,
+            placeholder = "https://.../room",
             supportingText = supportingText,
             validation = callUrlState.validator,
             onValidationErrorMessage = stringResource(R.string.screen_advanced_settings_element_call_base_url_validation_error),
-            displayValue = { value -> !isUsingDefaultUrl(value) },
+            displayValue = { value -> !value.isNullOrEmpty() },
             keyboardOptions = KeyboardOptions.Default.copy(autoCorrectEnabled = false, keyboardType = KeyboardType.Uri),
             onChange = { state.eventSink(DeveloperSettingsEvents.SetCustomElementCallBaseUrl(it)) }
         )

@@ -71,7 +71,7 @@ private fun EmptyView(
 ) {
     Box(modifier.fillMaxSize()) {
         EmptyScaffold(
-            title = "No Channels yet",
+            title = "No channels yet",
             modifier = Modifier.align(Alignment.Center),
         )
     }

@@ -20,6 +20,7 @@ import extension.allEnterpriseImpl
 import extension.allFeaturesImpl
 import extension.allLibrariesImpl
 import extension.allServicesImpl
+import extension.buildConfigFieldStr
 import extension.koverDependencies
 import extension.locales
 import extension.setupAnvil
@@ -59,30 +60,36 @@ android {
         versionCode = Versions.VERSION_CODE
         versionName = Versions.VERSION_NAME
 
-//        // Keep abiFilter for the universalApk
-//        ndk {
-//            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-//        }
-//
-//        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
-//        splits {
-//            // Configures multiple APKs based on ABI.
-//            abi {
-//                // Enables building multiple APKs per ABI.
-//                isEnable = true
-//                // By default all ABIs are included, so use reset() and include to specify that we only
-//                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
-//                // Resets the list of ABIs that Gradle should create APKs for to none.
-//                reset()
-//                // Specifies a list of ABIs that Gradle should create APKs for.
-//                include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-//                // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
-//                isUniversalApk = true
-//            }
-//        }
+        // Keep abiFilter for the universalApk
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+        }
 
-        defaultConfig {
-            resourceConfigurations += locales
+        // Ref: https://developer.android.com/studio/build/configure-apk-splits.html#configure-abi-split
+        splits {
+            // Configures multiple APKs based on ABI.
+            abi {
+                val buildingAppBundle = gradle.startParameter.taskNames.any { it.contains("bundle") }
+
+                // Enables building multiple APKs per ABI. This should be disabled when building an AAB.
+                isEnable = !buildingAppBundle
+
+                // By default all ABIs are included, so use reset() and include to specify that we only
+                // want APKs for armeabi-v7a, x86, arm64-v8a and x86_64.
+                // Resets the list of ABIs that Gradle should create APKs for to none.
+                reset()
+
+                if (!buildingAppBundle) {
+                    // Specifies a list of ABIs that Gradle should create APKs for.
+                    include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+                    // Generate a universal APK that includes all ABIs, so user who installs from CI tool can use this one by default.
+                    isUniversalApk = true
+                }
+            }
+        }
+
+        androidResources {
+            localeFilters += locales
         }
     }
 
@@ -105,7 +112,7 @@ android {
     }
 
     val baseAppName = BuildTimeConfig.APPLICATION_NAME
-    logger.warnInBox("Building $baseAppName")
+    logger.warnInBox("Building ${defaultConfig.applicationId} ($baseAppName)")
 
     buildTypes {
         getByName("debug") {
@@ -182,8 +189,8 @@ android {
         create("gplay") {
             dimension = "store"
             isDefault = true
-            buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"G\"")
-            buildConfigField("String", "FLAVOR_DESCRIPTION", "\"GooglePlay\"")
+            buildConfigFieldStr("SHORT_FLAVOR_DESCRIPTION", "G")
+            buildConfigFieldStr("FLAVOR_DESCRIPTION", "GooglePlay")
             if (CURRENT_APP_TIER == APP_TIER_ZERO) {
                 // Zero app icons and themes
                 manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher_zero"
@@ -199,8 +206,8 @@ android {
         }
         create("fdroid") {
             dimension = "store"
-            buildConfigField("String", "SHORT_FLAVOR_DESCRIPTION", "\"F\"")
-            buildConfigField("String", "FLAVOR_DESCRIPTION", "\"FDroid\"")
+            buildConfigFieldStr("SHORT_FLAVOR_DESCRIPTION", "F")
+            buildConfigFieldStr("FLAVOR_DESCRIPTION", "FDroid")
             manifestPlaceholders["app_icon"] = "@mipmap/ic_launcher"
             manifestPlaceholders["app_icon_round"] = "@mipmap/ic_launcher_round"
             manifestPlaceholders["app_theme"] = "@style/Theme.ElementX"
@@ -334,8 +341,8 @@ tasks.withType<GenerateBuildConfig>().configureEach {
     outputs.upToDateWhen { false }
     val gitRevision = providers.of(GitRevisionValueSource::class.java) {}.get()
     val gitBranchName = providers.of(GitBranchNameValueSource::class.java) {}.get()
-    android.defaultConfig.buildConfigField("String", "GIT_REVISION", "\"$gitRevision\"")
-    android.defaultConfig.buildConfigField("String", "GIT_BRANCH_NAME", "\"$gitBranchName\"")
+    android.defaultConfig.buildConfigFieldStr("GIT_REVISION", gitRevision)
+    android.defaultConfig.buildConfigFieldStr("GIT_BRANCH_NAME", gitBranchName)
 }
 
 licensee {

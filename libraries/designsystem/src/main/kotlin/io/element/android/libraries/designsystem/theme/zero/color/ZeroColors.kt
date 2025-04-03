@@ -8,6 +8,9 @@ internal val zeroDialogBackground = Color(0xFF1F1B22)
 internal val zeroChatBubbleOutgoing = Color(0xFF400999)
 internal val zeroChatBubbleIncoming = Color(0xFF111213)
 
+internal val Color.Companion.ZeroNewBackground
+    get() = Color(0xFF0D0D0D)
+
 val SemanticColors.zeroBrandColor
     get() = zeroAccentColor
 

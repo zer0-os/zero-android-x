@@ -32,6 +32,7 @@ import io.element.android.features.invite.api.response.InviteData
 import io.element.android.features.leaveroom.api.LeaveRoomEvent
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
+import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.features.roomlist.impl.datasource.RoomListDataSource
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.model.HomeScreenChannel
@@ -58,6 +59,7 @@ import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.isOnline
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
@@ -86,6 +88,7 @@ import kotlin.jvm.optionals.getOrNull
 
 private const val EXTENDED_RANGE_SIZE = 40
 private const val SUBSCRIBE_TO_VISIBLE_ROOMS_DEBOUNCE_IN_MILLIS = 300L
+private const val HOME_FEED_PAGE_SIZE = 15
 
 class RoomListPresenter @Inject constructor(
     private val client: MatrixClient,
@@ -104,10 +107,14 @@ class RoomListPresenter @Inject constructor(
     private val notificationCleaner: NotificationCleaner,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val appPreferencesStore: AppPreferencesStore,
+    private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
 ) : Presenter<RoomListState> {
     private val encryptionService: EncryptionService = client.encryptionService()
 
     private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
+
+    private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
+    private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
 
     @Composable
     override fun present(): RoomListState {
@@ -118,6 +125,7 @@ class RoomListPresenter @Inject constructor(
         val filtersState = filtersPresenter.present()
         val searchState = searchPresenter.present()
         val acceptDeclineInviteState = acceptDeclineInvitePresenter.present()
+        val canReportBug = remember { rageshakeFeatureAvailability.isAvailable() }
 
         var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
@@ -180,6 +188,23 @@ class RoomListPresenter @Inject constructor(
                 }
                 RoomListEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
                 is RoomListEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                is RoomListEvents.LoadMoreFeeds -> {
+                    _allFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreHomeFeeds(event.currentFeeds.size)
+                }
+                RoomListEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds()
+                is RoomListEvents.LoadMoreMyFeeds -> {
+                    _myFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
+                }
+                RoomListEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
+                is RoomListEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount)
             }
         }
 
@@ -192,6 +217,9 @@ class RoomListPresenter @Inject constructor(
             (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
         )
 
+        val allFeedsContentState = allFeedsListContentState()
+        val myFeedsContentState = allMyFeedsListContentState()
+
         return RoomListState(
             matrixUser = matrixUser.value,
             showAvatarIndicator = showAvatarIndicator,
@@ -201,9 +229,12 @@ class RoomListPresenter @Inject constructor(
             contextMenu = contextMenu.value,
             leaveRoomState = leaveRoomState,
             filtersState = filtersState,
+            canReportBug = canReportBug,
             searchState = searchState,
             contentState = contentState,
             channelContentState = channelContentState,
+            allFeedsContentState = allFeedsContentState,
+            myFeedsContentState = myFeedsContentState,
             resolvedChannelRoom = resolvedChannelRoomId.value,
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
@@ -349,6 +380,8 @@ class RoomListPresenter @Inject constructor(
 
     private fun CoroutineScope.clearCacheOfRoom(roomId: RoomId) = launch {
         client.getRoom(roomId)?.use { room ->
+            // Ideally we wouldn't have a live timeline at this point, but right now we instantiate one when retrieving the room
+            room.liveTimeline.close()
             room.clearEventCacheStorage()
         }
     }
@@ -379,7 +412,11 @@ class RoomListPresenter @Inject constructor(
             // Fetch user rewards
             async { client.getUserRewards(shouldCheckRewardsIntimation = true) },
             // Fetch home channels
-            async { client.getUserZIds() }
+            async { client.getUserZIds() },
+            // Fetch all home feeds
+            async { client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            // Fetch all my feeds
+            async { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
     }
 
@@ -411,6 +448,72 @@ class RoomListPresenter @Inject constructor(
                     .distinctBy { it.channelId() }
                     .toPersistentList()
                 ChannelListContentState.Channels(mappedChannels)
+            }
+        }
+    }
+
+    @Composable
+    private fun allFeedsListContentState(): FeedListContentState {
+        val homeFeedsState by produceState(initialValue = AsyncData.Loading()) {
+            client.allFeeds.collect {
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_allFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (homeFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                homeFeedsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> FeedListContentState.Empty
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
+            else -> {
+                val mappedChannels = homeFeedsState.dataOrNull()
+                    .orEmpty()
+                    .toPersistentList()
+                FeedListContentState.Feeds(mappedChannels)
+            }
+        }
+    }
+
+    @Composable
+    private fun allMyFeedsListContentState(): FeedListContentState {
+        val myFeedsState by produceState(initialValue = AsyncData.Loading()) {
+            client.allMyFeeds.collect {
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_myFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (myFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                myFeedsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> FeedListContentState.Empty
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
+            else -> {
+                val mappedChannels = myFeedsState.dataOrNull()
+                    .orEmpty()
+                    .toPersistentList()
+                FeedListContentState.Feeds(mappedChannels)
             }
         }
     }
@@ -458,6 +561,28 @@ class RoomListPresenter @Inject constructor(
             .onFailure { failure ->
                 genericActionState.value = AsyncData.Failure(failure)
             }
+    }
+
+    private fun CoroutineScope.loadMoreHomeFeeds(skip: Int) = launch {
+        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
+    }
+
+    private fun CoroutineScope.forceRefreshHomeFeeds() = launch {
+        _allFeeds.clear()
+        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
+    }
+
+    private fun CoroutineScope.loadMoreMyFeeds(skip: Int) = launch {
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
+    }
+
+    private fun CoroutineScope.forceRefreshMyFeeds() = launch {
+        _myFeeds.clear()
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
+    }
+
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
+        client.addMeowToFeed(feed, meowCount)
     }
 }
 

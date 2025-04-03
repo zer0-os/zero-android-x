@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
@@ -39,7 +40,7 @@ internal fun VerificationContentVerifying(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().padding(bottom = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         when (data) {
@@ -87,8 +88,8 @@ private fun EmojiItemView(emoji: VerificationEmoji, modifier: Modifier = Modifie
             text = stringResource(id = emojiResource.nameRes),
             style = ElementTheme.zeroTypography.fontBodyMdRegular,
             color = ElementTheme.colors.textSecondary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Visible,
+            textAlign = TextAlign.Center,
         )
     }
 }

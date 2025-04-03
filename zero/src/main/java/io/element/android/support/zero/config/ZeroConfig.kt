@@ -4,6 +4,8 @@ import io.element.android.support.zero.BuildConfig
 
 object ZeroConfig {
     val environment: EnvironmentConfig = EnvironmentConfig.Production
+
+    const val ARWEAVE_BASE_URL = "https://of2ub4a2ai55lgpqj5z7so7j7v6uwjcruh6cdm3ojgnhqngahkwa.arweave.net/"
 }
 
 sealed class EnvironmentConfig(

@@ -10,6 +10,7 @@ package io.element.android.features.roomlist.impl
 import io.element.android.features.roomlist.impl.model.HomeScreenChannel
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 sealed interface RoomListEvents {
     data class UpdateVisibleRange(val range: IntRange) : RoomListEvents
@@ -32,4 +33,13 @@ sealed interface RoomListEvents {
 
     sealed interface ChannelEvents : RoomListEvents
     data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
+
+    sealed interface HomeFeedEvents: RoomListEvents
+    data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>): HomeFeedEvents
+    data object RefreshFeeds: HomeFeedEvents
+    data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int): HomeFeedEvents
+
+    sealed interface HomeProfileEvents: RoomListEvents
+    data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>): HomeProfileEvents
+    data object RefreshMyFeeds: HomeFeedEvents
 }

@@ -10,6 +10,7 @@ import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroChannelService
 import io.element.android.support.zero.network.service.ZeroConversationService
+import io.element.android.support.zero.network.service.ZeroFeedService
 import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroRewardService
@@ -58,4 +59,9 @@ object ZeroServiceModule {
     @SingleIn(AppScope::class)
     fun provideZeroChannelService(retrofit: ZeroRetrofitFactory): ZeroChannelService =
         retrofit.baseClient.create(ZeroChannelService::class.java)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideZeroFeedService(retrofit: ZeroRetrofitFactory): ZeroFeedService =
+        retrofit.baseClient.create(ZeroFeedService::class.java)
 }

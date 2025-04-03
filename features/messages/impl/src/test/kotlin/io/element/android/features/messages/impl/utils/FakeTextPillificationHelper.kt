@@ -8,10 +8,10 @@
 package io.element.android.features.messages.impl.utils
 
 class FakeTextPillificationHelper(
-    private val pillifyLambda: (CharSequence) -> CharSequence = { it }
+    private val pillifyLambda: (CharSequence, Boolean) -> CharSequence = { text, _ -> text }
 ) : TextPillificationHelper {
-    override fun pillify(text: CharSequence): CharSequence {
-        return pillifyLambda(text)
+    override fun pillify(text: CharSequence, pillifyPermalinks: Boolean): CharSequence {
+        return pillifyLambda(text, pillifyPermalinks)
     }
 
     override fun pillifyWithZero(text: CharSequence): CharSequence {

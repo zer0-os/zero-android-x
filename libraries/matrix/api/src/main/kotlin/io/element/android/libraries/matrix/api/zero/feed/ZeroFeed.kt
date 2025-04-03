@@ -1,0 +1,157 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.libraries.matrix.api.zero.feed
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import java.math.BigInteger
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.UUID
+
+@Parcelize
+data class ZeroFeed(
+    val id: String,
+    val userId: String,
+    val zid: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val signedMessage: String,
+    val unsignedMessage: String,
+    val text: String,
+    val walletAddress: String,
+    val worldZid: String? = null,
+    val imageUrl: String? = null,
+    val arweaveId: String,
+    val replyTo: String? = null,
+    val conversationId: String? = null,
+    val user: ZeroFeedAuthor,
+    val postsMeowsSummary: PostsMeowsSummary? = null,
+    val meows: List<Meow>? = null,
+    val replies: List<Reply>? = null,
+    val replyToPost: ReplyToFeed? = null
+) : Parcelable {
+
+    private fun updatedAtDate(): LocalDateTime {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")
+        return try {
+            val instant = Instant.from(formatter.parse(updatedAt))
+            instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
+        } catch (e: DateTimeParseException) {
+            LocalDateTime.now()
+        }
+    }
+
+    fun updatedAtTimeAgo(): String {
+        val now = LocalDateTime.now()
+        val updatedAt = updatedAtDate()
+        val duration = Duration.between(updatedAt, now)
+        val seconds = duration.seconds.toInt()
+
+        return when {
+            seconds <= 0 -> "Just now"
+            seconds < 60 -> "${seconds}s ago"
+            seconds < 3600 -> "${seconds / 60}m ago"
+            seconds < 86400 -> "${seconds / 3600}h ago"
+            else -> updatedAt.format(DateTimeFormatter.ofPattern("MMM dd"))
+        }
+    }
+
+    companion object {
+        val placeholder = ZeroFeed(
+            id = UUID.randomUUID().toString(),
+            userId = UUID.randomUUID().toString(),
+            zid = UUID.randomUUID().toString(),
+            createdAt = "",
+            updatedAt = "",
+            signedMessage = "placeholder signed message",
+            unsignedMessage = "placeholder un-signed message",
+            text = "Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text Placeholder feed text...",
+            walletAddress = UUID.randomUUID().toString(),
+            arweaveId = UUID.randomUUID().toString(),
+            user = ZeroFeedAuthor(
+                id = UUID.randomUUID().toString(),
+                profileId = UUID.randomUUID().toString(),
+                handle = UUID.randomUUID().toString(),
+                profileSummary = ZeroFeedAuthorProfileSummary(
+                    id = UUID.randomUUID().toString(),
+                    firstName = "placeholder first name",
+                    lastName = "placeholder last name"
+                )
+            )
+        )
+    }
+}
+
+fun ZeroFeed.totalMeowCount(decimal: Int): String {
+    val value = postsMeowsSummary?.totalMeowAmount ?: "0"
+    return try {
+        val bigIntValue = BigInteger(value)
+        val divisor = BigInteger.TEN.pow(decimal)
+
+        (bigIntValue / divisor).toString()
+    } catch (e: NumberFormatException) {
+        value
+    }
+}
+
+@Parcelize
+data class ZeroFeedAuthor(
+    val id: String,
+    val profileId: String,
+    val handle: String,
+    val profileSummary: ZeroFeedAuthorProfileSummary
+) : Parcelable
+
+@Parcelize
+data class ZeroFeedAuthorProfileSummary(
+    val id: String,
+    val firstName: String,
+    val lastName: String,
+    val primaryEmail: String? = null,
+    val profileImage: String? = null
+) : Parcelable {
+    val name
+        get() = "$firstName $lastName".trim()
+}
+
+@Parcelize
+data class PostsMeowsSummary(
+    val postId: String,
+    val totalMeowAmount: String
+) : Parcelable
+
+@Parcelize
+data class Meow(
+    val id: String,
+    val postId: String,
+    val amount: String,
+    val createdAt: String? = null,
+    val userId: String? = null
+) : Parcelable
+
+@Parcelize
+data class Reply(
+    val id: String,
+    val replyTo: String
+) : Parcelable
+
+@Parcelize
+data class ReplyToFeed(
+    val id: String,
+    val userId: String,
+    val zid: String,
+    val createdAt: String,
+    val text: String,
+    val arweaveId: String,
+    val user: ZeroFeedAuthor
+) : Parcelable

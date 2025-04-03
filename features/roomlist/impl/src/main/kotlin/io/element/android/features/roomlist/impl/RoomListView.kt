@@ -31,6 +31,7 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
+import io.element.android.features.roomlist.impl.components.HomeFeedListContentView
 import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
 import io.element.android.features.roomlist.impl.components.HomeScreenTabView
 import io.element.android.features.roomlist.impl.components.RoomListContentView
@@ -158,6 +159,7 @@ private fun RoomListScaffold(
                 displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
                 displayFilters = state.displayFilters,
                 filtersState = state.filtersState,
+                canReportBug = state.canReportBug,
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
                 userRewards = state.userRewards,
                 onDismissRewardsTooltip = { immediate ->
@@ -238,11 +240,35 @@ internal fun HomeScreenContent(
                 modifier = modifier
             )
         }
+        HomeScreenTab.FEED -> {
+            HomeFeedListContentView(
+                contentState = state.allFeedsContentState,
+                eventSink = state.eventSink,
+                zeroUserRewards = state.userRewards,
+                isProfileFeedList = false,
+                onFeedClick = {
+
+                },
+                modifier = modifier
+            )
+        }
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
                 contentState = state.contentState,
                 eventSink = state.eventSink,
                 onNotificationClick = ::onNotificationClick,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.PROFILE -> {
+            HomeFeedListContentView(
+                contentState = state.myFeedsContentState,
+                eventSink = state.eventSink,
+                zeroUserRewards = state.userRewards,
+                isProfileFeedList = true,
+                onFeedClick = {
+
+                },
                 modifier = modifier
             )
         }

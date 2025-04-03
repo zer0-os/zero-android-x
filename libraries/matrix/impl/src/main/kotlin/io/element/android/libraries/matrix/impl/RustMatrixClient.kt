@@ -48,10 +48,12 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
+import io.element.android.libraries.matrix.api.zero.user.primaryZIdCoreChannel
 import io.element.android.libraries.matrix.impl.conversion.map
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
@@ -85,6 +87,7 @@ import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
+import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
@@ -244,6 +247,13 @@ class RustMatrixClient(
 
     private val _userZIds: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
     override val userZIds: StateFlow<List<String>> = _userZIds
+
+    private val _allFeeds: MutableStateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+    override val allFeeds: StateFlow<List<ZeroFeed>> = _allFeeds
+    private val _allMyFeeds: MutableStateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+    override val allMyFeeds: StateFlow<List<ZeroFeed>> = _allMyFeeds
+    private val _feedReplies: MutableStateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+    override val feedReplies: StateFlow<List<ZeroFeed>> = _feedReplies
 
     override val ignoredUsersFlow = mxCallbackFlow<ImmutableList<UserId>> {
         innerClient.subscribeToIgnoredUsers(object : IgnoredUsersListener {
@@ -542,12 +552,14 @@ class RustMatrixClient(
 
     override fun roomDirectoryService(): RoomDirectoryService = roomDirectoryService
 
-    override fun close() {
-        appCoroutineScope.launch {
-            roomFactory.destroy()
-            rustSyncService.destroy()
-            notificationSettingsService.destroy()
-        }
+    internal suspend fun destroy() {
+        innerNotificationClient.close()
+
+        roomFactory.destroy()
+        rustSyncService.destroy()
+        notificationSettingsService.destroy()
+        notificationProcessSetup.destroy()
+
         sessionCoroutineScope.cancel()
         clientDelegateTaskHandle?.cancelAndDestroy()
         verificationService.destroy()
@@ -555,7 +567,6 @@ class RustMatrixClient(
         sessionDelegate.clearCurrentClient()
         innerRoomListService.close()
         notificationService.close()
-        notificationProcessSetup.destroy()
         encryptionService.close()
         innerClient.close()
     }
@@ -566,7 +577,7 @@ class RustMatrixClient(
 
     override suspend fun clearCache() {
         innerClient.clearCaches()
-        close()
+        destroy()
     }
 
     override suspend fun logout(userInitiated: Boolean, ignoreSdkError: Boolean) {
@@ -590,7 +601,7 @@ class RustMatrixClient(
                     }
                 }
             }
-            close()
+            destroy()
 
             deleteSessionDirectory()
             if (userInitiated) {
@@ -641,7 +652,7 @@ class RustMatrixClient(
                     throw it
                 }
             }
-            close()
+            destroy()
             deleteSessionDirectory()
             sessionStore.removeSession(sessionId.value)
         }.onFailure {
@@ -826,6 +837,64 @@ class RustMatrixClient(
             zeroCoreRepository?.channel?.joinChannel(channelId)
         }
     }
+
+    override suspend fun fetchAllFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
+        val allFeeds = runCatching {
+            val feedRepo = zeroCoreRepository?.feed ?: return
+            feedRepo.fetchAllFeeds(limit, skip)
+                .map { it.toModel() }
+        }.getOrElse { emptyList() }
+        _allFeeds.emit(allFeeds)
+    }
+
+    override suspend fun fetchAllMyFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
+        val allMyFeeds = runCatching {
+            val feedRepo = zeroCoreRepository?.feed ?: return
+            val currentUser = zeroCoreRepository.user.getCurrentUser().firstOrNull()
+            val primaryZId = currentUser?.primaryZeroId ?: return
+            feedRepo.fetchAllMyFeeds(primaryZId, limit, skip)
+                .map { it.toModel() }
+        }.getOrElse { emptyList() }
+        _allMyFeeds.emit(allMyFeeds)
+    }
+
+    override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedRepo = zeroCoreRepository?.feed ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
+                feedRepo
+                    .fetchFeedDetails(feedId, includeReplies, includeMeow)
+                    ?.toModel()
+            }
+        }
+
+    override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
+        val feedReplies = runCatching {
+            val feedRepo = zeroCoreRepository?.feed ?: return
+            feedRepo.fetchFeedReplies(feedId, limit, skip)
+                .map { it.toModel() }
+        }.getOrElse { emptyList() }
+        _feedReplies.emit(feedReplies)
+    }
+
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {
+        val feedRepo = zeroCoreRepository?.feed ?: return
+        runCatching {
+            val updatedFeed = feedRepo
+                .addMeowToFeed(feedId = feed.id, meowAmount)
+                ?.toModel()
+           if (updatedFeed != null) {
+               val existingList = _allFeeds.value.toMutableList()
+               existingList.indexOfFirst { it.id == feed.id }
+                   .takeIf { it >= 0 }
+                   ?.let { index ->
+                       existingList[index] = updatedFeed
+                       _allFeeds.emit(existingList)
+                   }
+           }
+        }
+    }
+
     //endregion
 }
 

@@ -36,6 +36,7 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
@@ -44,10 +45,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.io.Closeable
 import java.util.Optional
 
-interface MatrixClient : Closeable {
+interface MatrixClient {
     val sessionId: SessionId
     val deviceId: DeviceId
     val userProfile: StateFlow<MatrixUser>
@@ -60,6 +60,10 @@ interface MatrixClient : Closeable {
     val userRewards: StateFlow<ZeroUserRewards>
     val messengerInvite: StateFlow<ZeroMessengerInvite>
     val userZIds: StateFlow<List<String>>
+
+    val allFeeds: StateFlow<List<ZeroFeed>>
+    val allMyFeeds: StateFlow<List<ZeroFeed>>
+    val feedReplies: StateFlow<List<ZeroFeed>>
 
     suspend fun getRoom(roomId: RoomId): MatrixRoom?
     suspend fun getPendingRoom(roomId: RoomId): RoomPreview?
@@ -193,6 +197,30 @@ interface MatrixClient : Closeable {
     suspend fun getUserZIds()
 
     suspend fun joinZeroChannel(channelId: String): Result<String?>
+
+    suspend fun fetchAllFeeds(limit: Int,
+                              skip: Int,
+                              includeReplies: Boolean = true,
+                              includeMeow: Boolean = true
+    )
+
+    suspend fun fetchAllMyFeeds(limit: Int,
+                                skip: Int,
+                                includeReplies: Boolean = true,
+                                includeMeow: Boolean = true
+    )
+
+    suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?>
+
+    suspend fun fetchFeedReplies(
+        feedId: String,
+        limit: Int,
+        skip: Int,
+        includeReplies: Boolean = true,
+        includeMeow: Boolean = true
+    )
+
+    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int)
 }
 
 /**

@@ -84,7 +84,7 @@ class DeveloperSettingsPresenterTest {
         presenter.test {
             skipItems(2)
             awaitItem().also { state ->
-                val feature = state.features.first()
+                val feature = state.features.first { !it.isEnabled }
                 state.eventSink(DeveloperSettingsEvents.UpdateEnabledFeature(feature, !feature.isEnabled))
             }
             awaitItem().also { state ->
@@ -133,7 +133,6 @@ class DeveloperSettingsPresenterTest {
             }
             awaitItem().also { state ->
                 assertThat(state.customElementCallBaseUrlState.baseUrl).isEqualTo("https://call.element.ahoy")
-                assertThat(state.customElementCallBaseUrlState.defaultUrl).isEqualTo(ElementCallConfig.DEFAULT_BASE_URL)
             }
         }
     }

@@ -59,7 +59,8 @@ class CreateRoomRootPresenter @Inject constructor(
                 is CreateRoomRootEvents.StartDM -> localCoroutineScope.launch {
                     startDMAction.execute(
                         matrixUser = event.matrixUser,
-                        createIfDmDoesNotExist = startDmActionState.value is AsyncAction.Confirming,
+                        // createIfDmDoesNotExist = startDmActionState.value is AsyncAction.Confirming,
+                        createIfDmDoesNotExist = true,
                         actionState = startDmActionState,
                     )
                 }
