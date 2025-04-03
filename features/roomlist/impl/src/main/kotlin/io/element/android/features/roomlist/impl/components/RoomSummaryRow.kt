@@ -59,7 +59,6 @@ import io.element.android.libraries.designsystem.theme.roomListRoomName
 import io.element.android.libraries.designsystem.theme.unreadIndicator
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.matrix.ui.components.InviteSenderView
 import io.element.android.libraries.matrix.ui.model.InviteSender
@@ -89,7 +88,7 @@ internal fun RoomSummaryRow(
                     },
                 ) {
                     InviteNameAndIndicatorRow(name = room.name)
-                    // InviteSubtitle(isDm = room.isDm, inviteSender = room.inviteSender, canonicalAlias = room.canonicalAlias)
+                    // InviteSubtitle(isDm = room.isDm, inviteSender = room.inviteSender)
                     if (!room.isDm && room.inviteSender != null) {
                         Spacer(modifier = Modifier.height(4.dp))
                         InviteSenderView(
@@ -235,13 +234,12 @@ private fun NameAndTimestampRow(
 private fun InviteSubtitle(
     isDm: Boolean,
     inviteSender: InviteSender?,
-    canonicalAlias: RoomAlias?,
     modifier: Modifier = Modifier
 ) {
     val subtitle = if (isDm) {
         inviteSender?.userId?.value
     } else {
-        canonicalAlias?.value
+        null
     }
     if (subtitle != null) {
         Text(
