@@ -79,6 +79,13 @@ class MentionSpan(
         displayText = formatter.formatDisplayText(type)
     }
 
+    /**
+     * Updates the display text directly (specifically for zero purpose).
+     */
+    fun updateDisplayText(text: CharSequence) {
+        displayText = text
+    }
+
     override fun getSize(
         paint: Paint,
         text: CharSequence?,

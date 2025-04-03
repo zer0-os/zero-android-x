@@ -240,7 +240,7 @@ internal fun HomeScreenContent(
                 modifier = modifier
             )
         }
-        /*HomeScreenTab.FEED -> {
+        HomeScreenTab.FEED -> {
             HomeFeedListContentView(
                 contentState = state.allFeedsContentState,
                 eventSink = state.eventSink,
@@ -251,7 +251,7 @@ internal fun HomeScreenContent(
                 },
                 modifier = modifier
             )
-        }*/
+        }
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
                 contentState = state.contentState,
@@ -260,7 +260,7 @@ internal fun HomeScreenContent(
                 modifier = modifier
             )
         }
-        /*HomeScreenTab.PROFILE -> {
+        HomeScreenTab.PROFILE -> {
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
                 eventSink = state.eventSink,
@@ -271,7 +271,7 @@ internal fun HomeScreenContent(
                 },
                 modifier = modifier
             )
-        }*/
+        }
     }
 }
 

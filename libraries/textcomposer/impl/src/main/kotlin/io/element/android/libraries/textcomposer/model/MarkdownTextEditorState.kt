@@ -93,8 +93,10 @@ class MarkdownTextEditorState(
                         when (mention.type) {
                             is MentionType.User -> {
                                 permalinkBuilder.permalinkForUser(mention.type.userId).getOrNull()?.let { link ->
-                                    val mentionUserName = mention.text.substringAfter("@").trim()
-                                    val mentionUserCleanId = mention.rawValue
+                                    val mentionUserName = mention.displayText.toString()
+                                        .substringAfter("@")
+                                        .trim()
+                                    val mentionUserCleanId = mention.type.userId.value
                                         .substringAfter("@")
                                         .substringBefore(":")
                                         .trim()

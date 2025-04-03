@@ -24,6 +24,7 @@ import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkBuilder
 import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
+import io.element.android.libraries.textcomposer.mentions.MentionSpan
 import io.element.android.libraries.textcomposer.mentions.MentionSpanProvider
 import io.element.android.libraries.textcomposer.mentions.getMentionSpans
 import io.element.android.wysiwyg.view.spans.CodeBlockSpan
@@ -126,8 +127,12 @@ class DefaultTextPillificationHelper @Inject constructor(
                 val userId = UserId(matrixUserId)
                 val permalink = permalinkBuilder.permalinkForUser(userId).getOrNull() ?: continue
                 val mentionSpan = mentionSpanProvider.getMentionSpanFor(match.value, permalink)
-                roomMemberProfilesCache.getDisplayName(userId)?.let { mentionSpan.text = it }
-                match.groupValues[1].let { mentionSpan.text = it }
+                mentionSpan?.let { mSpan ->
+                    roomMemberProfilesCache.getDisplayName(userId)?.let {
+                        mSpan.updateDisplayText(it)
+                    }
+                    match.groupValues[1].let { mSpan.updateDisplayText(it) }
+                }
                 spannable.replace(start, end + 1, "@")
                 spannable.setSpan(mentionSpan, start, start + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
