@@ -7,6 +7,7 @@
 
 package io.element.android.features.preferences.impl.developer
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +34,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
+import io.element.android.libraries.matrix.api.tracing.TraceLogPack
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
@@ -58,6 +60,7 @@ fun DeveloperSettingsView(
             FeatureListContent(state)
         }
         ElementCallCategory(state = state)
+
         PreferenceCategory(title = "Rust SDK") {
             PreferenceDropdown(
                 title = "Tracing log level",
@@ -69,6 +72,22 @@ fun DeveloperSettingsView(
                 }
             )
         }
+        PreferenceCategory(title = "Enable trace logs per SDK feature") {
+            Text(
+                text = "Requires app reboot",
+                style = ElementTheme.typography.fontBodyMdRegular,
+                color = ElementTheme.colors.textSecondary,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+            )
+            for (logPack in TraceLogPack.entries) {
+                PreferenceSwitch(
+                    title = logPack.title,
+                    isChecked = state.tracingLogPacks.contains(logPack),
+                    onCheckedChange = { isChecked -> state.eventSink(DeveloperSettingsEvents.ToggleTracingLogPack(logPack, isChecked)) }
+                )
+            }
+        }
+
         PreferenceCategory(title = "Showkase") {
             ListItem(
                 headlineContent = {
