@@ -159,7 +159,7 @@ private fun FeedsViewList(
                 HomeFeedRow(
                     feed = feed,
                     zeroUserRewards = zeroUserRewards,
-                    isProfileFeed = isProfileFeedList,
+                    isMyOwnFeed = isProfileFeedList,
                     onFeedClick = { onFeedClick(feed) },
                     onAddMeowToFeed = { meowCount ->
                         eventSink(RoomListEvents.AddMeowToFeed(feed, meowCount))

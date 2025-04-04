@@ -494,6 +494,10 @@ class LoggedInFlowNode @AssistedInject constructor(
                         override fun onFeedDetailsUpdated(feedId: String) {
 
                         }
+
+                        override fun onFeedReplyClick(reply: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(reply))
+                        }
                     })
                     .build()
             }

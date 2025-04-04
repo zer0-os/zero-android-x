@@ -9,8 +9,12 @@ package io.element.android.features.feeddetails.impl
 
 import androidx.compose.runtime.Immutable
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Immutable
 data class FeedDetailsState(
-    val zeroFeed: ZeroFeed
+    val zeroFeed: ZeroFeed,
+    val userRewards: ZeroUserRewards,
+    val loggedInUserId: String,
+    val feedComments: List<ZeroFeed>
 )

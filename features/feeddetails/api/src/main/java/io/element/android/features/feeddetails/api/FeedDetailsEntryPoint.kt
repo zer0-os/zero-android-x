@@ -20,6 +20,7 @@ interface FeedDetailsEntryPoint  : FeatureEntryPoint {
 
     interface Callback : Plugin {
         fun onFeedDetailsUpdated(feedId: String)
+        fun onFeedReplyClick(reply: ZeroFeed)
     }
 
     fun nodeBuilder(parentNode: Node, buildContext: BuildContext): NodeBuilder

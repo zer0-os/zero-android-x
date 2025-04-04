@@ -7,22 +7,66 @@
 
 package io.element.android.features.feeddetails.impl
 
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import io.element.android.features.feeddetails.impl.components.FeedDetailsWithCommentsView
+import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Scaffold
+import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Composable
 fun FeedDetailsView(
     modifier: Modifier = Modifier,
     state: FeedDetailsState,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onFeedReplyClick: (reply: ZeroFeed) -> Unit = {}
 ) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            FeedDetailsTopBar(goBack = onBackClick)
+        },
+    ) { padding ->
+        FeedDetailsWithCommentsView(
+            modifier = Modifier
+                .padding(padding)
+                .consumeWindowInsets(padding),
+            state = state,
+            onReplyClick = onFeedReplyClick,
+            onAddMeowToFeed = { meowCount ->
+
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FeedDetailsTopBar(
+    goBack: () -> Unit,
+) {
+    TopAppBar(
+        title = { },
+        navigationIcon = { BackButton(onClick = goBack) },
+    )
 }
 
 @PreviewsDayNight
 @Composable
 fun FeedDetailsViewPreview() = ElementPreview {
-    FeedDetailsView(state = FeedDetailsState(ZeroFeed.placeholder))
+    FeedDetailsView(
+        state = FeedDetailsState(
+            zeroFeed = ZeroFeed.placeholder,
+            userRewards = ZeroUserRewards.empty(),
+            loggedInUserId = "",
+            feedComments = emptyList()
+        )
+    )
 }

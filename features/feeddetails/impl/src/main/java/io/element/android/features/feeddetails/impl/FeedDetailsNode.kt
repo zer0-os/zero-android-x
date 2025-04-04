@@ -20,6 +20,7 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.di.SessionScope
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 @ContributesNode(SessionScope::class)
 class FeedDetailsNode @AssistedInject constructor(
@@ -32,6 +33,10 @@ class FeedDetailsNode @AssistedInject constructor(
     private val presenter = presenterFactory.create(inputs.feed)
     private val callbacks = plugins.filterIsInstance<FeedDetailsEntryPoint.Callback>()
 
+    private fun onFeedReplyClick(reply: ZeroFeed) {
+        callbacks.forEach { it.onFeedReplyClick(reply) }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -40,7 +45,8 @@ class FeedDetailsNode @AssistedInject constructor(
         FeedDetailsView(
             modifier = modifier,
             state = state,
-            onBackClick = ::navigateUp
+            onBackClick = ::navigateUp,
+            onFeedReplyClick = this::onFeedReplyClick
         )
     }
 }

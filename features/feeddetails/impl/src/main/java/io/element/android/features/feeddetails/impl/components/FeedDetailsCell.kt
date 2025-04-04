@@ -5,11 +5,9 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.components
+package io.element.android.features.feeddetails.impl.components
 
 import android.content.Intent
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,46 +15,38 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.libraries.designsystem.components.avatar.AvatarData
-import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.features.roomlist.impl.components.FeedActionButton
+import io.element.android.features.roomlist.impl.components.FeedMeowActionButton
+import io.element.android.features.roomlist.impl.components.annotatedText
+import io.element.android.features.roomlist.impl.components.arweaveLink
+import io.element.android.features.roomlist.impl.components.avatarData
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
-import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthor
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
-import io.element.android.support.zero.config.ZeroConfig
 
 @Composable
-fun HomeFeedRow(
+fun FeedDetailsCell(
     modifier: Modifier = Modifier,
     feed: ZeroFeed,
     zeroUserRewards: ZeroUserRewards,
     isMyOwnFeed: Boolean = false,
-    onFeedClick: () -> Unit,
     onAddMeowToFeed: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -69,7 +59,6 @@ fun HomeFeedRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onFeedClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -133,7 +122,7 @@ fun HomeFeedRow(
                     FeedActionButton(
                         iconResId = R.drawable.ic_post_reply,
                         supportingText = (feed.replies?.count() ?: 0).toString(),
-                        onClick = onFeedClick
+                        enabled = false
                     )
                     Spacer(Modifier.width(60.dp))
                     FeedMeowActionButton(
@@ -152,78 +141,12 @@ fun HomeFeedRow(
     }
 }
 
-@Composable
-fun FeedActionButton(
-    @DrawableRes iconResId: Int,
-    supportingText: String? = null,
-    highlighted: Boolean = false,
-    enabled: Boolean = true,
-    onClick: () -> Unit = {}
-) {
-    val tint = if (highlighted) ElementTheme.colors.zeroBrandColor
-    else ElementTheme.colors.textSecondary
-    val modifier = if (enabled) Modifier.clickable { onClick() }
-    else Modifier
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.size(18.dp),
-            painter = painterResource(iconResId),
-            contentDescription = null,
-            tint = tint
-        )
-        if (supportingText != null) {
-            Text(
-                modifier = Modifier.padding(start = 8.dp),
-                text = supportingText,
-                style = ElementTheme.typography.fontBodyMdRegular,
-                color = tint
-            )
-        }
-    }
-}
-
-fun ZeroFeedAuthor.avatarData() = AvatarData(
-    id = id,
-    name = profileSummary.name,
-    url = profileSummary.profileImage,
-    size = AvatarSize.RoomDirectoryItem
-)
-
-fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
-    return buildAnnotatedString {
-        append(text)
-        // Regex to match @mentions, #hashtags, and links (http, https, www)
-        val regex = """(@\w+|#\w+|\b(?:https?://|www\.)\S+)""".toRegex()
-        regex.findAll(text).forEach { match ->
-            val isLink = match.value.startsWith("http") || match.value.startsWith("www")
-            addStyle(
-                style = SpanStyle(
-                    color = highlightColor,
-                    textDecoration = if (isLink) TextDecoration.Underline else TextDecoration.None
-                ),
-                start = match.range.first,
-                end = match.range.last + 1
-            )
-        }
-    }
-}
-
-val ZeroFeed.arweaveLink: String
-    get() = buildString {
-        append(ZeroConfig.ARWEAVE_BASE_URL)
-        append(arweaveId)
-    }
-
 @PreviewsDayNight
 @Composable
-internal fun HomeFeedRowPreview() = ElementPreview {
-    HomeFeedRow(
+internal fun FeedDetailsCellPreview() = ElementPreview {
+    FeedDetailsCell(
         feed = ZeroFeed.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
-        onFeedClick = {},
         onAddMeowToFeed = {}
     )
 }
