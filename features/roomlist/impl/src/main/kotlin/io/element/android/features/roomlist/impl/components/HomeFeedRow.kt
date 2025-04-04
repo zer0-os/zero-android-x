@@ -69,6 +69,7 @@ fun HomeFeedRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable { onFeedClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -131,7 +132,8 @@ fun HomeFeedRow(
                 Row(Modifier.weight(1f)) {
                     FeedActionButton(
                         iconResId = R.drawable.ic_post_reply,
-                        supportingText = (feed.replies?.count() ?: 0).toString()
+                        supportingText = (feed.replies?.count() ?: 0).toString(),
+                        onClick = onFeedClick
                     )
                     Spacer(Modifier.width(60.dp))
                     FeedMeowActionButton(

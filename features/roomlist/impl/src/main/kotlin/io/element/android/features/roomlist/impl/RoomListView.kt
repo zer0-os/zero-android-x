@@ -51,6 +51,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
@@ -63,6 +64,7 @@ fun RoomListView(
     onCreateRoomClick: () -> Unit,
     onRoomSettingsClick: (roomId: RoomId) -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
+    onFeedClick: (ZeroFeed) -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -94,6 +96,7 @@ fun RoomListView(
                 onOpenSettings = onSettingsClick,
                 onCreateRoomClick = onCreateRoomClick,
                 onMenuActionClick = onMenuActionClick,
+                onFeedClick = onFeedClick,
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
@@ -133,6 +136,7 @@ private fun RoomListScaffold(
     onOpenSettings: () -> Unit,
     onCreateRoomClick: () -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
+    onFeedClick: (ZeroFeed) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -175,6 +179,7 @@ private fun RoomListScaffold(
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = ::onRoomClick,
                 onCreateRoomClick = onCreateRoomClick,
+                onFeedClick = onFeedClick,
                 modifier = Modifier
                     .padding(padding)
                     .consumeWindowInsets(padding)
@@ -214,6 +219,7 @@ internal fun HomeScreenContent(
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onCreateRoomClick: () -> Unit,
+    onFeedClick: (ZeroFeed) -> Unit,
     modifier: Modifier,
 ) {
     fun onNotificationClick(room: RoomListRoomSummary) {
@@ -246,9 +252,7 @@ internal fun HomeScreenContent(
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = false,
-                onFeedClick = {
-
-                },
+                onFeedClick = onFeedClick,
                 modifier = modifier
             )
         }
@@ -266,9 +270,7 @@ internal fun HomeScreenContent(
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = true,
-                onFeedClick = {
-
-                },
+                onFeedClick = onFeedClick,
                 modifier = modifier
             )
         }
@@ -289,6 +291,7 @@ internal fun RoomListViewPreview(@PreviewParameter(RoomListStateProvider::class)
         onCreateRoomClick = {},
         onRoomSettingsClick = {},
         onMenuActionClick = {},
+        onFeedClick = {},
         acceptDeclineInviteView = {},
     )
 }

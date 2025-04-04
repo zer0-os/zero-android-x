@@ -27,6 +27,7 @@ import io.element.android.features.roomlist.impl.components.RoomListMenuAction
 import io.element.android.libraries.deeplink.usecase.InviteFriendsUseCase
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.services.analytics.api.AnalyticsService
 
 @ContributesNode(SessionScope::class)
@@ -82,6 +83,10 @@ class RoomListNode @AssistedInject constructor(
         }
     }
 
+    private fun onFeedClick(feed: ZeroFeed) {
+        plugins<RoomListEntryPoint.Callback>().forEach { it.onFeedClick(feed) }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -96,6 +101,7 @@ class RoomListNode @AssistedInject constructor(
             onConfirmRecoveryKeyClick = this::onSessionConfirmRecoveryKeyClick,
             onRoomSettingsClick = this::onRoomSettingsClick,
             onMenuActionClick = { onMenuActionClick(activity, it) },
+            onFeedClick = this::onFeedClick,
             modifier = modifier,
         ) {
             acceptDeclineInviteView.Render(
