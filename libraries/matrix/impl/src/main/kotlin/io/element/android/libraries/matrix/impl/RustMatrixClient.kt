@@ -471,6 +471,7 @@ class RustMatrixClient(
             roomFactory.leaveInvitedRoom(roomId) ?: error("Failed to decline room invite")
         }
     }
+
     override suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomSummary?> = withContext(sessionDispatcher) {
         runCatching {
             innerClient.joinRoomByIdOrAlias(
@@ -827,7 +828,7 @@ class RustMatrixClient(
         _userZIds.emit(userZIds)
     }
 
-    override suspend fun joinZeroChannel(channelId: String): Result<String?> = withContext(sessionDispatcher){
+    override suspend fun joinZeroChannel(channelId: String): Result<String?> = withContext(sessionDispatcher) {
         runCatching {
             zeroCoreRepository?.channel?.joinChannel(channelId)
         }
@@ -873,23 +874,25 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {
-        val feedRepo = zeroCoreRepository?.feed ?: return
-        runCatching {
-            val updatedFeed = feedRepo
-                .addMeowToFeed(feedId = feed.id, meowAmount)
-                ?.toModel()
-            if (updatedFeed != null) {
-                val existingList = _allFeeds.value.toMutableList()
-                existingList.indexOfFirst { it.id == feed.id }
-                    .takeIf { it >= 0 }
-                    ?.let { index ->
-                        existingList[index] = updatedFeed
-                        _allFeeds.emit(existingList)
-                    }
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedRepo = zeroCoreRepository?.feed ?: return@runCatching null
+                val updatedFeed = feedRepo
+                    .addMeowToFeed(feedId = feed.id, meowAmount)
+                    ?.toModel()
+                if (updatedFeed != null) {
+                    val existingList = _allFeeds.value.toMutableList()
+                    existingList.indexOfFirst { it.id == feed.id }
+                        .takeIf { it >= 0 }
+                        ?.let { index ->
+                            existingList[index] = updatedFeed
+                            _allFeeds.emit(existingList)
+                        }
+                }
+                return@runCatching updatedFeed
             }
         }
-    }
 
     //endregion
 }

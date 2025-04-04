@@ -402,7 +402,9 @@ class FakeMatrixClient(
         return Result.success(emptyList())
     }
 
-    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {}
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?> {
+        return Result.success(ZeroFeed.placeholder)
+    }
 
     //endregion
 }

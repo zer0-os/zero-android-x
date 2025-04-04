@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.element.android.features.feeddetails.impl.FeedDetailsEvents
 import io.element.android.features.feeddetails.impl.FeedDetailsState
 import io.element.android.features.roomlist.impl.components.HomeFeedRow
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -41,7 +42,7 @@ fun FeedDetailsWithCommentsView(
     modifier: Modifier = Modifier,
     state: FeedDetailsState,
     onReplyClick: (ZeroFeed) -> Unit,
-    onAddMeowToFeed: (Int) -> Unit,
+    onAddMeowToFeed: (ZeroFeed, Int) -> Unit,
 ) {
     var refreshing by remember(state) { mutableStateOf(false) }
     var isLoadingMoreItems by remember(state) { mutableStateOf(false) }
@@ -49,7 +50,7 @@ fun FeedDetailsWithCommentsView(
     val lazyListState = rememberLazyListState()
     val pullRefreshState = rememberPullRefreshState(refreshing, {
         refreshing = true
-        //TODO: eventSink(RoomListEvents.RefreshMyFeeds)
+        state.eventSink(FeedDetailsEvents.RefreshFeed)
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
         }, 1_500)
@@ -58,7 +59,7 @@ fun FeedDetailsWithCommentsView(
         derivedStateOf {
             val lastVisibleItemIndex = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
             // Start loading next page when 2nd last item is visible
-            lastVisibleItemIndex == state.feedComments.lastIndex - 1
+            lastVisibleItemIndex == state.feedComments.lastIndex + 1
         }
     }
 
@@ -66,7 +67,7 @@ fun FeedDetailsWithCommentsView(
     LaunchedEffect(shouldLoadMoreFeed) {
         if (shouldLoadMoreFeed && !isLoadingMoreItems) {
             isLoadingMoreItems = true
-            //TODO: eventSink(RoomListEvents.RefreshMyFeeds)
+            state.eventSink(FeedDetailsEvents.LoadMoreReplies)
         }
     }
 
@@ -86,7 +87,9 @@ fun FeedDetailsWithCommentsView(
                         feed = state.zeroFeed,
                         zeroUserRewards = state.userRewards,
                         isMyOwnFeed = state.zeroFeed.userId == state.loggedInUserId,
-                        onAddMeowToFeed = onAddMeowToFeed
+                        onAddMeowToFeed = { meowCount ->
+                            onAddMeowToFeed(state.zeroFeed, meowCount)
+                        }
                     )
                     HorizontalDivider()
                 }
@@ -100,7 +103,9 @@ fun FeedDetailsWithCommentsView(
                     zeroUserRewards = state.userRewards,
                     isMyOwnFeed = comment.userId == state.loggedInUserId,
                     onFeedClick = { onReplyClick(comment) },
-                    onAddMeowToFeed = onAddMeowToFeed
+                    onAddMeowToFeed = { meowCount ->
+                        onAddMeowToFeed(comment, meowCount)
+                    }
                 )
                 if (index != state.feedComments.lastIndex) {
                     HorizontalDivider()

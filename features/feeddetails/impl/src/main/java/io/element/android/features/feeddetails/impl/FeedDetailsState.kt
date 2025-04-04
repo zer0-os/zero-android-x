@@ -16,5 +16,7 @@ data class FeedDetailsState(
     val zeroFeed: ZeroFeed,
     val userRewards: ZeroUserRewards,
     val loggedInUserId: String,
-    val feedComments: List<ZeroFeed>
+    val feedComments: List<ZeroFeed>,
+
+    val eventSink: (FeedDetailsEvents) -> Unit,
 )

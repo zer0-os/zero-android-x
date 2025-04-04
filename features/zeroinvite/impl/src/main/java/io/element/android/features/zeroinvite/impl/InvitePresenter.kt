@@ -31,7 +31,8 @@ class InvitePresenter @Inject constructor(
 
     private fun CoroutineScope.fetchMessengerInvite(messengerInviteFlow: MutableState<ZeroMessengerInvite>) = launch {
         val result = client.getZeroMessengerInvite()
-        val invite = result.getOrElse { ZeroMessengerInvite.empty() }
-        messengerInviteFlow.value = invite
+        result.getOrElse { ZeroMessengerInvite.empty() }.let {
+            messengerInviteFlow.value = it
+        }
     }
 }

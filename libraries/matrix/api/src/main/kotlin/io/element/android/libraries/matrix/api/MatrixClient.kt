@@ -221,7 +221,7 @@ interface MatrixClient {
         includeMeow: Boolean = true
     ): Result<List<ZeroFeed>>
 
-    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int)
+    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?>
 }
 
 /**

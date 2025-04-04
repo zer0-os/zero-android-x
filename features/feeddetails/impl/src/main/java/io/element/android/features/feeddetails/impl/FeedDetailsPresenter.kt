@@ -37,6 +37,8 @@ class FeedDetailsPresenter @AssistedInject constructor(
         fun create(feed: ZeroFeed): FeedDetailsPresenter
     }
 
+    private val _feedReplies: MutableList<ZeroFeed> = mutableListOf()
+
     @Composable
     override fun present(): FeedDetailsState {
         val coroutineScope = rememberCoroutineScope()
@@ -46,6 +48,14 @@ class FeedDetailsPresenter @AssistedInject constructor(
 
         val userRewards = client.userRewards.collectAsState()
 
+        fun handleEvents(event: FeedDetailsEvents) {
+            when (event) {
+                FeedDetailsEvents.RefreshFeed -> coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
+                is FeedDetailsEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount, feedDetailsFlow)
+                FeedDetailsEvents.LoadMoreReplies -> coroutineScope.loadMoreReplies(feed.id, feedRepliesFlow)
+            }
+        }
+
         LaunchedEffect(Unit) {
             coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
         }
@@ -54,7 +64,8 @@ class FeedDetailsPresenter @AssistedInject constructor(
             zeroFeed = feedDetailsFlow.value,
             userRewards = userRewards.value,
             loggedInUserId = client.sessionId.extractedDisplayName,
-            feedComments = feedRepliesFlow.value
+            feedComments = feedRepliesFlow.value,
+            eventSink = ::handleEvents
         )
     }
 
@@ -66,11 +77,31 @@ class FeedDetailsPresenter @AssistedInject constructor(
             async { client.fetchFeedDetails(feedId) },
             async { client.fetchFeedReplies(feedId, limit = FEED_DETAILS_COMMENTS_PAGE_SIZE, skip = 0) }
         )
-        (results.first() as? Result<ZeroFeed?>)?.getOrNull()?.let {
+        (results[0] as? Result<ZeroFeed?>)?.getOrNull()?.let {
             feedDetailsFlow.value = it
         }
         (results[1] as? Result<List<ZeroFeed>>)?.getOrNull()?.let {
+            _feedReplies.addAll(it)
             feedRepliesFlow.value = it
+        }
+    }
+
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, feedDetailsFlow: MutableState<ZeroFeed>) = launch {
+        val result = client.addMeowToFeed(feed, meowCount)
+        result.getOrNull()?.let {
+            feedDetailsFlow.value = it
+        }
+    }
+
+    private fun CoroutineScope.loadMoreReplies(feedId: String, feedRepliesFlow: MutableState<List<ZeroFeed>>) = launch {
+        if (_feedReplies.isNotEmpty()) {
+            val skip = _feedReplies.size
+            val result = client.fetchFeedReplies(feedId, limit = FEED_DETAILS_COMMENTS_PAGE_SIZE, skip = skip)
+            result.getOrNull()?.let { newReplies ->
+                _feedReplies.addAll(newReplies)
+                feedRepliesFlow.value = _feedReplies
+                    .distinctBy { it.id }
+            }
         }
     }
 }

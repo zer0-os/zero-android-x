@@ -40,8 +40,8 @@ fun FeedDetailsView(
                 .consumeWindowInsets(padding),
             state = state,
             onReplyClick = onFeedReplyClick,
-            onAddMeowToFeed = { meowCount ->
-
+            onAddMeowToFeed = { feed, meowCount ->
+                state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
             }
         )
     }
@@ -66,7 +66,8 @@ fun FeedDetailsViewPreview() = ElementPreview {
             zeroFeed = ZeroFeed.placeholder,
             userRewards = ZeroUserRewards.empty(),
             loggedInUserId = "",
-            feedComments = emptyList()
+            feedComments = emptyList(),
+            eventSink = {}
         )
     )
 }
