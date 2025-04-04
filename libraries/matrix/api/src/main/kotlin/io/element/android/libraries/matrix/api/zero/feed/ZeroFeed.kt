@@ -66,6 +66,11 @@ data class ZeroFeed(
         }
     }
 
+    fun completeDateAndTime(): String {
+        val updatedAt = updatedAtDate()
+        return updatedAt.format(DateTimeFormatter.ofPattern("h:mm a • MMM d, yyyy"))
+    }
+
     companion object {
         val placeholder = ZeroFeed(
             id = UUID.randomUUID().toString(),

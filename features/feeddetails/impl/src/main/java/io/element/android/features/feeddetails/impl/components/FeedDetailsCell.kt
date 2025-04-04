@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -56,87 +55,81 @@ fun FeedDetailsCell(
         )
     }
 
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.Top
+            .padding(16.dp)
     ) {
-        CompositeAvatar(
-            avatarData = feed.user.avatarData()
-        )
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp)
-        ) {
-            Row {
-                Text(
-                    text = feed.user.profileSummary.name,
-                    style = ElementTheme.typography.fontBodyMdMedium,
-                    color = ElementTheme.colors.textPrimary,
-                    maxLines = 1
-                )
-                Text(
-                    text = " • ",
-                    style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary,
-                    maxLines = 1
-                )
-                Text(
-                    text = feed.updatedAtTimeAgo(),
-                    style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary,
-                    maxLines = 1
-                )
-                Spacer(Modifier.width(8.dp))
-                if (!feed.worldZid.isNullOrBlank() && feed.worldZid != feed.zid) {
+        Row {
+            CompositeAvatar(avatarData = feed.user.avatarData())
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)
+            ) {
+                Row {
                     Text(
-                        modifier = Modifier.weight(1f),
-                        text = "$ZERO_CHANNEL_PREFIX${feed.worldZid ?: "{world_id_here}"}",
-                        style = ElementTheme.typography.fontBodyMdRegular,
-                        color = ElementTheme.colors.textSecondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.End
+                        text = feed.user.profileSummary.name,
+                        style = ElementTheme.typography.fontBodyMdMedium,
+                        color = ElementTheme.colors.textPrimary,
+                        maxLines = 1
                     )
+                    Spacer(Modifier.width(8.dp))
+                    if (!feed.worldZid.isNullOrBlank() && feed.worldZid != feed.zid) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "$ZERO_CHANNEL_PREFIX${feed.worldZid ?: "{world_id_here}"}",
+                            style = ElementTheme.typography.fontBodyMdRegular,
+                            color = ElementTheme.colors.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
-            }
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = "$ZERO_CHANNEL_PREFIX${feed.zid}",
-                style = ElementTheme.typography.fontBodyMdRegular,
-                color = ElementTheme.colors.textSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = feed.annotatedText(ElementTheme.colors.zeroBrandColor),
-                style = ElementTheme.typography.fontBodyLgRegular,
-                color = ElementTheme.colors.textPrimary
-            )
-            Spacer(Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(Modifier.weight(1f)) {
-                    FeedActionButton(
-                        iconResId = R.drawable.ic_post_reply,
-                        supportingText = (feed.replies?.count() ?: 0).toString(),
-                        enabled = false
-                    )
-                    Spacer(Modifier.width(60.dp))
-                    FeedMeowActionButton(
-                        meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
-                        highlighted = !feed.meows.isNullOrEmpty(),
-                        enabled = !isMyOwnFeed,
-                        onAddMeowToFeed = onAddMeowToFeed
-                    )
-                }
-                FeedActionButton(
-                    iconResId = R.drawable.ic_post_arweave,
-                    onClick = openArweaveLink
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = "$ZERO_CHANNEL_PREFIX${feed.zid}",
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = feed.annotatedText(ElementTheme.colors.zeroBrandColor),
+            style = ElementTheme.typography.fontBodyLgRegular,
+            color = ElementTheme.colors.textPrimary
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = feed.completeDateAndTime(),
+            style = ElementTheme.typography.fontBodyMdRegular,
+            color = ElementTheme.colors.textSecondary,
+            maxLines = 1
+        )
+        Spacer(Modifier.height(16.dp))
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.weight(1f)) {
+                FeedActionButton(
+                    iconResId = R.drawable.ic_post_reply,
+                    supportingText = (feed.replies?.count() ?: 0).toString(),
+                    enabled = false
+                )
+                Spacer(Modifier.width(60.dp))
+                FeedMeowActionButton(
+                    meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
+                    highlighted = !feed.meows.isNullOrEmpty(),
+                    enabled = !isMyOwnFeed,
+                    onAddMeowToFeed = onAddMeowToFeed
+                )
+            }
+            FeedActionButton(
+                iconResId = R.drawable.ic_post_arweave,
+                onClick = openArweaveLink
+            )
         }
     }
 }

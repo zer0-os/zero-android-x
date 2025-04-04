@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +58,7 @@ fun HomeFeedRow(
     feed: ZeroFeed,
     zeroUserRewards: ZeroUserRewards,
     isMyOwnFeed: Boolean = false,
+    showThreadLine: Boolean = false,
     onFeedClick: () -> Unit,
     onAddMeowToFeed: (Int) -> Unit,
 ) {
@@ -69,13 +72,19 @@ fun HomeFeedRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .clickable { onFeedClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
-        CompositeAvatar(
-            avatarData = feed.user.avatarData()
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CompositeAvatar(
+                avatarData = feed.user.avatarData()
+            )
+            if (showThreadLine) {
+                VerticalDivider(modifier = Modifier.padding(top = 8.dp))
+            }
+        }
         Column(
             modifier = modifier
                 .fillMaxWidth()

@@ -858,9 +858,13 @@ class RustMatrixClient(
         withContext(sessionDispatcher) {
             runCatching {
                 val feedRepo = zeroCoreRepository?.feed ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
-                feedRepo
+                val feed = feedRepo
                     .fetchFeedDetails(feedId, includeReplies, includeMeow)
                     ?.toModel()
+                if (feed != null) {
+                    updateFeedInHome(feed)
+                }
+                return@runCatching feed
             }
         }
 
@@ -882,18 +886,21 @@ class RustMatrixClient(
                     .addMeowToFeed(feedId = feed.id, meowAmount)
                     ?.toModel()
                 if (updatedFeed != null) {
-                    val existingList = _allFeeds.value.toMutableList()
-                    existingList.indexOfFirst { it.id == feed.id }
-                        .takeIf { it >= 0 }
-                        ?.let { index ->
-                            existingList[index] = updatedFeed
-                            _allFeeds.emit(existingList)
-                        }
+                    updateFeedInHome(updatedFeed)
                 }
                 return@runCatching updatedFeed
             }
         }
 
+    private suspend fun updateFeedInHome(updatedFeed: ZeroFeed) {
+        val existingList = _allFeeds.value.toMutableList()
+        existingList.indexOfFirst { it.id == updatedFeed.id }
+            .takeIf { it >= 0 }
+            ?.let { index ->
+                existingList[index] = updatedFeed
+                _allFeeds.emit(existingList)
+            }
+    }
     //endregion
 }
 

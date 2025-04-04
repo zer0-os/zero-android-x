@@ -9,7 +9,9 @@ package io.element.android.features.feeddetails.impl
 
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.element.android.features.feeddetails.impl.components.FeedDetailsWithCommentsView
@@ -17,7 +19,6 @@ import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Scaffold
-import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
@@ -52,8 +53,8 @@ fun FeedDetailsView(
 private fun FeedDetailsTopBar(
     goBack: () -> Unit,
 ) {
-    TopAppBar(
-        title = { },
+    CenterAlignedTopAppBar(
+        title = { Text("Post") },
         navigationIcon = { BackButton(onClick = goBack) },
     )
 }
