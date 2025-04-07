@@ -44,7 +44,7 @@ serialization_json = "1.8.1"
 #other
 coil = "3.1.0"
 showkase = "1.0.3"
-appyx = "1.6.0"
+appyx = "1.7.0"
 sqldelight = "2.0.2"
 wysiwyg = "2.38.3"
 telephoto = "0.15.1"
@@ -248,7 +248,7 @@ anvil = { id = "dev.zacsweers.anvil", version.ref = "anvil" }
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
 dependencygraph = "com.savvasdalkitsis.module-dependency-graph:0.12"
-dependencycheck = "org.owasp.dependencycheck:12.1.0"
+dependencycheck = "org.owasp.dependencycheck:12.1.1"
 dependencyanalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysis" }
 paparazzi = "app.cash.paparazzi:1.3.5"
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
