@@ -352,10 +352,9 @@ class FakeMatrixClient(
 
     override fun dismissRewardsIntimation() {}
 
-    override val messengerInvite: StateFlow<ZeroMessengerInvite> =
-        MutableStateFlow(ZeroMessengerInvite.empty())
-
-    override suspend fun getZeroMessengerInvite() {}
+    override suspend fun getZeroMessengerInvite(): Result<ZeroMessengerInvite> {
+        return Result.success(ZeroMessengerInvite.empty())
+    }
 
     override suspend fun isZeroProfileCompletionPending(): Boolean {
         return false
@@ -395,15 +394,17 @@ class FakeMatrixClient(
 
     override suspend fun fetchAllMyFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
 
-    override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?> {
+    override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed> {
         return Result.success(ZeroFeed.placeholder)
     }
 
-    override val feedReplies: StateFlow<List<ZeroFeed>> = MutableStateFlow(emptyList())
+    override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> {
+        return Result.success(emptyList())
+    }
 
-    override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {}
-
-    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int) {}
+    override suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?> {
+        return Result.success(ZeroFeed.placeholder)
+    }
 
     //endregion
 }

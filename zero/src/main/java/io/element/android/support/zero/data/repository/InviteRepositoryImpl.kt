@@ -3,26 +3,20 @@ package io.element.android.support.zero.data.repository
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.MessengerInvite
 import io.element.android.support.zero.network.service.ZeroInviteService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class InviteRepositoryImpl(
     private val zeroInviteService: ZeroInviteService
 ): InviteRepository {
-
-    private val _messengerInvite = MutableStateFlow(MessengerInvite.empty())
-    override val messengerInvite: StateFlow<MessengerInvite> = _messengerInvite
 
     override suspend fun validateInvite(inviteCode: String): Boolean {
         val result = zeroInviteService.validateInvite(inviteCode)
         return result.isSuccessful
     }
 
-    override suspend fun fetchMessengerInvite() {
-        runCatching {
+    override suspend fun fetchMessengerInvite(): MessengerInvite {
+        return runCatching {
             val apiInvite = zeroInviteService.fetchMessengerInvite()
-            val messengerInvite = apiInvite.toModel()
-            _messengerInvite.emit(messengerInvite)
-        }
+            apiInvite.toModel()
+        }.getOrElse { MessengerInvite.empty() }
     }
 }

@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +57,8 @@ fun HomeFeedRow(
     modifier: Modifier = Modifier,
     feed: ZeroFeed,
     zeroUserRewards: ZeroUserRewards,
-    isProfileFeed: Boolean = false,
+    isMyOwnFeed: Boolean = false,
+    showThreadLine: Boolean = false,
     onFeedClick: () -> Unit,
     onAddMeowToFeed: (Int) -> Unit,
 ) {
@@ -69,12 +72,19 @@ fun HomeFeedRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .clickable { onFeedClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
-        CompositeAvatar(
-            avatarData = feed.user.avatarData()
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CompositeAvatar(
+                avatarData = feed.user.avatarData()
+            )
+            if (showThreadLine) {
+                VerticalDivider(modifier = Modifier.padding(top = 8.dp))
+            }
+        }
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -131,13 +141,14 @@ fun HomeFeedRow(
                 Row(Modifier.weight(1f)) {
                     FeedActionButton(
                         iconResId = R.drawable.ic_post_reply,
-                        supportingText = (feed.replies?.count() ?: 0).toString()
+                        supportingText = (feed.replies?.count() ?: 0).toString(),
+                        onClick = onFeedClick
                     )
                     Spacer(Modifier.width(60.dp))
                     FeedMeowActionButton(
                         meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
                         highlighted = !feed.meows.isNullOrEmpty(),
-                        enabled = !isProfileFeed,
+                        enabled = !isMyOwnFeed,
                         onAddMeowToFeed = onAddMeowToFeed
                     )
                 }
@@ -151,16 +162,19 @@ fun HomeFeedRow(
 }
 
 @Composable
-private fun FeedActionButton(
+fun FeedActionButton(
     @DrawableRes iconResId: Int,
     supportingText: String? = null,
     highlighted: Boolean = false,
+    enabled: Boolean = true,
     onClick: () -> Unit = {}
 ) {
     val tint = if (highlighted) ElementTheme.colors.zeroBrandColor
     else ElementTheme.colors.textSecondary
+    val modifier = if (enabled) Modifier.clickable { onClick() }
+    else Modifier
     Row(
-        modifier = Modifier.clickable { onClick() },
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -180,14 +194,14 @@ private fun FeedActionButton(
     }
 }
 
-private fun ZeroFeedAuthor.avatarData() = AvatarData(
+fun ZeroFeedAuthor.avatarData() = AvatarData(
     id = id,
     name = profileSummary.name,
     url = profileSummary.profileImage,
     size = AvatarSize.RoomDirectoryItem
 )
 
-private fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
+fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
     return buildAnnotatedString {
         append(text)
         // Regex to match @mentions, #hashtags, and links (http, https, www)
@@ -206,10 +220,11 @@ private fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
     }
 }
 
-private val ZeroFeed.arweaveLink: String get() = buildString {
-    append(ZeroConfig.ARWEAVE_BASE_URL)
-    append(arweaveId)
-}
+val ZeroFeed.arweaveLink: String
+    get() = buildString {
+        append(ZeroConfig.ARWEAVE_BASE_URL)
+        append(arweaveId)
+    }
 
 @PreviewsDayNight
 @Composable

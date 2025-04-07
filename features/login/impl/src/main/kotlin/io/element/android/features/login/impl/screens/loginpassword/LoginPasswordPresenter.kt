@@ -53,7 +53,7 @@ class LoginPasswordPresenter @Inject constructor(
         val formState = rememberSaveable {
             mutableStateOf(LoginFormState.Default)
         }
-        val accountProvider by accountProviderDataSource.flow().collectAsState()
+        val accountProvider by accountProviderDataSource.flow.collectAsState()
 
         LaunchedEffect(Unit) {
             WalletConnectDelegate.wcEventModels.collectLatest { model ->

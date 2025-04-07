@@ -12,6 +12,7 @@ import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import io.element.android.libraries.architecture.FeatureEntryPoint
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 interface RoomListEntryPoint : FeatureEntryPoint {
     fun nodeBuilder(parentNode: Node, buildContext: BuildContext): NodeBuilder
@@ -29,5 +30,6 @@ interface RoomListEntryPoint : FeatureEntryPoint {
         fun onRoomSettingsClick(roomId: RoomId)
         fun onReportBugClick()
         fun onLogoutForNativeSlidingSyncMigrationNeeded()
+        fun onFeedClick(feed: ZeroFeed)
     }
 }

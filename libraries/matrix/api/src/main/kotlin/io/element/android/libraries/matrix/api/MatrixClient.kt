@@ -58,12 +58,10 @@ interface MatrixClient {
 
     val shouldShowNewRewardsIntimation: StateFlow<Boolean>
     val userRewards: StateFlow<ZeroUserRewards>
-    val messengerInvite: StateFlow<ZeroMessengerInvite>
     val userZIds: StateFlow<List<String>>
 
     val allFeeds: StateFlow<List<ZeroFeed>>
     val allMyFeeds: StateFlow<List<ZeroFeed>>
-    val feedReplies: StateFlow<List<ZeroFeed>>
 
     suspend fun getRoom(roomId: RoomId): MatrixRoom?
     suspend fun getPendingRoom(roomId: RoomId): RoomPreview?
@@ -180,7 +178,7 @@ interface MatrixClient {
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
 
-    suspend fun getZeroMessengerInvite()
+    suspend fun getZeroMessengerInvite(): Result<ZeroMessengerInvite>
 
     suspend fun isZeroProfileCompletionPending(): Boolean
 
@@ -210,7 +208,10 @@ interface MatrixClient {
                                 includeMeow: Boolean = true
     )
 
-    suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeow: Boolean): Result<ZeroFeed?>
+    suspend fun fetchFeedDetails(feedId: String,
+                                 includeReplies: Boolean = true,
+                                 includeMeow: Boolean = true
+    ): Result<ZeroFeed?>
 
     suspend fun fetchFeedReplies(
         feedId: String,
@@ -218,9 +219,9 @@ interface MatrixClient {
         skip: Int,
         includeReplies: Boolean = true,
         includeMeow: Boolean = true
-    )
+    ): Result<List<ZeroFeed>>
 
-    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int)
+    suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?>
 }
 
 /**

@@ -125,7 +125,9 @@ class RoomDetailsPresenter @Inject constructor(
         }
 
         val canHandleKnockRequests by room.canHandleKnockRequestsAsState(syncUpdateFlow.value)
-        val isKnockRequestsEnabled by featureFlagService.isFeatureEnabledFlow(FeatureFlags.Knock).collectAsState(false)
+        val isKnockRequestsEnabled by remember {
+            featureFlagService.isFeatureEnabledFlow(FeatureFlags.Knock)
+        }.collectAsState(false)
         val knockRequestsCount by produceState<Int?>(null) {
             room.knockRequestsFlow.collect { value = it.size }
         }

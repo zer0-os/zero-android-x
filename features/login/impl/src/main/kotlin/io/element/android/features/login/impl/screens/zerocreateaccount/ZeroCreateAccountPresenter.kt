@@ -70,7 +70,7 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
         val formState = rememberSaveable {
             mutableStateOf(ZeroCreateAccountFormState.Default)
         }
-        val accountProvider by accountProviderDataSource.flow().collectAsState()
+        val accountProvider by accountProviderDataSource.flow.collectAsState()
 
         LaunchedEffect(Unit) {
             WalletConnectDelegate.wcEventModels.collectLatest { model ->

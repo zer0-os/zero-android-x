@@ -46,6 +46,7 @@ import io.element.android.appnav.room.RoomFlowNode
 import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
 import io.element.android.features.createroom.api.CreateRoomEntryPoint
+import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.ftue.api.FtueEntryPoint
 import io.element.android.features.ftue.api.state.FtueService
 import io.element.android.features.ftue.api.state.FtueState
@@ -75,6 +76,7 @@ import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
 import io.element.android.libraries.matrix.api.verification.SessionVerificationServiceListener
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.services.appnavstate.api.AppNavigationStateService
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -113,6 +115,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val sendingQueue: SendQueues,
     private val logoutEntryPoint: LogoutEntryPoint,
     private val incomingVerificationEntryPoint: IncomingVerificationEntryPoint,
+    private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -265,6 +268,9 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class IncomingVerificationRequest(val data: VerificationRequest.Incoming) : NavTarget
+
+        @Parcelize
+        data class FeedDetails(val feed: ZeroFeed) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -310,6 +316,10 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onLogoutForNativeSlidingSyncMigrationNeeded() {
                         backstack.push(NavTarget.LogoutForNativeSlidingSyncMigrationNeeded)
+                    }
+
+                    override fun onFeedClick(feed: ZeroFeed) {
+                        backstack.push(NavTarget.FeedDetails(feed))
                     }
                 }
                 roomListEntryPoint
@@ -473,6 +483,20 @@ class LoggedInFlowNode @AssistedInject constructor(
                     .callback(object : IncomingVerificationEntryPoint.Callback {
                         override fun onDone() {
                             backstack.pop()
+                        }
+                    })
+                    .build()
+            }
+            is NavTarget.FeedDetails -> {
+                feedDetailsEntryPoint.nodeBuilder(this, buildContext)
+                    .params(FeedDetailsEntryPoint.Params(navTarget.feed))
+                    .callback(object : FeedDetailsEntryPoint.Callback {
+                        override fun onFeedDetailsUpdated(feedId: String) {
+
+                        }
+
+                        override fun onFeedReplyClick(reply: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(reply))
                         }
                     })
                     .build()
