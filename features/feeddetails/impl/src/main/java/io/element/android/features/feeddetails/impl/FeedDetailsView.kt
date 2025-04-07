@@ -14,13 +14,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import io.element.android.features.feeddetails.impl.components.FeedDetailsWithCommentsView
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
-import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Composable
 fun FeedDetailsView(
@@ -61,14 +61,10 @@ private fun FeedDetailsTopBar(
 
 @PreviewsDayNight
 @Composable
-fun FeedDetailsViewPreview() = ElementPreview {
+fun FeedDetailsViewPreview(
+    @PreviewParameter(FeedDetailsStateProvider::class) state: FeedDetailsState
+) = ElementPreview {
     FeedDetailsView(
-        state = FeedDetailsState(
-            zeroFeed = ZeroFeed.placeholder,
-            userRewards = ZeroUserRewards.empty(),
-            loggedInUserId = "",
-            feedComments = emptyList(),
-            eventSink = {}
-        )
+        state = state
     )
 }

@@ -42,9 +42,12 @@ class FeedDetailsPresenter @AssistedInject constructor(
     @Composable
     override fun present(): FeedDetailsState {
         val coroutineScope = rememberCoroutineScope()
+        val matrixUser = client.userProfile.collectAsState()
 
         val feedDetailsFlow: MutableState<ZeroFeed> = remember { mutableStateOf(feed) }
         val feedRepliesFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
+
+        val postReplyText: MutableState<String> = remember { mutableStateOf("") }
 
         val userRewards = client.userRewards.collectAsState()
 
@@ -53,6 +56,9 @@ class FeedDetailsPresenter @AssistedInject constructor(
                 FeedDetailsEvents.RefreshFeed -> coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
                 is FeedDetailsEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount, feedDetailsFlow)
                 FeedDetailsEvents.LoadMoreReplies -> coroutineScope.loadMoreReplies(feed.id, feedRepliesFlow)
+                is FeedDetailsEvents.PostReplyTextChanged -> postReplyText.value = event.text
+                FeedDetailsEvents.PostReply -> {
+                }
             }
         }
 
@@ -63,15 +69,18 @@ class FeedDetailsPresenter @AssistedInject constructor(
         return FeedDetailsState(
             zeroFeed = feedDetailsFlow.value,
             userRewards = userRewards.value,
+            matrixUser = matrixUser.value,
             loggedInUserId = client.sessionId.extractedDisplayName,
             feedComments = feedRepliesFlow.value,
+            postReplyText = postReplyText.value,
             eventSink = ::handleEvents
         )
     }
 
-    private fun CoroutineScope.refreshFeed(feedId: String,
-                                           feedDetailsFlow: MutableState<ZeroFeed>,
-                                           feedRepliesFlow: MutableState<List<ZeroFeed>>
+    private fun CoroutineScope.refreshFeed(
+        feedId: String,
+        feedDetailsFlow: MutableState<ZeroFeed>,
+        feedRepliesFlow: MutableState<List<ZeroFeed>>
     ) = launch {
         val results = awaitAll(
             async { client.fetchFeedDetails(feedId) },

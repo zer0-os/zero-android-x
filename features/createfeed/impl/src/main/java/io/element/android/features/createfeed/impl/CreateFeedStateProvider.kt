@@ -7,3 +7,23 @@
 
 package io.element.android.features.createfeed.impl
 
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.user.MatrixUser
+
+open class CreateFeedStateProvider : PreviewParameterProvider<CreateFeedState> {
+    override val values: Sequence<CreateFeedState>
+        get() = sequenceOf(
+            aCreateFeedState(),
+            aCreateFeedState(feedText = "This is a small feed text..."),
+        )
+}
+
+internal fun aCreateFeedState(
+    feedText: String = "",
+    matrixUser: MatrixUser = MatrixUser(userId = UserId("@id:domain"), displayName = "User#1")
+) = CreateFeedState(
+    feedText = feedText,
+    matrixUser = matrixUser,
+    eventSink = {}
+)

@@ -8,6 +8,10 @@
 package io.element.android.features.createfeed.impl
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -20,12 +24,20 @@ class CreateFeedPresenter @Inject constructor(
     override fun present(): CreateFeedState {
         val coroutineScope = rememberCoroutineScope()
 
-        fun handleEvents(event: CreateFeedEvents) {
+        val matrixUser = client.userProfile.collectAsState()
+        val newFeedText: MutableState<String> = remember { mutableStateOf("") }
 
+        fun handleEvents(event: CreateFeedEvents) {
+            when (event) {
+                is CreateFeedEvents.PostTextChanged -> newFeedText.value = event.text
+                CreateFeedEvents.CreatePost -> {
+                }
+            }
         }
 
         return CreateFeedState(
-            feedText = "",
+            feedText = newFeedText.value,
+            matrixUser = matrixUser.value,
             eventSink = ::handleEvents
         )
     }
