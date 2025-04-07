@@ -40,14 +40,12 @@ data class RoomListRoomSummary(
 ) {
     val isHighlighted = userDefinedNotificationMode != RoomNotificationMode.MUTE &&
         (numberOfUnreadNotifications > 0 || numberOfUnreadMentions > 0) ||
-        isMarkedUnread ||
-        displayType == RoomSummaryDisplayType.INVITE
+        isMarkedUnread
 
     val hasNewContent = numberOfUnreadMessages > 0 ||
         numberOfUnreadMentions > 0 ||
         numberOfUnreadNotifications > 0 ||
-        isMarkedUnread ||
-        displayType == RoomSummaryDisplayType.INVITE
+        isMarkedUnread
 
     val isAChannel = name?.startsWith(ZERO_CHANNEL_PREFIX) == true
 }
