@@ -222,6 +222,10 @@ interface MatrixClient {
     ): Result<List<ZeroFeed>>
 
     suspend fun addMeowToFeed(feed: ZeroFeed, meowAmount: Int): Result<ZeroFeed?>
+
+    suspend fun checkZeroThirdWebWallet()
+
+    suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit>
 }
 
 /**

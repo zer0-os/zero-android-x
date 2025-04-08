@@ -8,4 +8,6 @@ interface AccountRepository {
     suspend fun verifyUserPassword(password: String): Boolean
 
     suspend fun fetchUserZIds(): List<String>
+
+    suspend fun checkAndInitializeThirdWeb()
 }

@@ -406,5 +406,11 @@ class FakeMatrixClient(
         return Result.success(ZeroFeed.placeholder)
     }
 
+    override suspend fun checkZeroThirdWebWallet() {}
+
+    override suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit> {
+        return Result.success(Unit)
+    }
+
     //endregion
 }

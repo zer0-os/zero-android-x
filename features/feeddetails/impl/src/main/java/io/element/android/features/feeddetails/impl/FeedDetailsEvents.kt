@@ -15,4 +15,6 @@ sealed interface FeedDetailsEvents {
     data object LoadMoreReplies : FeedDetailsEvents
     data class PostReplyTextChanged(val text: String) : FeedDetailsEvents
     data object PostReply : FeedDetailsEvents
+
+    data object HideError : FeedDetailsEvents
 }

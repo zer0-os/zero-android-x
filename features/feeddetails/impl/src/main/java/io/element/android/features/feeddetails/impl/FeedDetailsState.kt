@@ -8,6 +8,7 @@
 package io.element.android.features.feeddetails.impl
 
 import androidx.compose.runtime.Immutable
+import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -22,6 +23,7 @@ data class FeedDetailsState(
     val postReplyText: String,
 
     val eventSink: (FeedDetailsEvents) -> Unit,
+    val genericActionState: AsyncData<Unit>,
 ) {
     val canPostReply: Boolean
         get() = postReplyText.isNotBlank()

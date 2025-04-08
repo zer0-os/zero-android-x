@@ -33,6 +33,7 @@ import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroRewardService
 import io.element.android.support.zero.network.service.ZeroUserService
+import io.element.android.support.zero.network.service.ZeroWalletService
 
 @Module
 @ContributesTo(AppScope::class)
@@ -100,7 +101,8 @@ object RepositoryModule {
     fun bindAccountRepository(
         zeroAccountService: ZeroAccountService,
         zeroUserService: ZeroUserService,
-    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService)
+        zeroWalletService: ZeroWalletService,
+    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService, zeroWalletService)
 
     @Provides
     @SingleIn(AppScope::class)

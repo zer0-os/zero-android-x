@@ -901,6 +901,46 @@ class RustMatrixClient(
                 _allFeeds.emit(existingList)
             }
     }
+
+    override suspend fun checkZeroThirdWebWallet() {
+        val zeroAccountRepo = zeroCoreRepository?.account ?: return
+        zeroAccountRepo.checkAndInitializeThirdWeb()
+        getUserProfile()
+    }
+
+    override suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val channelZId = _userProfile.value.primaryZeroId
+                    ?: return@withContext Result.failure(Throwable("Please set user primaryZId in profile settings."))
+                val feedRepo = zeroCoreRepository?.feed
+                    ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
+                val isSuccess = feedRepo.createNewFeed(channelZId, content, replyToPost)
+                if (isSuccess) {
+                    CoroutineScope(sessionDispatcher).launch {
+                        postCreateFeed(replyToPost)
+                    }
+                    Unit
+                } else {
+                    throw Throwable("Failed to create new post.")
+                }
+            }
+        }
+
+    private suspend fun postCreateFeed(replyToPost: String?) {
+        withContext(sessionDispatcher) {
+            runCatching {
+                awaitAll(
+                    async { fetchAllFeeds(10, 0) },
+                    async { fetchAllMyFeeds(10, 0) }
+                )
+                replyToPost?.let { feedId ->
+                    val feed = fetchFeedDetails(feedId)
+                    feed.getOrNull()?.let { updateFeedInHome(it) }
+                }
+            }
+        }
+    }
     //endregion
 }
 

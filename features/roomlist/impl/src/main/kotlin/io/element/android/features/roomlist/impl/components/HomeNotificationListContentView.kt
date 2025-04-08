@@ -130,9 +130,9 @@ private fun NotificationsViewList(
                 room = room,
                 onClick = onNotificationClick
             )
-            if (index != items.lastIndex) {
+            /*if (index != items.lastIndex) {
                 HorizontalDivider()
-            }
+            }*/
         }
     }
 }

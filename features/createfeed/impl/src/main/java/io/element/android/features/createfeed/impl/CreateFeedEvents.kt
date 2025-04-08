@@ -10,4 +10,6 @@ package io.element.android.features.createfeed.impl
 sealed interface CreateFeedEvents {
     data class PostTextChanged(val text: String) : CreateFeedEvents
     data object CreatePost : CreateFeedEvents
+
+    data object HideError : CreateFeedEvents
 }

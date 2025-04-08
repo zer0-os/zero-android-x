@@ -43,14 +43,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.feeddetails.impl.FeedDetailsEvents
 import io.element.android.features.feeddetails.impl.FeedDetailsState
 import io.element.android.features.roomlist.impl.components.HomeFeedRow
+import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
@@ -58,6 +62,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.ui.model.getAvatarData
+import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.extension.innerShadow
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -148,6 +153,17 @@ fun FeedDetailsWithCommentsView(
         PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 
         PostReplyView(state = state)
+
+        if (state.genericActionState is AsyncData.Loading) {
+            ProgressDialog(text = "Posting...")
+        }
+
+        if (state.genericActionState is AsyncData.Failure) {
+            ErrorDialog(
+                content = state.genericActionState.error.message ?: stringResource(CommonStrings.error_unknown),
+                onSubmit = { state.eventSink(FeedDetailsEvents.HideError) }
+            )
+        }
     }
 }
 
@@ -178,7 +194,10 @@ private fun BoxScope.PostReplyView(
             }
         )
         PostReplySendButton(
-            canPostReply = state.canPostReply
+            canPostReply = state.canPostReply,
+            onPostReply = {
+                state.eventSink(FeedDetailsEvents.PostReply)
+            }
         )
     }
 }
@@ -219,11 +238,12 @@ private fun PostReplyTextField(
 
 @Composable
 private fun PostReplySendButton(
-    canPostReply: Boolean = false
+    canPostReply: Boolean = false,
+    onPostReply: () -> Unit
 ) {
     IconButton(
         modifier = Modifier.size(48.dp),
-        onClick = {},
+        onClick = onPostReply,
         enabled = canPostReply,
     ) {
         Box(

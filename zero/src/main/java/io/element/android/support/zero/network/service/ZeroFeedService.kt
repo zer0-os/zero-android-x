@@ -8,6 +8,7 @@
 package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.MeowFeedRequest
+import io.element.android.support.zero.network.model.request.PostNewFeedRequest
 import io.element.android.support.zero.network.model.response.ApiFeedDetails
 import io.element.android.support.zero.network.model.response.ApiFeedReplies
 import io.element.android.support.zero.network.model.response.ApiFeeds
@@ -58,5 +59,11 @@ interface ZeroFeedService {
     suspend fun meowFeed(
         @Path("feed_id") feedId: String,
         @Body request: MeowFeedRequest
+    ): Response<ResponseBody>
+
+    @POST(value = "api/v2/posts/channel/raw/{channel_zid}")
+    suspend fun postNewFeed(
+        @Path("channel_zid") channelZId: String,
+        @Body request: PostNewFeedRequest
     ): Response<ResponseBody>
 }
