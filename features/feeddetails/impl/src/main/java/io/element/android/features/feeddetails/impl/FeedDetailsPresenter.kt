@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -42,9 +43,13 @@ class FeedDetailsPresenter @AssistedInject constructor(
     @Composable
     override fun present(): FeedDetailsState {
         val coroutineScope = rememberCoroutineScope()
+        val matrixUser = client.userProfile.collectAsState()
+        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
 
         val feedDetailsFlow: MutableState<ZeroFeed> = remember { mutableStateOf(feed) }
         val feedRepliesFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
+
+        val postReplyText: MutableState<String> = remember { mutableStateOf("") }
 
         val userRewards = client.userRewards.collectAsState()
 
@@ -53,25 +58,33 @@ class FeedDetailsPresenter @AssistedInject constructor(
                 FeedDetailsEvents.RefreshFeed -> coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
                 is FeedDetailsEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount, feedDetailsFlow)
                 FeedDetailsEvents.LoadMoreReplies -> coroutineScope.loadMoreReplies(feed.id, feedRepliesFlow)
+                is FeedDetailsEvents.PostReplyTextChanged -> postReplyText.value = event.text
+                FeedDetailsEvents.PostReply -> coroutineScope.postMyReply(postReplyText, genericActionState, feedDetailsFlow, feedRepliesFlow)
+                FeedDetailsEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
             }
         }
 
         LaunchedEffect(Unit) {
             coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
+            client.getUserProfile()
         }
 
         return FeedDetailsState(
             zeroFeed = feedDetailsFlow.value,
             userRewards = userRewards.value,
+            matrixUser = matrixUser.value,
             loggedInUserId = client.sessionId.extractedDisplayName,
             feedComments = feedRepliesFlow.value,
-            eventSink = ::handleEvents
+            postReplyText = postReplyText.value,
+            eventSink = ::handleEvents,
+            genericActionState = genericActionState.value
         )
     }
 
-    private fun CoroutineScope.refreshFeed(feedId: String,
-                                           feedDetailsFlow: MutableState<ZeroFeed>,
-                                           feedRepliesFlow: MutableState<List<ZeroFeed>>
+    private fun CoroutineScope.refreshFeed(
+        feedId: String,
+        feedDetailsFlow: MutableState<ZeroFeed>,
+        feedRepliesFlow: MutableState<List<ZeroFeed>>
     ) = launch {
         val results = awaitAll(
             async { client.fetchFeedDetails(feedId) },
@@ -103,5 +116,24 @@ class FeedDetailsPresenter @AssistedInject constructor(
                     .distinctBy { it.id }
             }
         }
+    }
+
+    private fun CoroutineScope.postMyReply(
+        replyText: MutableState<String>,
+        genericActionState: MutableState<AsyncData<Unit>>,
+        feedDetailsFlow: MutableState<ZeroFeed>,
+        feedRepliesFlow: MutableState<List<ZeroFeed>>
+    ) = launch {
+        genericActionState.value = AsyncData.Loading()
+        val postText = replyText.value
+        replyText.value = ""
+        client.createNewFeed(postText, feed.id)
+            .onSuccess {
+                genericActionState.value = AsyncData.Success(Unit)
+                refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
+            }
+            .onFailure { error ->
+                genericActionState.value = AsyncData.Failure(error)
+            }
     }
 }

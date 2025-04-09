@@ -352,7 +352,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                 passphrase = pendingPassphrase,
                 slidingSyncType = ClientBuilderSlidingSync.Discovered,
             )
-            .passphrase(passphrase)
+            .sessionPassphrase(passphrase)
             .buildWithQrCode(qrCodeData, oidcConfiguration, progressListener)
     }
 

@@ -8,6 +8,8 @@
 package io.element.android.features.feeddetails.impl
 
 import androidx.compose.runtime.Immutable
+import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
@@ -15,8 +17,14 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 data class FeedDetailsState(
     val zeroFeed: ZeroFeed,
     val userRewards: ZeroUserRewards,
+    val matrixUser: MatrixUser,
     val loggedInUserId: String,
     val feedComments: List<ZeroFeed>,
+    val postReplyText: String,
 
     val eventSink: (FeedDetailsEvents) -> Unit,
-)
+    val genericActionState: AsyncData<Unit>,
+) {
+    val canPostReply: Boolean
+        get() = postReplyText.isNotBlank()
+}

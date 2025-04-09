@@ -30,6 +30,7 @@ import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRow
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.modifiers.niceClickable
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
@@ -50,6 +51,7 @@ fun UserProfileHeaderSection(
     verificationState: UserProfileVerificationState,
     primaryZeroId: String?,
     openAvatarPreview: (url: String) -> Unit,
+    onUserIdClick: () -> Unit,
     withdrawVerificationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -78,7 +80,10 @@ fun UserProfileHeaderSection(
         }
         if (!primaryZeroId.isNullOrBlank()) {
             Text(
-                text = primaryZeroId,
+                modifier = Modifier.niceClickable {
+                    // onUserIdClick()
+                                                  },
+            text = primaryZeroId,
                 style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
@@ -130,6 +135,7 @@ internal fun UserProfileHeaderSectionPreview() = ElementPreview {
         verificationState = UserProfileVerificationState.VERIFIED,
         primaryZeroId = null,
         openAvatarPreview = {},
+        onUserIdClick = {},
         withdrawVerificationClick = {},
     )
 }
@@ -144,6 +150,7 @@ internal fun UserProfileHeaderSectionWithVerificationViolationPreview() = Elemen
         verificationState = UserProfileVerificationState.VERIFICATION_VIOLATION,
         primaryZeroId = null,
         openAvatarPreview = {},
+        onUserIdClick = {},
         withdrawVerificationClick = {},
     )
 }

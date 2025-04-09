@@ -43,6 +43,7 @@ import io.element.android.libraries.matrix.api.room.history.RoomHistoryVisibilit
 import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.room.knock.KnockRequest
 import io.element.android.libraries.matrix.api.room.location.AssetType
+import io.element.android.libraries.matrix.api.room.message.ReplyParameters
 import io.element.android.libraries.matrix.api.room.powerlevels.MatrixRoomPowerLevels
 import io.element.android.libraries.matrix.api.room.powerlevels.UserRoleChange
 import io.element.android.libraries.matrix.api.room.roomMembers
@@ -511,8 +512,17 @@ class RustMatrixRoom(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
+        replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
-        val result = liveTimeline.sendImage(file, thumbnailFile, imageInfo, caption, formattedCaption, progressCallback)
+        val result = liveTimeline.sendImage(
+            file = file,
+            thumbnailFile = thumbnailFile,
+            imageInfo = imageInfo,
+            caption = caption,
+            formattedCaption = formattedCaption,
+            progressCallback = progressCallback,
+            replyParameters = replyParameters
+        )
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
         }
@@ -526,8 +536,17 @@ class RustMatrixRoom(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
+        replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
-        val result = liveTimeline.sendVideo(file, thumbnailFile, videoInfo, caption, formattedCaption, progressCallback)
+        val result = liveTimeline.sendVideo(
+            file = file,
+            thumbnailFile = thumbnailFile,
+            videoInfo = videoInfo,
+            caption = caption,
+            formattedCaption = formattedCaption,
+            progressCallback = progressCallback,
+            replyParameters = replyParameters
+        )
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
         }
@@ -540,6 +559,7 @@ class RustMatrixRoom(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
+        replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val result = liveTimeline.sendAudio(
             file = file,
@@ -547,6 +567,7 @@ class RustMatrixRoom(
             caption = caption,
             formattedCaption = formattedCaption,
             progressCallback = progressCallback,
+            replyParameters = replyParameters,
         )
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
@@ -560,14 +581,50 @@ class RustMatrixRoom(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
+        replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val result = liveTimeline.sendFile(
-            file,
-            fileInfo,
-            caption,
-            formattedCaption,
-            progressCallback,
+            file = file,
+            fileInfo = fileInfo,
+            caption = caption,
+            formattedCaption = formattedCaption,
+            progressCallback = progressCallback,
+            replyParameters = replyParameters,
         )
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
+        }
+        return result
+    }
+
+    override suspend fun sendVoiceMessage(
+        file: File,
+        audioInfo: AudioInfo,
+        waveform: List<Float>,
+        progressCallback: ProgressCallback?,
+        replyParameters: ReplyParameters?,
+    ): Result<MediaUploadHandler> {
+        val result = liveTimeline.sendVoiceMessage(
+            file = file,
+            audioInfo = audioInfo,
+            waveform = waveform,
+            progressCallback = progressCallback,
+            replyParameters = replyParameters,
+        )
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
+        }
+        return result
+    }
+
+    override suspend fun sendLocation(
+        body: String,
+        geoUri: String,
+        description: String?,
+        zoomLevel: Int?,
+        assetType: AssetType?,
+    ): Result<Unit> {
+        val result = liveTimeline.sendLocation(body, geoUri, description, zoomLevel, assetType)
         if (result.isSuccess) {
             zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
         }
@@ -665,16 +722,6 @@ class RustMatrixRoom(
         }
     }
 
-    override suspend fun sendLocation(
-        body: String,
-        geoUri: String,
-        description: String?,
-        zoomLevel: Int?,
-        assetType: AssetType?,
-    ): Result<Unit> {
-        return liveTimeline.sendLocation(body, geoUri, description, zoomLevel, assetType)
-    }
-
     override suspend fun createPoll(
         question: String,
         answers: List<String>,
@@ -706,19 +753,6 @@ class RustMatrixRoom(
         text: String
     ): Result<Unit> {
         return liveTimeline.endPoll(pollStartId, text)
-    }
-
-    override suspend fun sendVoiceMessage(
-        file: File,
-        audioInfo: AudioInfo,
-        waveform: List<Float>,
-        progressCallback: ProgressCallback?,
-    ): Result<MediaUploadHandler> {
-        val result = liveTimeline.sendVoiceMessage(file, audioInfo, waveform, progressCallback)
-        if (result.isSuccess) {
-            zeroConversationRepository?.onNewMessageSent(roomId = roomId.value, isRoomAChannel())
-        }
-        return result
     }
 
     override suspend fun typingNotice(isTyping: Boolean) = withContext(roomDispatcher) {

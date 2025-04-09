@@ -17,6 +17,7 @@ import io.element.android.features.userprofile.api.UserProfileState
 import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.features.userprofile.shared.aUserProfileState
 import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
@@ -112,6 +113,7 @@ fun aRoomDetailsState(
     canShowPinnedMessages: Boolean = true,
     canShowMediaGallery: Boolean = true,
     pinnedMessagesCount: Int? = null,
+    snackbarMessage: SnackbarMessage? = null,
     canShowKnockRequests: Boolean = false,
     knockRequestsCount: Int? = null,
     canShowSecurityAndPrivacy: Boolean = true,
@@ -142,12 +144,13 @@ fun aRoomDetailsState(
     canShowPinnedMessages = canShowPinnedMessages,
     canShowMediaGallery = canShowMediaGallery,
     pinnedMessagesCount = pinnedMessagesCount,
+    snackbarMessage = snackbarMessage,
     canShowKnockRequests = canShowKnockRequests,
     knockRequestsCount = knockRequestsCount,
     canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
     hasMemberVerificationViolations = hasMemberVerificationViolations,
     isRoomAChannel = isRoomAChannel,
-    eventSink = eventSink
+    eventSink = eventSink,
 )
 
 fun aRoomNotificationSettings(

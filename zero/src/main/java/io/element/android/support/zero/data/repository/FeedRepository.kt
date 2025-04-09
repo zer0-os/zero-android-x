@@ -41,4 +41,6 @@ interface FeedRepository {
     ): List<ApiFeed>
 
     suspend fun addMeowToFeed(feedId: String, meowAmount: Int): ApiFeed?
+
+    suspend fun createNewFeed(channelZId: String, content: String, replyToPost: String?): Boolean
 }

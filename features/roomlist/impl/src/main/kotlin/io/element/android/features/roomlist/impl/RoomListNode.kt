@@ -87,6 +87,10 @@ class RoomListNode @AssistedInject constructor(
         plugins<RoomListEntryPoint.Callback>().forEach { it.onFeedClick(feed) }
     }
 
+    private fun onCreateFeedClick() {
+        plugins<RoomListEntryPoint.Callback>().forEach { it.onCreateFeedClick() }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -102,6 +106,7 @@ class RoomListNode @AssistedInject constructor(
             onRoomSettingsClick = this::onRoomSettingsClick,
             onMenuActionClick = { onMenuActionClick(activity, it) },
             onFeedClick = this::onFeedClick,
+            onCreateFeedClick = this::onCreateFeedClick,
             modifier = modifier,
         ) {
             acceptDeclineInviteView.Render(

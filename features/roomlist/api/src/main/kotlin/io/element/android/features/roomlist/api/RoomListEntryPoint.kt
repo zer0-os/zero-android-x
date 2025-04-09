@@ -31,5 +31,6 @@ interface RoomListEntryPoint : FeatureEntryPoint {
         fun onReportBugClick()
         fun onLogoutForNativeSlidingSyncMigrationNeeded()
         fun onFeedClick(feed: ZeroFeed)
+        fun onCreateFeedClick()
     }
 }

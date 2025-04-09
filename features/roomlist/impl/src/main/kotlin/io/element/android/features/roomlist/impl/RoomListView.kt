@@ -65,6 +65,7 @@ fun RoomListView(
     onRoomSettingsClick: (roomId: RoomId) -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
+    onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -97,6 +98,7 @@ fun RoomListView(
                 onCreateRoomClick = onCreateRoomClick,
                 onMenuActionClick = onMenuActionClick,
                 onFeedClick = onFeedClick,
+                onCreateFeedClick = onCreateFeedClick,
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
@@ -137,6 +139,7 @@ private fun RoomListScaffold(
     onCreateRoomClick: () -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
+    onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -189,7 +192,12 @@ private fun RoomListScaffold(
             if (state.shouldDisplayActions(selectedNavigationTab.value)) {
                 FloatingActionButton(
                     containerColor = ElementTheme.colors.iconPrimary,
-                    onClick = onCreateRoomClick
+                    onClick = {
+                        when {
+                            selectedNavigationTab.value == HomeScreenTab.CHAT -> onCreateRoomClick()
+                            else -> onCreateFeedClick()
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = CompoundIcons.Plus(),
@@ -292,6 +300,7 @@ internal fun RoomListViewPreview(@PreviewParameter(RoomListStateProvider::class)
         onRoomSettingsClick = {},
         onMenuActionClick = {},
         onFeedClick = {},
+        onCreateFeedClick = {},
         acceptDeclineInviteView = {},
     )
 }

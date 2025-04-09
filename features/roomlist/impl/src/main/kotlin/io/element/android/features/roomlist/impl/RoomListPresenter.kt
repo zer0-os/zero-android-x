@@ -411,8 +411,8 @@ class RoomListPresenter @Inject constructor(
 
     private fun CoroutineScope.fetchInitialData() = launch {
         awaitAll(
-            // Force a refresh of the profile
-            async { client.getUserProfile() },
+            // Check zero thirdWeb wallet
+            async { client.checkZeroThirdWebWallet() },
             // Fetch user rewards
             async { client.getUserRewards(shouldCheckRewardsIntimation = true) },
             // Fetch home channels

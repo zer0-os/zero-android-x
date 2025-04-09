@@ -45,6 +45,7 @@ import io.element.android.appnav.loggedin.SendQueues
 import io.element.android.appnav.room.RoomFlowNode
 import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
+import io.element.android.features.createfeed.api.CreateFeedEntryPoint
 import io.element.android.features.createroom.api.CreateRoomEntryPoint
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.ftue.api.FtueEntryPoint
@@ -116,6 +117,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val logoutEntryPoint: LogoutEntryPoint,
     private val incomingVerificationEntryPoint: IncomingVerificationEntryPoint,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
+    private val createFeedEntryPoint: CreateFeedEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -271,6 +273,9 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class FeedDetails(val feed: ZeroFeed) : NavTarget
+
+        @Parcelize
+        data object CreateFeed : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -320,6 +325,10 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onFeedClick(feed: ZeroFeed) {
                         backstack.push(NavTarget.FeedDetails(feed))
+                    }
+
+                    override fun onCreateFeedClick() {
+                        backstack.push(NavTarget.CreateFeed)
                     }
                 }
                 roomListEntryPoint
@@ -498,6 +507,13 @@ class LoggedInFlowNode @AssistedInject constructor(
                         override fun onFeedReplyClick(reply: ZeroFeed) {
                             backstack.push(NavTarget.FeedDetails(reply))
                         }
+                    })
+                    .build()
+            }
+            NavTarget.CreateFeed -> {
+                createFeedEntryPoint.nodeBuilder(this, buildContext)
+                    .callback(object : CreateFeedEntryPoint.Callback {
+
                     })
                     .build()
             }

@@ -9,6 +9,7 @@ package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.network.model.request.MeowFeedRequest
+import io.element.android.support.zero.network.model.request.PostNewFeedRequest
 import io.element.android.support.zero.network.model.response.ApiFeed
 import io.element.android.support.zero.network.service.ZeroFeedService
 
@@ -70,5 +71,15 @@ class FeedRepositoryImpl(
                 null
             }
         }.getOrNull()
+    }
+
+    override suspend fun createNewFeed(channelZId: String, content: String, replyToPost: String?): Boolean {
+        return runCatching {
+            val result = zeroFeedService.postNewFeed(
+                channelZId = channelZId.replace(ZERO_CHANNEL_PREFIX, ""),
+                request = PostNewFeedRequest.newRequest(content, replyToPost)
+            )
+            result.isSuccessful
+        }.getOrDefault(false)
     }
 }
