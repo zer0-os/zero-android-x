@@ -43,6 +43,7 @@ data class RoomListState(
     val resolvedChannelRoom: RoomId?,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,
+    val hideInvitesAvatars: Boolean,
     val eventSink: (RoomListEvents) -> Unit,
 
     val shouldShowNewRewardsIntimation: Boolean = true,

@@ -39,8 +39,12 @@ import io.element.android.libraries.designsystem.toEnabledColor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+interface SimpleDropdownOption {
+    val text: String
+}
+
 @Composable
-fun <T : DropdownOption> PreferenceDropDownSimple(
+fun <T : SimpleDropdownOption> PreferenceDropDownSimple(
     modifier: Modifier = Modifier,
     title: String?,
     selectedOption: T?,
@@ -101,13 +105,13 @@ fun <T : DropdownOption> PreferenceDropDownSimple(
 @Composable
 internal fun PreferenceDropdownSimplePreview() = ElementThemedPreview {
     val options = listOf(
-        object : DropdownOption {
+        object : SimpleDropdownOption {
             override val text = "Option 1"
         },
-        object : DropdownOption {
+        object : SimpleDropdownOption {
             override val text = "Option 2"
         },
-        object : DropdownOption {
+        object : SimpleDropdownOption {
             override val text = "Option 3"
         },
     ).toImmutableList()

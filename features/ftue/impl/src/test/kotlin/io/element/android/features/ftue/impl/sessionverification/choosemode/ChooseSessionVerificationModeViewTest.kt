@@ -88,6 +88,7 @@ class ChooseSessionVerificationModeViewTest {
                 onUseAnotherDevice = onUseAnotherDevice,
                 onResetKey = onResetKey,
                 onUseRecoveryKey = onEnterRecoveryKey,
+                onSkipVerification = {}
             )
         }
     }

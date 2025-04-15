@@ -15,6 +15,6 @@ class FakeTextPillificationHelper(
     }
 
     override fun pillifyWithZero(text: CharSequence): CharSequence {
-        return pillifyLambda(text)
+        return pillifyLambda(text, true)
     }
 }

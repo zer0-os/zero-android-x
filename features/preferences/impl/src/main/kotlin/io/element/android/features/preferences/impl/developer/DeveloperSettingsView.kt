@@ -7,7 +7,6 @@
 
 package io.element.android.features.preferences.impl.developer
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,7 +24,6 @@ import io.element.android.features.preferences.impl.R
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
-import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
 import io.element.android.libraries.designsystem.components.preferences.PreferenceTextField
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -34,7 +32,6 @@ import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.featureflag.ui.FeatureListView
 import io.element.android.libraries.featureflag.ui.model.FeatureUiModel
-import io.element.android.libraries.matrix.api.tracing.TraceLogPack
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 
@@ -52,8 +49,7 @@ fun DeveloperSettingsView(
         title = stringResource(id = CommonStrings.common_advanced_settings)
     ) {
         // Note: this is OK to hardcode strings in this debug screen.
-        /*SettingsCategory(state)
-        PreferenceCategory(
+        /*PreferenceCategory(
             title = "Feature flags",
             showTopDivider = true,
         ) {
@@ -134,22 +130,6 @@ fun DeveloperSettingsView(
                 }
             )
         }
-    }
-}
-
-@Composable
-private fun SettingsCategory(
-    state: DeveloperSettingsState,
-) {
-    PreferenceCategory(title = "Preferences", showTopDivider = false) {
-        PreferenceSwitch(
-            title = "Hide image & video previews",
-            subtitle = "When toggled image & video will not render in the timeline by default.",
-            isChecked = state.hideImagesAndVideos,
-            onCheckedChange = {
-                state.eventSink(DeveloperSettingsEvents.SetHideImagesAndVideos(it))
-            }
-        )
     }
 }
 

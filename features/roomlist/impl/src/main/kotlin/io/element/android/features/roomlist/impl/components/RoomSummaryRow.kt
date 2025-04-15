@@ -70,6 +70,7 @@ internal val minHeight = 84.dp
 @Composable
 internal fun RoomSummaryRow(
     room: RoomListRoomSummary,
+    hideInviteAvatars: Boolean,
     isInviteSeen: Boolean,
     onClick: (RoomListRoomSummary) -> Unit,
     eventSink: (RoomListEvents) -> Unit,
@@ -83,6 +84,7 @@ internal fun RoomSummaryRow(
             RoomSummaryDisplayType.INVITE -> {
                 RoomSummaryScaffoldRow(
                     room = room,
+                    hideAvatarImage = hideInviteAvatars,
                     onClick = onClick,
                     onLongClick = {
                         Timber.d("Long click on invite room")
@@ -95,6 +97,7 @@ internal fun RoomSummaryRow(
                         InviteSenderView(
                             modifier = Modifier.fillMaxWidth(),
                             inviteSender = room.inviteSender,
+                            hideAvatarImage = hideInviteAvatars
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -167,6 +170,7 @@ private fun RoomSummaryScaffoldRow(
     onClick: (RoomListRoomSummary) -> Unit,
     onLongClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
+    hideAvatarImage: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val clickModifier = Modifier.combinedClickable(
@@ -187,6 +191,7 @@ private fun RoomSummaryScaffoldRow(
         CompositeAvatar(
             avatarData = room.avatarData,
             heroes = room.heroes,
+            hideAvatarImages = hideAvatarImage,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(
@@ -391,6 +396,7 @@ private fun MentionIndicatorAtom() {
 internal fun RoomSummaryRowPreview(@PreviewParameter(RoomListRoomSummaryProvider::class) data: RoomListRoomSummary) = ElementPreview {
     RoomSummaryRow(
         room = data,
+        hideInviteAvatars = false,
         // Set isInviteSeen to true for the preview when the room has name "Bob"
         isInviteSeen = data.name == "Bob",
         onClick = {},
