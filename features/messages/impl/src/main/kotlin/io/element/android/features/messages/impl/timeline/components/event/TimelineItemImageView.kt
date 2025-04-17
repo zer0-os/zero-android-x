@@ -11,7 +11,6 @@ import android.text.SpannedString
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,8 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -59,6 +56,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.textcomposer.ElementRichTextEditorStyle
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.libraries.ui.utils.time.isTalkbackActive
 import io.element.android.wysiwyg.compose.EditorStyledText
 import io.element.android.wysiwyg.link.Link
 
@@ -75,10 +73,9 @@ fun TimelineItemImageView(
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val description = stringResource(CommonStrings.common_image)
-    Column(
-        modifier = modifier.semantics { contentDescription = description },
-    ) {
+    val a11yLabel = stringResource(CommonStrings.common_image)
+    val description = content.caption?.let { "$a11yLabel: $it" } ?: a11yLabel
+    Column(modifier = modifier) {
         val containerModifier = if (content.showCaption) {
             Modifier.clip(RoundedCornerShape(10.dp))
         } else {
@@ -97,7 +94,16 @@ fun TimelineItemImageView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(if (isLoaded) Modifier.background(Color.White) else Modifier)
-                        .then(if (onContentClick != null) Modifier.combinedClickable(onClick = onContentClick, onLongClick = onLongClick) else Modifier),
+                        .then(
+                            if (!isTalkbackActive() && onContentClick != null) {
+                                Modifier.combinedClickable(
+                                    onClick = onContentClick,
+                                    onLongClick = onLongClick
+                                )
+                            } else {
+                                Modifier
+                            }
+                        ),
                     model = if (content.isGiphySource) {
                         content.giphySourceUrl
                     } else {
