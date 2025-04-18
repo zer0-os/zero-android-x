@@ -35,7 +35,6 @@ open class DeveloperSettingsStateProvider : PreviewParameterProvider<DeveloperSe
 fun aDeveloperSettingsState(
     clearCacheAction: AsyncAction<Unit> = AsyncAction.Uninitialized,
     customElementCallBaseUrlState: CustomElementCallBaseUrlState = aCustomElementCallBaseUrlState(),
-    hideImagesAndVideos: Boolean = false,
     traceLogPacks: List<TraceLogPack> = emptyList(),
     isDeleteAccountInProgress: Boolean = false,
     eventSink: (DeveloperSettingsEvents) -> Unit = {},
@@ -45,7 +44,6 @@ fun aDeveloperSettingsState(
     cacheSize = AsyncData.Success("1.2 MB"),
     clearCacheAction = clearCacheAction,
     customElementCallBaseUrlState = customElementCallBaseUrlState,
-    hideImagesAndVideos = hideImagesAndVideos,
     tracingLogLevel = AsyncData.Success(LogLevelItem.INFO),
     tracingLogPacks = traceLogPacks.toPersistentList(),
     isDeleteAccountInProgress = isDeleteAccountInProgress,

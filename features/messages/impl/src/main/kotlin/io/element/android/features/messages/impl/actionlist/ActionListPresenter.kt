@@ -41,10 +41,12 @@ import io.element.android.libraries.dateformatter.api.DateFormatter
 import io.element.android.libraries.dateformatter.api.DateFormatterMode
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.featureflag.api.FeatureFlagService
-import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.room.MatrixRoom
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
+import io.element.android.support.zero.data.model.helper.EventMessageContent
+import io.element.android.support.zero.data.model.helper.isRemoteGif
+import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -157,9 +159,18 @@ class DefaultActionListPresenter @AssistedInject constructor(
         isPinnedEventsEnabled: Boolean,
         isEventPinned: Boolean,
     ): List<TimelineItemAction> {
-        val canRedact = timelineItem.isMine && usersEventPermissions.canRedactOwn || !timelineItem.isMine && usersEventPermissions.canRedactOther
+        // val canRedact = timelineItem.isMine && usersEventPermissions.canRedactOwn || !timelineItem.isMine && usersEventPermissions.canRedactOther
+        val canRedact = timelineItem.isMine && usersEventPermissions.canRedactOwn
+        val isAGiphy = try {
+            timelineItem.debugInfo.originalJson
+                ?.decodeJson<EventMessageContent>()
+                ?.content
+                ?.isRemoteGif ?: false
+        } catch (e: Exception) {
+            false
+        }
         return buildSet {
-            if (timelineItem.canBeRepliedTo && usersEventPermissions.canSendMessage) {
+            if (timelineItem.canBeRepliedTo && usersEventPermissions.canSendMessage && !isAGiphy) {
                 /*if (timelineItem.isThreaded) {
                     add(TimelineItemAction.ReplyInThread)
                 } else {
@@ -167,7 +178,7 @@ class DefaultActionListPresenter @AssistedInject constructor(
                 }*/
                 add(TimelineItemAction.Reply)
             }
-            if (timelineItem.isRemote && timelineItem.content.canBeForwarded()) {
+            if (timelineItem.isRemote && timelineItem.content.canBeForwarded() && !isAGiphy) {
                 add(TimelineItemAction.Forward)
             }
             if (timelineItem.isEditable) {

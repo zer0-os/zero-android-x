@@ -105,6 +105,7 @@ fun RoomListView(
             RoomListSearchView(
                 state = state.searchState,
                 eventSink = state.eventSink,
+                hideInvitesAvatars = state.hideInvitesAvatars,
                 onRoomClick = onRoomClick,
                 modifier = Modifier
                     .statusBarsPadding()
@@ -239,6 +240,7 @@ internal fun HomeScreenContent(
             RoomListContentView(
                 contentState = state.contentState,
                 filtersState = state.filtersState,
+                hideInvitesAvatars = state.hideInvitesAvatars,
                 eventSink = state.eventSink,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,

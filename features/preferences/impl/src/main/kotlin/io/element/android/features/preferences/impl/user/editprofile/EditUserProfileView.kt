@@ -31,8 +31,8 @@ import io.element.android.libraries.designsystem.components.async.AsyncActionVie
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.button.BackButton
-import io.element.android.libraries.designsystem.components.preferences.DropdownOption
 import io.element.android.libraries.designsystem.components.preferences.PreferenceDropDownSimple
+import io.element.android.libraries.designsystem.components.preferences.SimpleDropdownOption
 import io.element.android.libraries.designsystem.modifiers.clearFocusOnTap
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -124,11 +124,11 @@ fun EditUserProfileView(
             Spacer(modifier = Modifier.height(40.dp))
             PreferenceDropDownSimple(
                 title = "Primary ZId",
-                selectedOption = object : DropdownOption {
+                selectedOption = object : SimpleDropdownOption {
                     override val text = state.primaryZId ?: EditUserProfileState.PRIMARY_ZERO_ID_NONE
                 },
                 options = state.userZIds.map { zid ->
-                    object : DropdownOption {
+                    object : SimpleDropdownOption {
                         override val text = zid
                     }
                 }.toImmutableList(),

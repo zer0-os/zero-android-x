@@ -21,6 +21,7 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.test.A_USER_ID
 import io.element.android.libraries.matrix.test.permalink.FakePermalinkBuilder
 import io.element.android.libraries.matrix.test.permalink.FakePermalinkParser
+import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.textcomposer.mentions.MentionSpanFormatter
 import io.element.android.libraries.textcomposer.mentions.MentionSpanProvider
 import io.element.android.libraries.textcomposer.mentions.MentionSpanTheme
@@ -225,10 +226,12 @@ class DefaultTextPillificationHelperTest {
             mentionSpanFormatter = mentionSpanFormatter,
             mentionSpanTheme = MentionSpanTheme(A_USER_ID),
         )
+        val roomMemberProfileCache = RoomMemberProfilesCache()
         return DefaultTextPillificationHelper(
             mentionSpanProvider = mentionSpanProvider,
             permalinkBuilder = permalinkBuilder,
             permalinkParser = permalinkParser,
+            roomMemberProfilesCache = roomMemberProfileCache,
         )
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -22,8 +23,7 @@ import io.element.android.libraries.designsystem.icons.CompoundDrawables
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
-import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun TimelineItemFileView(
@@ -43,7 +43,7 @@ fun TimelineItemFileView(
         icon = {
             Icon(
                 resourceId = CompoundDrawables.ic_compound_attachment,
-                contentDescription = null,
+                contentDescription = stringResource(CommonStrings.common_file),
                 tint = ElementTheme.colors.iconPrimary,
                 modifier = Modifier
                     .size(16.dp)

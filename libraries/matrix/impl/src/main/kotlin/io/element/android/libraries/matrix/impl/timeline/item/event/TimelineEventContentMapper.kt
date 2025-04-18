@@ -30,6 +30,7 @@ import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import org.matrix.rustcomponents.sdk.MsgLikeKind
 import org.matrix.rustcomponents.sdk.TimelineItemContent
 import org.matrix.rustcomponents.sdk.use
 import uniffi.matrix_sdk_ui.RoomPinnedEventsChange
@@ -47,13 +48,20 @@ class TimelineEventContentMapper(
                 is TimelineItemContent.FailedToParseMessageLike -> {
                     // If message content parsing is failed (GIPHY case in this), we need to handle the content ourself rather than returning unsupportedTimelineItem
                     debugInfo?.originalJson?.let { eventJsonString ->
-                        val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
-                        customEventContent?.let { customEvent ->
-                            eventMessageMapper.mapToCustomEvent(customEvent)
-                        } ?: FailedToParseMessageLikeContent(
-                            eventType = it.eventType,
-                            error = it.error
-                        )
+                        try {
+                            val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
+                            customEventContent?.let { customEvent ->
+                                eventMessageMapper.mapToCustomEvent(customEvent)
+                            } ?: FailedToParseMessageLikeContent(
+                                eventType = it.eventType,
+                                error = it.error
+                            )
+                        } catch (e: Exception) {
+                            FailedToParseMessageLikeContent(
+                                eventType = it.eventType,
+                                error = it.error
+                            )
+                        }
                     } ?: FailedToParseMessageLikeContent(
                         eventType = it.eventType,
                         error = it.error
@@ -66,14 +74,18 @@ class TimelineEventContentMapper(
                         error = it.error
                     )
                 }
-                is TimelineItemContent.Message -> {
+                is TimelineItemContent.MsgLike -> {
                     // Need to handle GIPHY case in un-encrypted chats
                     debugInfo?.originalJson?.let { eventJsonString ->
-                        val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
-                        customEventContent?.let { customEvent ->
-                            eventMessageMapper.mapToCustomEvent(customEvent)
-                        } ?: eventMessageMapper.map(it.content)
-                    } ?: eventMessageMapper.map(it.content)
+                        try {
+                            val customEventContent = eventJsonString.decodeJson<EventMessageContent>()
+                            customEventContent?.let { customEvent ->
+                                eventMessageMapper.mapToCustomEvent(customEvent)
+                            } ?: getActualEventContent(it, eventMessageMapper)
+                        } catch (e: Exception) {
+                            getActualEventContent(it, eventMessageMapper)
+                        }
+                    } ?: getActualEventContent(it, eventMessageMapper)
                 }
                 is TimelineItemContent.ProfileChange -> {
                     ProfileChangeContent(
@@ -82,9 +94,6 @@ class TimelineEventContentMapper(
                         avatarUrl = it.avatarUrl,
                         prevAvatarUrl = it.prevAvatarUrl
                     )
-                }
-                TimelineItemContent.RedactedMessage -> {
-                    RedactedContent
                 }
                 is TimelineItemContent.RoomMembership -> {
                     RoomMembershipContent(
@@ -99,35 +108,51 @@ class TimelineEventContentMapper(
                         content = it.content.map()
                     )
                 }
-                is TimelineItemContent.Sticker -> {
-                    StickerContent(
-                        filename = it.body,
-                        body = null,
-                        info = it.info.map(),
-                        source = it.source.map(),
-                    )
-                }
-                is TimelineItemContent.Poll -> {
-                    PollContent(
-                        question = it.question,
-                        kind = it.kind.map(),
-                        maxSelections = it.maxSelections,
-                        answers = it.answers.map { answer -> answer.map() }.toImmutableList(),
-                        votes = it.votes.mapValues { vote ->
-                            vote.value.map { userId -> UserId(userId) }.toImmutableList()
-                        }.toImmutableMap(),
-                        endTime = it.endTime,
-                        isEdited = it.hasBeenEdited,
-                    )
-                }
-                is TimelineItemContent.UnableToDecrypt -> {
-                    UnableToDecryptContent(
-                        data = it.msg.map()
-                    )
-                }
                 is TimelineItemContent.CallInvite -> LegacyCallInviteContent
                 is TimelineItemContent.CallNotify -> CallNotifyContent
             }
+        }
+    }
+}
+
+private fun getActualEventContent(
+    it: TimelineItemContent.MsgLike,
+    eventMessageMapper: EventMessageMapper
+): EventContent {
+    return when (val kind = it.content.kind) {
+        is MsgLikeKind.Message -> {
+            val inReplyTo = it.content.inReplyTo
+            val isThreaded = it.content.threadRoot != null
+            eventMessageMapper.map(kind, inReplyTo, isThreaded)
+        }
+        is MsgLikeKind.Redacted -> {
+            RedactedContent
+        }
+        is MsgLikeKind.Poll -> {
+            PollContent(
+                question = kind.question,
+                kind = kind.kind.map(),
+                maxSelections = kind.maxSelections,
+                answers = kind.answers.map { answer -> answer.map() }.toImmutableList(),
+                votes = kind.votes.mapValues { vote ->
+                    vote.value.map { userId -> UserId(userId) }.toImmutableList()
+                }.toImmutableMap(),
+                endTime = kind.endTime,
+                isEdited = kind.hasBeenEdited,
+            )
+        }
+        is MsgLikeKind.UnableToDecrypt -> {
+            UnableToDecryptContent(
+                data = kind.msg.map()
+            )
+        }
+        is MsgLikeKind.Sticker -> {
+            StickerContent(
+                filename = kind.body,
+                body = null,
+                info = kind.info.map(),
+                source = kind.source.map(),
+            )
         }
     }
 }

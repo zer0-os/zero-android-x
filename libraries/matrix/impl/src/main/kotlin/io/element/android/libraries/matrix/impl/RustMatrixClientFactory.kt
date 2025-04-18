@@ -109,7 +109,7 @@ class RustMatrixClientFactory @Inject constructor(
                     retryLimit = null,
                     timeout = 25000u,
                     maxConcurrentRequests = null,
-                    retryTimeout = null
+                    maxRetryTime = null
                 )
             )
             .sessionPaths(
