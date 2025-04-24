@@ -59,7 +59,7 @@ class EditUserProfilePresenter @AssistedInject constructor(
     @Composable
     override fun present(): EditUserProfileState {
         val cameraPermissionState = cameraPermissionPresenter.present()
-        var userAvatarUri by rememberSaveable { mutableStateOf(matrixUser.avatarUrl?.let { Uri.parse(it) }) }
+        var userAvatarUri by rememberSaveable { mutableStateOf(matrixUser.avatarUrl?.toUri()) }
         var userDisplayName by rememberSaveable { mutableStateOf(matrixUser.displayName) }
         var userPrimaryZId by rememberSaveable { mutableStateOf(matrixUser.primaryZeroId) }
         val userZIds = matrixClient.userZIds.collectAsState()

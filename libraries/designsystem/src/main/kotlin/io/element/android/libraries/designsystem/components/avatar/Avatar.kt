@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -124,6 +125,7 @@ private fun ImageAvatar(
 private fun InitialsAvatar(
     avatarData: AvatarData,
     forcedAvatarSize: Dp?,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
 ) {
     val avatarColors = AvatarColorsProvider.provide(avatarData.id)
@@ -136,7 +138,11 @@ private fun InitialsAvatar(
         val lineHeight = originalFont.lineHeight * ratio
         Text(
             modifier = Modifier
-                .clearAndSetSemantics {}
+                .clearAndSetSemantics {
+                    contentDescription?.let {
+                        this.contentDescription = it
+                    }
+                }
                 .align(Alignment.Center),
             text = avatarData.initial,
             style = originalFont.copy(fontSize = fontSize, lineHeight = lineHeight, letterSpacing = 0.sp),
