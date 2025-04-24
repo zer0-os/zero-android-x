@@ -233,13 +233,13 @@ fun RoomDetailsView(
             }
 
             PreferenceCategory {
-                /*if (state.canShowPinnedMessages) {
+                if (state.canShowPinnedMessages) {
                     PinnedMessagesItem(
                         pinnedMessagesCount = state.pinnedMessagesCount,
                         onPinnedMessagesClick = onPinnedMessagesClick
                     )
                 }
-                PollsItem(
+                /*PollsItem(
                     openPollHistory = openPollHistory
                 )*/
                 if (state.canShowMediaGallery) {

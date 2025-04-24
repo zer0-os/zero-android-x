@@ -201,14 +201,14 @@ class DefaultActionListPresenter @AssistedInject constructor(
             /*if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
                 add(TimelineItemAction.EndPoll)
             }*/
-            /*val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
+            val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
             if (canPinUnpin) {
                 if (isEventPinned) {
                     add(TimelineItemAction.Unpin)
                 } else {
                     add(TimelineItemAction.Pin)
                 }
-            }*/
+            }
             if (timelineItem.content.canBeCopied()) {
                 add(TimelineItemAction.CopyText)
             } else if ((timelineItem.content as? TimelineItemEventContentWithAttachment)?.caption.isNullOrBlank().not()) {
