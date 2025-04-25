@@ -42,7 +42,7 @@ import io.element.android.libraries.dateformatter.api.DateFormatterMode
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.core.EventId
-import io.element.android.libraries.matrix.api.room.MatrixRoom
+import io.element.android.libraries.matrix.api.room.BaseRoom
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.data.model.helper.isRemoteGif
@@ -65,7 +65,7 @@ class DefaultActionListPresenter @AssistedInject constructor(
     private val postProcessor: TimelineItemActionPostProcessor,
     private val appPreferencesStore: AppPreferencesStore,
     private val isPinnedMessagesFeatureEnabled: IsPinnedMessagesFeatureEnabled,
-    private val room: MatrixRoom,
+    private val room: BaseRoom,
     private val userSendFailureFactory: VerifiedUserSendFailureFactory,
     private val featureFlagService: FeatureFlagService,
     private val dateFormatter: DateFormatter,
@@ -201,14 +201,14 @@ class DefaultActionListPresenter @AssistedInject constructor(
             /*if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
                 add(TimelineItemAction.EndPoll)
             }*/
-            /*val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
+            val canPinUnpin = isPinnedEventsEnabled && usersEventPermissions.canPinUnpin && timelineItem.isRemote
             if (canPinUnpin) {
                 if (isEventPinned) {
                     add(TimelineItemAction.Unpin)
                 } else {
                     add(TimelineItemAction.Pin)
                 }
-            }*/
+            }
             if (timelineItem.content.canBeCopied()) {
                 add(TimelineItemAction.CopyText)
             } else if ((timelineItem.content as? TimelineItemEventContentWithAttachment)?.caption.isNullOrBlank().not()) {

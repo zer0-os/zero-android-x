@@ -266,7 +266,7 @@ internal interface PinnedMessagesBannerViewScrollBehavior {
 
 internal object PinnedMessagesBannerViewDefaults {
     @Composable
-    fun rememberExitOnScrollBehavior(): PinnedMessagesBannerViewScrollBehavior = remember {
+    fun rememberScrollBehavior(pinnedMessagesCount: Int): PinnedMessagesBannerViewScrollBehavior = remember(pinnedMessagesCount) {
         ExitOnScrollBehavior()
     }
 }

@@ -110,6 +110,7 @@ import io.element.android.wysiwyg.link.Link
 import kotlinx.collections.immutable.ImmutableList
 import timber.log.Timber
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MessagesView(
@@ -364,7 +365,9 @@ private fun MessagesViewContent(
             },
             content = { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
-                    val scrollBehavior = PinnedMessagesBannerViewDefaults.rememberExitOnScrollBehavior()
+                    val scrollBehavior = PinnedMessagesBannerViewDefaults.rememberScrollBehavior(
+                        pinnedMessagesCount = state.pinnedMessagesBannerState.pinnedMessagesCount(),
+                    )
                     TimelineView(
                         state = state.timelineState,
                         timelineProtectionState = state.timelineProtectionState,
@@ -381,7 +384,7 @@ private fun MessagesViewContent(
                         onJoinCallClick = onJoinCallClick,
                         nestedScrollConnection = scrollBehavior.nestedScrollConnection,
                     )
-                    /*AnimatedVisibility(
+                    AnimatedVisibility(
                         visible = state.pinnedMessagesBannerState is PinnedMessagesBannerState.Visible && scrollBehavior.isVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
@@ -397,7 +400,7 @@ private fun MessagesViewContent(
                             onViewAllClick = onViewAllPinnedMessagesClick,
                         )
                     }
-                    knockRequestsBannerView()*/
+                    // knockRequestsBannerView()
                 }
             },
             sheetContent = { subcomposing: Boolean ->
