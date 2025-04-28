@@ -224,8 +224,7 @@ class RustMatrixClient(
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         featureFlagService = featureFlagService,
         roomMembershipObserver = roomMembershipObserver,
-        zeroConversationRepository = zeroCoreRepository?.conversation,
-        zeroUserRepository = zeroCoreRepository?.user,
+        zeroCoreRepository = zeroCoreRepository
     )
 
     override val mediaLoader: MatrixMediaLoader = RustMediaLoader(

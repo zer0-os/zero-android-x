@@ -23,8 +23,7 @@ import io.element.android.libraries.matrix.api.roomlist.awaitLoaded
 import io.element.android.libraries.matrix.impl.room.preview.RoomPreviewInfoMapper
 import io.element.android.libraries.matrix.impl.roomlist.roomOrNull
 import io.element.android.services.toolbox.api.systemclock.SystemClock
-import io.element.android.support.zero.data.repository.ConversationRepository
-import io.element.android.support.zero.data.repository.UserRepository
+import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
@@ -53,8 +52,7 @@ class RustRoomFactory(
     private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val featureFlagService: FeatureFlagService,
     private val roomMembershipObserver: RoomMembershipObserver,
-    private val zeroConversationRepository: ConversationRepository?,
-    private val zeroUserRepository: UserRepository?,
+    private val zeroCoreRepository: ZeroCoreRepository?
 ) {
     private val dispatcher = dispatchers.io.limitedParallelism(1)
     private val mutex = Mutex()
@@ -104,7 +102,7 @@ class RustRoomFactory(
             roomMembershipObserver = roomMembershipObserver,
             initialRoomInfo = roomInfoMapper.map(initialRoomInfo),
             sessionCoroutineScope = sessionCoroutineScope,
-            zeroUserRepository = zeroUserRepository
+            zeroUserRepository = zeroCoreRepository?.user
         )
     }
 
@@ -134,8 +132,9 @@ class RustRoomFactory(
                         systemClock = systemClock,
                         roomInfoMapper = roomInfoMapper,
                         featureFlagService = featureFlagService,
-                        zeroConversationRepository = zeroConversationRepository,
-                        zeroUserRepository = zeroUserRepository
+                        zeroConversationRepository = zeroCoreRepository?.conversation,
+                        zeroUserRepository = zeroCoreRepository?.user,
+                        zeroMetaDataRepository = zeroCoreRepository?.metaData
                     )
                 )
             } else {

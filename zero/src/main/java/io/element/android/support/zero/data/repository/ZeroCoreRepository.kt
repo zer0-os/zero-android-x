@@ -15,5 +15,6 @@ class ZeroCoreRepository(
     val feed: FeedRepository,
     val invite: InviteRepository,
     val rewards: RewardsRepository,
-    val user: UserRepository
+    val user: UserRepository,
+    val metaData: MetaDataRepository
 )
