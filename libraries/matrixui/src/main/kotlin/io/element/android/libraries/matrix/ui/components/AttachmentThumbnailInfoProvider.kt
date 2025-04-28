@@ -22,6 +22,7 @@ open class AttachmentThumbnailInfoProvider : PreviewParameterProvider<Attachment
             anAttachmentThumbnailInfo(type = AttachmentThumbnailType.Location),
             anAttachmentThumbnailInfo(type = AttachmentThumbnailType.Voice),
             anAttachmentThumbnailInfo(type = AttachmentThumbnailType.Poll),
+            anAttachmentThumbnailInfo(type = AttachmentThumbnailType.Link),
         )
 }
 

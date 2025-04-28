@@ -90,6 +90,8 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.ui.messages.linkpreview.LinkPreviewView
 import io.element.android.libraries.matrix.ui.messages.reply.InReplyToDetails
 import io.element.android.libraries.matrix.ui.messages.reply.InReplyToView
 import io.element.android.libraries.matrix.ui.messages.reply.eventId
@@ -118,6 +120,7 @@ fun TimelineItemEventRow(
     event: TimelineItem.Event,
     timelineRoomInfo: TimelineRoomInfo,
     timelineProtectionState: TimelineProtectionState,
+    linkPreview: ZeroLinkPreview? = null,
     renderReadReceipts: Boolean,
     isLastOutgoingMessage: Boolean,
     isHighlighted: Boolean,
@@ -195,6 +198,7 @@ fun TimelineItemEventRow(
                     TimelineItemEventRowContent(
                         event = event,
                         timelineProtectionState = timelineProtectionState,
+                        linkPreview = linkPreview,
                         isHighlighted = isHighlighted,
                         timelineRoomInfo = timelineRoomInfo,
                         interactionSource = interactionSource,
@@ -229,6 +233,7 @@ fun TimelineItemEventRow(
             TimelineItemEventRowContent(
                 event = event,
                 timelineProtectionState = timelineProtectionState,
+                linkPreview = linkPreview,
                 isHighlighted = isHighlighted,
                 timelineRoomInfo = timelineRoomInfo,
                 interactionSource = interactionSource,
@@ -285,6 +290,7 @@ private fun SwipeSensitivity(
 private fun TimelineItemEventRowContent(
     event: TimelineItem.Event,
     timelineProtectionState: TimelineProtectionState,
+    linkPreview: ZeroLinkPreview?,
     isHighlighted: Boolean,
     timelineRoomInfo: TimelineRoomInfo,
     interactionSource: MutableInteractionSource,
@@ -404,6 +410,7 @@ private fun TimelineItemEventRowContent(
                 MessageEventBubbleContent(
                     event = event,
                     timelineProtectionState = timelineProtectionState,
+                    linkPreview = linkPreview,
                     onMessageLongClick = onLongClick,
                     inReplyToClick = inReplyToClick,
                     eventSink = eventSink,
@@ -506,6 +513,7 @@ private fun MessageSenderInformation(
 private fun MessageEventBubbleContent(
     event: TimelineItem.Event,
     timelineProtectionState: TimelineProtectionState,
+    linkPreview: ZeroLinkPreview?,
     onMessageLongClick: () -> Unit,
     inReplyToClick: () -> Unit,
     eventSink: (TimelineEvents.EventFromTimelineItem) -> Unit,
@@ -675,12 +683,18 @@ private fun MessageEventBubbleContent(
             // Use SubComposeLayout only if necessary as it can have consequences on the performance.
             EqualWidthColumn(spacing = 8.dp) {
                 threadDecoration()
+                if (linkPreview != null) {
+                    LinkPreviewView(linkPreview)
+                }
                 inReplyTo(inReplyToDetails)
                 contentWithTimestamp()
             }
         } else {
             Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 threadDecoration()
+                if (linkPreview != null) {
+                    LinkPreviewView(linkPreview)
+                }
                 contentWithTimestamp()
             }
         }

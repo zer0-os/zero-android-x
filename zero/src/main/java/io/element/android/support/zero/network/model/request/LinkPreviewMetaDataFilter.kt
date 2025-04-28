@@ -8,18 +8,18 @@
 package io.element.android.support.zero.network.model.request
 
 import io.element.android.support.zero.datastore.converter.AppJson.toJson
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LinkPreviewMetaDataFilter(
-    val url: String
+    @SerialName("url") val url: String = ""
 ) {
     override fun toString() = toJson()
 
     companion object {
-        fun newFilter(url: String) =
-            UsersFilter(url).toString()
+        fun newFilter(url: String) = LinkPreviewMetaDataFilter(url).toString()
 
-        fun emptyFilter() = UsersFilter().toJson()
+        fun emptyFilter() = LinkPreviewMetaDataFilter().toString()
     }
 }

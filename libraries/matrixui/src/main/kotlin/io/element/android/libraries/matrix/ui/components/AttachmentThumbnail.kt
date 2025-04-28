@@ -115,6 +115,12 @@ fun AttachmentThumbnail(
                         contentDescription = info.textContent,
                     )
                 }
+                AttachmentThumbnailType.Link -> {
+                    Icon(
+                        imageVector = CompoundIcons.Link(),
+                        contentDescription = info.textContent,
+                    )
+                }
             }
         }
     }
@@ -129,6 +135,7 @@ enum class AttachmentThumbnailType : Parcelable {
     Location,
     Voice,
     Poll,
+    Link
 }
 
 @Parcelize

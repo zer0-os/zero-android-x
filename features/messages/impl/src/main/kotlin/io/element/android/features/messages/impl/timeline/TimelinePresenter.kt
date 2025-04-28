@@ -124,7 +124,7 @@ class TimelinePresenter @AssistedInject constructor(
             timelineController.isLive()
         }.collectAsState(initial = true)
 
-        val eventLinkPreviewMap = rememberSaveable { mutableStateMapOf<UniqueId, ZeroLinkPreview>() }
+        val eventLinkPreviewMap = remember { mutableStateMapOf<UniqueId, ZeroLinkPreview>() }
 
         fun handleEvents(event: TimelineEvents) {
             when (event) {
@@ -270,6 +270,7 @@ class TimelinePresenter @AssistedInject constructor(
             focusRequestState = focusRequestState,
             messageShield = messageShield.value,
             resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
+            linkPreviewMap = eventLinkPreviewMap,
             eventSink = { handleEvents(it) }
         )
     }

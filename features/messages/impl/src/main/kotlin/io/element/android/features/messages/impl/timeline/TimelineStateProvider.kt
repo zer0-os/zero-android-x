@@ -67,6 +67,7 @@ fun aTimelineState(
         focusRequestState = focusRequestState,
         messageShield = messageShield,
         resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
+        linkPreviewMap = emptyMap(),
         eventSink = eventSink,
     )
 }
