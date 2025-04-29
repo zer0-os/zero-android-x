@@ -180,7 +180,7 @@ class TimelinePresenter @AssistedInject constructor(
                 is TimelineEvents.ComputeVerifiedUserSendFailure -> {
                     resolveVerifiedUserSendFailureState.eventSink(ResolveVerifiedUserSendFailureEvents.ComputeForMessage(event.event))
                 }
-                is TimelineEvents.GetLinkPreviewIdApplicable -> {
+                is TimelineEvents.GetLinkPreviewIfApplicable -> {
                     localScope.getLinkPreviewIfRequired(event.event, eventLinkPreviewMap)
                 }
             }

@@ -175,7 +175,7 @@ fun TimelineItemEventRow(
     }
 
     LaunchedEffect(event) {
-        eventSink.invoke(TimelineEvents.GetLinkPreviewIdApplicable(event))
+        eventSink.invoke(TimelineEvents.GetLinkPreviewIfApplicable(event))
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
