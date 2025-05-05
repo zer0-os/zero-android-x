@@ -46,6 +46,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.impl.core.RustSendHandle
 import io.element.android.libraries.matrix.impl.mapper.map
@@ -62,7 +63,9 @@ import io.element.android.libraries.matrix.impl.widget.RustWidgetDriver
 import io.element.android.libraries.matrix.impl.widget.generateWidgetWebViewUrl
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.repository.ConversationRepository
+import io.element.android.support.zero.data.repository.MetaDataRepository
 import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -112,6 +115,7 @@ class JoinedRustRoom(
     private val featureFlagService: FeatureFlagService,
     private val zeroConversationRepository: ConversationRepository?,
     private val zeroUserRepository: UserRepository?,
+    private val zeroMetaDataRepository: MetaDataRepository?,
 ) : JoinedRoom, BaseRoom by baseRoom {
     // Create a dispatcher for all room methods...
     private val roomDispatcher = coroutineDispatchers.io.limitedParallelism(32)
@@ -720,4 +724,12 @@ class JoinedRustRoom(
     override fun isRoomAChannel(): Boolean {
         return innerRoom.displayName()?.startsWith(ZERO_CHANNEL_PREFIX) == true
     }
+
+    override suspend fun getUrlLinkPreview(url: String): Result<ZeroLinkPreview?> =
+        withContext(roomDispatcher) {
+            runCatching {
+                val metaDataRepo = zeroMetaDataRepository ?: return@withContext Result.failure(Throwable("MetaData repository is not initialized yet."))
+                metaDataRepo.fetchLinkPreview(url)?.toModel()
+            }
+        }
 }

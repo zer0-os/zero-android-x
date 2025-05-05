@@ -16,6 +16,7 @@ import io.element.android.features.roomcall.api.RoomCallState
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UniqueId
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.collections.immutable.ImmutableList
 import kotlin.time.Duration
 
@@ -30,6 +31,7 @@ data class TimelineState(
     // If not null, info will be rendered in a dialog
     val messageShield: MessageShield?,
     val resolveVerifiedUserSendFailureState: ResolveVerifiedUserSendFailureState,
+    val linkPreviewMap: Map<UniqueId, ZeroLinkPreview>,
     val eventSink: (TimelineEvents) -> Unit,
 ) {
     private val lastTimelineEvent = timelineItems.firstOrNull { it is TimelineItem.Event } as? TimelineItem.Event

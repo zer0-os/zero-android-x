@@ -66,6 +66,7 @@ fun PreferenceCheckbox(
             checked = isChecked,
             enabled = enabled,
         ),
+        enabled = enabled,
     )
 }
 

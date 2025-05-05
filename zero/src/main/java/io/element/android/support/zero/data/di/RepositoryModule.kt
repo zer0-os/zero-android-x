@@ -19,6 +19,8 @@ import io.element.android.support.zero.data.repository.FeedRepository
 import io.element.android.support.zero.data.repository.FeedRepositoryImpl
 import io.element.android.support.zero.data.repository.InviteRepository
 import io.element.android.support.zero.data.repository.InviteRepositoryImpl
+import io.element.android.support.zero.data.repository.MetaDataRepository
+import io.element.android.support.zero.data.repository.MetaDataRepositoryImpl
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
@@ -31,6 +33,7 @@ import io.element.android.support.zero.network.service.ZeroConversationService
 import io.element.android.support.zero.network.service.ZeroFeedService
 import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
+import io.element.android.support.zero.network.service.ZeroMetaDataService
 import io.element.android.support.zero.network.service.ZeroRewardService
 import io.element.android.support.zero.network.service.ZeroUserService
 import io.element.android.support.zero.network.service.ZeroWalletService
@@ -50,6 +53,7 @@ object RepositoryModule {
         inviteRepository: InviteRepository,
         rewardsRepository: RewardsRepository,
         userRepository: UserRepository,
+        metaDataRepository: MetaDataRepository,
     ): ZeroCoreRepository = ZeroCoreRepository(
         auth = authRepository,
         account = accountRepository,
@@ -58,7 +62,8 @@ object RepositoryModule {
         feed = feedRepository,
         invite = inviteRepository,
         rewards = rewardsRepository,
-        user = userRepository
+        user = userRepository,
+        metaData = metaDataRepository
     )
 
     @Provides
@@ -115,4 +120,10 @@ object RepositoryModule {
     fun bindFeedRepository(
         zeroFeedService: ZeroFeedService
     ): FeedRepository = FeedRepositoryImpl(zeroFeedService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindMetaDataRepository(
+        zeroMetaDataService: ZeroMetaDataService
+    ): MetaDataRepository = MetaDataRepositoryImpl(zeroMetaDataService)
 }

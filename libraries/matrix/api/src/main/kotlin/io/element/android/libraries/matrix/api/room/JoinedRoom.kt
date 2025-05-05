@@ -34,6 +34,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -328,4 +329,6 @@ interface JoinedRoom : BaseRoom {
     suspend fun fetchDirectZeroUser()
 
     fun isRoomAChannel(): Boolean
+
+    suspend fun getUrlLinkPreview(url: String): Result<ZeroLinkPreview?>
 }

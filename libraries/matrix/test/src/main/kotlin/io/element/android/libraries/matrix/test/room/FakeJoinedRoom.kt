@@ -42,6 +42,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetDriver
 import io.element.android.libraries.matrix.api.widget.MatrixWidgetSettings
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.test.A_ROOM_ID
 import io.element.android.libraries.matrix.test.A_SESSION_ID
@@ -434,6 +435,17 @@ class FakeJoinedRoom(
     }
 
     override fun isRoomAChannel(): Boolean = false
+
+    override suspend fun getUrlLinkPreview(url: String): Result<ZeroLinkPreview?> {
+        return Result.success(
+            ZeroLinkPreview(
+            url = "https://dummyurl.com",
+            title = "Title of the url",
+            description = null,
+            thumbnailUrl = null
+        )
+        )
+    }
 
     private suspend fun simulateSendMediaProgress(progressCallback: ProgressCallback?) {
         progressCallbackValues.forEach { (current, total) ->

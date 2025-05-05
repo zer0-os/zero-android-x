@@ -7,17 +7,20 @@
 
 package io.element.android.features.messages.impl.timeline
 
+import android.util.Patterns
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -28,6 +31,7 @@ import io.element.android.features.messages.impl.timeline.factories.TimelineItem
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactoryConfig
 import io.element.android.features.messages.impl.timeline.model.NewEventState
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
+import io.element.android.features.messages.impl.timeline.model.event.TimelineItemTextBasedContent
 import io.element.android.features.messages.impl.typing.TypingNotificationState
 import io.element.android.features.messages.impl.voicemessages.timeline.RedactedVoiceMessageManager
 import io.element.android.features.poll.api.actions.EndPollAction
@@ -45,6 +49,7 @@ import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
 import io.element.android.libraries.matrix.api.timeline.item.event.TimelineItemEventOrigin
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.ui.room.canSendMessageAsState
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import kotlinx.collections.immutable.ImmutableList
@@ -119,6 +124,8 @@ class TimelinePresenter @AssistedInject constructor(
             timelineController.isLive()
         }.collectAsState(initial = true)
 
+        val eventLinkPreviewMap = remember { mutableStateMapOf<UniqueId, ZeroLinkPreview>() }
+
         fun handleEvents(event: TimelineEvents) {
             when (event) {
                 is TimelineEvents.LoadMore -> {
@@ -172,6 +179,9 @@ class TimelinePresenter @AssistedInject constructor(
                 is TimelineEvents.ShowShieldDialog -> messageShield.value = event.messageShield
                 is TimelineEvents.ComputeVerifiedUserSendFailure -> {
                     resolveVerifiedUserSendFailureState.eventSink(ResolveVerifiedUserSendFailureEvents.ComputeForMessage(event.event))
+                }
+                is TimelineEvents.GetLinkPreviewIfApplicable -> {
+                    localScope.getLinkPreviewIfRequired(event.event, eventLinkPreviewMap)
                 }
             }
         }
@@ -260,6 +270,7 @@ class TimelinePresenter @AssistedInject constructor(
             focusRequestState = focusRequestState,
             messageShield = messageShield.value,
             resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
+            linkPreviewMap = eventLinkPreviewMap,
             eventSink = { handleEvents(it) }
         )
     }
@@ -326,6 +337,35 @@ class TimelinePresenter @AssistedInject constructor(
             }
         }
         return null
+    }
+
+    private fun CoroutineScope.getLinkPreviewIfRequired(
+        event: TimelineItem.Event,
+        eventLinkPreviewMap: SnapshotStateMap<UniqueId, ZeroLinkPreview>
+    ) {
+        if (eventLinkPreviewMap.containsKey(event.id)) return
+        val text = (event.content as? TimelineItemTextBasedContent)?.body ?: return
+        val link = extractFirstLink(text) ?: return
+
+        launch(dispatchers.computation) {
+            room.getUrlLinkPreview(link)
+                .onSuccess { linkPreview ->
+                    linkPreview?.let { eventLinkPreviewMap[event.id] = it }
+                }
+                .onFailure { failure ->
+                    Timber.tag("TimelineEvent_LinkPreview")
+                        .i("Failed to get link preview of event ${event.eventId} with error: ${failure.message}")
+                }
+        }
+    }
+
+    private fun extractFirstLink(text: String): String? {
+        val matcher = Patterns.WEB_URL.matcher(text)
+        return if (matcher.find()) {
+            matcher.group()
+        } else {
+            null
+        }
     }
 }
 

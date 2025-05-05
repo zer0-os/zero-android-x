@@ -167,6 +167,7 @@ fun TimelineView(
                         timelineItem = timelineItem,
                         timelineRoomInfo = state.timelineRoomInfo,
                         timelineProtectionState = timelineProtectionState,
+                        linkPreview = state.linkPreviewMap[timelineItem.identifier()],
                         renderReadReceipts = state.renderReadReceipts,
                         isLastOutgoingMessage = state.isLastOutgoingMessage(timelineItem.identifier()),
                         focusedEventId = state.focusedEventId,

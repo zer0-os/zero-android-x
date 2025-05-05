@@ -31,6 +31,8 @@ sealed interface TimelineEvents {
     data class ShowShieldDialog(val messageShield: MessageShield) : EventFromTimelineItem
     data class LoadMore(val direction: Timeline.PaginationDirection) : EventFromTimelineItem
 
+    data class GetLinkPreviewIfApplicable(val event: TimelineItem.Event) : EventFromTimelineItem
+
     /**
      * Events coming from a poll item.
      */
