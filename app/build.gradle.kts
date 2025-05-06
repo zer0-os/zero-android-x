@@ -115,12 +115,18 @@ android {
     logger.warnInBox("Building ${defaultConfig.applicationId} ($baseAppName)")
 
     buildTypes {
+        val oidcRedirectSchemeBase = BuildTimeConfig.METADATA_HOST_REVERSED ?: "io.element.android"
         getByName("debug") {
             if (CURRENT_APP_TIER == APP_TIER_ZERO) {
                 resValue("string", "app_name", "ZERO")
             } else {
                 resValue("string", "app_name", "$baseAppName dbg")
             }
+            resValue(
+                "string",
+                "login_redirect_scheme",
+                "$oidcRedirectSchemeBase.debug",
+            )
             //applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -131,6 +137,11 @@ android {
             } else {
                 resValue("string", "app_name", baseAppName)
             }
+            resValue(
+                "string",
+                "login_redirect_scheme",
+                oidcRedirectSchemeBase,
+            )
             signingConfig = signingConfigs.getByName("debug")
 
             postprocessing {
@@ -149,6 +160,11 @@ android {
             applicationIdSuffix = ".nightly"
             versionNameSuffix = "-nightly"
             resValue("string", "app_name", "$baseAppName nightly")
+            resValue(
+                "string",
+                "login_redirect_scheme",
+                "$oidcRedirectSchemeBase.nightly",
+            )
             matchingFallbacks += listOf("release")
             signingConfig = signingConfigs.getByName("nightly")
 
@@ -328,6 +344,7 @@ dependencies {
     testImplementation(libs.test.truth)
     testImplementation(libs.test.turbine)
     testImplementation(projects.libraries.matrix.test)
+    testImplementation(projects.services.toolbox.test)
 
     koverDependencies()
 

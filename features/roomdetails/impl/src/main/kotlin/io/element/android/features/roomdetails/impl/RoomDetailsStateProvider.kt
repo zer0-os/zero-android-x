@@ -118,6 +118,7 @@ fun aRoomDetailsState(
     knockRequestsCount: Int? = null,
     canShowSecurityAndPrivacy: Boolean = true,
     hasMemberVerificationViolations: Boolean = false,
+    canReportRoom: Boolean = true,
     isRoomAChannel: Boolean = false,
     eventSink: (RoomDetailsEvent) -> Unit = {},
 ) = RoomDetailsState(
@@ -149,6 +150,7 @@ fun aRoomDetailsState(
     knockRequestsCount = knockRequestsCount,
     canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
     hasMemberVerificationViolations = hasMemberVerificationViolations,
+    canReportRoom = canReportRoom,
     isRoomAChannel = isRoomAChannel,
     eventSink = eventSink,
 )

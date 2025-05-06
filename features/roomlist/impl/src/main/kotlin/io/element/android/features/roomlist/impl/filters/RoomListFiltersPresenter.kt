@@ -13,6 +13,7 @@ import androidx.compose.runtime.produceState
 import io.element.android.features.roomlist.impl.filters.selection.FilterSelectionStrategy
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
+import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -46,9 +47,11 @@ class RoomListFiltersPresenter @Inject constructor(
                             return@mapNotNull null
                         }
                         when (filterState.filter) {
-                            RoomListFilter.Rooms -> MatrixRoomListFilter.Category.Group
-                            RoomListFilter.People -> MatrixRoomListFilter.Category.People
-                            RoomListFilter.Unread -> MatrixRoomListFilter.Unread
+                            //RoomListFilter.Rooms -> MatrixRoomListFilter.Category.Group
+                            RoomListFilter.Rooms -> MatrixRoomListFilter.Unread
+                            //RoomListFilter.People -> MatrixRoomListFilter.Category.People
+                            //RoomListFilter.Unread -> MatrixRoomListFilter.Unread
+                            RoomListFilter.Channels -> MatrixRoomListFilter.NormalizedMatchRoomName(ZERO_CHANNEL_PREFIX)
                             RoomListFilter.Favourites -> MatrixRoomListFilter.Favorite
                             RoomListFilter.Invites -> MatrixRoomListFilter.Invite
                         }

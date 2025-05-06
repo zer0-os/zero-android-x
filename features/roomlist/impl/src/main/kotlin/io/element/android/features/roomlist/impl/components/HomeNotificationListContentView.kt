@@ -27,6 +27,9 @@ import io.element.android.features.roomlist.impl.RoomListContentState
 import io.element.android.features.roomlist.impl.RoomListContentStateProvider
 import io.element.android.features.roomlist.impl.RoomListEvents
 import io.element.android.features.roomlist.impl.contentType
+import io.element.android.features.roomlist.impl.filters.RoomListFilter
+import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
+import io.element.android.features.roomlist.impl.filters.aRoomListFiltersState
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.model.RoomSummaryDisplayType
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -38,6 +41,7 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 fun HomeNotificationListContentView(
     contentState: RoomListContentState,
+    filtersState: RoomListFiltersState,
     eventSink: (RoomListEvents) -> Unit,
     onNotificationClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
@@ -55,6 +59,13 @@ fun HomeNotificationListContentView(
             is RoomListContentState.Rooms -> {
                 val items = contentState.summaries
                     .filter { it.hasNewContent && it.displayType !in (RoomSummaryDisplayType.KNOCKED..RoomSummaryDisplayType.PLACEHOLDER) }
+                    .let { roomListRoomSummaries ->
+                        if (filtersState.selectedFilters().contains(RoomListFilter.Rooms)) {
+                            roomListRoomSummaries.filter { !it.isAChannel }
+                        } else {
+                            roomListRoomSummaries
+                        }
+                    }
                     .toPersistentList()
                 if (items.isEmpty()) {
                     EmptyView(modifier = modifier)
@@ -142,6 +153,7 @@ private fun NotificationsViewList(
 internal fun HomeNotificationListContentViewPreview(@PreviewParameter(RoomListContentStateProvider::class) state: RoomListContentState) = ElementPreview {
     HomeNotificationListContentView(
         contentState = state,
+        filtersState = aRoomListFiltersState(),
         eventSink = {},
         onNotificationClick = {},
     )

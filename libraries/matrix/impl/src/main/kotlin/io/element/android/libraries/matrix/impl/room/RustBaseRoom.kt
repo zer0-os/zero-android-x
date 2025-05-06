@@ -96,6 +96,8 @@ class RustBaseRoom(
         }
     }
 
+    override fun close() = destroy()
+
     override fun destroy() {
         innerRoom.destroy()
     }
@@ -264,6 +266,13 @@ class RustBaseRoom(
         runCatching {
             Timber.d("clearComposerDraft for $roomId")
             innerRoom.clearComposerDraft()
+        }
+    }
+
+    override suspend fun reportRoom(reason: String?): Result<Unit> = withContext(roomDispatcher) {
+        runCatching {
+            Timber.d("reportRoom $roomId")
+            innerRoom.reportRoom(reason)
         }
     }
 }

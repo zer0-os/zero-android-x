@@ -74,6 +74,7 @@ import org.matrix.rustcomponents.sdk.MessageFormat
 import org.matrix.rustcomponents.sdk.PollData
 import org.matrix.rustcomponents.sdk.SendAttachmentJoinHandle
 import org.matrix.rustcomponents.sdk.UploadParameters
+import org.matrix.rustcomponents.sdk.UploadSource
 import org.matrix.rustcomponents.sdk.use
 import timber.log.Timber
 import uniffi.matrix_sdk.RoomPaginationStatus
@@ -367,7 +368,7 @@ class RustTimeline(
         return sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendImage(
                 params = UploadParameters(
-                    filename = file.path,
+                    source = UploadSource.File(file.path),
                     caption = caption,
                     formattedCaption = formattedCaption?.let {
                         FormattedBody(body = it, format = MessageFormat.Html)
@@ -396,7 +397,7 @@ class RustTimeline(
         return sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendVideo(
                 params = UploadParameters(
-                    filename = file.path,
+                    source = UploadSource.File(file.path),
                     caption = caption,
                     formattedCaption = formattedCaption?.let {
                         FormattedBody(body = it, format = MessageFormat.Html)
@@ -424,7 +425,7 @@ class RustTimeline(
         return sendAttachment(listOf(file)) {
             inner.sendAudio(
                 params = UploadParameters(
-                    filename = file.path,
+                    source = UploadSource.File(file.path),
                     caption = caption,
                     formattedCaption = formattedCaption?.let {
                         FormattedBody(body = it, format = MessageFormat.Html)
@@ -451,7 +452,7 @@ class RustTimeline(
         return sendAttachment(listOf(file)) {
             inner.sendFile(
                 params = UploadParameters(
-                    filename = file.path,
+                    source = UploadSource.File(file.path),
                     caption = caption,
                     formattedCaption = formattedCaption?.let {
                         FormattedBody(body = it, format = MessageFormat.Html)
@@ -512,7 +513,7 @@ class RustTimeline(
         return sendAttachment(listOf(file)) {
             inner.sendVoiceMessage(
                 params = UploadParameters(
-                    filename = file.path,
+                    source = UploadSource.File(file.path),
                     // Maybe allow a caption in the future?
                     caption = null,
                     formattedCaption = null,
