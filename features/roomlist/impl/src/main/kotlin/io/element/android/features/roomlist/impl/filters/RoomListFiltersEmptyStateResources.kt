@@ -28,16 +28,20 @@ data class RoomListFiltersEmptyStateResources(
                 selectedFilters.isEmpty() -> null
                 selectedFilters.size == 1 -> {
                     when (selectedFilters.first()) {
-                        RoomListFilter.Unread -> RoomListFiltersEmptyStateResources(
+                        /*RoomListFilter.Unread -> RoomListFiltersEmptyStateResources(
                             title = R.string.screen_roomlist_filter_unreads_empty_state_title,
                             subtitle = R.string.screen_roomlist_filter_mixed_empty_state_subtitle
                         )
                         RoomListFilter.People -> RoomListFiltersEmptyStateResources(
                             title = R.string.screen_roomlist_filter_people_empty_state_title,
                             subtitle = R.string.screen_roomlist_filter_mixed_empty_state_subtitle
-                        )
+                        )*/
                         RoomListFilter.Rooms -> RoomListFiltersEmptyStateResources(
                             title = R.string.screen_roomlist_filter_rooms_empty_state_title,
+                            subtitle = R.string.screen_roomlist_filter_mixed_empty_state_subtitle
+                        )
+                        RoomListFilter.Channels -> RoomListFiltersEmptyStateResources(
+                            title = R.string.screen_roomlist_filter_channels_empty_state_title,
                             subtitle = R.string.screen_roomlist_filter_mixed_empty_state_subtitle
                         )
                         RoomListFilter.Favourites -> RoomListFiltersEmptyStateResources(

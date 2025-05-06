@@ -63,6 +63,7 @@ fun RoomListContextMenu(
                 eventSink(RoomListEvents.LeaveRoom(contextMenu.roomId))
             },
             onFavoriteChange = { isFavorite ->
+                eventSink(RoomListEvents.HideContextMenu)
                 eventSink(RoomListEvents.SetRoomIsFavorite(contextMenu.roomId, isFavorite))
             },
             onClearCacheRoomClick = {
@@ -167,7 +168,7 @@ private fun RoomListModalBottomSheetContent(
             ),
             style = ListItemStyle.Primary,
         )
-        if (canReportRoom) {
+        /*if (canReportRoom) {
             ListItem(
                 headlineContent = {
                     Text(text = stringResource(CommonStrings.action_report_room))
@@ -181,7 +182,7 @@ private fun RoomListModalBottomSheetContent(
                 ),
                 style = ListItemStyle.Destructive,
             )
-        }
+        }*/
         ListItem(
             headlineContent = {
                 Text(text = stringResource(CommonStrings.action_leave_room))
@@ -194,7 +195,7 @@ private fun RoomListModalBottomSheetContent(
             ),
             style = ListItemStyle.Destructive,
         )
-        if (contextMenu.eventCacheFeatureFlagEnabled) {
+        /*if (contextMenu.eventCacheFeatureFlagEnabled) {
             ListItem(
                 headlineContent = {
                     Text(text = "Clear cache for this room")
@@ -205,7 +206,7 @@ private fun RoomListModalBottomSheetContent(
                 ),
                 style = ListItemStyle.Primary,
             )
-        }
+        }*/
     }
 }
 

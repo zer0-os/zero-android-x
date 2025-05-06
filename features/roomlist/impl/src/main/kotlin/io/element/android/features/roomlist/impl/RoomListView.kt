@@ -177,7 +177,7 @@ private fun RoomListScaffold(
                 onOpenSettings = onOpenSettings,
                 scrollBehavior = scrollBehavior,
                 displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
-                displayFilters = state.displayFilters,
+                displayFilters = state.shouldDisplayFilters(selectedNavigationTab.value),
                 filtersState = state.filtersState,
                 canReportBug = state.canReportBug,
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
@@ -281,6 +281,7 @@ internal fun HomeScreenContent(
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
                 contentState = state.contentState,
+                filtersState = state.filtersState,
                 eventSink = state.eventSink,
                 onNotificationClick = ::onNotificationClick,
                 modifier = modifier

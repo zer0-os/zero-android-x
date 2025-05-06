@@ -51,8 +51,7 @@ data class RoomListState(
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty()
 ) {
-    //val displayFilters = contentState is RoomListContentState.Rooms
-    val displayFilters = false //Hiding room list filters for now
+    private val displayFilters = contentState is RoomListContentState.Rooms
     private val displayActions = true
 
     sealed interface ContextMenu {
@@ -76,6 +75,10 @@ data class RoomListState(
     fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {
         return displayActions &&
             selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.FEED, HomeScreenTab.PROFILE)
+    }
+
+    fun shouldDisplayFilters(selectedHomeTab: HomeScreenTab): Boolean {
+        return displayFilters && (selectedHomeTab == HomeScreenTab.NOTIFICATION)
     }
 }
 
