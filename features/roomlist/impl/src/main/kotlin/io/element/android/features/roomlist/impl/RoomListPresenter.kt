@@ -26,11 +26,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import im.vector.app.features.analytics.plan.Interaction
+import io.element.android.appconfig.MatrixConfiguration
 import io.element.android.features.invite.api.SeenInvitesStore
-import io.element.android.features.invite.api.response.AcceptDeclineInviteEvents
-import io.element.android.features.invite.api.response.AcceptDeclineInviteState
-import io.element.android.features.invite.api.response.InviteData
-import io.element.android.features.leaveroom.api.LeaveRoomEvent
+import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.AcceptInvite
+import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.DeclineInvite
+import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteState
+import io.element.android.features.leaveroom.api.LeaveRoomEvent.ShowConfirmation
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
@@ -150,6 +151,7 @@ class RoomListPresenter @Inject constructor(
         }.collectAsState(initial = false)
 
         val contextMenu = remember { mutableStateOf<RoomListState.ContextMenu>(RoomListState.ContextMenu.Hidden) }
+        val declineInviteMenu = remember { mutableStateOf<RoomListState.DeclineInviteMenu>(RoomListState.DeclineInviteMenu.Hidden) }
 
         val directLogoutState = logoutPresenter.present()
 
@@ -167,20 +169,22 @@ class RoomListPresenter @Inject constructor(
                 is RoomListEvents.HideContextMenu -> {
                     contextMenu.value = RoomListState.ContextMenu.Hidden
                 }
-                is RoomListEvents.LeaveRoom -> leaveRoomState.eventSink(LeaveRoomEvent.ShowConfirmation(event.roomId))
+                is RoomListEvents.LeaveRoom -> leaveRoomState.eventSink(ShowConfirmation(event.roomId))
                 is RoomListEvents.SetRoomIsFavorite -> coroutineScope.setRoomIsFavorite(event.roomId, event.isFavorite)
                 is RoomListEvents.MarkAsRead -> coroutineScope.markAsRead(event.roomId)
                 is RoomListEvents.MarkAsUnread -> coroutineScope.markAsUnread(event.roomId)
                 is RoomListEvents.AcceptInvite -> {
                     acceptDeclineInviteState.eventSink(
-                        AcceptDeclineInviteEvents.AcceptInvite(event.roomListRoomSummary.toInviteData())
+                        AcceptInvite(event.roomSummary.toInviteData())
                     )
                 }
                 is RoomListEvents.DeclineInvite -> {
                     acceptDeclineInviteState.eventSink(
-                        AcceptDeclineInviteEvents.DeclineInvite(event.roomListRoomSummary.toInviteData())
+                        DeclineInvite(event.roomSummary.toInviteData(), blockUser = event.blockUser, shouldConfirm = false)
                     )
                 }
+                is RoomListEvents.ShowDeclineInviteMenu -> declineInviteMenu.value = RoomListState.DeclineInviteMenu.Shown(event.roomSummary)
+                RoomListEvents.HideDeclineInviteMenu -> declineInviteMenu.value = RoomListState.DeclineInviteMenu.Hidden
                 is RoomListEvents.ClearCacheOfRoom -> coroutineScope.clearCacheOfRoom(event.roomId)
                 is RoomListEvents.DismissRewardsIntimation -> {
                     if (event.immediate) {
@@ -232,6 +236,7 @@ class RoomListPresenter @Inject constructor(
             hasNetworkConnection = isOnline,
             genericActionState = genericActionState.value,
             contextMenu = contextMenu.value,
+            declineInviteMenu = declineInviteMenu.value,
             leaveRoomState = leaveRoomState,
             filtersState = filtersState,
             canReportBug = canReportBug,
@@ -244,6 +249,7 @@ class RoomListPresenter @Inject constructor(
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
             hideInvitesAvatars = hideInvitesAvatar,
+            canReportRoom = MatrixConfiguration.CAN_REPORT_ROOM,
             eventSink = ::handleEvents,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
@@ -322,18 +328,18 @@ class RoomListPresenter @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun CoroutineScope.showContextMenu(event: RoomListEvents.ShowContextMenu, contextMenuState: MutableState<RoomListState.ContextMenu>) = launch {
         val initialState = RoomListState.ContextMenu.Shown(
-            roomId = event.roomListRoomSummary.roomId,
-            roomName = event.roomListRoomSummary.name,
-            isDm = event.roomListRoomSummary.isDm,
-            isFavorite = event.roomListRoomSummary.isFavorite,
+            roomId = event.roomSummary.roomId,
+            roomName = event.roomSummary.name,
+            isDm = event.roomSummary.isDm,
+            isFavorite = event.roomSummary.isFavorite,
             markAsUnreadFeatureFlagEnabled = featureFlagService.isFeatureEnabled(FeatureFlags.MarkAsUnread),
-            hasNewContent = event.roomListRoomSummary.hasNewContent,
+            hasNewContent = event.roomSummary.hasNewContent,
             eventCacheFeatureFlagEnabled = appPreferencesStore.isDeveloperModeEnabledFlow().first() &&
                 featureFlagService.isFeatureEnabled(FeatureFlags.EventCache),
         )
         contextMenuState.value = initialState
 
-        client.getRoom(event.roomListRoomSummary.roomId)?.use { room ->
+        client.getRoom(event.roomSummary.roomId)?.use { room ->
 
             val isShowingContextMenuFlow = snapshotFlow { contextMenuState.value is RoomListState.ContextMenu.Shown }
                 .distinctUntilChanged()
@@ -590,15 +596,4 @@ class RoomListPresenter @Inject constructor(
     private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
         client.addMeowToFeed(feed, meowCount)
     }
-}
-
-@VisibleForTesting
-internal fun RoomListRoomSummary.toInviteData(): InviteData? {
-    if (inviteSender == null) return null
-    return InviteData(
-        roomId = roomId,
-        roomName = name ?: roomId.value,
-        isDm = isDm,
-        senderId = inviteSender.userId,
-    )
 }

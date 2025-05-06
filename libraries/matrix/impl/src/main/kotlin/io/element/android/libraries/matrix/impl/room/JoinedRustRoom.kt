@@ -685,9 +685,11 @@ class JoinedRustRoom(
         }
     }
 
+    override fun close() = destroy()
+
     override fun destroy() {
         baseRoom.destroy()
-        liveInnerTimeline.close()
+        liveInnerTimeline.destroy()
         roomCoroutineScope.cancel()
     }
 
