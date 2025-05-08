@@ -178,7 +178,7 @@ private fun Modifier.withAccessibilityModifier(
     content: ListItemContent?,
     enabled: Boolean,
     onClick: (() -> Unit)?,
-): Modifier = then(
+): Modifier = this.then(
     when (content) {
         is ListItemContent.Checkbox -> {
             Modifier.toggleable(

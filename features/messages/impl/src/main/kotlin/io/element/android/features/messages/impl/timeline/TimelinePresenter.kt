@@ -31,6 +31,7 @@ import io.element.android.features.messages.impl.timeline.factories.TimelineItem
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactoryConfig
 import io.element.android.features.messages.impl.timeline.model.NewEventState
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
+import io.element.android.features.messages.impl.timeline.model.virtual.TimelineItemTypingNotificationModel
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemTextBasedContent
 import io.element.android.features.messages.impl.typing.TypingNotificationState
 import io.element.android.features.messages.impl.voicemessages.timeline.RedactedVoiceMessageManager
@@ -138,7 +139,7 @@ class TimelinePresenter @AssistedInject constructor(
                         if (event.firstIndex == 0) {
                             newEventState.value = NewEventState.None
                         }
-                        println("## sendReadReceiptIfNeeded firstVisibleIndex: ${event.firstIndex}")
+                        Timber.d("## sendReadReceiptIfNeeded firstVisibleIndex: ${event.firstIndex}")
                         appScope.sendReadReceiptIfNeeded(
                             firstVisibleIndex = event.firstIndex,
                             timelineItems = timelineItems,
@@ -289,7 +290,10 @@ class TimelinePresenter @AssistedInject constructor(
         if (newEventState.value == NewEventState.FromMe) {
             return@withContext
         }
-        val newMostRecentItem = timelineItems.firstOrNull()
+        val newMostRecentItem = timelineItems.firstOrNull {
+            // Ignore typing item
+            (it as? TimelineItem.Virtual)?.model !is TimelineItemTypingNotificationModel
+        }
         val prevMostRecentItemIdValue = prevMostRecentItemId.value
         val newMostRecentItemId = newMostRecentItem?.identifier()
         val hasNewEvent = prevMostRecentItemIdValue != null &&
