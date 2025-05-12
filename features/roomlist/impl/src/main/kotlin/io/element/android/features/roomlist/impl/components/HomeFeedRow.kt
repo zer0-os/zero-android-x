@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -41,9 +40,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
@@ -61,7 +58,8 @@ import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
-import io.element.android.support.zero.common.ui.component.CircularProgress
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
 import io.element.android.support.zero.config.ZeroConfig
 
 @Composable
@@ -153,19 +151,22 @@ fun HomeFeedRow(
             )
             if (feed.media != null) {
                 val media = feed.media!!
-                Box(modifier = Modifier.padding(vertical = 8.dp)) {
+                Box(modifier = Modifier
+                    .background(Color.Black, RoundedCornerShape(4.dp))
+                    .padding(vertical = 8.dp)
+                ) {
                     if (media.isVideo) {
-
-                    } else {
-                        AsyncImage(
+                        FeedMediaVideoView(
+                            videoUrl = feedMedia?.url ?: "",
                             modifier = Modifier
-                                .background(Color.Black, RoundedCornerShape(4.dp))
+                                .clip(RoundedCornerShape(4.dp))
+                        )
+                    } else {
+                        FeedMediaImageView(
+                            url = feedMedia?.url ?: "",
+                            modifier = Modifier
                                 .aspectRatio(media.aspectRatio)
-                                .clip(RoundedCornerShape(4.dp)),
-                            model = feedMedia?.url,
-                            contentScale = ContentScale.Fit,
-                            alignment = Alignment.Center,
-                            contentDescription = null,
+                                .clip(RoundedCornerShape(4.dp))
                         )
                     }
                 }

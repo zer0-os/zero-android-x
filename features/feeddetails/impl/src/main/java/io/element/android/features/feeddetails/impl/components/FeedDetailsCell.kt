@@ -21,17 +21,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.roomlist.impl.components.FeedActionButton
 import io.element.android.features.roomlist.impl.components.FeedMeowActionButton
@@ -50,6 +47,8 @@ import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
 
 @Composable
 fun FeedDetailsCell(
@@ -116,19 +115,22 @@ fun FeedDetailsCell(
         )
         if (feed.media != null) {
             val media = feed.media!!
-            Box(modifier = Modifier.padding(vertical = 8.dp)) {
+            Box(modifier = Modifier
+                .background(Color.Black, RoundedCornerShape(4.dp))
+                .padding(vertical = 8.dp)
+            ) {
                 if (media.isVideo) {
-
-                } else {
-                    AsyncImage(
+                    FeedMediaVideoView(
+                        videoUrl = media.url ?: "",
                         modifier = Modifier
-                            .background(Color.Black, RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                } else {
+                    FeedMediaImageView(
+                        url = media.url ?: "",
+                        modifier = Modifier
                             .aspectRatio(media.aspectRatio)
-                            .clip(RoundedCornerShape(4.dp)),
-                        model = media.url,
-                        contentScale = ContentScale.Fit,
-                        alignment = Alignment.Center,
-                        contentDescription = null,
+                            .clip(RoundedCornerShape(4.dp))
                     )
                 }
             }

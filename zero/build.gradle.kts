@@ -46,6 +46,10 @@ dependencies {
     implementation(projects.libraries.di)
     implementation(projects.libraries.matrix.api)
 
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+
     implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.network.okhttp.bom))
     implementation(libs.network.okhttp)

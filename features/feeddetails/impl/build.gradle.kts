@@ -21,7 +21,6 @@ dependencies {
     implementation(projects.libraries.uiStrings)
     implementation(projects.zero)
     implementation(projects.features.roomlist.impl)
-    implementation(libs.coil.compose)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)
