@@ -11,15 +11,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import io.element.android.features.roomlist.impl.datasource.FeedItemMediaCache
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -48,6 +52,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
 
         val feedDetailsFlow: MutableState<ZeroFeed> = remember { mutableStateOf(feed) }
         val feedRepliesFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
+        val feedRepliesMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
 
         val postReplyText: MutableState<String> = remember { mutableStateOf("") }
 
@@ -65,9 +70,12 @@ class FeedDetailsPresenter @AssistedInject constructor(
         }
 
         LaunchedEffect(Unit) {
+            feedRepliesMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
             coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
             client.getUserProfile()
         }
+
+        coroutineScope.fetchFeedRepliesMedia(feedRepliesFlow.value, feedRepliesMediaMap)
 
         return FeedDetailsState(
             zeroFeed = feedDetailsFlow.value,
@@ -75,6 +83,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
             matrixUser = matrixUser.value,
             loggedInUserId = client.sessionId.extractedDisplayName,
             feedComments = feedRepliesFlow.value,
+            feedCommentsMediaMap = feedRepliesMediaMap,
             postReplyText = postReplyText.value,
             eventSink = ::handleEvents,
             genericActionState = genericActionState.value
@@ -91,7 +100,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
             async { client.fetchFeedReplies(feedId, limit = FEED_DETAILS_COMMENTS_PAGE_SIZE, skip = 0) }
         )
         (results[0] as? Result<ZeroFeed?>)?.getOrNull()?.let {
-            feedDetailsFlow.value = it
+            feedDetailsFlow.value = it.copy(media = feed.media)
         }
         (results[1] as? Result<List<ZeroFeed>>)?.getOrNull()?.let {
             _feedReplies.addAll(it)
@@ -135,5 +144,24 @@ class FeedDetailsPresenter @AssistedInject constructor(
             .onFailure { error ->
                 genericActionState.value = AsyncData.Failure(error)
             }
+    }
+
+    private fun CoroutineScope.fetchFeedRepliesMedia(replies: List<ZeroFeed>,
+                                                     feedRepliesMediaMap: SnapshotStateMap<String, FeedMedia>
+    ) = launch {
+        val feedsToFetch = replies.mapNotNull { feed ->
+            val mediaId = feed.media?.id ?: return@mapNotNull null
+            if (feedRepliesMediaMap.contains(mediaId)) return@mapNotNull null
+            else feed
+        }
+        val results = feedsToFetch.map { feed ->
+            async { feed.id to client.fetchFeedMedia(feed.media!!.id) }
+        }.awaitAll()
+        results.forEach { (feedId, media) ->
+            media.getOrNull()?.let { feedMedia ->
+                FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
+                feedRepliesMediaMap[feedId] = feedMedia
+            }
+        }
     }
 }

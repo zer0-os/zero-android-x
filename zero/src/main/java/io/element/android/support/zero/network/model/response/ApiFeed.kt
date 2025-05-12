@@ -47,7 +47,9 @@ data class ApiFeed(
     val postsMeowsSummary: PostsMeowsSummary? = null,
     val meows: List<Meow>? = null,
     val replies: List<Reply>? = null,
-    val replyToPost: ReplyToFeed? = null
+    val replyToPost: ReplyToFeed? = null,
+    val mediaId: String? = null,
+    val media: ApiFeedMedia? = null
 )
 
 @Serializable
@@ -97,4 +99,13 @@ data class ReplyToFeed(
     val text: String,
     val arweaveId: String,
     val user: FeedUser
+)
+
+@Serializable
+data class ApiFeedMedia(
+    val id: String,
+    val mimeType: String?,
+    val width: Float,
+    val height: Float,
+    val fileSize: String?,
 )

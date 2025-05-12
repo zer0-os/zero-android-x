@@ -37,6 +37,7 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -213,6 +214,8 @@ interface MatrixClient {
                                  includeReplies: Boolean = true,
                                  includeMeow: Boolean = true
     ): Result<ZeroFeed?>
+
+    suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?>
 
     suspend fun fetchFeedReplies(
         feedId: String,

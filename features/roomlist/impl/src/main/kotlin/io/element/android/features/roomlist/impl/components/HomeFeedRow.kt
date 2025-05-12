@@ -9,22 +9,28 @@ package io.element.android.features.roomlist.impl.components
 
 import android.content.Intent
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -35,7 +41,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
@@ -44,18 +52,23 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthor
+import io.element.android.libraries.matrix.api.zero.feed.aspectRatio
+import io.element.android.libraries.matrix.api.zero.feed.isVideo
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.ui.component.CircularProgress
 import io.element.android.support.zero.config.ZeroConfig
 
 @Composable
 fun HomeFeedRow(
     modifier: Modifier = Modifier,
     feed: ZeroFeed,
+    feedMedia: FeedMedia?,
     zeroUserRewards: ZeroUserRewards,
     isMyOwnFeed: Boolean = false,
     showThreadLine: Boolean = false,
@@ -69,12 +82,14 @@ fun HomeFeedRow(
         )
     }
 
+    val rowModifier = modifier
+        .fillMaxWidth()
+        .clickable { onFeedClick() }
+        .padding(16.dp)
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .clickable { onFeedClick() }
-            .padding(16.dp),
+        modifier = if (feed.media != null) {
+            rowModifier
+        } else rowModifier.height(IntrinsicSize.Min),
         verticalAlignment = Alignment.Top
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -136,6 +151,25 @@ fun HomeFeedRow(
                 style = ElementTheme.typography.fontBodyLgRegular,
                 color = ElementTheme.colors.textPrimary
             )
+            if (feed.media != null) {
+                val media = feed.media!!
+                Box(modifier = Modifier.padding(vertical = 8.dp)) {
+                    if (media.isVideo) {
+
+                    } else {
+                        AsyncImage(
+                            modifier = Modifier
+                                .background(Color.Black, RoundedCornerShape(4.dp))
+                                .aspectRatio(media.aspectRatio)
+                                .clip(RoundedCornerShape(4.dp)),
+                            model = feedMedia?.url,
+                            contentScale = ContentScale.Fit,
+                            alignment = Alignment.Center,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
                 Row(Modifier.weight(1f)) {
@@ -231,6 +265,7 @@ val ZeroFeed.arweaveLink: String
 internal fun HomeFeedRowPreview() = ElementPreview {
     HomeFeedRow(
         feed = ZeroFeed.placeholder,
+        feedMedia = FeedMedia.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
         onFeedClick = {},
         onAddMeowToFeed = {}

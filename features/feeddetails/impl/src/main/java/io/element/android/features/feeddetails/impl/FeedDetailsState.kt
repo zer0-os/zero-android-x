@@ -10,6 +10,7 @@ package io.element.android.features.feeddetails.impl
 import androidx.compose.runtime.Immutable
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
@@ -20,6 +21,7 @@ data class FeedDetailsState(
     val matrixUser: MatrixUser,
     val loggedInUserId: String,
     val feedComments: List<ZeroFeed>,
+    val feedCommentsMediaMap: Map<String, FeedMedia>,
     val postReplyText: String,
 
     val eventSink: (FeedDetailsEvents) -> Unit,

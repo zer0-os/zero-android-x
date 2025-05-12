@@ -52,6 +52,7 @@ dependencies {
     implementation(projects.services.analytics.api)
     implementation(projects.zero)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.coil.compose)
     implementation(projects.features.reportroom.api)
     api(projects.features.roomlist.api)
 

@@ -49,6 +49,7 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -889,6 +890,14 @@ class RustMatrixClient(
                 return@runCatching feed
             }
         }
+
+    override suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?> = withContext(sessionDispatcher) {
+        runCatching {
+            val metaDataRepo = zeroCoreRepository?.metaData
+                ?: return@withContext Result.failure(Throwable("MetaData repository is not initialized yet."))
+            metaDataRepo.fetchFeedMedia(mediaId)?.toModel()
+        }
+    }
 
     override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> =
         withContext(sessionDispatcher) {

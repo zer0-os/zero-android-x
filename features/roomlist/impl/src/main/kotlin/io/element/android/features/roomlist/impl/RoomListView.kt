@@ -271,6 +271,7 @@ internal fun HomeScreenContent(
         HomeScreenTab.FEED -> {
             HomeFeedListContentView(
                 contentState = state.allFeedsContentState,
+                feedMediaMap = state.feedMediaMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = false,
@@ -290,6 +291,7 @@ internal fun HomeScreenContent(
         HomeScreenTab.PROFILE -> {
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
+                feedMediaMap = state.feedMediaMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = true,

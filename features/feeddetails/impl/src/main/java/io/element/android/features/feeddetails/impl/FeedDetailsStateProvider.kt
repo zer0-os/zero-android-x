@@ -34,6 +34,7 @@ internal fun aFeedDetailState(
     matrixUser = matrixUser,
     loggedInUserId = "",
     feedComments = emptyList(),
+    feedCommentsMediaMap = emptyMap(),
     postReplyText = "",
     eventSink = {},
     genericActionState = genericActionState

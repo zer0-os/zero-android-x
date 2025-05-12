@@ -7,10 +7,13 @@
 
 package io.element.android.support.zero.data.conversion
 
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthor
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthorProfileSummary
 import io.element.android.support.zero.network.model.response.ApiFeed
+import io.element.android.support.zero.network.model.response.ApiFeedMedia
+import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
 import io.element.android.support.zero.network.model.response.FeedUser
 import io.element.android.support.zero.network.model.response.FeedUserProfileSummary
 import io.element.android.support.zero.network.model.response.Meow
@@ -37,7 +40,8 @@ fun ApiFeed.toModel() = ZeroFeed(
     postsMeowsSummary = postsMeowsSummary?.toModel(),
     meows = meows?.map { it.toModel() },
     replies = replies?.map { it.toModel() },
-    replyToPost = replyToPost?.toModel()
+    replyToPost = replyToPost?.toModel(),
+    media = media?.toModel()
 )
 
 fun FeedUser.toModel() = ZeroFeedAuthor(
@@ -81,4 +85,20 @@ fun ReplyToFeed.toModel() = io.element.android.libraries.matrix.api.zero.feed.Re
     text = text,
     arweaveId = arweaveId,
     user = user.toModel()
+)
+
+fun ApiFeedMedia.toModel() = FeedMedia(
+    id = id,
+    width = width,
+    height = height,
+    mimeType = mimeType,
+    url = null
+)
+
+fun ApiFeedMediaResponse.toModel() = FeedMedia(
+    id = media.id,
+    width = media.width,
+    height = media.height,
+    mimeType = media.mimeType,
+    url = signedUrl
 )
