@@ -17,5 +17,5 @@ interface MetaDataRepository {
 
     suspend fun fetchFeedMedia(mediaId: String): ApiFeedMediaResponse?
 
-    suspend fun uploadFeedMedia(media: File): ApiUploadFeedMedia?
+    suspend fun uploadFeedMedia(media: File, mimeType: String): ApiUploadFeedMedia?
 }

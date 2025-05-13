@@ -76,7 +76,7 @@ data class RoomListState(
 
     fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {
         return displayActions &&
-            selectedHomeTab in listOf(HomeScreenTab.CHAT)
+            selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.FEED, HomeScreenTab.PROFILE)
     }
 
     fun shouldDisplayFilters(selectedHomeTab: HomeScreenTab): Boolean {

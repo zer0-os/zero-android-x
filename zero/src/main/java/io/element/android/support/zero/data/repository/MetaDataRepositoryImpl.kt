@@ -7,7 +7,6 @@
 
 package io.element.android.support.zero.data.repository
 
-import io.element.android.support.zero.common.extension.mimeType
 import io.element.android.support.zero.network.model.request.LinkPreviewMetaDataFilter
 import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
 import io.element.android.support.zero.network.model.response.ApiLinkPreview
@@ -35,9 +34,9 @@ data class MetaDataRepositoryImpl(
         }.getOrNull()
     }
 
-    override suspend fun uploadFeedMedia(media: File): ApiUploadFeedMedia? {
+    override suspend fun uploadFeedMedia(media: File, mimeType: String): ApiUploadFeedMedia? {
         return runCatching {
-            val requestFile = media.asRequestBody(media.mimeType().toMediaTypeOrNull())
+            val requestFile = media.asRequestBody(mimeType.toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", media.name, requestFile)
             zeroMetaDataService.uploadFeedMedia(body)
         }.getOrNull()

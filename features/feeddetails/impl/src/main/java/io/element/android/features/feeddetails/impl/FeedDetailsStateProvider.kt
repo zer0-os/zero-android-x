@@ -36,6 +36,7 @@ internal fun aFeedDetailState(
     feedComments = emptyList(),
     feedCommentsMediaMap = emptyMap(),
     postReplyText = "",
+    postReplyAttachment = null,
     eventSink = {},
     genericActionState = genericActionState
 )

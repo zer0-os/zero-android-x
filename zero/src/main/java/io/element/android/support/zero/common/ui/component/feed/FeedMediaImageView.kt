@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
+import java.io.File
 
 @Composable
 fun FeedMediaImageView(
@@ -21,6 +22,20 @@ fun FeedMediaImageView(
     AsyncImage(
         modifier = modifier,
         model = url,
+        contentScale = ContentScale.Fit,
+        alignment = Alignment.Center,
+        contentDescription = null,
+    )
+}
+
+@Composable
+fun FeedMediaImageView(
+    file: File,
+    modifier: Modifier = Modifier
+) {
+    AsyncImage(
+        modifier = modifier,
+        model = file,
         contentScale = ContentScale.Fit,
         alignment = Alignment.Center,
         contentDescription = null,
