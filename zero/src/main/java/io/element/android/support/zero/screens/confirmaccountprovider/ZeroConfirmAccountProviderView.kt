@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.form.textFieldState
-import io.element.android.libraries.designsystem.components.keyboard.Keyboard
-import io.element.android.libraries.designsystem.components.keyboard.keyboardAsState
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
@@ -56,6 +54,8 @@ import io.element.android.support.zero.common.ui.component.ElevatedStrip
 import io.element.android.support.zero.common.ui.component.OverlappingLoadingContainer
 import io.element.android.support.zero.common.ui.component.SimpleInputField
 import io.element.android.support.zero.common.ui.component.ZImageButton
+import io.element.android.support.zero.common.ui.component.keyboard.Keyboard
+import io.element.android.support.zero.common.ui.component.keyboard.keyboardAsState
 import io.element.android.support.zero.common.ui.theme.PADDING_10X
 import io.element.android.support.zero.common.ui.theme.PADDING_2X
 import io.element.android.support.zero.common.ui.theme.PADDING_3X
@@ -101,6 +101,7 @@ fun ZeroConfirmAccountProviderView(
     ) {
         Box(modifier = modifier
             .fillMaxSize()
+            .background(Color.Black)
             //.imePadding()
             .offset { offset }
         ) {
