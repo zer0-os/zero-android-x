@@ -162,8 +162,7 @@ private fun FeedsViewList(
             ) { index, feed ->
                 val feedMedia = feedMediaMap[feed.id]
                 HomeFeedRow(
-                    feed = feed,
-                    feedMedia = feedMedia,
+                    feed = feed.copy(media = feedMedia),
                     zeroUserRewards = zeroUserRewards,
                     isMyOwnFeed = isProfileFeedList,
                     onFeedClick = { onFeedClick(

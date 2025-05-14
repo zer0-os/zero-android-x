@@ -17,4 +17,6 @@ object FeedItemMediaCache {
     fun addFeedMedia(feedId: String, media: FeedMedia) {
         feedItemMediaMap[feedId] = media
     }
+
+    fun contains(mediaId: String): Boolean = feedItemMediaMap.contains(mediaId)
 }

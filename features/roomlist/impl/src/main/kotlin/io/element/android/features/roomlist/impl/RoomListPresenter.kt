@@ -22,6 +22,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -233,6 +234,16 @@ class RoomListPresenter @Inject constructor(
         val allFeedsContentState = allFeedsListContentState()
         val myFeedsContentState = allMyFeedsListContentState()
 
+        /*val feedMediaMap = rememberSaveable(
+            saver = mapSaver(
+                save = { it.toMap() },
+                restore = {
+                    mutableStateMapOf<String, FeedMedia>().apply {
+                        putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+                    }
+                }
+            )
+        ) { mutableStateMapOf() }*/
         val feedMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
         LaunchedEffect(Unit) {
             feedMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
@@ -620,10 +631,10 @@ class RoomListPresenter @Inject constructor(
                 val feeds = mutableListOf<ZeroFeed>().apply {
                     addAll(allFeeds)
                     addAll(myFeeds)
-                }.toList()
+                }.distinctBy { it.id }.toList()
                 val feedsToFetch = feeds.mapNotNull { feed ->
                     val mediaId = feed.media?.id ?: return@mapNotNull null
-                    if (feedMediaMap.contains(mediaId)) return@mapNotNull null
+                    if (feedMediaMap.contains(mediaId) || FeedItemMediaCache.contains(mediaId)) return@mapNotNull null
                     else feed
                 }
                 val results = feedsToFetch.map { feed ->

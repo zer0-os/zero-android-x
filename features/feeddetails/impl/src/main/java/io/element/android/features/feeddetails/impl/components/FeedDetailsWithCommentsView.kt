@@ -134,8 +134,7 @@ fun FeedDetailsWithCommentsView(
                 val media = state.feedCommentsMediaMap[comment.id]
 
                 HomeFeedRow(
-                    feed = comment,
-                    feedMedia = media,
+                    feed = comment.copy(media = media),
                     zeroUserRewards = state.userRewards,
                     isMyOwnFeed = comment.userId == state.loggedInUserId,
                     showThreadLine = showThreadLine,
@@ -152,7 +151,11 @@ fun FeedDetailsWithCommentsView(
             }
 
             item {
-                Spacer(modifier = Modifier.size(60.dp))
+                if (state.postReplyAttachment != null) {
+                    Spacer(modifier = Modifier.size(140.dp))
+                } else {
+                    Spacer(modifier = Modifier.size(60.dp))
+                }
             }
         }
 
@@ -178,16 +181,20 @@ private fun BoxScope.PostReplyView(
     state: FeedDetailsState,
     modifier: Modifier = Modifier,
 ) {
+    val hasPostReplyAttachment = state.postReplyAttachment != null
+    val columnBg = if (hasPostReplyAttachment) Color.Black else Color.Transparent
+
     Column(modifier = modifier
+        .background(columnBg)
         .align(Alignment.BottomCenter)
         .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
-        if (state.postReplyAttachment != null) {
+        if (hasPostReplyAttachment) {
             Row(modifier = Modifier.fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(vertical = 4.dp)
             ) {
                 PostReplyAttachmentView(
-                    media = state.postReplyAttachment.media,
+                    media = state.postReplyAttachment!!.media,
                     onRemoveMedia = {
                         state.eventSink(FeedDetailsEvents.RemoveMedia)
                     }

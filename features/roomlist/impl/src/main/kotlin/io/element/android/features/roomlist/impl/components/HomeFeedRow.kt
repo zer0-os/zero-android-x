@@ -66,7 +66,6 @@ import io.element.android.support.zero.config.ZeroConfig
 fun HomeFeedRow(
     modifier: Modifier = Modifier,
     feed: ZeroFeed,
-    feedMedia: FeedMedia?,
     zeroUserRewards: ZeroUserRewards,
     isMyOwnFeed: Boolean = false,
     showThreadLine: Boolean = false,
@@ -157,13 +156,13 @@ fun HomeFeedRow(
                 ) {
                     if (media.isVideo) {
                         FeedMediaVideoView(
-                            videoUrl = feedMedia?.url ?: "",
+                            videoUrl = media.url ?: "",
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                         )
                     } else {
                         FeedMediaImageView(
-                            url = feedMedia?.url ?: "",
+                            url = media.url ?: "",
                             modifier = Modifier
                                 .aspectRatio(media.aspectRatio)
                                 .clip(RoundedCornerShape(4.dp))
@@ -266,7 +265,6 @@ val ZeroFeed.arweaveLink: String
 internal fun HomeFeedRowPreview() = ElementPreview {
     HomeFeedRow(
         feed = ZeroFeed.placeholder,
-        feedMedia = FeedMedia.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
         onFeedClick = {},
         onAddMeowToFeed = {}
