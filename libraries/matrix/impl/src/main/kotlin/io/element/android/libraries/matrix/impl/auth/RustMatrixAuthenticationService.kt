@@ -222,6 +222,7 @@ class RustMatrixAuthenticationService @Inject constructor(
                 val oAuthAuthorizationData = client.urlForOidc(
                     oidcConfiguration = oidcConfigurationProvider.get(),
                     prompt = prompt.toRustPrompt(),
+                    loginHint = null,
                 )
                 val url = oAuthAuthorizationData.loginUrl()
                 pendingOAuthAuthorizationData = oAuthAuthorizationData

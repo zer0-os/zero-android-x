@@ -29,6 +29,7 @@ internal fun aCreateFeedState(
 ) = CreateFeedState(
     feedText = feedText,
     matrixUser = matrixUser,
+    mediaAttachment = null,
     eventSink = {},
     genericActionState = genericActionState
 )

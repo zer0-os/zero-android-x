@@ -9,7 +9,6 @@ package io.element.android.features.roomlist.impl
 
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -17,14 +16,17 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.appconfig.MatrixConfiguration
 import io.element.android.features.invite.api.SeenInvitesStore
@@ -35,10 +37,10 @@ import io.element.android.features.leaveroom.api.LeaveRoomEvent.ShowConfirmation
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
+import io.element.android.features.roomlist.impl.datasource.FeedItemMediaCache
 import io.element.android.features.roomlist.impl.datasource.RoomListDataSource
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.model.HomeScreenChannel
-import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.model.channelId
 import io.element.android.features.roomlist.impl.search.RoomListSearchEvents
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
@@ -60,12 +62,14 @@ import io.element.android.libraries.matrix.api.roomlist.RoomList
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
@@ -75,6 +79,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -229,6 +234,22 @@ class RoomListPresenter @Inject constructor(
         val allFeedsContentState = allFeedsListContentState()
         val myFeedsContentState = allMyFeedsListContentState()
 
+        /*val feedMediaMap = rememberSaveable(
+            saver = mapSaver(
+                save = { it.toMap() },
+                restore = {
+                    mutableStateMapOf<String, FeedMedia>().apply {
+                        putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+                    }
+                }
+            )
+        ) { mutableStateMapOf() }*/
+        val feedMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
+        LaunchedEffect(Unit) {
+            feedMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+        }
+        fetchFeedMediaIfRequired(allFeedsContentState, myFeedsContentState, feedMediaMap)
+
         return RoomListState(
             matrixUser = matrixUser.value,
             showAvatarIndicator = showAvatarIndicator,
@@ -245,6 +266,7 @@ class RoomListPresenter @Inject constructor(
             channelContentState = channelContentState,
             allFeedsContentState = allFeedsContentState,
             myFeedsContentState = myFeedsContentState,
+            feedMediaMap = feedMediaMap,
             resolvedChannelRoom = resolvedChannelRoomId.value,
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
@@ -489,10 +511,10 @@ class RoomListPresenter @Inject constructor(
             showEmpty -> FeedListContentState.Empty
             showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
             else -> {
-                val mappedChannels = homeFeedsState.dataOrNull()
+                val mappedAllFeeds = homeFeedsState.dataOrNull()
                     .orEmpty()
                     .toPersistentList()
-                FeedListContentState.Feeds(mappedChannels)
+                FeedListContentState.Feeds(mappedAllFeeds)
             }
         }
     }
@@ -522,10 +544,10 @@ class RoomListPresenter @Inject constructor(
             showEmpty -> FeedListContentState.Empty
             showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
             else -> {
-                val mappedChannels = myFeedsState.dataOrNull()
+                val mappedMyFeeds = myFeedsState.dataOrNull()
                     .orEmpty()
                     .toPersistentList()
-                FeedListContentState.Feeds(mappedChannels)
+                FeedListContentState.Feeds(mappedMyFeeds)
             }
         }
     }
@@ -595,5 +617,36 @@ class RoomListPresenter @Inject constructor(
 
     private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
         client.addMeowToFeed(feed, meowCount)
+    }
+
+    private fun fetchFeedMediaIfRequired(
+        allFeedsContentState: FeedListContentState,
+        myFeedsContentState: FeedListContentState,
+        feedMediaMap: SnapshotStateMap<String, FeedMedia>
+    ) {
+        withIOScope {
+            coroutineScope {
+                val allFeeds = (allFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+                val myFeeds = (myFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+                val feeds = mutableListOf<ZeroFeed>().apply {
+                    addAll(allFeeds)
+                    addAll(myFeeds)
+                }.distinctBy { it.id }.toList()
+                val feedsToFetch = feeds.mapNotNull { feed ->
+                    val mediaId = feed.media?.id ?: return@mapNotNull null
+                    if (feedMediaMap.contains(mediaId) || FeedItemMediaCache.contains(mediaId)) return@mapNotNull null
+                    else feed
+                }
+                val results = feedsToFetch.map { feed ->
+                    async { feed.id to client.fetchFeedMedia(feed.media!!.id) }
+                }.awaitAll()
+                results.forEach { (feedId, media) ->
+                    media.getOrNull()?.let { feedMedia ->
+                        FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
+                        feedMediaMap[feedId] = feedMedia
+                    }
+                }
+            }
+        }
     }
 }

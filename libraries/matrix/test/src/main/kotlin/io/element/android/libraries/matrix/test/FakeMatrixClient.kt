@@ -34,6 +34,8 @@ import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -399,6 +401,10 @@ class FakeMatrixClient(
         return Result.success(ZeroFeed.placeholder)
     }
 
+    override suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?> {
+        return Result.success(FeedMedia.placeholder)
+    }
+
     override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> {
         return Result.success(emptyList())
     }
@@ -409,7 +415,7 @@ class FakeMatrixClient(
 
     override suspend fun checkZeroThirdWebWallet() {}
 
-    override suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit> {
+    override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> {
         return Result.success(Unit)
     }
 

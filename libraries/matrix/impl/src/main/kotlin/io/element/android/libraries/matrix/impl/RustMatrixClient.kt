@@ -49,6 +49,8 @@ import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -890,6 +892,14 @@ class RustMatrixClient(
             }
         }
 
+    override suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?> = withContext(sessionDispatcher) {
+        runCatching {
+            val metaDataRepo = zeroCoreRepository?.metaData
+                ?: return@withContext Result.failure(Throwable("MetaData repository is not initialized yet."))
+            metaDataRepo.fetchFeedMedia(mediaId)?.toModel()
+        }
+    }
+
     override suspend fun fetchFeedReplies(feedId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> =
         withContext(sessionDispatcher) {
             runCatching {
@@ -930,14 +940,22 @@ class RustMatrixClient(
         getUserProfile()
     }
 
-    override suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit> =
+    override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> =
         withContext(sessionDispatcher) {
             runCatching {
                 val channelZId = _userProfile.value.primaryZeroId
                     ?: return@withContext Result.failure(Throwable("Please set user primaryZId in profile settings."))
                 val feedRepo = zeroCoreRepository?.feed
                     ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
-                val isSuccess = feedRepo.createNewFeed(channelZId, content, replyToPost)
+                var feedMediaId: String? = null
+                attachment?.let { feedAttachment ->
+                    val mediaUploadResponse = zeroCoreRepository.metaData.uploadFeedMedia(
+                        media = feedAttachment.media,
+                        mimeType = feedAttachment.mimeType
+                    )
+                    feedMediaId = mediaUploadResponse?.id
+                }
+                val isSuccess = feedRepo.createNewFeed(channelZId, content, feedMediaId, replyToPost)
                 if (isSuccess) {
                     CoroutineScope(sessionDispatcher).launch {
                         postCreateFeed(replyToPost)

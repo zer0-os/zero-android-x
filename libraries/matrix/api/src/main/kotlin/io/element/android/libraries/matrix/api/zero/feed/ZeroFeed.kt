@@ -38,7 +38,8 @@ data class ZeroFeed(
     val postsMeowsSummary: PostsMeowsSummary? = null,
     val meows: List<Meow>? = null,
     val replies: List<Reply>? = null,
-    val replyToPost: ReplyToFeed? = null
+    val replyToPost: ReplyToFeed? = null,
+    val media: FeedMedia? = null
 ) : Parcelable {
 
     private fun updatedAtDate(): LocalDateTime {
@@ -92,7 +93,8 @@ data class ZeroFeed(
                     firstName = "placeholder first name",
                     lastName = "placeholder last name"
                 )
-            )
+            ),
+            media = FeedMedia.placeholder
         )
     }
 }
@@ -160,3 +162,22 @@ data class ReplyToFeed(
     val arweaveId: String,
     val user: ZeroFeedAuthor
 ) : Parcelable
+
+@Parcelize
+data class FeedMedia(
+    val id: String,
+    val width: Float,
+    val height: Float,
+    val mimeType: String?,
+    val url: String?
+) : Parcelable {
+    companion object {
+        val placeholder: FeedMedia = FeedMedia("placeholder_id", 1080f, 720f, "image/png", "")
+    }
+}
+
+val FeedMedia.aspectRatio
+    get() = width.div(height)
+
+val FeedMedia.isVideo
+    get() = mimeType?.contains("video") == true

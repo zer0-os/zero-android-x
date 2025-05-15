@@ -21,6 +21,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -40,6 +41,7 @@ import io.element.android.features.roomlist.impl.components.RoomListTopBar
 import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchView
+import io.element.android.libraries.androidutils.throttler.FirstThrottler
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -71,6 +73,9 @@ fun RoomListView(
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val firstThrottler = remember { FirstThrottler(300, coroutineScope) }
+
     val resolvedChannelRoomId by remember(state.resolvedChannelRoom) {
         derivedStateOf { state.resolvedChannelRoom }
     }
@@ -105,9 +110,9 @@ fun RoomListView(
                 state = state,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
-                onRoomClick = onRoomClick,
-                onOpenSettings = onSettingsClick,
-                onCreateRoomClick = onCreateRoomClick,
+                onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
+                onOpenSettings = { if (firstThrottler.canHandle()) onSettingsClick() },
+                onCreateRoomClick = { if (firstThrottler.canHandle()) onCreateRoomClick() },
                 onMenuActionClick = onMenuActionClick,
                 onFeedClick = onFeedClick,
                 onCreateFeedClick = onCreateFeedClick,
@@ -118,7 +123,7 @@ fun RoomListView(
                 state = state.searchState,
                 eventSink = state.eventSink,
                 hideInvitesAvatars = state.hideInvitesAvatars,
-                onRoomClick = onRoomClick,
+                onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 modifier = Modifier
                     .statusBarsPadding()
                     .padding(top = topPadding)
@@ -271,6 +276,7 @@ internal fun HomeScreenContent(
         HomeScreenTab.FEED -> {
             HomeFeedListContentView(
                 contentState = state.allFeedsContentState,
+                feedMediaMap = state.feedMediaMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = false,
@@ -290,6 +296,7 @@ internal fun HomeScreenContent(
         HomeScreenTab.PROFILE -> {
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
+                feedMediaMap = state.feedMediaMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = true,

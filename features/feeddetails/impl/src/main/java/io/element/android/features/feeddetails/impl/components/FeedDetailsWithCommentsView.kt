@@ -64,6 +64,8 @@ import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.extension.innerShadow
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
+import java.io.File
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -129,13 +131,16 @@ fun FeedDetailsWithCommentsView(
             ) { index, comment ->
                 val nextComment = state.feedComments.getOrNull(index + 1)
                 val showThreadLine = nextComment?.userId == comment.userId
+                val media = state.feedCommentsMediaMap[comment.id]
 
                 HomeFeedRow(
-                    feed = comment,
+                    feed = comment.copy(media = media),
                     zeroUserRewards = state.userRewards,
                     isMyOwnFeed = comment.userId == state.loggedInUserId,
                     showThreadLine = showThreadLine,
-                    onFeedClick = { onReplyClick(comment) },
+                    onFeedClick = { onReplyClick(
+                        comment.copy(media = media)
+                    ) },
                     onAddMeowToFeed = { meowCount ->
                         onAddMeowToFeed(comment, meowCount)
                     }
@@ -146,7 +151,11 @@ fun FeedDetailsWithCommentsView(
             }
 
             item {
-                Spacer(modifier = Modifier.size(60.dp))
+                if (state.postReplyAttachment != null) {
+                    Spacer(modifier = Modifier.size(140.dp))
+                } else {
+                    Spacer(modifier = Modifier.size(60.dp))
+                }
             }
         }
 
@@ -172,33 +181,84 @@ private fun BoxScope.PostReplyView(
     state: FeedDetailsState,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .padding(vertical = 8.dp, horizontal = 16.dp)
-            .fillMaxWidth()
-            .align(Alignment.BottomCenter),
-        verticalAlignment = Alignment.CenterVertically
+    val hasPostReplyAttachment = state.postReplyAttachment != null
+    val columnBg = if (hasPostReplyAttachment) Color.Black else Color.Transparent
+
+    Column(modifier = modifier
+        .background(columnBg)
+        .align(Alignment.BottomCenter)
+        .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
-        Avatar(
-            modifier = Modifier
-                .padding(vertical = 12.dp),
-            avatarData = state.matrixUser.getAvatarData(size = AvatarSize.UserListItem),
-        )
-        PostReplyTextField(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp),
-            text = state.postReplyText,
-            onTextChanged = { text ->
-                state.eventSink(FeedDetailsEvents.PostReplyTextChanged(text))
+        if (hasPostReplyAttachment) {
+            Row(modifier = Modifier.fillMaxWidth()
+                .padding(vertical = 4.dp)
+            ) {
+                PostReplyAttachmentView(
+                    media = state.postReplyAttachment!!.media,
+                    onRemoveMedia = {
+                        state.eventSink(FeedDetailsEvents.RemoveMedia)
+                    }
+                )
             }
-        )
-        PostReplySendButton(
-            canPostReply = state.canPostReply,
-            onPostReply = {
-                state.eventSink(FeedDetailsEvents.PostReply)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Avatar(
+                modifier = Modifier
+                    .padding(vertical = 12.dp),
+                avatarData = state.matrixUser.getAvatarData(size = AvatarSize.UserListItem),
+            )
+            PostReplyTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                text = state.postReplyText,
+                onTextChanged = { text ->
+                    state.eventSink(FeedDetailsEvents.PostReplyTextChanged(text))
+                }
+            )
+            PostReplyAttachmentButton {
+                state.eventSink(FeedDetailsEvents.SelectMedia)
             }
+            PostReplySendButton(
+                canPostReply = state.canPostReply,
+                onPostReply = {
+                    state.eventSink(FeedDetailsEvents.PostReply)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun PostReplyAttachmentView(
+    media: File,
+    onRemoveMedia: () -> Unit,
+) {
+    Box {
+        FeedMediaImageView(
+            file = media,
+            modifier = Modifier
+                .size(75.dp)
+                .background(Color.Black, RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(4.dp))
+                .align(Alignment.Center)
+                .padding(12.dp)
         )
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(Color.DarkGray, CircleShape)
+                .size(24.dp),
+            onClick = onRemoveMedia,
+        ) {
+            Icon(modifier = Modifier.fillMaxSize(),
+                imageVector = CompoundIcons.Close(),
+                contentDescription = null)
+        }
     }
 }
 
@@ -233,6 +293,31 @@ private fun PostReplyTextField(
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
+    }
+}
+
+@Composable
+private fun PostReplyAttachmentButton(
+    onSelectAttachment: () -> Unit
+) {
+    IconButton(
+        modifier = Modifier.size(48.dp),
+        onClick = onSelectAttachment
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(36.dp)
+                .background(ElementTheme.colors.zeroBrandColorAlpha15)
+        ) {
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.Center),
+                imageVector = CompoundIcons.Attachment(),
+                contentDescription = null,
+                tint = ElementTheme.colors.zeroBrandColor
+            )
+        }
     }
 }
 

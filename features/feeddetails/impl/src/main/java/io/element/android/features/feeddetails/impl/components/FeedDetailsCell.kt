@@ -8,16 +8,22 @@
 package io.element.android.features.feeddetails.impl.components
 
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,10 +41,14 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.aspectRatio
+import io.element.android.libraries.matrix.api.zero.feed.isVideo
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
 
 @Composable
 fun FeedDetailsCell(
@@ -103,6 +113,28 @@ fun FeedDetailsCell(
             style = ElementTheme.typography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary
         )
+        if (feed.media != null) {
+            val media = feed.media!!
+            Box(modifier = Modifier
+                .background(Color.Black, RoundedCornerShape(4.dp))
+                .padding(vertical = 8.dp)
+            ) {
+                if (media.isVideo) {
+                    FeedMediaVideoView(
+                        videoUrl = media.url ?: "",
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                } else {
+                    FeedMediaImageView(
+                        url = media.url ?: "",
+                        modifier = Modifier
+                            .aspectRatio(media.aspectRatio)
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                }
+            }
+        }
         Spacer(Modifier.height(16.dp))
         Text(
             text = feed.completeDateAndTime(),

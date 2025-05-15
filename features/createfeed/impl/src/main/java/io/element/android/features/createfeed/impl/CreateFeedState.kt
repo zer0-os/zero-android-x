@@ -8,6 +8,7 @@
 package io.element.android.features.createfeed.impl
 
 import androidx.compose.runtime.Immutable
+import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.user.MatrixUser
 
@@ -15,6 +16,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 data class CreateFeedState(
     val feedText: String,
     val matrixUser: MatrixUser,
+    val mediaAttachment: CreateFeedMediaAttachment?,
 
     val eventSink: (CreateFeedEvents) -> Unit,
     val genericActionState: AsyncData<Unit>,

@@ -20,6 +20,7 @@ import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsState
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -41,6 +42,7 @@ data class RoomListState(
     val channelContentState: ChannelListContentState,
     val allFeedsContentState: FeedListContentState,
     val myFeedsContentState: FeedListContentState,
+    val feedMediaMap: Map<String, FeedMedia>,
     val resolvedChannelRoom: RoomId?,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,

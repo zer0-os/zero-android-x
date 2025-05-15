@@ -37,6 +37,8 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
+import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -214,6 +216,8 @@ interface MatrixClient {
                                  includeMeow: Boolean = true
     ): Result<ZeroFeed?>
 
+    suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?>
+
     suspend fun fetchFeedReplies(
         feedId: String,
         limit: Int,
@@ -226,7 +230,7 @@ interface MatrixClient {
 
     suspend fun checkZeroThirdWebWallet()
 
-    suspend fun createNewFeed(content: String, replyToPost: String?): Result<Unit>
+    suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit>
 }
 
 /**

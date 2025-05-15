@@ -36,12 +36,14 @@ import io.element.android.features.roomlist.impl.RoomListEvents
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Composable
 fun HomeFeedListContentView(
     contentState: FeedListContentState,
+    feedMediaMap: Map<String, FeedMedia>,
     eventSink: (RoomListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
@@ -61,6 +63,7 @@ fun HomeFeedListContentView(
             is FeedListContentState.Feeds -> {
                 FeedsViewList(
                     state = contentState,
+                    feedMediaMap = feedMediaMap,
                     eventSink = eventSink,
                     zeroUserRewards = zeroUserRewards,
                     isProfileFeedList = isProfileFeedList,
@@ -101,6 +104,7 @@ private fun EmptyView(
 @Composable
 private fun FeedsViewList(
     state: FeedListContentState.Feeds,
+    feedMediaMap: Map<String, FeedMedia>,
     eventSink: (RoomListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
@@ -156,11 +160,14 @@ private fun FeedsViewList(
             itemsIndexed(
                 items = state.feeds
             ) { index, feed ->
+                val feedMedia = feedMediaMap[feed.id]
                 HomeFeedRow(
-                    feed = feed,
+                    feed = feed.copy(media = feedMedia),
                     zeroUserRewards = zeroUserRewards,
                     isMyOwnFeed = isProfileFeedList,
-                    onFeedClick = { onFeedClick(feed) },
+                    onFeedClick = { onFeedClick(
+                        feed.copy(media = feedMedia)
+                    ) },
                     onAddMeowToFeed = { meowCount ->
                         eventSink(RoomListEvents.AddMeowToFeed(feed, meowCount))
                     }
@@ -184,6 +191,7 @@ private fun FeedsViewList(
 internal fun HomeFeedListContentViewPreview(@PreviewParameter(FeedListContentStateProvider::class) state: FeedListContentState) = ElementPreview {
     HomeFeedListContentView(
         contentState = state,
+        feedMediaMap = emptyMap(),
         zeroUserRewards = ZeroUserRewards.empty(),
         isProfileFeedList = false,
         eventSink = {},

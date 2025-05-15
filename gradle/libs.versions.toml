@@ -3,7 +3,7 @@
 
 [versions]
 # Project
-android_gradle_plugin = "8.9.2"
+android_gradle_plugin = "8.10.0"
 kotlin = "2.1.20"
 kotlinpoet = "2.1.0"
 ksp = "2.1.20-2.0.1"
@@ -11,10 +11,10 @@ firebaseAppDistribution = "5.1.1"
 
 # AndroidX
 core = "1.16.0"
-datastore = "1.1.4"
+datastore = "1.1.6"
 constraintlayout = "2.2.1"
 constraintlayout_compose = "1.1.1"
-lifecycle = "2.8.7"
+lifecycle = "2.9.0"
 activity = "1.10.1"
 media3 = "1.6.1"
 camera = "1.4.2"
@@ -171,14 +171,14 @@ jsoup = "org.jsoup:jsoup:1.20.1"
 appyx_core = { module = "com.bumble.appyx:core", version.ref = "appyx" }
 molecule-runtime = "app.cash.molecule:molecule-runtime:2.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.4.30"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.5.13"
 matrix_richtexteditor = { module = "io.element.android:wysiwyg", version.ref = "wysiwyg" }
 matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose", version.ref = "wysiwyg" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
-sqlite = "androidx.sqlite:sqlite-ktx:2.5.0"
+sqlite = "androidx.sqlite:sqlite-ktx:2.5.1"
 unifiedpush = "com.github.UnifiedPush:android-connector:2.4.0"
 otaliastudios_transcoder = "com.otaliastudios:transcoder:0.11.2"
 vanniktech_blurhash = "com.vanniktech:blurhash:0.3.0"
@@ -209,7 +209,7 @@ anvil_compiler_api = { module = "dev.zacsweers.anvil:compiler-api", version.ref 
 anvil_compiler_utils = { module = "dev.zacsweers.anvil:compiler-utils", version.ref = "anvil" }
 
 # Element Call
-element_call_embedded = "io.element.android:element-call-embedded:0.10.0"
+element_call_embedded = "io.element.android:element-call-embedded:0.9.0"
 
 # Auto services
 google_autoservice = { module = "com.google.auto.service:auto-service", version.ref = "autoservice" }
