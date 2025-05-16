@@ -22,13 +22,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import im.vector.app.features.analytics.plan.Interaction
-import io.element.android.appconfig.MatrixConfiguration
 import io.element.android.features.invite.api.SeenInvitesStore
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.AcceptInvite
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.DeclineInvite
@@ -64,6 +62,7 @@ import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
@@ -71,6 +70,7 @@ import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
+import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.CoroutineScope
@@ -226,6 +226,8 @@ class RoomListPresenter @Inject constructor(
 
         val contentState = roomListContentState(securityBannerDismissed)
 
+        val canReportRoom by produceState(false) { value = client.canReportRoom() }
+
         val channelContentState = channelListContentState()
         createChannelRoomMap(
             (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
@@ -245,10 +247,15 @@ class RoomListPresenter @Inject constructor(
             )
         ) { mutableStateMapOf() }*/
         val feedMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
+        val feedLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
+
         LaunchedEffect(Unit) {
             feedMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+            feedLinkMetaDataMap.putAll(FeedItemMediaCache.getCachedFeedItemLinkMetaDataMap())
         }
-        fetchFeedMediaIfRequired(allFeedsContentState, myFeedsContentState, feedMediaMap)
+        val allCombinedFeeds = extractFeedsToFetchData(allFeedsContentState, myFeedsContentState)
+        fetchFeedMediaIfRequired(allCombinedFeeds, feedMediaMap)
+        fetchLinksMetaDataIfRequired(allCombinedFeeds, feedLinkMetaDataMap)
 
         return RoomListState(
             matrixUser = matrixUser.value,
@@ -267,11 +274,12 @@ class RoomListPresenter @Inject constructor(
             allFeedsContentState = allFeedsContentState,
             myFeedsContentState = myFeedsContentState,
             feedMediaMap = feedMediaMap,
+            feedLinkMetaDataMap = feedLinkMetaDataMap,
             resolvedChannelRoom = resolvedChannelRoomId.value,
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
             hideInvitesAvatars = hideInvitesAvatar,
-            canReportRoom = MatrixConfiguration.CAN_REPORT_ROOM,
+            canReportRoom = canReportRoom,
             eventSink = ::handleEvents,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
@@ -356,8 +364,7 @@ class RoomListPresenter @Inject constructor(
             isFavorite = event.roomSummary.isFavorite,
             markAsUnreadFeatureFlagEnabled = featureFlagService.isFeatureEnabled(FeatureFlags.MarkAsUnread),
             hasNewContent = event.roomSummary.hasNewContent,
-            eventCacheFeatureFlagEnabled = appPreferencesStore.isDeveloperModeEnabledFlow().first() &&
-                featureFlagService.isFeatureEnabled(FeatureFlags.EventCache),
+            displayClearRoomCacheAction = appPreferencesStore.isDeveloperModeEnabledFlow().first(),
         )
         contextMenuState.value = initialState
 
@@ -619,22 +626,28 @@ class RoomListPresenter @Inject constructor(
         client.addMeowToFeed(feed, meowCount)
     }
 
-    private fun fetchFeedMediaIfRequired(
+    private fun extractFeedsToFetchData(
         allFeedsContentState: FeedListContentState,
         myFeedsContentState: FeedListContentState,
+    ): List<ZeroFeed> {
+        val allFeeds = (allFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+        val myFeeds = (myFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+        val feeds = mutableListOf<ZeroFeed>().apply {
+            addAll(allFeeds)
+            addAll(myFeeds)
+        }.distinctBy { it.id }.toList()
+        return feeds
+    }
+
+    private fun fetchFeedMediaIfRequired(
+        feeds: List<ZeroFeed>,
         feedMediaMap: SnapshotStateMap<String, FeedMedia>
     ) {
         withIOScope {
             coroutineScope {
-                val allFeeds = (allFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
-                val myFeeds = (myFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
-                val feeds = mutableListOf<ZeroFeed>().apply {
-                    addAll(allFeeds)
-                    addAll(myFeeds)
-                }.distinctBy { it.id }.toList()
                 val feedsToFetch = feeds.mapNotNull { feed ->
                     val mediaId = feed.media?.id ?: return@mapNotNull null
-                    if (feedMediaMap.contains(mediaId) || FeedItemMediaCache.contains(mediaId)) return@mapNotNull null
+                    if (feedMediaMap.contains(feed.id) || FeedItemMediaCache.containsMedia(feed.id)) return@mapNotNull null
                     else feed
                 }
                 val results = feedsToFetch.map { feed ->
@@ -644,6 +657,31 @@ class RoomListPresenter @Inject constructor(
                     media.getOrNull()?.let { feedMedia ->
                         FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
                         feedMediaMap[feedId] = feedMedia
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchLinksMetaDataIfRequired(
+        feeds: List<ZeroFeed>,
+        feedLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
+    ) {
+        withIOScope {
+            coroutineScope {
+                val feedsToFetch = feeds.mapNotNull { feed ->
+                    val availableYoutubeUrl = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text) ?: return@mapNotNull null
+                    if (feedLinkMetaDataMap.contains(feed.id) || FeedItemMediaCache.containsUrlMetaData(feed.id)) return@mapNotNull null
+                    else feed
+                }
+                val results = feedsToFetch.map { feed ->
+                    val url = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text)!!
+                    async { feed.id to client.fetchUrlMetaData(url) }
+                }.awaitAll()
+                results.forEach { (feedId, urlMetaData) ->
+                    urlMetaData.getOrNull()?.let { metaData ->
+                        FeedItemMediaCache.addLinkMetaData(feedId, metaData)
+                        feedLinkMetaDataMap[feedId] = metaData
                     }
                 }
             }

@@ -38,6 +38,7 @@ import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachme
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
 import io.element.android.libraries.matrix.test.media.FakeMatrixMediaLoader
@@ -93,6 +94,7 @@ class FakeMatrixClient(
     private val availableSlidingSyncVersionsLambda: () -> Result<List<SlidingSyncVersion>> = { lambdaError() },
     private val ignoreUserResult: (UserId) -> Result<Unit> = { lambdaError() },
     private var unIgnoreUserResult: (UserId) -> Result<Unit> = { Result.success(Unit) },
+    private val canReportRoomLambda: () -> Boolean = { false },
     override val ignoredUsersFlow: StateFlow<ImmutableList<UserId>> = MutableStateFlow(persistentListOf()),
 ) : MatrixClient {
     var setDisplayNameCalled: Boolean = false
@@ -344,6 +346,10 @@ class FakeMatrixClient(
         return availableSlidingSyncVersionsLambda()
     }
 
+    override suspend fun canReportRoom(): Boolean {
+        return canReportRoomLambda()
+    }
+
     //region ZERO
     override val shouldShowNewRewardsIntimation: StateFlow<Boolean> =
         MutableStateFlow(false)
@@ -417,6 +423,18 @@ class FakeMatrixClient(
 
     override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> {
         return Result.success(Unit)
+    }
+
+    override suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?> {
+        return Result.success(
+            ZeroLinkPreview(
+                url = "https://dummyurl.com",
+                title = "Title of the url",
+                description = null,
+                author = null,
+                thumbnail = null
+            )
+        )
     }
 
     //endregion

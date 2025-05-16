@@ -86,7 +86,8 @@ internal fun LinkPreviewViewPreview() = ElementPreview {
         url = "https://dummyURL.com",
         title = "Dummy link preview title",
         description = null,
-        thumbnailUrl = null
+        author = null,
+        thumbnail = null
     )
     LinkPreviewView(dummyPreview)
 }

@@ -11,6 +11,7 @@ import io.element.android.support.zero.network.model.request.LinkPreviewMetaData
 import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
 import io.element.android.support.zero.network.model.response.ApiLinkPreview
 import io.element.android.support.zero.network.model.response.ApiUploadFeedMedia
+import io.element.android.support.zero.network.model.response.ApiYoutubeLinkPreview
 import io.element.android.support.zero.network.service.ZeroMetaDataService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -39,6 +40,12 @@ data class MetaDataRepositoryImpl(
             val requestFile = media.asRequestBody(mimeType.toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", media.name, requestFile)
             zeroMetaDataService.uploadFeedMedia(body)
+        }.getOrNull()
+    }
+
+    override suspend fun fetchYoutubeLinkPreview(url: String): ApiYoutubeLinkPreview? {
+        return runCatching {
+            zeroMetaDataService.getYoutubeLinkMetaData(youtubeUrl = url)
         }.getOrNull()
     }
 }

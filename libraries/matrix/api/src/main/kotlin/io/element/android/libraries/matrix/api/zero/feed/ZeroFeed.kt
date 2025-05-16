@@ -8,6 +8,7 @@
 package io.element.android.libraries.matrix.api.zero.feed
 
 import android.os.Parcelable
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 import java.time.Duration
@@ -39,7 +40,8 @@ data class ZeroFeed(
     val meows: List<Meow>? = null,
     val replies: List<Reply>? = null,
     val replyToPost: ReplyToFeed? = null,
-    val media: FeedMedia? = null
+    val media: FeedMedia? = null,
+    val linkMetaData: ZeroLinkPreview? = null
 ) : Parcelable {
 
     private fun updatedAtDate(): LocalDateTime {

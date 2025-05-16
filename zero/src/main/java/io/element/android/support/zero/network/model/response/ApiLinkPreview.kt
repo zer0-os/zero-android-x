@@ -19,14 +19,11 @@ data class ApiLinkPreview(
     val providerName: String?,
     val authorName: String?,
     val thumbnail: ApiLinkPreviewThumbnail?
-) {
-    val thumbnailURL: String?
-        get() = thumbnail?.url
-}
+)
 
 @Serializable
 data class ApiLinkPreviewThumbnail(
     val url: String,
-    val width: Int,
-    val height: Int
+    val width: Float,
+    val height: Float
 )

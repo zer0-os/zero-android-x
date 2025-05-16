@@ -21,6 +21,7 @@ import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermiss
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -43,6 +44,7 @@ data class RoomListState(
     val allFeedsContentState: FeedListContentState,
     val myFeedsContentState: FeedListContentState,
     val feedMediaMap: Map<String, FeedMedia>,
+    val feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     val resolvedChannelRoom: RoomId?,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val directLogoutState: DirectLogoutState,
@@ -64,8 +66,8 @@ data class RoomListState(
             val isDm: Boolean,
             val isFavorite: Boolean,
             val markAsUnreadFeatureFlagEnabled: Boolean,
-            val eventCacheFeatureFlagEnabled: Boolean,
             val hasNewContent: Boolean,
+            val displayClearRoomCacheAction: Boolean,
         ) : ContextMenu
     }
 

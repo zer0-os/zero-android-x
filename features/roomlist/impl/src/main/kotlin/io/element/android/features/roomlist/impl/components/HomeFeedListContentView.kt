@@ -38,12 +38,14 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Composable
 fun HomeFeedListContentView(
     contentState: FeedListContentState,
     feedMediaMap: Map<String, FeedMedia>,
+    feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     eventSink: (RoomListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
@@ -64,6 +66,7 @@ fun HomeFeedListContentView(
                 FeedsViewList(
                     state = contentState,
                     feedMediaMap = feedMediaMap,
+                    feedLinkMetaDataMap = feedLinkMetaDataMap,
                     eventSink = eventSink,
                     zeroUserRewards = zeroUserRewards,
                     isProfileFeedList = isProfileFeedList,
@@ -105,6 +108,7 @@ private fun EmptyView(
 private fun FeedsViewList(
     state: FeedListContentState.Feeds,
     feedMediaMap: Map<String, FeedMedia>,
+    feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     eventSink: (RoomListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
@@ -161,12 +165,13 @@ private fun FeedsViewList(
                 items = state.feeds
             ) { index, feed ->
                 val feedMedia = feedMediaMap[feed.id]
+                val feedLinkMetaData = feedLinkMetaDataMap[feed.id]
                 HomeFeedRow(
-                    feed = feed.copy(media = feedMedia),
+                    feed = feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData),
                     zeroUserRewards = zeroUserRewards,
                     isMyOwnFeed = isProfileFeedList,
                     onFeedClick = { onFeedClick(
-                        feed.copy(media = feedMedia)
+                        feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData)
                     ) },
                     onAddMeowToFeed = { meowCount ->
                         eventSink(RoomListEvents.AddMeowToFeed(feed, meowCount))
@@ -192,6 +197,7 @@ internal fun HomeFeedListContentViewPreview(@PreviewParameter(FeedListContentSta
     HomeFeedListContentView(
         contentState = state,
         feedMediaMap = emptyMap(),
+        feedLinkMetaDataMap = emptyMap(),
         zeroUserRewards = ZeroUserRewards.empty(),
         isProfileFeedList = false,
         eventSink = {},

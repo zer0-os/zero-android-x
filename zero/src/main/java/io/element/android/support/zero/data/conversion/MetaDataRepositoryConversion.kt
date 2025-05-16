@@ -8,11 +8,33 @@
 package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreviewThumbnail
 import io.element.android.support.zero.network.model.response.ApiLinkPreview
+import io.element.android.support.zero.network.model.response.ApiLinkPreviewThumbnail
+import io.element.android.support.zero.network.model.response.ApiYoutubeLinkPreview
 
 fun ApiLinkPreview.toModel() = ZeroLinkPreview(
     url = url,
     title = title,
     description = description,
-    thumbnailUrl = thumbnailURL
+    author = authorName,
+    thumbnail = thumbnail?.toModel(),
+)
+
+fun ApiLinkPreviewThumbnail.toModel() = ZeroLinkPreviewThumbnail(
+    url = url,
+    width = width,
+    height = height
+)
+
+fun ApiYoutubeLinkPreview.toModel(url: String) = ZeroLinkPreview(
+    url = url,
+    title = title,
+    description = "$authorName $authorURL",
+    author = authorName,
+    thumbnail = ZeroLinkPreviewThumbnail(
+        url = thumbnailURL,
+        width = thumbnailWidth,
+        height = thumbnailHeight
+    )
 )

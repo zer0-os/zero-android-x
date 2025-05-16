@@ -132,14 +132,15 @@ fun FeedDetailsWithCommentsView(
                 val nextComment = state.feedComments.getOrNull(index + 1)
                 val showThreadLine = nextComment?.userId == comment.userId
                 val media = state.feedCommentsMediaMap[comment.id]
+                val linkMetaData = state.feedCommentsLinkMetaDataMap[comment.id]
 
                 HomeFeedRow(
-                    feed = comment.copy(media = media),
+                    feed = comment.copy(media = media, linkMetaData = linkMetaData),
                     zeroUserRewards = state.userRewards,
                     isMyOwnFeed = comment.userId == state.loggedInUserId,
                     showThreadLine = showThreadLine,
                     onFeedClick = { onReplyClick(
-                        comment.copy(media = media)
+                        comment.copy(media = media, linkMetaData = linkMetaData)
                     ) },
                     onAddMeowToFeed = { meowCount ->
                         onAddMeowToFeed(comment, meowCount)

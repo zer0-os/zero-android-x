@@ -30,6 +30,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -68,6 +69,7 @@ internal fun aRoomListState(
     allFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
     myFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
     feedMediaMap: Map<String, FeedMedia> = emptyMap(),
+    feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
     resolvedChannelRoom: RoomId? = null,
     acceptDeclineInviteState: AcceptDeclineInviteState = anAcceptDeclineInviteState(),
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
@@ -91,6 +93,7 @@ internal fun aRoomListState(
     allFeedsContentState = allFeedsContentState,
     myFeedsContentState = myFeedsContentState,
     feedMediaMap = feedMediaMap,
+    feedLinkMetaDataMap = feedLinkMetaDataMap,
     resolvedChannelRoom = resolvedChannelRoom,
     acceptDeclineInviteState = acceptDeclineInviteState,
     directLogoutState = directLogoutState,

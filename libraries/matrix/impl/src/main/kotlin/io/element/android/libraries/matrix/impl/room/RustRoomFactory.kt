@@ -100,6 +100,7 @@ class RustRoomFactory(
             coroutineDispatchers = dispatchers,
             roomSyncSubscriber = roomSyncSubscriber,
             roomMembershipObserver = roomMembershipObserver,
+            roomInfoMapper = roomInfoMapper,
             initialRoomInfo = roomInfoMapper.map(initialRoomInfo),
             sessionCoroutineScope = sessionCoroutineScope,
             zeroUserRepository = zeroCoreRepository?.user
@@ -130,7 +131,6 @@ class RustRoomFactory(
                         liveInnerTimeline = roomReferences.room.timeline(),
                         coroutineDispatchers = dispatchers,
                         systemClock = systemClock,
-                        roomInfoMapper = roomInfoMapper,
                         featureFlagService = featureFlagService,
                         zeroConversationRepository = zeroCoreRepository?.conversation,
                         zeroUserRepository = zeroCoreRepository?.user,

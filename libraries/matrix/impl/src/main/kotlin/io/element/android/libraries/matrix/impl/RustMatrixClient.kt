@@ -53,6 +53,7 @@ import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachme
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
@@ -91,6 +92,7 @@ import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
+import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
@@ -742,6 +744,12 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun canReportRoom(): Boolean = withContext(sessionDispatcher) {
+        runCatching {
+            innerClient.isReportRoomApiSupported()
+        }.getOrDefault(false)
+    }
+
     private suspend fun File.getCacheSize(
         includeCryptoDb: Boolean = false,
     ): Long = withContext(sessionDispatcher) {
@@ -963,6 +971,19 @@ class RustMatrixClient(
                     Unit
                 } else {
                     throw Throwable("Failed to create new post.")
+                }
+            }
+        }
+
+    override suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val metaDataRepo = zeroCoreRepository?.metaData ?: return@withContext Result.failure(Throwable("MetaData repository is not initialized yet."))
+                val isYoutubeLinkUrl = YoutubeLinkHelperUtil.isUrlAYoutubeLink(url)
+                if (isYoutubeLinkUrl) {
+                    metaDataRepo.fetchYoutubeLinkPreview(url)?.toModel(url)
+                } else {
+                    metaDataRepo.fetchLinkPreview(url)?.toModel()
                 }
             }
         }

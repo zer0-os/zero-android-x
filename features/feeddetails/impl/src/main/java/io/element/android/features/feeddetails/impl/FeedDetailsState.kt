@@ -13,6 +13,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Immutable
@@ -23,6 +24,7 @@ data class FeedDetailsState(
     val loggedInUserId: String,
     val feedComments: List<ZeroFeed>,
     val feedCommentsMediaMap: Map<String, FeedMedia>,
+    val feedCommentsLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     val postReplyText: String,
     val postReplyAttachment: CreateFeedMediaAttachment?,
 
