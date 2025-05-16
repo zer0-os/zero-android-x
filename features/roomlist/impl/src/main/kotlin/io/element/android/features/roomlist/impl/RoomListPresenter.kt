@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import im.vector.app.features.analytics.plan.Interaction
-import io.element.android.appconfig.MatrixConfiguration
 import io.element.android.features.invite.api.SeenInvitesStore
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.AcceptInvite
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents.DeclineInvite
@@ -226,6 +225,8 @@ class RoomListPresenter @Inject constructor(
 
         val contentState = roomListContentState(securityBannerDismissed)
 
+        val canReportRoom by produceState(false) { value = client.canReportRoom() }
+
         val channelContentState = channelListContentState()
         createChannelRoomMap(
             (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
@@ -271,7 +272,7 @@ class RoomListPresenter @Inject constructor(
             acceptDeclineInviteState = acceptDeclineInviteState,
             directLogoutState = directLogoutState,
             hideInvitesAvatars = hideInvitesAvatar,
-            canReportRoom = MatrixConfiguration.CAN_REPORT_ROOM,
+            canReportRoom = canReportRoom,
             eventSink = ::handleEvents,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
@@ -356,8 +357,7 @@ class RoomListPresenter @Inject constructor(
             isFavorite = event.roomSummary.isFavorite,
             markAsUnreadFeatureFlagEnabled = featureFlagService.isFeatureEnabled(FeatureFlags.MarkAsUnread),
             hasNewContent = event.roomSummary.hasNewContent,
-            eventCacheFeatureFlagEnabled = appPreferencesStore.isDeveloperModeEnabledFlow().first() &&
-                featureFlagService.isFeatureEnabled(FeatureFlags.EventCache),
+            displayClearRoomCacheAction = appPreferencesStore.isDeveloperModeEnabledFlow().first(),
         )
         contextMenuState.value = initialState
 

@@ -178,6 +178,11 @@ interface MatrixClient {
     fun canDeactivateAccount(): Boolean
     suspend fun deactivateAccount(password: String, eraseData: Boolean): Result<Unit>
 
+    /**
+     * Check if the user can report a room.
+     */
+    suspend fun canReportRoom(): Boolean
+
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
 
