@@ -29,8 +29,10 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.support.zero.common.extension.localFile
+import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -61,6 +63,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
         val feedDetailsFlow: MutableState<ZeroFeed> = remember { mutableStateOf(feed) }
         val feedRepliesFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
         val feedRepliesMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
+        val feedRepliesLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
 
         val postReplyText: MutableState<String> = remember { mutableStateOf("") }
         val newFeedAttachmentState: MutableState<CreateFeedMediaAttachment?> = remember { mutableStateOf(null) }
@@ -92,11 +95,13 @@ class FeedDetailsPresenter @AssistedInject constructor(
 
         LaunchedEffect(Unit) {
             feedRepliesMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+            feedRepliesLinkMetaDataMap.putAll(FeedItemMediaCache.getCachedFeedItemLinkMetaDataMap())
             coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
             client.getUserProfile()
         }
 
         coroutineScope.fetchFeedRepliesMedia(feedRepliesFlow.value, feedRepliesMediaMap)
+        coroutineScope.fetchFeedRepliesLinkMetaData(feedRepliesFlow.value, feedRepliesLinkMetaDataMap)
 
         return FeedDetailsState(
             zeroFeed = feedDetailsFlow.value,
@@ -105,6 +110,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
             loggedInUserId = client.sessionId.extractedDisplayName,
             feedComments = feedRepliesFlow.value,
             feedCommentsMediaMap = feedRepliesMediaMap,
+            feedCommentsLinkMetaDataMap = feedRepliesLinkMetaDataMap,
             postReplyText = postReplyText.value,
             postReplyAttachment = newFeedAttachmentState.value,
             eventSink = ::handleEvents,
@@ -122,7 +128,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
             async { client.fetchFeedReplies(feedId, limit = FEED_DETAILS_COMMENTS_PAGE_SIZE, skip = 0) }
         )
         (results[0] as? Result<ZeroFeed?>)?.getOrNull()?.let {
-            feedDetailsFlow.value = it.copy(media = feed.media)
+            feedDetailsFlow.value = it.copy(media = feed.media, linkMetaData = feed.linkMetaData)
         }
         (results[1] as? Result<List<ZeroFeed>>)?.getOrNull()?.let {
             _feedReplies.addAll(it)
@@ -176,7 +182,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
     ) = launch {
         val feedsToFetch = replies.mapNotNull { feed ->
             val mediaId = feed.media?.id ?: return@mapNotNull null
-            if (feedRepliesMediaMap.contains(mediaId)) return@mapNotNull null
+            if (feedRepliesMediaMap.contains(feed.id) || FeedItemMediaCache.containsMedia(feed.id)) return@mapNotNull null
             else feed
         }
         val results = feedsToFetch.map { feed ->
@@ -186,6 +192,26 @@ class FeedDetailsPresenter @AssistedInject constructor(
             media.getOrNull()?.let { feedMedia ->
                 FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
                 feedRepliesMediaMap[feedId] = feedMedia
+            }
+        }
+    }
+
+    private fun CoroutineScope.fetchFeedRepliesLinkMetaData(replies: List<ZeroFeed>,
+                                                     feedRepliesLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
+    ) = launch {
+        val feedsToFetch = replies.mapNotNull { feed ->
+            val availableYoutubeUrl = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text) ?: return@mapNotNull null
+            if (feedRepliesLinkMetaDataMap.contains(feed.id) || FeedItemMediaCache.containsUrlMetaData(feed.id)) return@mapNotNull null
+            else feed
+        }
+        val results = feedsToFetch.map { feed ->
+            val url = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text)!!
+            async { feed.id to client.fetchUrlMetaData(url) }
+        }.awaitAll()
+        results.forEach { (feedId, urlMetaData) ->
+            urlMetaData.getOrNull()?.let { metaData ->
+                FeedItemMediaCache.addLinkMetaData(feedId, metaData)
+                feedRepliesLinkMetaDataMap[feedId] = metaData
             }
         }
     }

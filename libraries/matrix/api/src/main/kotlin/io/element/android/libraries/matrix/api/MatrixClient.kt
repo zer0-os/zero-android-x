@@ -41,6 +41,7 @@ import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachme
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -236,6 +237,8 @@ interface MatrixClient {
     suspend fun checkZeroThirdWebWallet()
 
     suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit>
+
+    suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?>
 }
 
 /**

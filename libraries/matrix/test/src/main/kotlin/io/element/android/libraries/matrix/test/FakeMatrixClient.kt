@@ -38,6 +38,7 @@ import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachme
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
 import io.element.android.libraries.matrix.test.media.FakeMatrixMediaLoader
@@ -422,6 +423,18 @@ class FakeMatrixClient(
 
     override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> {
         return Result.success(Unit)
+    }
+
+    override suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?> {
+        return Result.success(
+            ZeroLinkPreview(
+                url = "https://dummyurl.com",
+                title = "Title of the url",
+                description = null,
+                author = null,
+                thumbnail = null
+            )
+        )
     }
 
     //endregion

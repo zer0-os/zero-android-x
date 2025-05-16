@@ -15,5 +15,19 @@ data class ZeroLinkPreview(
     val url: String,
     val title: String?,
     val description: String?,
+    val author: String?,
+    val thumbnail: ZeroLinkPreviewThumbnail?,
+): Parcelable {
     val thumbnailUrl: String?
+        get() = thumbnail?.url
+}
+
+@Parcelize
+data class ZeroLinkPreviewThumbnail(
+    val url: String,
+    val width: Float,
+    val height: Float,
 ): Parcelable
+
+val ZeroLinkPreviewThumbnail.aspectRatio
+    get() = width.div(height)

@@ -35,6 +35,7 @@ internal fun aFeedDetailState(
     loggedInUserId = "",
     feedComments = emptyList(),
     feedCommentsMediaMap = emptyMap(),
+    feedCommentsLinkMetaDataMap = emptyMap(),
     postReplyText = "",
     postReplyAttachment = null,
     eventSink = {},

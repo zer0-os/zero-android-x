@@ -8,15 +8,24 @@
 package io.element.android.features.roomlist.impl.datasource
 
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 
 object FeedItemMediaCache {
     private val feedItemMediaMap = mutableMapOf<String, FeedMedia>()
+    private val feedItemLinkMetaDataMap = mutableMapOf<String, ZeroLinkPreview>()
 
     fun getCachedFeedItemMediaMap() = feedItemMediaMap.toMap()
+    fun getCachedFeedItemLinkMetaDataMap() = feedItemLinkMetaDataMap.toMap()
 
     fun addFeedMedia(feedId: String, media: FeedMedia) {
         feedItemMediaMap[feedId] = media
     }
 
-    fun contains(mediaId: String): Boolean = feedItemMediaMap.contains(mediaId)
+    fun addLinkMetaData(feedId: String, linkMetaData: ZeroLinkPreview) {
+        feedItemLinkMetaDataMap[feedId] = linkMetaData
+    }
+
+    fun containsMedia(feedId: String): Boolean = feedItemMediaMap.contains(feedId)
+
+    fun containsUrlMetaData(feedId: String): Boolean = feedItemLinkMetaDataMap.contains(feedId)
 }

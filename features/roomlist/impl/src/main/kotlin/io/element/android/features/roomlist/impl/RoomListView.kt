@@ -277,6 +277,7 @@ internal fun HomeScreenContent(
             HomeFeedListContentView(
                 contentState = state.allFeedsContentState,
                 feedMediaMap = state.feedMediaMap,
+                feedLinkMetaDataMap = state.feedLinkMetaDataMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = false,
@@ -297,6 +298,7 @@ internal fun HomeScreenContent(
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
                 feedMediaMap = state.feedMediaMap,
+                feedLinkMetaDataMap = state.feedLinkMetaDataMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = true,

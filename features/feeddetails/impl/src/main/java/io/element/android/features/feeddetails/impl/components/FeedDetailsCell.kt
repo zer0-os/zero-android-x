@@ -8,6 +8,7 @@
 package io.element.android.features.feeddetails.impl.components
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,9 +45,11 @@ import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.aspectRatio
 import io.element.android.libraries.matrix.api.zero.feed.isVideo
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
+import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.ui.component.feed.FeedLinkPreviewView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
 
@@ -59,9 +62,9 @@ fun FeedDetailsCell(
     onAddMeowToFeed: (Int) -> Unit,
 ) {
     val context = LocalContext.current
-    val openArweaveLink: () -> Unit = {
+    val openExternalLink: (Uri) -> Unit = { uri ->
         context.startActivity(
-            Intent(Intent.ACTION_VIEW, feed.arweaveLink.toUri())
+            Intent(Intent.ACTION_VIEW, uri)
         )
     }
 
@@ -113,11 +116,35 @@ fun FeedDetailsCell(
             style = ElementTheme.typography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary
         )
+        if (feed.linkMetaData != null) {
+            val linkMetaData = feed.linkMetaData!!
+            Box(modifier = Modifier
+                .padding(vertical = 8.dp)
+                .background(Color.Black, RoundedCornerShape(4.dp))
+            ) {
+                val linkPreviewModifier = if (linkMetaData.thumbnail?.aspectRatio != null) {
+                    Modifier
+                        .aspectRatio(linkMetaData.thumbnail?.aspectRatio!!)
+                        .clip(RoundedCornerShape(4.dp))
+                } else {
+                    Modifier.clip(RoundedCornerShape(4.dp))
+                }
+                FeedLinkPreviewView(
+                    modifier = linkPreviewModifier,
+                    thumbnailUrl = linkMetaData.thumbnailUrl ?: "",
+                    title = linkMetaData.title,
+                    description = linkMetaData.description,
+                    onLinkPreviewClick = {
+                        openExternalLink(linkMetaData.url.toUri())
+                    }
+                )
+            }
+        }
         if (feed.media != null) {
             val media = feed.media!!
             Box(modifier = Modifier
-                .background(Color.Black, RoundedCornerShape(4.dp))
                 .padding(vertical = 8.dp)
+                .background(Color.Black, RoundedCornerShape(4.dp))
             ) {
                 if (media.isVideo) {
                     FeedMediaVideoView(
@@ -160,7 +187,7 @@ fun FeedDetailsCell(
             }
             FeedActionButton(
                 iconResId = R.drawable.ic_post_arweave,
-                onClick = openArweaveLink
+                onClick = { openExternalLink(feed.arweaveLink.toUri()) }
             )
         }
     }

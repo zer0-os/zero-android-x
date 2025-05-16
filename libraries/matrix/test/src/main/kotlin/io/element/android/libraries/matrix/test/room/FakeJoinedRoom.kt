@@ -439,11 +439,12 @@ class FakeJoinedRoom(
     override suspend fun getUrlLinkPreview(url: String): Result<ZeroLinkPreview?> {
         return Result.success(
             ZeroLinkPreview(
-            url = "https://dummyurl.com",
-            title = "Title of the url",
-            description = null,
-            thumbnailUrl = null
-        )
+                url = "https://dummyurl.com",
+                title = "Title of the url",
+                description = null,
+                author = null,
+                thumbnail = null
+            )
         )
     }
 
