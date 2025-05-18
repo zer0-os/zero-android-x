@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.roomlist.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -33,6 +34,7 @@ fun FeedsScreenTabView(
 
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
+        edgePadding = 0.dp,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
