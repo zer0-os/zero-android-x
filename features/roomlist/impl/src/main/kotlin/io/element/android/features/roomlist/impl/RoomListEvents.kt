@@ -39,8 +39,8 @@ sealed interface RoomListEvents {
     data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
 
     sealed interface HomeFeedEvents: RoomListEvents
-    data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>): HomeFeedEvents
-    data object RefreshFeeds: HomeFeedEvents
+    data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean): HomeFeedEvents
+    data class RefreshFeeds(val followingFeeds: Boolean): HomeFeedEvents
     data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int): HomeFeedEvents
 
     sealed interface HomeProfileEvents: RoomListEvents

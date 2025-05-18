@@ -17,9 +17,10 @@ class FeedRepositoryImpl(
     private val zeroFeedService: ZeroFeedService
 ) : FeedRepository {
 
-    override suspend fun fetchAllFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
+    override suspend fun fetchAllFeeds(followingFeeds: Boolean, limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
         return runCatching {
             zeroFeedService.fetchAllFeeds(
+                following = followingFeeds.toString(),
                 limit = limit,
                 skip = skip,
                 includeReplies = includeReplies.toString(),

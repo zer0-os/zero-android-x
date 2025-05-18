@@ -10,6 +10,7 @@ package io.element.android.features.roomlist.impl.components
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.features.roomlist.impl.FeedListContentState
 import io.element.android.features.roomlist.impl.FeedListContentStateProvider
 import io.element.android.features.roomlist.impl.RoomListEvents
+import io.element.android.features.roomlist.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -52,26 +55,42 @@ fun HomeFeedListContentView(
     onFeedClick: (ZeroFeed) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        when (contentState) {
-            is FeedListContentState.Skeleton -> {
-                SkeletonView(
-                    count = contentState.count,
-                )
-            }
-            is FeedListContentState.Empty -> {
-                EmptyView(modifier = modifier)
-            }
-            is FeedListContentState.Feeds -> {
-                FeedsViewList(
-                    state = contentState,
-                    feedMediaMap = feedMediaMap,
-                    feedLinkMetaDataMap = feedLinkMetaDataMap,
-                    eventSink = eventSink,
-                    zeroUserRewards = zeroUserRewards,
-                    isProfileFeedList = isProfileFeedList,
-                    onFeedClick = onFeedClick
-                )
+    val selectedFeedTab = remember { mutableStateOf(FeedsScreenTab.FOLLOWING) }
+    Column(modifier = modifier) {
+        if (!isProfileFeedList) {
+            FeedsScreenTabView(
+                onTabSelected = { tab ->
+                    selectedFeedTab.value = tab
+                    eventSink(RoomListEvents.RefreshFeeds(
+                        followingFeeds = tab == FeedsScreenTab.FOLLOWING
+                    ))
+                }
+            )
+        }
+        Box {
+            when (contentState) {
+                is FeedListContentState.Skeleton -> {
+                    SkeletonView(
+                        count = contentState.count,
+                    )
+                }
+                is FeedListContentState.Empty -> {
+                    EmptyView(modifier = modifier)
+                }
+                is FeedListContentState.Feeds -> {
+                    FeedsViewList(
+                        state = contentState,
+                        feedMediaMap = feedMediaMap,
+                        feedLinkMetaDataMap = feedLinkMetaDataMap,
+                        eventSink = eventSink,
+                        zeroUserRewards = zeroUserRewards,
+                        isProfileFeedList = isProfileFeedList,
+                        onFeedClick = onFeedClick,
+                        isFollowingFeedsTabSelected = {
+                            selectedFeedTab.value == FeedsScreenTab.FOLLOWING
+                        }
+                    )
+                }
             }
         }
     }
@@ -113,6 +132,7 @@ private fun FeedsViewList(
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
     onFeedClick: (ZeroFeed) -> Unit,
+    isFollowingFeedsTabSelected: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     var refreshing by remember(state) { mutableStateOf(false) }
@@ -124,7 +144,7 @@ private fun FeedsViewList(
         if (isProfileFeedList) {
             eventSink(RoomListEvents.RefreshMyFeeds)
         } else {
-            eventSink(RoomListEvents.RefreshFeeds)
+            eventSink(RoomListEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
         }
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
@@ -145,7 +165,7 @@ private fun FeedsViewList(
             if (isProfileFeedList) {
                 eventSink(RoomListEvents.LoadMoreMyFeeds(state.feeds))
             } else {
-                eventSink(RoomListEvents.LoadMoreFeeds(state.feeds))
+                eventSink(RoomListEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
             }
         }
     }

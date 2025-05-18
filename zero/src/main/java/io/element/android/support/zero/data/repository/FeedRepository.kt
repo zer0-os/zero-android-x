@@ -12,6 +12,7 @@ import io.element.android.support.zero.network.model.response.ApiFeed
 interface FeedRepository {
 
     suspend fun fetchAllFeeds(
+        followingFeeds: Boolean,
         limit: Int = 10,
         skip: Int = 0,
         includeReplies: Boolean = true,

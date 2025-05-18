@@ -24,6 +24,7 @@ interface ZeroFeedService {
 
     @GET(value = "api/v2/posts")
     suspend fun fetchAllFeeds(
+        @Query("following") following: String = "true",
         @Query("limit") limit: Int = 10,
         @Query("skip") skip: Int = 0,
         @Query("include_replies") includeReplies: String = "true",

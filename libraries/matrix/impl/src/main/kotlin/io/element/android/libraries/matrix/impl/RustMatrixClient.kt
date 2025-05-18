@@ -866,10 +866,10 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun fetchAllFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
+    override suspend fun fetchAllFeeds(followingFeeds: Boolean, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
         val allFeeds = runCatching {
             val feedRepo = zeroCoreRepository?.feed ?: return
-            feedRepo.fetchAllFeeds(limit, skip)
+            feedRepo.fetchAllFeeds(followingFeeds, limit, skip)
                 .map { it.toModel() }
         }.getOrElse { emptyList() }
         _allFeeds.emit(allFeeds)
@@ -992,7 +992,7 @@ class RustMatrixClient(
         withContext(sessionDispatcher) {
             runCatching {
                 awaitAll(
-                    async { fetchAllFeeds(10, 0) },
+                    async { fetchAllFeeds(true, 10, 0) },
                     async { fetchAllMyFeeds(10, 0) }
                 )
                 replyToPost?.let { feedId ->

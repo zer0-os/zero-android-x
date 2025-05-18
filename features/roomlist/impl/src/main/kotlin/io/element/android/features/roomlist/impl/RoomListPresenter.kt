@@ -207,9 +207,9 @@ class RoomListPresenter @Inject constructor(
                         clear()
                         addAll(event.currentFeeds)
                     }
-                    coroutineScope.loadMoreHomeFeeds(event.currentFeeds.size)
+                    coroutineScope.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
                 }
-                RoomListEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds()
+                is RoomListEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds(event.followingFeeds)
                 is RoomListEvents.LoadMoreMyFeeds -> {
                     _myFeeds.apply {
                         clear()
@@ -455,7 +455,7 @@ class RoomListPresenter @Inject constructor(
             // Fetch home channels
             async { client.getUserZIds() },
             // Fetch all home feeds
-            async { client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            async { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
             // Fetch all my feeds
             async { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
@@ -604,13 +604,13 @@ class RoomListPresenter @Inject constructor(
             }
     }
 
-    private fun CoroutineScope.loadMoreHomeFeeds(skip: Int) = launch {
-        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
+    private fun CoroutineScope.loadMoreHomeFeeds(followingFeedsOnly: Boolean, skip: Int) = launch {
+        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = skip)
     }
 
-    private fun CoroutineScope.forceRefreshHomeFeeds() = launch {
+    private fun CoroutineScope.forceRefreshHomeFeeds(followingFeedsOnly: Boolean) = launch {
         _allFeeds.clear()
-        client.fetchAllFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
+        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = 0)
     }
 
     private fun CoroutineScope.loadMoreMyFeeds(skip: Int) = launch {
