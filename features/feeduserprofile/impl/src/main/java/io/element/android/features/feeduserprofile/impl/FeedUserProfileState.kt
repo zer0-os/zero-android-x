@@ -26,4 +26,7 @@ data class FeedUserProfileState(
     val isMyOwnProfile: Boolean,
     val eventSink: (FeedUserProfileEvents) -> Unit,
     val genericActionState: AsyncData<Unit>,
-)
+) {
+    val shouldShowFollowButton: Boolean
+        get() = !isMyOwnProfile && isUserFollowed != null
+}

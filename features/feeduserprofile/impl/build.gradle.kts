@@ -20,6 +20,7 @@ dependencies {
     implementation(projects.libraries.designsystem)
     implementation(projects.libraries.uiStrings)
     implementation(projects.zero)
+    implementation(projects.features.roomlist.impl)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)

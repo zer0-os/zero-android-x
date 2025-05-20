@@ -114,11 +114,11 @@ data class ApiFeedMedia(
 @Serializable
 data class ApiFeedUserProfileView(
     val userId: String,
-    val createdAt: String?,
+    val createdAt: String? = null,
     val primaryZid: String,
     val firstName: String,
-    val profileImage: String?,
-    val publicAddress: String?,
-    val followersCount: String?,
-    val followingCount: String?,
+    val profileImage: String? = null,
+    val publicAddress: String? = null,
+    val followersCount: String? = null,
+    val followingCount: String? = null,
 )
