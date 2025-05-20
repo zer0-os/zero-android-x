@@ -437,5 +437,21 @@ class FakeMatrixClient(
         )
     }
 
+    override suspend fun fetchAllUserFeeds(userZId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> {
+        return Result.success(emptyList())
+    }
+
+    override suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean> {
+        return Result.success(false)
+    }
+
+    override suspend fun followUser(userId: String): Result<Boolean> {
+        return Result.success(true)
+    }
+
+    override suspend fun unFollowUser(userId: String): Result<Boolean> {
+        return Result.success(true)
+    }
+
     //endregion
 }

@@ -13,6 +13,7 @@ class ZeroCoreRepository(
     val channel: ChannelRepository,
     val conversation: ConversationRepository,
     val feed: FeedRepository,
+    val feedUser: FeedUserRepository,
     val invite: InviteRepository,
     val rewards: RewardsRepository,
     val user: UserRepository,

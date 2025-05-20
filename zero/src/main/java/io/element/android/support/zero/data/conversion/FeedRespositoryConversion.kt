@@ -8,12 +8,14 @@
 package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthor
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthorProfileSummary
 import io.element.android.support.zero.network.model.response.ApiFeed
 import io.element.android.support.zero.network.model.response.ApiFeedMedia
 import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
+import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
 import io.element.android.support.zero.network.model.response.FeedUser
 import io.element.android.support.zero.network.model.response.FeedUserProfileSummary
 import io.element.android.support.zero.network.model.response.Meow
@@ -41,7 +43,8 @@ fun ApiFeed.toModel() = ZeroFeed(
     meows = meows?.map { it.toModel() },
     replies = replies?.map { it.toModel() },
     replyToPost = replyToPost?.toModel(),
-    media = media?.toModel()
+    media = media?.toModel(),
+    userProfileView = userProfileView?.toModel()
 )
 
 fun FeedUser.toModel() = ZeroFeedAuthor(
@@ -101,4 +104,13 @@ fun ApiFeedMediaResponse.toModel() = FeedMedia(
     height = media.height,
     mimeType = media.mimeType,
     url = signedUrl
+)
+
+fun ApiFeedUserProfileView.toModel() = FeedUserProfileView(
+    userId = userId,
+    primaryZid = primaryZid,
+    firstName = firstName,
+    profileImage = profileImage,
+    followersCount = followersCount,
+    followingCount = followingCount
 )

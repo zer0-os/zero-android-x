@@ -89,6 +89,7 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
+import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -985,6 +986,45 @@ class RustMatrixClient(
                 } else {
                     metaDataRepo.fetchLinkPreview(url)?.toModel()
                 }
+            }
+        }
+
+    override suspend fun fetchAllUserFeeds(userZId: String,
+                                           limit: Int,
+                                           skip: Int,
+                                           includeReplies: Boolean,
+                                           includeMeow: Boolean
+    ): Result<List<ZeroFeed>> = withContext(sessionDispatcher) {
+        runCatching {
+            val feedRepo = zeroCoreRepository?.feed ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
+            val cleanedUserZId = userZId.replace(ZERO_CHANNEL_PREFIX, "")
+            feedRepo
+                .fetchAllUserFeeds(cleanedUserZId, limit, skip)
+                .map { it.toModel() }
+        }
+    }
+
+    override suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
+                feedUserRepo.fetchUserFollowingStatus(userId)
+            }
+        }
+
+    override suspend fun followUser(userId: String): Result<Boolean> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
+                feedUserRepo.followUser(userId)
+            }
+        }
+
+    override suspend fun unFollowUser(userId: String): Result<Boolean> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
+                feedUserRepo.unFollowUser(userId)
             }
         }
 

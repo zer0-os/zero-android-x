@@ -49,7 +49,8 @@ data class ApiFeed(
     val replies: List<Reply>? = null,
     val replyToPost: ReplyToFeed? = null,
     val mediaId: String? = null,
-    val media: ApiFeedMedia? = null
+    val media: ApiFeedMedia? = null,
+    val userProfileView: ApiFeedUserProfileView? = null,
 )
 
 @Serializable
@@ -108,4 +109,16 @@ data class ApiFeedMedia(
     val width: Float,
     val height: Float,
     val fileSize: String?,
+)
+
+@Serializable
+data class ApiFeedUserProfileView(
+    val userId: String,
+    val createdAt: String?,
+    val primaryZid: String,
+    val firstName: String,
+    val profileImage: String?,
+    val publicAddress: String?,
+    val followersCount: String?,
+    val followingCount: String?,
 )

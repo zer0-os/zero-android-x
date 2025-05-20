@@ -239,6 +239,18 @@ interface MatrixClient {
     suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit>
 
     suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?>
+
+    suspend fun fetchAllUserFeeds(userZId: String,
+                                  limit: Int,
+                                  skip: Int,
+                                  includeReplies: Boolean = true,
+                                  includeMeow: Boolean = true): Result<List<ZeroFeed>>
+
+    suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean>
+
+    suspend fun followUser(userId: String): Result<Boolean>
+
+    suspend fun unFollowUser(userId: String): Result<Boolean>
 }
 
 /**

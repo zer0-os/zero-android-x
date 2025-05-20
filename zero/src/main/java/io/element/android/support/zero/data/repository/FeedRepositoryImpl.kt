@@ -40,6 +40,18 @@ class FeedRepositoryImpl(
         }.getOrDefault(emptyList())
     }
 
+    override suspend fun fetchAllUserFeeds(userId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeows: Boolean): List<ApiFeed> {
+        return runCatching {
+            zeroFeedService.fetchAllUserFeeds(
+                userId = userId,
+                limit = limit,
+                skip = skip,
+                includeReplies = includeReplies.toString(),
+                includeMeows = includeMeows.toString()
+            ).feeds
+        }.getOrDefault(emptyList())
+    }
+
     override suspend fun fetchFeedDetails(feedId: String, includeReplies: Boolean, includeMeows: Boolean): ApiFeed? {
         return runCatching {
             zeroFeedService.fetchFeedDetails(

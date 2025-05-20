@@ -26,6 +26,14 @@ interface FeedRepository {
         includeMeows: Boolean = true
     ): List<ApiFeed>
 
+    suspend fun fetchAllUserFeeds(
+        userId: String,
+        limit: Int = 10,
+        skip: Int = 0,
+        includeReplies: Boolean = true,
+        includeMeows: Boolean = true
+    ): List<ApiFeed>
+
     suspend fun fetchFeedDetails(
         feedId: String,
         includeReplies: Boolean = true,

@@ -17,6 +17,8 @@ import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.ConversationRepositoryImpl
 import io.element.android.support.zero.data.repository.FeedRepository
 import io.element.android.support.zero.data.repository.FeedRepositoryImpl
+import io.element.android.support.zero.data.repository.FeedUserRepository
+import io.element.android.support.zero.data.repository.FeedUserRepositoryImpl
 import io.element.android.support.zero.data.repository.InviteRepository
 import io.element.android.support.zero.data.repository.InviteRepositoryImpl
 import io.element.android.support.zero.data.repository.MetaDataRepository
@@ -31,6 +33,7 @@ import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroChannelService
 import io.element.android.support.zero.network.service.ZeroConversationService
 import io.element.android.support.zero.network.service.ZeroFeedService
+import io.element.android.support.zero.network.service.ZeroFeedUserService
 import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroMetaDataService
@@ -50,6 +53,7 @@ object RepositoryModule {
         conversationRepository: ConversationRepository,
         channelRepository: ChannelRepository,
         feedRepository: FeedRepository,
+        feedUserRepository: FeedUserRepository,
         inviteRepository: InviteRepository,
         rewardsRepository: RewardsRepository,
         userRepository: UserRepository,
@@ -60,6 +64,7 @@ object RepositoryModule {
         channel = channelRepository,
         conversation = conversationRepository,
         feed = feedRepository,
+        feedUser = feedUserRepository,
         invite = inviteRepository,
         rewards = rewardsRepository,
         user = userRepository,
@@ -120,6 +125,12 @@ object RepositoryModule {
     fun bindFeedRepository(
         zeroFeedService: ZeroFeedService
     ): FeedRepository = FeedRepositoryImpl(zeroFeedService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindFeedUserRepository(
+        zeroFeedUserService: ZeroFeedUserService
+    ): FeedUserRepository = FeedUserRepositoryImpl(zeroFeedUserService)
 
     @Provides
     @SingleIn(AppScope::class)

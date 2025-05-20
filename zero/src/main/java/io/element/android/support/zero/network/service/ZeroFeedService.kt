@@ -39,6 +39,15 @@ interface ZeroFeedService {
         @Query("include_meows") includeMeows: String = "true",
     ): ApiFeeds
 
+    @GET(value = "api/v2/posts")
+    suspend fun fetchAllUserFeeds(
+        @Query("user_id") userId: String,
+        @Query("limit") limit: Int = 10,
+        @Query("skip") skip: Int = 0,
+        @Query("include_replies") includeReplies: String = "true",
+        @Query("include_meows") includeMeows: String = "true",
+    ): ApiFeeds
+
     @GET(value = "api/v2/posts/{feed_id}")
     suspend fun fetchFeedDetails(
         @Path("feed_id") feedId: String,

@@ -41,7 +41,8 @@ data class ZeroFeed(
     val replies: List<Reply>? = null,
     val replyToPost: ReplyToFeed? = null,
     val media: FeedMedia? = null,
-    val linkMetaData: ZeroLinkPreview? = null
+    val linkMetaData: ZeroLinkPreview? = null,
+    val userProfileView: FeedUserProfileView? = null
 ) : Parcelable {
 
     private fun updatedAtDate(): LocalDateTime {
@@ -177,6 +178,16 @@ data class FeedMedia(
         val placeholder: FeedMedia = FeedMedia("placeholder_id", 1080f, 720f, "image/png", "")
     }
 }
+
+@Parcelize
+data class FeedUserProfileView(
+    val userId: String,
+    val primaryZid: String,
+    val firstName: String,
+    val profileImage: String?,
+    val followersCount: String?,
+    val followingCount: String?,
+): Parcelable
 
 val FeedMedia.aspectRatio
     get() = width.div(height)
