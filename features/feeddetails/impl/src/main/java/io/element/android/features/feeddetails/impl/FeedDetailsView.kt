@@ -20,6 +20,7 @@ import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Scaffold
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 @Composable
@@ -27,7 +28,8 @@ fun FeedDetailsView(
     modifier: Modifier = Modifier,
     state: FeedDetailsState,
     onBackClick: () -> Unit = {},
-    onFeedReplyClick: (reply: ZeroFeed) -> Unit = {}
+    onFeedReplyClick: (reply: ZeroFeed) -> Unit = {},
+    onFeedUserClick: (user: FeedUserProfileView) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -41,6 +43,7 @@ fun FeedDetailsView(
                 .consumeWindowInsets(padding),
             state = state,
             onReplyClick = onFeedReplyClick,
+            onFeedUserClick = onFeedUserClick,
             onAddMeowToFeed = { feed, meowCount ->
                 state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
             }

@@ -51,6 +51,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
@@ -989,7 +990,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun fetchAllUserFeeds(userZId: String,
+    override suspend fun fetchAllUserFeeds(userId: String,
                                            limit: Int,
                                            skip: Int,
                                            includeReplies: Boolean,
@@ -997,12 +998,20 @@ class RustMatrixClient(
     ): Result<List<ZeroFeed>> = withContext(sessionDispatcher) {
         runCatching {
             val feedRepo = zeroCoreRepository?.feed ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
-            val cleanedUserZId = userZId.replace(ZERO_CHANNEL_PREFIX, "")
             feedRepo
-                .fetchAllUserFeeds(cleanedUserZId, limit, skip)
+                .fetchAllUserFeeds(userId, limit, skip)
                 .map { it.toModel() }
         }
     }
+
+    override suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
+                val cleanedUserZId = userZId.replace(ZERO_CHANNEL_PREFIX, "")
+                feedUserRepo.fetchUserProfile(cleanedUserZId)?.toModel()
+            }
+        }
 
     override suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean> =
         withContext(sessionDispatcher) {

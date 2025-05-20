@@ -10,6 +10,7 @@ package io.element.android.features.feeddetails.impl.components
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,10 +42,12 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.aspectRatio
 import io.element.android.libraries.matrix.api.zero.feed.isVideo
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
+import io.element.android.libraries.matrix.api.zero.feed.userProfile
 import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
@@ -60,6 +63,7 @@ fun FeedDetailsCell(
     zeroUserRewards: ZeroUserRewards,
     isMyOwnFeed: Boolean = false,
     onAddMeowToFeed: (Int) -> Unit,
+    onFeedUserClick: (FeedUserProfileView) -> Unit,
 ) {
     val context = LocalContext.current
     val openExternalLink: (Uri) -> Unit = { uri ->
@@ -74,7 +78,12 @@ fun FeedDetailsCell(
             .padding(16.dp)
     ) {
         Row {
-            CompositeAvatar(avatarData = feed.user.avatarData())
+            CompositeAvatar(
+                modifier = Modifier.clickable {
+                    onFeedUserClick(feed.userProfile)
+                },
+                avatarData = feed.user.avatarData()
+            )
             Column(
                 modifier = modifier
                     .fillMaxWidth()
@@ -82,6 +91,9 @@ fun FeedDetailsCell(
             ) {
                 Row {
                     Text(
+                        modifier = Modifier.clickable {
+                            onFeedUserClick(feed.userProfile)
+                        },
                         text = feed.user.profileSummary.name,
                         style = ElementTheme.typography.fontBodyMdMedium,
                         color = ElementTheme.colors.textPrimary,
@@ -199,6 +211,7 @@ internal fun FeedDetailsCellPreview() = ElementPreview {
     FeedDetailsCell(
         feed = ZeroFeed.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
-        onAddMeowToFeed = {}
+        onAddMeowToFeed = {},
+        onFeedUserClick = {}
     )
 }

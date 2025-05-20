@@ -53,6 +53,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -69,6 +70,7 @@ fun RoomListView(
     onReportRoomClick: (roomId: RoomId) -> Unit,
     onDeclineInviteAndBlockUser: (roomSummary: RoomListRoomSummary) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
+    onFeedUserClick: (FeedUserProfileView) -> Unit,
     onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
@@ -115,6 +117,7 @@ fun RoomListView(
                 onCreateRoomClick = { if (firstThrottler.canHandle()) onCreateRoomClick() },
                 onMenuActionClick = onMenuActionClick,
                 onFeedClick = onFeedClick,
+                onFeedUserClick = onFeedUserClick,
                 onCreateFeedClick = onCreateFeedClick,
                 modifier = Modifier.padding(top = topPadding),
             )
@@ -157,6 +160,7 @@ private fun RoomListScaffold(
     onCreateRoomClick: () -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
+    onFeedUserClick: (FeedUserProfileView) -> Unit,
     onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -201,6 +205,7 @@ private fun RoomListScaffold(
                 onRoomClick = ::onRoomClick,
                 onCreateRoomClick = onCreateRoomClick,
                 onFeedClick = onFeedClick,
+                onFeedUserClick = onFeedUserClick,
                 modifier = Modifier
                     .padding(padding)
                     .consumeWindowInsets(padding)
@@ -246,6 +251,7 @@ internal fun HomeScreenContent(
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onCreateRoomClick: () -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
+    onFeedUserClick: (FeedUserProfileView) -> Unit,
     modifier: Modifier,
 ) {
     fun onNotificationClick(room: RoomListRoomSummary) {
@@ -282,6 +288,7 @@ internal fun HomeScreenContent(
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = false,
                 onFeedClick = onFeedClick,
+                onFeedUserClick = onFeedUserClick,
                 modifier = modifier
             )
         }
@@ -303,6 +310,7 @@ internal fun HomeScreenContent(
                 zeroUserRewards = state.userRewards,
                 isProfileFeedList = true,
                 onFeedClick = onFeedClick,
+                onFeedUserClick = onFeedUserClick,
                 modifier = modifier
             )
         }
@@ -325,6 +333,7 @@ internal fun RoomListViewPreview(@PreviewParameter(RoomListStateProvider::class)
         onReportRoomClick = {},
         onMenuActionClick = {},
         onFeedClick = {},
+        onFeedUserClick = {},
         onCreateFeedClick = {},
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},

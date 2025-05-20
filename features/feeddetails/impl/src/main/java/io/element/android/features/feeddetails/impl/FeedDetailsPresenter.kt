@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.element.android.features.roomlist.impl.datasource.FeedItemMediaCache
+import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient

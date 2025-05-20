@@ -60,7 +60,9 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.userProfile
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.extension.innerShadow
@@ -73,6 +75,7 @@ fun FeedDetailsWithCommentsView(
     modifier: Modifier = Modifier,
     state: FeedDetailsState,
     onReplyClick: (ZeroFeed) -> Unit,
+    onFeedUserClick: (FeedUserProfileView) -> Unit,
     onAddMeowToFeed: (ZeroFeed, Int) -> Unit,
 ) {
     var refreshing by remember(state) { mutableStateOf(false) }
@@ -120,7 +123,8 @@ fun FeedDetailsWithCommentsView(
                         isMyOwnFeed = state.zeroFeed.userId == state.loggedInUserId,
                         onAddMeowToFeed = { meowCount ->
                             onAddMeowToFeed(state.zeroFeed, meowCount)
-                        }
+                        },
+                        onFeedUserClick = onFeedUserClick
                     )
                     HorizontalDivider()
                 }
@@ -142,6 +146,9 @@ fun FeedDetailsWithCommentsView(
                     onFeedClick = { onReplyClick(
                         comment.copy(media = media, linkMetaData = linkMetaData)
                     ) },
+                    onFeedUserClick = {
+                        onFeedUserClick(comment.userProfile)
+                    },
                     onAddMeowToFeed = { meowCount ->
                         onAddMeowToFeed(comment, meowCount)
                     }

@@ -36,6 +36,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
@@ -439,6 +440,10 @@ class FakeMatrixClient(
 
     override suspend fun fetchAllUserFeeds(userZId: String, limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean): Result<List<ZeroFeed>> {
         return Result.success(emptyList())
+    }
+
+    override suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?> {
+        return Result.success(FeedUserProfileView.placeholder)
     }
 
     override suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean> {

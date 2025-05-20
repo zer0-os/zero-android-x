@@ -48,6 +48,7 @@ import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
 import io.element.android.features.createfeed.api.CreateFeedEntryPoint
 import io.element.android.features.createroom.api.CreateRoomEntryPoint
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
+import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.features.ftue.api.FtueEntryPoint
 import io.element.android.features.ftue.api.state.FtueService
 import io.element.android.features.ftue.api.state.FtueState
@@ -78,6 +79,7 @@ import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
 import io.element.android.libraries.matrix.api.verification.SessionVerificationServiceListener
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.services.appnavstate.api.AppNavigationStateService
 import io.element.android.support.zero.common.state.StateBus
@@ -119,6 +121,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val incomingVerificationEntryPoint: IncomingVerificationEntryPoint,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
+    private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -277,6 +280,9 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object CreateFeed : NavTarget
+
+        @Parcelize
+        data class FeedUserProfile(val profile: FeedUserProfileView) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -330,6 +336,10 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onCreateFeedClick() {
                         backstack.push(NavTarget.CreateFeed)
+                    }
+
+                    override fun onFeedUserClick(profile: FeedUserProfileView) {
+                        backstack.push(NavTarget.FeedUserProfile(profile))
                     }
                 }
                 roomListEntryPoint
@@ -509,12 +519,12 @@ class LoggedInFlowNode @AssistedInject constructor(
                 feedDetailsEntryPoint.nodeBuilder(this, buildContext)
                     .params(FeedDetailsEntryPoint.Params(navTarget.feed))
                     .callback(object : FeedDetailsEntryPoint.Callback {
-                        override fun onFeedDetailsUpdated(feedId: String) {
-
-                        }
-
                         override fun onFeedReplyClick(reply: ZeroFeed) {
                             backstack.push(NavTarget.FeedDetails(reply))
+                        }
+
+                        override fun onFeedUserClick(user: FeedUserProfileView) {
+                            backstack.push(NavTarget.FeedUserProfile(user))
                         }
                     })
                     .build()
@@ -523,6 +533,16 @@ class LoggedInFlowNode @AssistedInject constructor(
                 createFeedEntryPoint.nodeBuilder(this, buildContext)
                     .callback(object : CreateFeedEntryPoint.Callback {
 
+                    })
+                    .build()
+            }
+            is NavTarget.FeedUserProfile -> {
+                feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
+                    .params(FeedUserProfileEntryPoint.Params(navTarget.profile))
+                    .callback(object : FeedUserProfileEntryPoint.Callback {
+                        override fun onUserFeedClick(feed: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(feed))
+                        }
                     })
                     .build()
             }

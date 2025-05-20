@@ -37,6 +37,7 @@ import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.deeplink.usecase.InviteFriendsUseCase
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.services.analytics.api.AnalyticsService
 import kotlinx.parcelize.Parcelize
@@ -119,6 +120,10 @@ class RoomListFlowNode @AssistedInject constructor(
         plugins<RoomListEntryPoint.Callback>().forEach { it.onCreateFeedClick() }
     }
 
+    private fun onFeedUserClick(profile: FeedUserProfileView) {
+        plugins<RoomListEntryPoint.Callback>().forEach { it.onFeedUserClick(profile) }
+    }
+
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {
         when (roomListMenuAction) {
             RoomListMenuAction.InviteFriends -> {
@@ -147,6 +152,7 @@ class RoomListFlowNode @AssistedInject constructor(
                 onReportRoomClick = this::onReportRoomClick,
                 onDeclineInviteAndBlockUser = this::onDeclineInviteAndBlockUserClick,
                 onFeedClick = this::onFeedClick,
+                onFeedUserClick = this::onFeedUserClick,
                 onCreateFeedClick = this::onCreateFeedClick,
                 modifier = modifier,
             ) {

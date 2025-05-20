@@ -35,7 +35,7 @@ import io.element.android.features.leaveroom.api.LeaveRoomEvent.ShowConfirmation
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
-import io.element.android.features.roomlist.impl.datasource.FeedItemMediaCache
+import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.features.roomlist.impl.datasource.RoomListDataSource
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.model.HomeScreenChannel

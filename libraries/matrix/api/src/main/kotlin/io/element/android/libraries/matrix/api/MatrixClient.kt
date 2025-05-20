@@ -39,6 +39,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
@@ -240,11 +241,13 @@ interface MatrixClient {
 
     suspend fun fetchUrlMetaData(url: String): Result<ZeroLinkPreview?>
 
-    suspend fun fetchAllUserFeeds(userZId: String,
+    suspend fun fetchAllUserFeeds(userId: String,
                                   limit: Int,
                                   skip: Int,
                                   includeReplies: Boolean = true,
                                   includeMeow: Boolean = true): Result<List<ZeroFeed>>
+
+    suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?>
 
     suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean>
 

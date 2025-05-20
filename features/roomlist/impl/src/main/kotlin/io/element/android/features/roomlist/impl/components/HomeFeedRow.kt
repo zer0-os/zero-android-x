@@ -72,6 +72,7 @@ fun HomeFeedRow(
     isMyOwnFeed: Boolean = false,
     showThreadLine: Boolean = false,
     onFeedClick: () -> Unit,
+    onFeedUserClick: () -> Unit,
     onAddMeowToFeed: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -93,6 +94,7 @@ fun HomeFeedRow(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CompositeAvatar(
+                modifier = Modifier.clickable { onFeedUserClick() },
                 avatarData = feed.user.avatarData()
             )
             if (showThreadLine) {
@@ -106,6 +108,7 @@ fun HomeFeedRow(
         ) {
             Row {
                 Text(
+                    modifier = Modifier.clickable { onFeedUserClick() },
                     text = feed.user.profileSummary.name,
                     style = ElementTheme.typography.fontBodyMdMedium,
                     color = ElementTheme.colors.textPrimary,
@@ -293,6 +296,7 @@ internal fun HomeFeedRowPreview() = ElementPreview {
         feed = ZeroFeed.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
         onFeedClick = {},
+        onFeedUserClick = {},
         onAddMeowToFeed = {}
     )
 }

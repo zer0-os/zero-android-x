@@ -187,10 +187,32 @@ data class FeedUserProfileView(
     val profileImage: String?,
     val followersCount: String?,
     val followingCount: String?,
-): Parcelable
+): Parcelable {
+    companion object {
+        val placeholder: FeedUserProfileView = FeedUserProfileView(
+            userId = "placeholder_id",
+            primaryZid = "0://placeholder_id",
+            firstName = "placeholder name",
+            profileImage = null,
+            followersCount = "0",
+            followingCount = "0")
+    }
+}
 
 val FeedMedia.aspectRatio
     get() = width.div(height)
 
 val FeedMedia.isVideo
     get() = mimeType?.contains("video") == true
+
+fun ZeroFeedAuthor.toProfileView(userZId: String) = FeedUserProfileView(
+    userId = id,
+    primaryZid = userZId,
+    firstName = profileSummary.firstName,
+    profileImage = profileSummary.profileImage,
+    followersCount = null,
+    followingCount = null
+)
+
+val ZeroFeed.userProfile
+    get() = userProfileView ?: user.toProfileView(zid)
