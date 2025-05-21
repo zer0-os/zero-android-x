@@ -63,7 +63,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         fun handleEvents(event: FeedUserProfileEvents) {
             when (event) {
                 is FeedUserProfileEvents.AddMeowToFeed ->
-                    coroutineScope.addMeowToFeed(event.feed, event.meowCount)
+                    coroutineScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
                 FeedUserProfileEvents.LoadMoreUserFeeds ->
                     coroutineScope.loadMoreUserFeeds(userProfile.primaryZid, userFeedsFlow)
                 FeedUserProfileEvents.ToggleFollowUser ->
@@ -138,10 +138,18 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         }
     }
 
-    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, userFeedsFlow: MutableState<List<ZeroFeed>>) = launch {
         val result = client.addMeowToFeed(feed, meowCount)
-        result.getOrNull()?.let {
-            //feedDetailsFlow.value = it
+        result.getOrNull()?.let { updatedFeed ->
+            val allFeeds = userFeedsFlow.value.toMutableList()
+            allFeeds.indexOfFirst { it.id == updatedFeed.id }
+                .takeIf { it >= 0 }
+                ?.let { index ->
+                    allFeeds[index] = updatedFeed
+                    _userFeeds.clear()
+                    _userFeeds.addAll(allFeeds)
+                    userFeedsFlow.value = allFeeds
+                }
         }
     }
 

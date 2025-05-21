@@ -185,7 +185,7 @@ private fun RoomListScaffold(
                 onMenuActionClick = onMenuActionClick,
                 onOpenSettings = onOpenSettings,
                 scrollBehavior = scrollBehavior,
-                displayMenuItems = state.shouldDisplayActions(selectedNavigationTab.value),
+                displayMenuItems = state.showDisplayMenuItems(selectedNavigationTab.value),
                 displayFilters = state.shouldDisplayFilters(selectedNavigationTab.value),
                 filtersState = state.filtersState,
                 canReportBug = state.canReportBug,

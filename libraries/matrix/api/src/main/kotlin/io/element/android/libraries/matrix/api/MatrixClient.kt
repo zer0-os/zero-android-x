@@ -206,7 +206,8 @@ interface MatrixClient {
 
     suspend fun joinZeroChannel(channelId: String): Result<String?>
 
-    suspend fun fetchAllFeeds(limit: Int,
+    suspend fun fetchAllFeeds(followingFeeds: Boolean,
+                              limit: Int,
                               skip: Int,
                               includeReplies: Boolean = true,
                               includeMeow: Boolean = true
