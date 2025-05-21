@@ -69,7 +69,7 @@ fun UserProfileHeaderView(
             Box(Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.align(Alignment.CenterStart)) {
                     Text(
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
                         text = state.userProfile.firstName,
                         style = ElementTheme.typography.fontHeadingSmMedium,
                         maxLines = 1,

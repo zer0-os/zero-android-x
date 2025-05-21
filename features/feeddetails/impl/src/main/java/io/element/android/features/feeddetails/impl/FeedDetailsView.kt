@@ -7,6 +7,7 @@
 
 package io.element.android.features.feeddetails.impl
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -14,14 +15,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import io.element.android.features.feeddetails.impl.components.FeedDetailsWithCommentsView
+import io.element.android.features.feeddetails.impl.components.FeedDetailsWithReplies
+import io.element.android.features.feeddetails.impl.components.FeedReplyComposer
+import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.button.BackButton
+import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun FeedDetailsView(
@@ -37,17 +44,32 @@ fun FeedDetailsView(
             FeedDetailsTopBar(goBack = onBackClick)
         },
     ) { padding ->
-        FeedDetailsWithCommentsView(
-            modifier = Modifier
-                .padding(padding)
-                .consumeWindowInsets(padding),
-            state = state,
-            onReplyClick = onFeedReplyClick,
-            onFeedUserClick = onFeedUserClick,
-            onAddMeowToFeed = { feed, meowCount ->
-                state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
-            }
-        )
+        Column(modifier = Modifier
+            .padding(padding)
+            .consumeWindowInsets(padding)
+        ) {
+            FeedDetailsWithReplies(
+                modifier = Modifier.weight(1f),
+                state = state,
+                onReplyClick = onFeedReplyClick,
+                onFeedUserClick = onFeedUserClick,
+                onAddMeowToFeed = { feed, meowCount ->
+                    state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
+                }
+            )
+            FeedReplyComposer(state)
+        }
+
+        if (state.genericActionState is AsyncData.Loading) {
+            ProgressDialog(text = "Posting...")
+        }
+
+        if (state.genericActionState is AsyncData.Failure) {
+            ErrorDialog(
+                content = state.genericActionState.error.message ?: stringResource(CommonStrings.error_unknown),
+                onSubmit = { state.eventSink(FeedDetailsEvents.HideError) }
+            )
+        }
     }
 }
 
@@ -58,7 +80,7 @@ private fun FeedDetailsTopBar(
 ) {
     CenterAlignedTopAppBar(
         title = { Text("Post") },
-        navigationIcon = { BackButton(onClick = goBack) },
+        navigationIcon = { BackButton(onClick = goBack) }
     )
 }
 

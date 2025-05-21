@@ -277,9 +277,13 @@ class RustTimeline(
         intentionalMentions: List<IntentionalMention>,
     ): Result<Unit> = withContext(dispatcher) {
         MessageEventContent.from(body, htmlBody, intentionalMentions).use { content ->
-            runCatching<Unit> {
+            val result = runCatching<Unit> {
                 inner.send(content)
             }
+            if (result.isSuccess) {
+                zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+            }
+            result
         }
     }
 
@@ -365,7 +369,7 @@ class RustTimeline(
         replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
-        return sendAttachment(listOfNotNull(file, thumbnailFile)) {
+        val result = sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendImage(
                 params = UploadParameters(
                     source = UploadSource.File(file.path),
@@ -382,6 +386,10 @@ class RustTimeline(
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        return result
     }
 
     override suspend fun sendVideo(
@@ -394,7 +402,7 @@ class RustTimeline(
         replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
-        return sendAttachment(listOfNotNull(file, thumbnailFile)) {
+        val result = sendAttachment(listOfNotNull(file, thumbnailFile)) {
             inner.sendVideo(
                 params = UploadParameters(
                     source = UploadSource.File(file.path),
@@ -411,6 +419,10 @@ class RustTimeline(
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        return result
     }
 
     override suspend fun sendAudio(
@@ -422,7 +434,7 @@ class RustTimeline(
         replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
-        return sendAttachment(listOf(file)) {
+        val result = sendAttachment(listOf(file)) {
             inner.sendAudio(
                 params = UploadParameters(
                     source = UploadSource.File(file.path),
@@ -438,6 +450,10 @@ class RustTimeline(
                 progressWatcher = progressCallback?.toProgressWatcher()
             )
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        return result
     }
 
     override suspend fun sendFile(
@@ -449,7 +465,7 @@ class RustTimeline(
         replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
-        return sendAttachment(listOf(file)) {
+        val result = sendAttachment(listOf(file)) {
             inner.sendFile(
                 params = UploadParameters(
                     source = UploadSource.File(file.path),
@@ -465,6 +481,10 @@ class RustTimeline(
                 progressWatcher = progressCallback?.toProgressWatcher(),
             )
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        return result
     }
 
     override suspend fun toggleReaction(emoji: String, eventOrTransactionId: EventOrTransactionId): Result<Unit> = withContext(dispatcher) {
@@ -477,11 +497,15 @@ class RustTimeline(
     }
 
     override suspend fun forwardEvent(eventId: EventId, roomIds: List<RoomId>): Result<Unit> = withContext(dispatcher) {
-        runCatching {
+        val result = runCatching {
             roomContentForwarder.forward(fromTimeline = inner, eventId = eventId, toRoomIds = roomIds)
         }.onFailure {
             Timber.e(it)
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        result
     }
 
     override suspend fun sendLocation(
@@ -510,7 +534,7 @@ class RustTimeline(
         replyParameters: ReplyParameters?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
-        return sendAttachment(listOf(file)) {
+        val result = sendAttachment(listOf(file)) {
             inner.sendVoiceMessage(
                 params = UploadParameters(
                     source = UploadSource.File(file.path),
@@ -526,6 +550,10 @@ class RustTimeline(
                 progressWatcher = progressCallback?.toProgressWatcher(),
             )
         }
+        if (result.isSuccess) {
+            zeroConversationRepository?.onNewMessageSent(roomId = joinedRoom.roomId.value, joinedRoom.isRoomAChannel())
+        }
+        return result
     }
 
     override suspend fun createPoll(

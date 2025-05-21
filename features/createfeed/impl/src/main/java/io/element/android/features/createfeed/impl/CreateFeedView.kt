@@ -30,8 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.createfeed.impl.components.FullScreenTextField
+import io.element.android.features.roomlist.impl.R
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.avatar.Avatar
@@ -40,6 +42,7 @@ import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.FloatingActionButton
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Scaffold
@@ -63,6 +66,21 @@ fun CreateFeedView(
                 goBack = onBackClick
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.padding(vertical = 24.dp),
+                containerColor = ElementTheme.colors.iconPrimary,
+                onClick = {
+                    state.eventSink(CreateFeedEvents.SelectMedia)
+                }
+            ) {
+                Icon(
+                    imageVector = CompoundIcons.Attachment(),
+                    contentDescription = stringResource(id = R.string.screen_roomlist_a11y_create_message),
+                    tint = ElementTheme.colors.iconOnSolidPrimary,
+                )
+            }
+        }
     ) { padding ->
         CreateFeedContent(
             modifier = Modifier
@@ -87,14 +105,6 @@ private fun CreateFeedTopBar(
         title = { Text("New Post") },
         navigationIcon = { BackButton(onClick = goBack) },
         actions = {
-            IconButton(
-                onClick = {
-                    state.eventSink(CreateFeedEvents.SelectMedia)
-                }
-            ) {
-                Icon(imageVector = CompoundIcons.Attachment(),
-                    contentDescription = null)
-            }
             TextButton(
                 text = "Post",
                 onClick = {
