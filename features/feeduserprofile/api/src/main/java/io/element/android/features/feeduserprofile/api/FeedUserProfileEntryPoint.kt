@@ -12,12 +12,16 @@ import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import io.element.android.libraries.architecture.FeatureEntryPoint
 import io.element.android.libraries.architecture.NodeInputs
+import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 interface FeedUserProfileEntryPoint  : FeatureEntryPoint {
 
-    data class Params(val userProfile: FeedUserProfileView) : NodeInputs
+    data class Params(
+        val userId: UserId,
+        val userProfile: FeedUserProfileView?,
+    ) : NodeInputs
 
     interface Callback : Plugin {
         fun onUserFeedClick(feed: ZeroFeed)

@@ -30,7 +30,7 @@ class RoomMemberListNode @AssistedInject constructor(
     private val analyticsService: AnalyticsService,
 ) : Node(buildContext, plugins = plugins), RoomMemberListNavigator {
     interface Callback : Plugin {
-        fun openRoomMemberDetails(roomMemberId: UserId)
+        fun openRoomMemberDetails(roomMemberId: UserId, primaryZId: String?)
         fun openInviteMembers()
     }
 
@@ -45,9 +45,9 @@ class RoomMemberListNode @AssistedInject constructor(
         )
     }
 
-    override fun openRoomMemberDetails(roomMemberId: UserId) {
+    override fun openRoomMemberDetails(roomMemberId: UserId, primaryZId: String?) {
         callbacks.forEach {
-            it.openRoomMemberDetails(roomMemberId)
+            it.openRoomMemberDetails(roomMemberId, primaryZId)
         }
     }
 
@@ -74,6 +74,6 @@ class RoomMemberListNode @AssistedInject constructor(
 
 interface RoomMemberListNavigator {
     fun exitRoomMemberList() {}
-    fun openRoomMemberDetails(roomMemberId: UserId) {}
+    fun openRoomMemberDetails(roomMemberId: UserId, primaryZId: String?) {}
     fun openInviteMembers() {}
 }

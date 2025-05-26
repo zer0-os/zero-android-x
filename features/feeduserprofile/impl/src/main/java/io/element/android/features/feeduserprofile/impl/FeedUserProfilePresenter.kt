@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -22,6 +23,7 @@ import dagger.assisted.AssistedInject
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -37,12 +39,13 @@ private const val USER_FEED_PAGE_SIZE = 15
 
 class FeedUserProfilePresenter @AssistedInject constructor(
     private val client: MatrixClient,
-    @Assisted private val userProfile: FeedUserProfileView,
+    @Assisted private val userId: UserId,
+    @Assisted private val userProfile: FeedUserProfileView?,
 ) : Presenter<FeedUserProfileState> {
 
     @AssistedFactory
     interface Factory {
-        fun create(userProfile: FeedUserProfileView): FeedUserProfilePresenter
+        fun create(userId: UserId, userProfile: FeedUserProfileView?): FeedUserProfilePresenter
     }
 
     private val _userFeeds: MutableList<ZeroFeed> = mutableListOf()
@@ -52,7 +55,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         val coroutineScope = rememberCoroutineScope()
         val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
 
-        val userProfileFlow: MutableState<FeedUserProfileView> = remember { mutableStateOf(userProfile) }
+        val userProfileFlow: MutableState<FeedUserProfileView?> = rememberSaveable { mutableStateOf(userProfile) }
         val userProfileFollowingFlow: MutableState<Boolean?> = remember { mutableStateOf(null) }
         val userFeedsFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
         val userFeedsMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
@@ -64,8 +67,10 @@ class FeedUserProfilePresenter @AssistedInject constructor(
             when (event) {
                 is FeedUserProfileEvents.AddMeowToFeed ->
                     coroutineScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
-                FeedUserProfileEvents.LoadMoreUserFeeds ->
-                    coroutineScope.loadMoreUserFeeds(userProfile.primaryZid, userFeedsFlow)
+                FeedUserProfileEvents.LoadMoreUserFeeds -> {
+                    val primaryZId = userProfileFlow.value?.primaryZid ?: return
+                    coroutineScope.loadMoreUserFeeds(primaryZId, userFeedsFlow)
+                }
                 FeedUserProfileEvents.ToggleFollowUser ->
                     coroutineScope.toggleFollowUser(userProfileFlow, userProfileFollowingFlow, userFeedsFlow, genericActionState)
                 FeedUserProfileEvents.HideError ->
@@ -76,7 +81,11 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         LaunchedEffect(Unit) {
             userFeedsMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
             userFeedsLinkMetaDataMap.putAll(FeedItemMediaCache.getCachedFeedItemLinkMetaDataMap())
-            coroutineScope.fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
+            if (userProfileFlow.value == null) {
+                coroutineScope.fetchUserProfileById(userId, userProfileFlow, userProfileFollowingFlow, userFeedsFlow, genericActionState)
+            } else {
+                coroutineScope.fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
+            }
         }
 
         coroutineScope.fetchUserFeedsMedia(userFeedsFlow.value, userFeedsMediaMap)
@@ -89,17 +98,18 @@ class FeedUserProfilePresenter @AssistedInject constructor(
             userFeedsMediaMap = userFeedsMediaMap,
             userFeedsLinkMetaDataMap = userFeedsLinkMetaDataMap,
             isUserFollowed = userProfileFollowingFlow.value,
-            isMyOwnProfile = client.sessionId.extractedDisplayName == userProfile.userId,
+            isMyOwnProfile = client.sessionId.extractedDisplayName == userProfileFlow.value?.userId,
             eventSink = ::handleEvents,
             genericActionState = genericActionState.value
         )
     }
 
     private fun CoroutineScope.fetchUserProfileData(
-        userProfileFlow: MutableState<FeedUserProfileView>,
+        userProfileFlow: MutableState<FeedUserProfileView?>,
         userProfileFollowingFlow: MutableState<Boolean?>,
         userFeedsFlow: MutableState<List<ZeroFeed>>
     ) = launch {
+        val userProfile = userProfileFlow.value ?: return@launch
         val results = awaitAll(
             async { client.fetchFeedUserProfile(userProfile.primaryZid) },
             async { client.fetchUserFollowingStatus(userProfile.userId) },
@@ -118,11 +128,12 @@ class FeedUserProfilePresenter @AssistedInject constructor(
     }
 
     private fun CoroutineScope.toggleFollowUser(
-        userProfileFlow: MutableState<FeedUserProfileView>,
+        userProfileFlow: MutableState<FeedUserProfileView?>,
         userProfileFollowingFlow: MutableState<Boolean?>,
         userFeedsFlow: MutableState<List<ZeroFeed>>,
         genericActionState: MutableState<AsyncData<Unit>>,
     ) = launch {
+        val userProfile = userProfileFlow.value ?: return@launch
         genericActionState.value = AsyncData.Loading()
         val isFollowing = userProfileFollowingFlow.value ?: false
         val call = if (isFollowing) {
@@ -204,5 +215,35 @@ class FeedUserProfilePresenter @AssistedInject constructor(
                 feedRepliesLinkMetaDataMap[feedId] = metaData
             }
         }
+    }
+
+    private fun CoroutineScope.fetchUserProfileById(
+        userId: UserId,
+        userProfileFlow: MutableState<FeedUserProfileView?>,
+        userProfileFollowingFlow: MutableState<Boolean?>,
+        userFeedsFlow: MutableState<List<ZeroFeed>>,
+        genericActionState: MutableState<AsyncData<Unit>>,
+    ) = launch {
+        genericActionState.value = AsyncData.Loading()
+        client.getProfile(userId)
+            .onSuccess { matrixProfile ->
+                val primaryZId = matrixProfile.primaryZeroId
+                if (primaryZId != null) {
+                    client.fetchFeedUserProfile(primaryZId)
+                        .onSuccess { zeroProfile ->
+                            genericActionState.value = AsyncData.Success(Unit)
+                            userProfileFlow.value = zeroProfile
+                            fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
+                        }
+                        .onFailure { error ->
+                            genericActionState.value = AsyncData.Failure(error)
+                        }
+                } else {
+                    genericActionState.value = AsyncData.Failure(Throwable("Failed to fetch user feed profile. User primaryZId is not set. Check profile settings."))
+                }
+            }
+            .onFailure { error ->
+                genericActionState.value = AsyncData.Failure(error)
+            }
     }
 }

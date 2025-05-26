@@ -19,20 +19,20 @@ class RoomMembersModerationStateProvider : PreviewParameterProvider<RoomMembersM
             aRoomMembersModerationState(
                 selectedRoomMember = anAlice(),
                 actions = listOf(
-                    ModerationAction.DisplayProfile(anAlice().userId),
+                    ModerationAction.DisplayProfile(anAlice().userId, null),
                 ),
             ),
             aRoomMembersModerationState(
                 selectedRoomMember = anAlice(),
                 actions = listOf(
-                    ModerationAction.DisplayProfile(anAlice().userId),
+                    ModerationAction.DisplayProfile(anAlice().userId, null),
                     ModerationAction.KickUser(userId = anAlice().userId),
                 ),
             ),
             aRoomMembersModerationState(
                 selectedRoomMember = anAlice(),
                 actions = listOf(
-                    ModerationAction.DisplayProfile(anAlice().userId),
+                    ModerationAction.DisplayProfile(anAlice().userId, null),
                     ModerationAction.KickUser(userId = anAlice().userId),
                     ModerationAction.BanUser(userId = anAlice().userId),
                 ),

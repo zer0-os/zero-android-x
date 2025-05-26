@@ -30,7 +30,7 @@ class FeedUserProfileNode @AssistedInject constructor(
 ) : Node(buildContext, plugins = plugins) {
 
     private val inputs = inputs<FeedUserProfileEntryPoint.Params>()
-    private val presenter = presenterFactory.create(inputs.userProfile)
+    private val presenter = presenterFactory.create(inputs.userId, inputs.userProfile)
     private val callbacks = plugins.filterIsInstance<FeedUserProfileEntryPoint.Callback>()
 
     private fun onUserFeedClick(feed: ZeroFeed) {

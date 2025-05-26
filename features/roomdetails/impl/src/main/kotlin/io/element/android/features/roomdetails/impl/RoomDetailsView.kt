@@ -105,7 +105,7 @@ fun RoomDetailsView(
     onPinnedMessagesClick: () -> Unit,
     onKnockRequestsClick: () -> Unit,
     onSecurityAndPrivacyClick: () -> Unit,
-    onProfileClick: (UserId) -> Unit,
+    onProfileClick: (UserId, String?) -> Unit,
     onReportRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -205,7 +205,7 @@ fun RoomDetailsView(
                 state.roomMemberDetailsState?.let { dmMemberDetails ->
                     ProfileItem(
                         verificationState = dmMemberDetails.verificationState,
-                        onClick = { onProfileClick(dmMemberDetails.userId) }
+                        onClick = { onProfileClick(dmMemberDetails.userId, dmMemberDetails.primaryZeroId) }
                     )
                 }
             }
@@ -748,7 +748,7 @@ private fun ContentToPreview(state: RoomDetailsState) {
         onPinnedMessagesClick = {},
         onKnockRequestsClick = {},
         onSecurityAndPrivacyClick = {},
-        onProfileClick = {},
+        onProfileClick = { _, _ -> },
         onReportRoomClick = {},
     )
 }

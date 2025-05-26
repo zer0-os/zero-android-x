@@ -142,7 +142,7 @@ class JoinedRoomLoadedFlowNode @AssistedInject constructor(
                 createRoomDetailsNode(buildContext, RoomDetailsEntryPoint.InitialTarget.RoomDetails)
             }
             is NavTarget.RoomMemberDetails -> {
-                createRoomDetailsNode(buildContext, RoomDetailsEntryPoint.InitialTarget.RoomMemberDetails(navTarget.userId))
+                createRoomDetailsNode(buildContext, RoomDetailsEntryPoint.InitialTarget.RoomMemberDetails(navTarget.userId, navTarget.primaryZId))
             }
             NavTarget.RoomNotificationSettings -> {
                 createRoomDetailsNode(buildContext, RoomDetailsEntryPoint.InitialTarget.RoomNotificationSettings)
@@ -159,8 +159,8 @@ class JoinedRoomLoadedFlowNode @AssistedInject constructor(
                 backstack.push(NavTarget.RoomDetails)
             }
 
-            override fun onUserDataClick(userId: UserId) {
-                backstack.push(NavTarget.RoomMemberDetails(userId))
+            override fun onUserDataClick(userId: UserId, primaryZId: String?) {
+                backstack.push(NavTarget.RoomMemberDetails(userId, primaryZId))
             }
 
             override fun onPermalinkClick(data: PermalinkData, pushToBackstack: Boolean) {
@@ -188,7 +188,7 @@ class JoinedRoomLoadedFlowNode @AssistedInject constructor(
         data object RoomDetails : NavTarget
 
         @Parcelize
-        data class RoomMemberDetails(val userId: UserId) : NavTarget
+        data class RoomMemberDetails(val userId: UserId, val primaryZId: String?) : NavTarget
 
         @Parcelize
         data object RoomNotificationSettings : NavTarget

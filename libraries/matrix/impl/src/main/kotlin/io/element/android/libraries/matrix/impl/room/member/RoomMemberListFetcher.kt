@@ -127,7 +127,10 @@ internal class RoomMemberListFetcher(
                     val apiMembers = zeroUserRepository?.getUsers(memberIds) ?: emptyList()
                     val updatedMembers = members.map {
                         val apiMember = apiMembers.firstOrNull { zeroUser -> zeroUser.matrixId == it.userId.value }
-                        it.copy(displayName = apiMember?.name ?: it.displayName)
+                        it.copy(
+                            displayName = apiMember?.name ?: it.displayName,
+                            primaryZId = apiMember?.primaryZeroId
+                        )
                     }
                     addAll(updatedMembers)
                     Timber.i("Loaded first $size members for room $roomId")

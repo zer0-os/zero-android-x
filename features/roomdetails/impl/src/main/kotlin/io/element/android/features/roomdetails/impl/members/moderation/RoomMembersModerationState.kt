@@ -24,7 +24,7 @@ data class RoomMembersModerationState(
 )
 
 sealed interface ModerationAction {
-    data class DisplayProfile(val userId: UserId) : ModerationAction
+    data class DisplayProfile(val userId: UserId, val primaryZId: String?) : ModerationAction
     data class KickUser(val userId: UserId) : ModerationAction
     data class BanUser(val userId: UserId) : ModerationAction
 }

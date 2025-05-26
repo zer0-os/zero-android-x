@@ -60,7 +60,7 @@ import timber.log.Timber
 @Composable
 fun RoomMembersModerationView(
     state: RoomMembersModerationState,
-    onDisplayMemberProfile: (UserId) -> Unit,
+    onDisplayMemberProfile: (UserId, String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -71,7 +71,7 @@ fun RoomMembersModerationView(
                 onSelectAction = { action ->
                     when (action) {
                         is ModerationAction.DisplayProfile -> {
-                            onDisplayMemberProfile(action.userId)
+                            onDisplayMemberProfile(action.userId, action.primaryZId)
                         }
                         is ModerationAction.KickUser -> {
                             state.eventSink(RoomMembersModerationEvents.KickUser)
@@ -314,7 +314,7 @@ internal fun RoomMembersModerationViewPreview(@PreviewParameter(RoomMembersModer
         ) {
             RoomMembersModerationView(
                 state = state,
-                onDisplayMemberProfile = {},
+                onDisplayMemberProfile = { _, _ -> },
             )
         }
     }

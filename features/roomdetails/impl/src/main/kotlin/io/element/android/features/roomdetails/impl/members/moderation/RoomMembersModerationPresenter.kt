@@ -63,7 +63,7 @@ class RoomMembersModerationPresenter @Inject constructor(
             derivedStateOf {
                 buildList {
                     selectedMember?.let { roomMember ->
-                        add(ModerationAction.DisplayProfile(roomMember.userId))
+                        add(ModerationAction.DisplayProfile(roomMember.userId, roomMember.primaryZId))
                         if (currentUserMemberPowerLevel > roomMember.powerLevel) {
                             if (canKick) {
                                 add(ModerationAction.KickUser(roomMember.userId))

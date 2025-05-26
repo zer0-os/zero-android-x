@@ -45,72 +45,75 @@ fun UserProfileHeaderView(
     state: FeedUserProfileState,
     onBackClick: () -> Unit = {},
 ) {
-    Column {
-        Box {
-            Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.img_zero_account_backup_header),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-            BackButton(
+    if (state.userProfile != null) {
+        Column {
+            Box {
+                Image(
+                    modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.img_zero_account_backup_header),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+                BackButton(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .background(ElementTheme.colors.bgCanvasDefaultLevel1, CircleShape),
+                    onClick = onBackClick
+                )
+            }
+            Column(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .background(ElementTheme.colors.bgCanvasDefaultLevel1, CircleShape),
-                onClick = onBackClick
-            )
-        }
-        Column(
-            modifier = Modifier
-                .offset(y = (-48).dp)
-                .padding(horizontal = 24.dp)
-        ) {
-            CompositeAvatar(avatarData = state.userProfile.avatarData())
-            Box(Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                    Text(
-                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
-                        text = state.userProfile.firstName,
-                        style = ElementTheme.typography.fontHeadingSmMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = state.userProfile.primaryZid,
-                        style = ElementTheme.typography.fontBodyLgRegular,
-                        color = ElementTheme.colors.textSecondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    .offset(y = (-48).dp)
+                    .padding(horizontal = 24.dp)
+            ) {
+                CompositeAvatar(avatarData = state.userProfile.avatarData())
+                Row(modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = state.userProfile.firstName,
+                            style = ElementTheme.typography.fontHeadingSmMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            modifier = Modifier.padding(top = 2.dp),
+                            text = state.userProfile.primaryZid,
+                            style = ElementTheme.typography.fontBodyLgRegular,
+                            color = ElementTheme.colors.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (state.shouldShowFollowButton) {
+                        val buttonText = if (state.isUserFollowed == true) "Unfollow" else "Follow"
+                        Button(
+                            text = buttonText,
+                            onClick = {
+                                state.eventSink(FeedUserProfileEvents.ToggleFollowUser)
+                            }
+                        )
+                    }
                 }
-                if (state.shouldShowFollowButton) {
-                    val buttonText = if (state.isUserFollowed == true) "Unfollow" else "Follow"
-                    Button(
-                        text = buttonText,
-                        onClick = {
-                            state.eventSink(FeedUserProfileEvents.ToggleFollowUser)
-                        },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    )
-                }
-            }
-            Row(modifier = Modifier.padding(vertical = 16.dp)) {
-                if (state.userProfile.followersCount != null) {
-                    UserFollowInfoText(
-                        count = state.userProfile.followersCount!!,
-                        text = "Followers"
-                    )
-                }
-                if (state.userProfile.followingCount != null) {
-                    UserFollowInfoText(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        count = state.userProfile.followingCount!!,
-                        text = "Following"
-                    )
+                Row(modifier = Modifier.padding(vertical = 8.dp)) {
+                    if (state.userProfile.followersCount != null) {
+                        UserFollowInfoText(
+                            count = state.userProfile.followersCount!!,
+                            text = "Followers"
+                        )
+                    }
+                    if (state.userProfile.followingCount != null) {
+                        UserFollowInfoText(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            count = state.userProfile.followingCount!!,
+                            text = "Following"
+                        )
+                    }
                 }
             }
+            HorizontalDivider(modifier = Modifier.offset(y = (-48).dp))
         }
-        HorizontalDivider(modifier = Modifier.offset(y = (-48).dp))
     }
 }
 

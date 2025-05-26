@@ -25,6 +25,8 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.appconfig.LearnMoreConfig
 import io.element.android.features.call.api.CallType
 import io.element.android.features.call.api.ElementCallEntryPoint
+import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
+import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.features.knockrequests.api.list.KnockRequestsListEntryPoint
 import io.element.android.features.messages.api.MessagesEntryPoint
 import io.element.android.features.poll.api.history.PollHistoryEntryPoint
@@ -53,6 +55,8 @@ import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
 import io.element.android.libraries.matrix.api.room.BaseRoom
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
+import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.mediaviewer.api.MediaGalleryEntryPoint
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.services.analytics.api.AnalyticsService
@@ -73,6 +77,8 @@ class RoomDetailsFlowNode @AssistedInject constructor(
     private val mediaGalleryEntryPoint: MediaGalleryEntryPoint,
     private val outgoingVerificationEntryPoint: OutgoingVerificationEntryPoint,
     private val reportRoomEntryPoint: ReportRoomEntryPoint,
+    private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
+    private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
 ) : BaseFlowNode<RoomDetailsFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = plugins.filterIsInstance<RoomDetailsEntryPoint.Params>().first().initialElement.toNavTarget(),
@@ -104,7 +110,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
         ) : NavTarget
 
         @Parcelize
-        data class RoomMemberDetails(val roomMemberId: UserId) : NavTarget
+        data class RoomMemberDetails(val roomMemberId: UserId, val primaryZId: String?) : NavTarget
 
         @Parcelize
         data class AvatarPreview(val name: String, val avatarUrl: String) : NavTarget
@@ -132,6 +138,9 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object ReportRoom : NavTarget
+
+        @Parcelize
+        data class FeedDetails(val feed: ZeroFeed) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -182,8 +191,8 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                         backstack.push(NavTarget.SecurityAndPrivacy)
                     }
 
-                    override fun openDmUserProfile(userId: UserId) {
-                        backstack.push(NavTarget.RoomMemberDetails(userId))
+                    override fun openDmUserProfile(userId: UserId, primaryZId: String?) {
+                        backstack.push(NavTarget.RoomMemberDetails(userId, primaryZId))
                     }
 
                     override fun onJoinCall() {
@@ -204,8 +213,8 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
             NavTarget.RoomMemberList -> {
                 val roomMemberListCallback = object : RoomMemberListNode.Callback {
-                    override fun openRoomMemberDetails(roomMemberId: UserId) {
-                        backstack.push(NavTarget.RoomMemberDetails(roomMemberId))
+                    override fun openRoomMemberDetails(roomMemberId: UserId, primaryZId: String?) {
+                        backstack.push(NavTarget.RoomMemberDetails(roomMemberId, primaryZId))
                     }
 
                     override fun openInviteMembers() {
@@ -234,25 +243,48 @@ class RoomDetailsFlowNode @AssistedInject constructor(
             }
 
             is NavTarget.RoomMemberDetails -> {
-                val callback = object : UserProfileNodeHelper.Callback {
-                    override fun openAvatarPreview(username: String, avatarUrl: String) {
-                        overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
-                    }
+                if (navTarget.primaryZId.isNullOrBlank()) {
+                    val callback = object : UserProfileNodeHelper.Callback {
+                        override fun openAvatarPreview(username: String, avatarUrl: String) {
+                            overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
+                        }
 
-                    override fun onStartDM(roomId: RoomId) {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
-                    }
+                        override fun onStartDM(roomId: RoomId) {
+                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
+                        }
 
-                    override fun onStartCall(dmRoomId: RoomId) {
-                        elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
-                    }
+                        override fun onStartCall(dmRoomId: RoomId) {
+                            elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
+                        }
 
-                    override fun onVerifyUser(userId: UserId) {
-                        backstack.push(NavTarget.VerifyUser(userId))
+                        override fun onVerifyUser(userId: UserId) {
+                            backstack.push(NavTarget.VerifyUser(userId))
+                        }
                     }
+                    val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
+                    createNode<RoomMemberDetailsNode>(buildContext, plugins)
+                } else {
+                    feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
+                        .params(FeedUserProfileEntryPoint.Params(navTarget.roomMemberId, null))
+                        .callback(object : FeedUserProfileEntryPoint.Callback {
+                            override fun onUserFeedClick(feed: ZeroFeed) {
+                                backstack.push(NavTarget.FeedDetails(feed))
+                            }
+                        })
+                        .build()
                 }
-                val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
-                createNode<RoomMemberDetailsNode>(buildContext, plugins)
+            }
+            is NavTarget.FeedDetails -> {
+                feedDetailsEntryPoint.nodeBuilder(this, buildContext)
+                    .params(FeedDetailsEntryPoint.Params(navTarget.feed))
+                    .callback(object : FeedDetailsEntryPoint.Callback {
+                        override fun onFeedReplyClick(reply: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(reply))
+                        }
+
+                        override fun onFeedUserClick(user: FeedUserProfileView) {}
+                    })
+                    .build()
             }
             is NavTarget.AvatarPreview -> {
                 val callback = object : MediaViewerEntryPoint.Callback {
@@ -306,7 +338,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                 val callback = object : MessagesEntryPoint.Callback {
                     override fun onRoomDetailsClick() = Unit
 
-                    override fun onUserDataClick(userId: UserId) = Unit
+                    override fun onUserDataClick(userId: UserId, primaryZId: String?) = Unit
 
                     override fun onPermalinkClick(data: PermalinkData, pushToBackstack: Boolean) {
                         plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onPermalinkClick(data, pushToBackstack) }

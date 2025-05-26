@@ -80,7 +80,8 @@ fun aDmRoomMember(
     normalizedPowerLevel = normalizedPowerLevel,
     isIgnored = isIgnored,
     role = role,
-    membershipChangeReason = membershipChangeReason
+    membershipChangeReason = membershipChangeReason,
+    primaryZId = null
 )
 
 fun aRoomDetailsState(

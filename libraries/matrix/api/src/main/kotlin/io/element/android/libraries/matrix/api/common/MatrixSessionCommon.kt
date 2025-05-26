@@ -8,4 +8,16 @@ object MatrixSessionCommon {
     }
 
     fun getHomeServerPostfix() = homeServerPostfix
+
+    fun matrixUserIdFromIdHex(userIdHex: String): String {
+        return if (userIdHex.contains(getHomeServerPostfix())) userIdHex
+        else {
+            buildString {
+                append("@")
+                append(userIdHex)
+                append(":")
+                append(getHomeServerPostfix())
+            }
+        }
+    }
 }

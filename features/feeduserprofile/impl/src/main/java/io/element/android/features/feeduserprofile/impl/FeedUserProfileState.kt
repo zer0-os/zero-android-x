@@ -17,7 +17,7 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 @Immutable
 data class FeedUserProfileState(
-    val userProfile: FeedUserProfileView,
+    val userProfile: FeedUserProfileView?,
     val userRewards: ZeroUserRewards,
     val userFeeds: List<ZeroFeed>,
     val userFeedsMediaMap: Map<String, FeedMedia>,

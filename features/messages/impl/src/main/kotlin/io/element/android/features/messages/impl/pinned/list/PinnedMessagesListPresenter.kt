@@ -60,7 +60,7 @@ import timber.log.Timber
 
 class PinnedMessagesListPresenter @AssistedInject constructor(
     @Assisted private val navigator: PinnedMessagesListNavigator,
-    private val room: JoinedRoom,
+    val room: JoinedRoom,
     timelineItemsFactoryCreator: TimelineItemsFactory.Creator,
     private val timelineProvider: PinnedEventsTimelineProvider,
     private val timelineProtectionPresenter: Presenter<TimelineProtectionState>,
