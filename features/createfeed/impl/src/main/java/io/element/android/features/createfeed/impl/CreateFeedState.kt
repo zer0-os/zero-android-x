@@ -8,9 +8,9 @@
 package io.element.android.features.createfeed.impl
 
 import androidx.compose.runtime.Immutable
-import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 
 @Immutable
 data class CreateFeedState(
@@ -19,7 +19,7 @@ data class CreateFeedState(
     val mediaAttachment: CreateFeedMediaAttachment?,
 
     val eventSink: (CreateFeedEvents) -> Unit,
-    val genericActionState: AsyncData<Unit>,
+    val genericActionState: AsyncAction<Unit>,
 ) {
     val canSendPost: Boolean
         get() = feedText.isNotBlank()

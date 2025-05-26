@@ -545,6 +545,10 @@ class LoggedInFlowNode @AssistedInject constructor(
                         override fun onUserFeedClick(feed: ZeroFeed) {
                             backstack.push(NavTarget.FeedDetails(feed))
                         }
+
+                        override fun onOpenDm(roomId: RoomId) {
+                            backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
+                        }
                     })
                     .build()
             }

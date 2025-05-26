@@ -17,7 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
@@ -36,7 +36,7 @@ class CreateFeedPresenter @Inject constructor(
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
 
-        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
+        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val matrixUser = client.userProfile.collectAsState()
         val newFeedText: MutableState<String> = remember { mutableStateOf("") }
         val newFeedAttachmentState: MutableState<CreateFeedMediaAttachment?> = remember { mutableStateOf(null) }
@@ -55,7 +55,7 @@ class CreateFeedPresenter @Inject constructor(
                 CreateFeedEvents.CreatePost -> coroutineScope.createNewFeed(
                     newFeedText, newFeedAttachmentState.value, genericActionState
                 )
-                CreateFeedEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
+                CreateFeedEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
                 CreateFeedEvents.SelectMedia -> {
                     coroutineScope.launch {
                         galleryMediaPicker.launch()
@@ -77,16 +77,16 @@ class CreateFeedPresenter @Inject constructor(
     private fun CoroutineScope.createNewFeed(
         newFeedText: MutableState<String>,
         feedAttachment: CreateFeedMediaAttachment?,
-        genericActionState: MutableState<AsyncData<Unit>>
+        genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
-        genericActionState.value = AsyncData.Loading()
+        genericActionState.value = AsyncAction.Loading
         val postText = newFeedText.value
         client.createNewFeed(postText, feedAttachment, null)
             .onSuccess {
-                genericActionState.value = AsyncData.Success(Unit)
+                genericActionState.value = AsyncAction.Success(Unit)
             }
             .onFailure { error ->
-                genericActionState.value = AsyncData.Failure(error)
+                genericActionState.value = AsyncAction.Failure(error)
             }
     }
 

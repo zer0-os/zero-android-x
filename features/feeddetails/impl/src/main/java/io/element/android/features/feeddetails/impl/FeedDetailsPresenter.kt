@@ -22,8 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.element.android.support.zero.common.util.FeedItemMediaCache
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
@@ -32,6 +31,7 @@ import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.support.zero.common.extension.localFile
+import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -58,7 +58,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
         val matrixUser = client.userProfile.collectAsState()
-        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
+        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val feedDetailsFlow: MutableState<ZeroFeed> = remember { mutableStateOf(feed) }
         val feedRepliesFlow: MutableState<List<ZeroFeed>> = remember { mutableStateOf(emptyList()) }
@@ -89,7 +89,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
                     }
                 }
                 FeedDetailsEvents.RemoveMedia -> newFeedAttachmentState.value = null
-                FeedDetailsEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
+                FeedDetailsEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
             }
         }
 
@@ -158,22 +158,22 @@ class FeedDetailsPresenter @AssistedInject constructor(
     private fun CoroutineScope.postMyReply(
         replyText: MutableState<String>,
         feedAttachment: MutableState<CreateFeedMediaAttachment?>,
-        genericActionState: MutableState<AsyncData<Unit>>,
+        genericActionState: MutableState<AsyncAction<Unit>>,
         feedDetailsFlow: MutableState<ZeroFeed>,
         feedRepliesFlow: MutableState<List<ZeroFeed>>
     ) = launch {
-        genericActionState.value = AsyncData.Loading()
+        genericActionState.value = AsyncAction.Loading
         val postText = replyText.value
         val attachment = feedAttachment.value
         replyText.value = ""
         feedAttachment.value = null
         client.createNewFeed(postText, attachment, feed.id)
             .onSuccess {
-                genericActionState.value = AsyncData.Success(Unit)
+                genericActionState.value = AsyncAction.Success(Unit)
                 refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
             }
             .onFailure { error ->
-                genericActionState.value = AsyncData.Failure(error)
+                genericActionState.value = AsyncAction.Failure(error)
             }
     }
 
@@ -197,7 +197,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
     }
 
     private fun CoroutineScope.fetchFeedRepliesLinkMetaData(replies: List<ZeroFeed>,
-                                                     feedRepliesLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
+                                                            feedRepliesLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
     ) = launch {
         val feedsToFetch = replies.mapNotNull { feed ->
             val availableYoutubeUrl = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text) ?: return@mapNotNull null

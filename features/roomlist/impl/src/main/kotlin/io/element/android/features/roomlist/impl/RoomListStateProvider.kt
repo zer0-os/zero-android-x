@@ -22,7 +22,7 @@ import io.element.android.features.roomlist.impl.model.aRoomListRoomSummary
 import io.element.android.features.roomlist.impl.model.anInviteSender
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
 import io.element.android.features.roomlist.impl.search.aRoomListSearchState
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
@@ -57,7 +57,7 @@ internal fun aRoomListState(
     showAvatarIndicator: Boolean = false,
     hasNetworkConnection: Boolean = true,
     snackbarMessage: SnackbarMessage? = null,
-    genericActionState: AsyncData<Unit> = AsyncData.Uninitialized,
+    genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
     contextMenu: RoomListState.ContextMenu = RoomListState.ContextMenu.Hidden,
     declineInviteMenu: RoomListState.DeclineInviteMenu = RoomListState.DeclineInviteMenu.Hidden,
     leaveRoomState: LeaveRoomState = aLeaveRoomState(),

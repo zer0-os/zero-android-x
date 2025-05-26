@@ -20,6 +20,7 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.di.SessionScope
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 @ContributesNode(SessionScope::class)
@@ -37,6 +38,10 @@ class FeedUserProfileNode @AssistedInject constructor(
         callbacks.forEach { it.onUserFeedClick(feed) }
     }
 
+    private fun onOpenDm(roomId: RoomId) {
+        callbacks.forEach { it.onOpenDm(roomId) }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -46,6 +51,7 @@ class FeedUserProfileNode @AssistedInject constructor(
             modifier = modifier,
             state = state,
             onBackClick = ::navigateUp,
+            onOpenDm = ::onOpenDm,
             onUserFeedClick = this::onUserFeedClick
         )
     }

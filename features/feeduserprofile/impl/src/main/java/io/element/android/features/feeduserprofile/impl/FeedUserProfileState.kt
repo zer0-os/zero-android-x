@@ -8,7 +8,9 @@
 package io.element.android.features.feeduserprofile.impl
 
 import androidx.compose.runtime.Immutable
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -24,8 +26,10 @@ data class FeedUserProfileState(
     val userFeedsLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     val isUserFollowed: Boolean?,
     val isMyOwnProfile: Boolean,
+    val dmRoomId: RoomId?,
+    val startDmActionState: AsyncAction<RoomId>,
     val eventSink: (FeedUserProfileEvents) -> Unit,
-    val genericActionState: AsyncData<Unit>,
+    val genericActionState: AsyncAction<Unit>,
 ) {
     val shouldShowFollowButton: Boolean
         get() = !isMyOwnProfile && isUserFollowed != null

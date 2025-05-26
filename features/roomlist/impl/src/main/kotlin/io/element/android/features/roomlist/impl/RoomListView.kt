@@ -42,7 +42,7 @@ import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchView
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -135,11 +135,11 @@ fun RoomListView(
             )
             acceptDeclineInviteView()
 
-            if (state.genericActionState is AsyncData.Loading) {
+            if (state.genericActionState is AsyncAction.Loading) {
                 ProgressDialog()
             }
 
-            if (state.genericActionState is AsyncData.Failure) {
+            if (state.genericActionState is AsyncAction.Failure) {
                 ErrorDialog(
                     content = stringResource(CommonStrings.error_unknown),
                     onSubmit = { state.eventSink(RoomListEvents.HideError) }

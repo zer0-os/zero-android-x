@@ -10,9 +10,12 @@ package io.element.android.features.feeduserprofile.impl
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -20,10 +23,13 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.features.createroom.api.StartDMAction
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -39,6 +45,7 @@ private const val USER_FEED_PAGE_SIZE = 15
 
 class FeedUserProfilePresenter @AssistedInject constructor(
     private val client: MatrixClient,
+    private val startDMAction: StartDMAction,
     @Assisted private val userId: UserId,
     @Assisted private val userProfile: FeedUserProfileView?,
 ) : Presenter<FeedUserProfileState> {
@@ -51,9 +58,16 @@ class FeedUserProfilePresenter @AssistedInject constructor(
     private val _userFeeds: MutableList<ZeroFeed> = mutableListOf()
 
     @Composable
+    private fun getDmRoomId(): State<RoomId?> {
+        return produceState<RoomId?>(initialValue = null) {
+            value = client.findDM(userId)
+        }
+    }
+
+    @Composable
     override fun present(): FeedUserProfileState {
         val coroutineScope = rememberCoroutineScope()
-        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
+        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val userProfileFlow: MutableState<FeedUserProfileView?> = rememberSaveable { mutableStateOf(userProfile) }
         val userProfileFollowingFlow: MutableState<Boolean?> = remember { mutableStateOf(null) }
@@ -62,6 +76,18 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         val userFeedsLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
 
         val userRewards = client.userRewards.collectAsState()
+
+        val startDmActionState: MutableState<AsyncAction<RoomId>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        val dmRoomId by getDmRoomId()
+
+        fun getMatrixUser(profileView: FeedUserProfileView?): MatrixUser {
+            return MatrixUser(
+                userId = userId,
+                displayName = profileView?.firstName,
+                avatarUrl = profileView?.profileImage,
+                primaryZeroId = profileView?.primaryZid
+            )
+        }
 
         fun handleEvents(event: FeedUserProfileEvents) {
             when (event) {
@@ -74,7 +100,19 @@ class FeedUserProfilePresenter @AssistedInject constructor(
                 FeedUserProfileEvents.ToggleFollowUser ->
                     coroutineScope.toggleFollowUser(userProfileFlow, userProfileFollowingFlow, userFeedsFlow, genericActionState)
                 FeedUserProfileEvents.HideError ->
-                    genericActionState.value = AsyncData.Uninitialized
+                    genericActionState.value = AsyncAction.Uninitialized
+                FeedUserProfileEvents.StartDM -> {
+                    coroutineScope.launch {
+                        startDMAction.execute(
+                            matrixUser = getMatrixUser(userProfileFlow.value),
+                            createIfDmDoesNotExist = startDmActionState.value is AsyncAction.Confirming,
+                            actionState = startDmActionState,
+                        )
+                    }
+                }
+                FeedUserProfileEvents.ClearStartDMState -> {
+                    startDmActionState.value = AsyncAction.Uninitialized
+                }
             }
         }
 
@@ -99,6 +137,8 @@ class FeedUserProfilePresenter @AssistedInject constructor(
             userFeedsLinkMetaDataMap = userFeedsLinkMetaDataMap,
             isUserFollowed = userProfileFollowingFlow.value,
             isMyOwnProfile = client.sessionId.extractedDisplayName == userProfileFlow.value?.userId,
+            dmRoomId = dmRoomId,
+            startDmActionState = startDmActionState.value,
             eventSink = ::handleEvents,
             genericActionState = genericActionState.value
         )
@@ -131,10 +171,10 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         userProfileFlow: MutableState<FeedUserProfileView?>,
         userProfileFollowingFlow: MutableState<Boolean?>,
         userFeedsFlow: MutableState<List<ZeroFeed>>,
-        genericActionState: MutableState<AsyncData<Unit>>,
+        genericActionState: MutableState<AsyncAction<Unit>>,
     ) = launch {
         val userProfile = userProfileFlow.value ?: return@launch
-        genericActionState.value = AsyncData.Loading()
+        genericActionState.value = AsyncAction.Loading
         val isFollowing = userProfileFollowingFlow.value ?: false
         val call = if (isFollowing) {
             client.unFollowUser(userProfile.userId)
@@ -142,10 +182,10 @@ class FeedUserProfilePresenter @AssistedInject constructor(
             client.followUser(userProfile.userId)
         }
         call.onSuccess {
-            genericActionState.value = AsyncData.Success(Unit)
+            genericActionState.value = AsyncAction.Success(Unit)
             fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
         }.onFailure { error ->
-            genericActionState.value = AsyncData.Failure(error)
+            genericActionState.value = AsyncAction.Failure(error)
         }
     }
 
@@ -222,28 +262,28 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         userProfileFlow: MutableState<FeedUserProfileView?>,
         userProfileFollowingFlow: MutableState<Boolean?>,
         userFeedsFlow: MutableState<List<ZeroFeed>>,
-        genericActionState: MutableState<AsyncData<Unit>>,
+        genericActionState: MutableState<AsyncAction<Unit>>,
     ) = launch {
-        genericActionState.value = AsyncData.Loading()
+        genericActionState.value = AsyncAction.Loading
         client.getProfile(userId)
             .onSuccess { matrixProfile ->
                 val primaryZId = matrixProfile.primaryZeroId
                 if (primaryZId != null) {
                     client.fetchFeedUserProfile(primaryZId)
                         .onSuccess { zeroProfile ->
-                            genericActionState.value = AsyncData.Success(Unit)
+                            genericActionState.value = AsyncAction.Success(Unit)
                             userProfileFlow.value = zeroProfile
                             fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
                         }
                         .onFailure { error ->
-                            genericActionState.value = AsyncData.Failure(error)
+                            genericActionState.value = AsyncAction.Failure(error)
                         }
                 } else {
-                    genericActionState.value = AsyncData.Failure(Throwable("Failed to fetch user feed profile. User primaryZId is not set. Check profile settings."))
+                    genericActionState.value = AsyncAction.Failure(Throwable("Failed to fetch user feed profile. User primaryZId is not set. Check profile settings."))
                 }
             }
             .onFailure { error ->
-                genericActionState.value = AsyncData.Failure(error)
+                genericActionState.value = AsyncAction.Failure(error)
             }
     }
 }

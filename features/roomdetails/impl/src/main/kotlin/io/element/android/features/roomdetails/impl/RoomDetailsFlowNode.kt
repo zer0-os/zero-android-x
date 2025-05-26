@@ -270,6 +270,10 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                             override fun onUserFeedClick(feed: ZeroFeed) {
                                 backstack.push(NavTarget.FeedDetails(feed))
                             }
+
+                            override fun onOpenDm(roomId: RoomId) {
+                                plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
+                            }
                         })
                         .build()
                 }

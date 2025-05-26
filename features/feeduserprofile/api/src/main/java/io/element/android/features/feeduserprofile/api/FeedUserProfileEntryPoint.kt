@@ -12,11 +12,12 @@ import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import io.element.android.libraries.architecture.FeatureEntryPoint
 import io.element.android.libraries.architecture.NodeInputs
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
-interface FeedUserProfileEntryPoint  : FeatureEntryPoint {
+interface FeedUserProfileEntryPoint : FeatureEntryPoint {
 
     data class Params(
         val userId: UserId,
@@ -25,6 +26,7 @@ interface FeedUserProfileEntryPoint  : FeatureEntryPoint {
 
     interface Callback : Plugin {
         fun onUserFeedClick(feed: ZeroFeed)
+        fun onOpenDm(roomId: RoomId)
     }
 
     fun nodeBuilder(parentNode: Node, buildContext: BuildContext): NodeBuilder
