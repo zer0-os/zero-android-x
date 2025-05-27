@@ -8,7 +8,7 @@
 package io.element.android.features.login.impl.screens.confirmaccountprovider
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,10 +17,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
 import io.element.android.features.login.impl.login.LoginHelper
-import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
-import io.element.android.support.zero.common.extension.withScope
-import kotlinx.coroutines.Dispatchers
 
 class ConfirmAccountProviderPresenter @AssistedInject constructor(
     @Assisted private val params: Params,
@@ -43,6 +40,10 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
 
         val loginMode by loginHelper.collectLoginMode()
 
+        DisposableEffect(Unit) {
+            onDispose { loginHelper.clearError() }
+        }
+
         fun handleEvents(event: ConfirmAccountProviderEvents) {
             when (event) {
                 ConfirmAccountProviderEvents.Continue -> {
@@ -55,7 +56,7 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
                 }
                 ConfirmAccountProviderEvents.ClearError -> loginHelper.clearError()
                 is ConfirmAccountProviderEvents.ValidateInvite -> {
-                    validateInviteCode(event.inviteCode, loginFlowAction)
+                    loginHelper.validateInviteCode(localCoroutineScope, event.inviteCode)
                 }
             }
         }
@@ -67,24 +68,4 @@ class ConfirmAccountProviderPresenter @AssistedInject constructor(
             eventSink = ::handleEvents
         )
     }
-
-    private fun validateInviteCode(
-        inviteCode: String,
-        loginFlowAction: MutableState<AsyncData<LoginFlow>>,
-    ) {
-        loginFlowAction.value = AsyncData.Loading()
-        withScope(Dispatchers.IO) {
-            val result = authenticationService.validateInviteCode(inviteCode)
-            val isCodeValid = result.getOrNull() ?: false
-            if (isCodeValid) {
-                loginFlowAction.value = AsyncData.Success(
-                    LoginFlow.ZeroCreateAccountFlow(inviteCode)
-                )
-            } else {
-                loginFlowAction.value = AsyncData.Failure(InvalidZeroInviteCode())
-            }
-        }
-    }
 }
-
-internal class InvalidZeroInviteCode: Exception()

@@ -100,6 +100,7 @@ fun ConfirmAccountProviderView(
             onOidcDetails = onOidcDetails,
             onNeedLoginPassword = onNeedLoginPassword,
             onCreateAccountContinue = onCreateAccountContinue,
+            onCreateZeroAccount = onCreateZeroAccount
         )
     }
 }

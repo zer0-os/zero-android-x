@@ -13,4 +13,5 @@ sealed interface LoginMode {
     data object PasswordLogin : LoginMode
     data class Oidc(val oidcDetails: OidcDetails) : LoginMode
     data class AccountCreation(val url: String) : LoginMode
+    data class ZeroCreateAccountFlow(val inviteCode: String) : LoginMode
 }

@@ -29,7 +29,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import io.element.android.features.login.impl.DefaultLoginUserStory
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
-import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
+import io.element.android.features.login.impl.login.LoginMode
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
 import io.element.android.features.login.impl.walletconnect.WalletConnectService
 import io.element.android.libraries.architecture.AsyncData
@@ -63,7 +63,7 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
         val createAccountAction: MutableState<AsyncData<SessionId>> = remember {
             mutableStateOf(AsyncData.Uninitialized)
         }
-        val loginFlowAction: MutableState<AsyncData<LoginFlow>> = remember {
+        val loginFlowAction: MutableState<AsyncData<LoginMode>> = remember {
             mutableStateOf(AsyncData.Uninitialized)
         }
 
@@ -184,12 +184,12 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
     private fun CoroutineScope.proceedToLogin(
         homeserverUrl: String,
         createAccountAction: MutableState<AsyncData<SessionId>>,
-        loginFlowActionState: MutableState<AsyncData<LoginFlow>>
+        loginFlowActionState: MutableState<AsyncData<LoginMode>>
     ) = launch {
         createAccountAction.value = AsyncData.Loading()
         authenticationService.setHomeserver(homeserverUrl)
             .onSuccess {
-                loginFlowActionState.value = AsyncData.Success(LoginFlow.PasswordLogin)
+                loginFlowActionState.value = AsyncData.Success(LoginMode.PasswordLogin)
                 createAccountAction.value = AsyncData.Uninitialized
             }
             .onFailure { failure ->

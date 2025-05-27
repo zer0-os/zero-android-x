@@ -26,7 +26,8 @@ fun LoginModeView(
     onLearnMoreClick: () -> Unit,
     onOidcDetails: (OidcDetails) -> Unit,
     onNeedLoginPassword: () -> Unit,
-    onCreateAccountContinue: (url: String) -> Unit
+    onCreateAccountContinue: (url: String) -> Unit,
+    onCreateZeroAccount: (inviteCode: String) -> Unit,
 ) {
     when (loginMode) {
         is AsyncData.Failure -> {
@@ -66,6 +67,12 @@ fun LoginModeView(
                         onSubmit = onClearError,
                     )
                 }
+                is InvalidZeroInviteCode -> {
+                    ErrorDialog(
+                        content = stringResource(io.element.android.support.zero.R.string.error_invalid_invite_code),
+                        onSubmit = onClearError
+                    )
+                }
                 else -> {
                     ErrorDialog(
                         content = stringResource(CommonStrings.error_unknown),
@@ -80,6 +87,7 @@ fun LoginModeView(
                 is LoginMode.Oidc -> onOidcDetails(loginModeData.oidcDetails)
                 LoginMode.PasswordLogin -> onNeedLoginPassword()
                 is LoginMode.AccountCreation -> onCreateAccountContinue(loginModeData.url)
+                is LoginMode.ZeroCreateAccountFlow -> onCreateZeroAccount(loginModeData.inviteCode)
             }
         }
         AsyncData.Uninitialized -> Unit

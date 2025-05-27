@@ -53,8 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.login.impl.error.loginError
-import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
-import io.element.android.features.login.impl.screens.loginpassword.LoginPasswordEvents
+import io.element.android.features.login.impl.login.LoginMode
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -218,7 +217,7 @@ fun ZeroCreateAccountView(
             when (state.loginFlow) {
                 is AsyncData.Success -> {
                     when (state.loginFlow.data) {
-                        LoginFlow.PasswordLogin -> onProceedToLoginScreen()
+                        LoginMode.PasswordLogin -> onProceedToLoginScreen()
                         else -> {}
                     }
                 }

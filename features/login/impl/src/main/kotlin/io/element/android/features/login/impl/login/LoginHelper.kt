@@ -94,6 +94,18 @@ class LoginHelper @Inject constructor(
         )
     }
 
+    fun validateInviteCode(coroutineScope: CoroutineScope, inviteCode: String) =
+        coroutineScope.launch {
+            loginModeState.value = AsyncData.Loading()
+            val result = authenticationService.validateInviteCode(inviteCode)
+            val isCodeValid = result.getOrNull() ?: false
+            if (isCodeValid) {
+                loginModeState.value = AsyncData.Success(LoginMode.ZeroCreateAccountFlow(inviteCode))
+            } else {
+                loginModeState.value = AsyncData.Failure(InvalidZeroInviteCode())
+            }
+        }
+
     private suspend fun onOidcAction(oidcAction: OidcAction) {
         loginModeState.value = AsyncData.Loading()
         when (oidcAction) {
@@ -119,3 +131,5 @@ class LoginHelper @Inject constructor(
         oidcActionFlow.reset()
     }
 }
+
+internal class InvalidZeroInviteCode: Exception()

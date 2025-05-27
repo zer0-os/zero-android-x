@@ -131,6 +131,7 @@ fun ChooseAccountProviderView(
                 onOidcDetails = onOidcDetails,
                 onNeedLoginPassword = onNeedLoginPassword,
                 onCreateAccountContinue = onCreateAccountContinue,
+                onCreateZeroAccount = {}
             )
         }
     }

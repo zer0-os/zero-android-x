@@ -9,7 +9,7 @@ package io.element.android.features.login.impl.screens.zerocreateaccount
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import io.element.android.features.login.impl.screens.confirmaccountprovider.LoginFlow
+import io.element.android.features.login.impl.login.LoginMode
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.core.SessionId
 import io.element.android.support.zero.common.util.ValidationUtil
@@ -20,7 +20,7 @@ data class ZeroCreateAccountState(
     val inviteCode: String = "",
     val formState: ZeroCreateAccountFormState,
     val createAccountAction: AsyncData<SessionId>,
-    val loginFlow: AsyncData<LoginFlow>,
+    val loginFlow: AsyncData<LoginMode>,
     val showWeb3Modal: Boolean,
     val eventSink: (ZeroCreateAccountEvents) -> Unit
 ) {
