@@ -7,26 +7,17 @@
 
 package io.element.android.features.login.impl.screens.confirmaccountprovider
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.support.zero.R
-import io.element.android.features.login.impl.dialogs.SlidingSyncNotSupportedDialog
-import io.element.android.features.login.impl.error.ChangeServerError
-import io.element.android.features.login.impl.screens.createaccount.AccountCreationNotSupported
+import io.element.android.features.login.impl.login.LoginModeView
 import io.element.android.libraries.architecture.AsyncData
-import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.matrix.api.auth.OidcDetails
-import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.screens.confirmaccountprovider.ZeroConfirmAccountProviderView
 
 @Composable
@@ -40,9 +31,9 @@ fun ConfirmAccountProviderView(
     onCreateZeroAccount: (inviteCode: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isLoading by remember(state.loginFlow) {
+    val isLoading by remember(state.loginMode) {
         derivedStateOf {
-            state.loginFlow is AsyncData.Loading
+            state.loginMode is AsyncData.Loading
         }
     }
     val eventSink = state.eventSink
@@ -100,57 +91,16 @@ fun ConfirmAccountProviderView(
             eventSink.invoke(ConfirmAccountProviderEvents.ValidateInvite(inviteCode))
         }
     ) {
-        when (state.loginFlow) {
-            is AsyncData.Failure -> {
-                when (val error = state.loginFlow.error) {
-                    is ChangeServerError.Error -> {
-                        ErrorDialog(
-                            content = error.message(),
-                            onSubmit = {
-                                eventSink.invoke(ConfirmAccountProviderEvents.ClearError)
-                            }
-                        )
-                    }
-                    is ChangeServerError.SlidingSyncAlert -> {
-                        SlidingSyncNotSupportedDialog(
-                            onLearnMoreClick = {
-                                onLearnMoreClick()
-                                eventSink(ConfirmAccountProviderEvents.ClearError)
-                            },
-                            onDismiss = {
-                                eventSink(ConfirmAccountProviderEvents.ClearError)
-                            }
-                        )
-                    }
-                    is AccountCreationNotSupported -> {
-                        ErrorDialog(
-                            content = stringResource(CommonStrings.error_account_creation_not_possible),
-                            onSubmit = {
-                                eventSink.invoke(ConfirmAccountProviderEvents.ClearError)
-                            }
-                        )
-                    }
-                    is InvalidZeroInviteCode -> {
-                        ErrorDialog(
-                            content = stringResource(R.string.error_invalid_invite_code),
-                            onSubmit = {
-                                eventSink.invoke(ConfirmAccountProviderEvents.ClearError)
-                            }
-                        )
-                    }
-                }
-            }
-            is AsyncData.Loading -> Unit // The Continue button shows the loading state
-            is AsyncData.Success -> {
-                when (val loginFlowState = state.loginFlow.data) {
-                    is LoginFlow.OidcFlow -> onOidcDetails(loginFlowState.oidcDetails)
-                    LoginFlow.PasswordLogin -> onNeedLoginPassword()
-                    is LoginFlow.AccountCreationFlow -> onCreateAccountContinue(loginFlowState.url)
-                    is LoginFlow.ZeroCreateAccountFlow -> onCreateZeroAccount(loginFlowState.inviteCode)
-                }
-            }
-            AsyncData.Uninitialized -> Unit
-        }
+        LoginModeView(
+            loginMode = state.loginMode,
+            onClearError = {
+                eventSink(ConfirmAccountProviderEvents.ClearError)
+            },
+            onLearnMoreClick = onLearnMoreClick,
+            onOidcDetails = onOidcDetails,
+            onNeedLoginPassword = onNeedLoginPassword,
+            onCreateAccountContinue = onCreateAccountContinue,
+        )
     }
 }
 

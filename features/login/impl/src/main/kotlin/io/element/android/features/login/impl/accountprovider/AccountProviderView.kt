@@ -40,6 +40,7 @@ fun AccountProviderView(
     item: AccountProvider,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selected: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -67,7 +68,7 @@ fun AccountProviderView(
                 } else {
                     RoundedIconAtom(
                         size = RoundedIconAtomSize.Medium,
-                        imageVector = CompoundIcons.Search(),
+                        imageVector = CompoundIcons.Host(),
                         tint = ElementTheme.colors.iconPrimary,
                     )
                 }
@@ -87,6 +88,15 @@ fun AccountProviderView(
                         imageVector = CompoundIcons.Public(),
                         contentDescription = null,
                         tint = ElementTheme.colors.iconSecondary,
+                    )
+                }
+                if (selected) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(start = 10.dp),
+                        imageVector = CompoundIcons.Check(),
+                        contentDescription = null,
+                        tint = ElementTheme.colors.iconAccentPrimary,
                     )
                 }
             }
