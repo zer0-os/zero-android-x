@@ -56,13 +56,13 @@ class EventMessageMapper {
     fun mapToCustomEvent(messageContent: EventMessageContent): MessageContent? {
         val content = messageContent.content
         return if (content.isRemoteGif) {
-            val source = MediaSource(url = content.url ?: "", content.toJson())
+            val source = MediaSource(url = content.url.orEmpty(), content.toJson())
             val height = (content.info?.height ?: content.info?.h)?.toLong()
             val width = (content.info?.width ?: content.info?.w)?.toLong()
             val mimeType = content.info?.mimeType
             val size = content.info?.size?.toLong()
             val type = ImageMessageType(
-                filename = content.info?.name ?: "",
+                filename = content.info?.name.orEmpty(),
                 caption = null,
                 formattedCaption = null,
                 source = source,
@@ -71,7 +71,7 @@ class EventMessageMapper {
                 ),
             )
             MessageContent(
-                body = content.body ?: "",
+                body = content.body.orEmpty(),
                 inReplyTo = null,
                 isEdited = false,
                 isThreaded = false,

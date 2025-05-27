@@ -86,7 +86,7 @@ class AndroidLocalMediaFactory @Inject constructor(
         duration: String?,
     ): LocalMedia {
         val resolvedMimeType = mimeType ?: context.getMimeType(uri) ?: MimeTypes.OctetStream
-        val fileName = name ?: context.getFileName(uri) ?: ""
+        val fileName = name ?: context.getFileName(uri).orEmpty()
         val fileSize = formattedFileSize ?: fileSizeFormatter.format(context.getFileSize(uri))
         val fileExtension = fileExtensionExtractor.extractFromName(fileName)
         return LocalMedia(

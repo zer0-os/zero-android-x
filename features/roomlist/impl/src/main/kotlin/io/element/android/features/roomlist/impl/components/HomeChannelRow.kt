@@ -55,7 +55,7 @@ fun HomeChannelRow(
                     )
                 }
             ) {
-                append(channel.displayTitle ?: "")
+                append(channel.displayTitle.orEmpty())
             }
         }
         Text(

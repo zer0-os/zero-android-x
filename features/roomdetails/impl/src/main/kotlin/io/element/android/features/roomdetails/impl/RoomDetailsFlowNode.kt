@@ -243,27 +243,27 @@ class RoomDetailsFlowNode @AssistedInject constructor(
             }
 
             is NavTarget.RoomMemberDetails -> {
-                if (navTarget.primaryZId.isNullOrBlank()) {
-                    val callback = object : UserProfileNodeHelper.Callback {
-                        override fun openAvatarPreview(username: String, avatarUrl: String) {
-                            overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
-                        }
-
-                        override fun onStartDM(roomId: RoomId) {
-                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
-                        }
-
-                        override fun onStartCall(dmRoomId: RoomId) {
-                            elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
-                        }
-
-                        override fun onVerifyUser(userId: UserId) {
-                            backstack.push(NavTarget.VerifyUser(userId))
-                        }
-                    }
-                    val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
-                    createNode<RoomMemberDetailsNode>(buildContext, plugins)
-                } else {
+//                if (navTarget.primaryZId.isNullOrBlank()) {
+//                    val callback = object : UserProfileNodeHelper.Callback {
+//                        override fun openAvatarPreview(username: String, avatarUrl: String) {
+//                            overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
+//                        }
+//
+//                        override fun onStartDM(roomId: RoomId) {
+//                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
+//                        }
+//
+//                        override fun onStartCall(dmRoomId: RoomId) {
+//                            elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
+//                        }
+//
+//                        override fun onVerifyUser(userId: UserId) {
+//                            backstack.push(NavTarget.VerifyUser(userId))
+//                        }
+//                    }
+//                    val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
+//                    createNode<RoomMemberDetailsNode>(buildContext, plugins)
+//                } else {
                     feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
                         .params(FeedUserProfileEntryPoint.Params(navTarget.roomMemberId, null))
                         .callback(object : FeedUserProfileEntryPoint.Callback {
@@ -276,7 +276,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                             }
                         })
                         .build()
-                }
+//                }
             }
             is NavTarget.FeedDetails -> {
                 feedDetailsEntryPoint.nodeBuilder(this, buildContext)

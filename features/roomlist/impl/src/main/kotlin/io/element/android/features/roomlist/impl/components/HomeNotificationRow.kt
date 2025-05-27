@@ -88,7 +88,7 @@ fun HomeNotificationRow(
 
 private fun AnnotatedString.Builder.appendNotificationContent(text: String?) {
     withStyle(SpanStyle(color = Color.White)) {
-        append(text ?: "")
+        append(text.orEmpty())
     }
 }
 

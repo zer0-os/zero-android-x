@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.toZeroProfile
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
@@ -267,11 +268,11 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         genericActionState.value = AsyncAction.Loading
         client.getProfile(userId)
             .onSuccess { matrixProfile ->
+                genericActionState.value = AsyncAction.Success(Unit)
                 val primaryZId = matrixProfile.primaryZeroId
                 if (primaryZId != null) {
                     client.fetchFeedUserProfile(primaryZId)
                         .onSuccess { zeroProfile ->
-                            genericActionState.value = AsyncAction.Success(Unit)
                             userProfileFlow.value = zeroProfile
                             fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
                         }
@@ -279,7 +280,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
                             genericActionState.value = AsyncAction.Failure(error)
                         }
                 } else {
-                    genericActionState.value = AsyncAction.Failure(Throwable("Failed to fetch user feed profile. User primaryZId is not set. Check profile settings."))
+                    userProfileFlow.value = matrixProfile.toZeroProfile()
                 }
             }
             .onFailure { error ->

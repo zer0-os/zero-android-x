@@ -8,6 +8,7 @@
 package io.element.android.libraries.matrix.api.zero.feed
 
 import android.os.Parcelable
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
@@ -205,7 +206,7 @@ val FeedMedia.aspectRatio
 val FeedMedia.isVideo
     get() = mimeType?.contains("video") == true
 
-fun ZeroFeedAuthor.toProfileView(userZId: String) = FeedUserProfileView(
+fun ZeroFeedAuthor.toZeroProfile(userZId: String) = FeedUserProfileView(
     userId = id,
     primaryZid = userZId,
     firstName = profileSummary.firstName,
@@ -214,5 +215,14 @@ fun ZeroFeedAuthor.toProfileView(userZId: String) = FeedUserProfileView(
     followingCount = null
 )
 
+fun MatrixUser.toZeroProfile() = FeedUserProfileView(
+    userId = userId.extractedDisplayName,
+    primaryZid = primaryZeroId.orEmpty(),
+    firstName = displayName.orEmpty(),
+    profileImage = avatarUrl,
+    followersCount = null,
+    followingCount = null
+)
+
 val ZeroFeed.userProfile
-    get() = userProfileView ?: user.toProfileView(zid)
+    get() = userProfileView ?: user.toZeroProfile(zid)

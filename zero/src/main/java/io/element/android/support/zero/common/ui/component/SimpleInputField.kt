@@ -77,7 +77,7 @@ fun SimpleInputField(
 					onTextChanged.invoke(it.text)
 				}
 			},
-			placeholderText = placeholder?.let { stringResource(id = it) } ?: "",
+			placeholderText = placeholder?.let { stringResource(id = it) }.orEmpty(),
 			textStyle =
 			ElementTheme.zeroTypography
 				.fontBodyLgRegular

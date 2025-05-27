@@ -42,6 +42,7 @@ import io.element.android.libraries.designsystem.theme.components.HorizontalDivi
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.support.zero.R
 
@@ -82,7 +83,9 @@ fun UserProfileHeaderView(
                             state.eventSink(FeedUserProfileEvents.StartDM)
                         }
                     ) {
-                        Icon(CompoundIcons.Chat(), contentDescription = "StartDMAction")
+                        Icon(CompoundIcons.Chat(),
+                            contentDescription = "StartDMAction",
+                            tint = ElementTheme.colors.zeroBrandColor)
                     }
                 }
                 Row(

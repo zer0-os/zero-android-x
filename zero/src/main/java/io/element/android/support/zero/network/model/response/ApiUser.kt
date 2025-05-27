@@ -33,7 +33,7 @@ data class ApiUser(
     val primaryWallet: ApiWallet? = null
 ) : ApiBaseMember {
     val firstName
-        get() = profile?.firstName ?: ""
+        get() = profile?.firstName.orEmpty()
 
     val name
         get() = _name ?: profile?.run { "$firstName $lastName" }
