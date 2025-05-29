@@ -104,10 +104,12 @@ internal fun TimelineItemCallNotifyView(
 
 @PreviewsDayNight
 @Composable
-internal fun TimelineItemCallNotifyViewPreview() {
-    ElementPreview {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            RoomCallStateProvider().values.forEach { roomCallState ->
+internal fun TimelineItemCallNotifyViewPreview() = ElementPreview {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        RoomCallStateProvider()
+            .values
+            .filter { it !is RoomCallState.Unavailable }
+            .forEach { roomCallState ->
                 TimelineItemCallNotifyView(
                     event = aTimelineItemEvent(content = TimelineItemCallNotifyContent()),
                     roomCallState = roomCallState,
@@ -115,6 +117,5 @@ internal fun TimelineItemCallNotifyViewPreview() {
                     onJoinCallClick = {},
                 )
             }
-        }
     }
 }
