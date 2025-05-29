@@ -30,9 +30,11 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.primaryZIdOrWalletAddress
 import io.element.android.libraries.matrix.api.zero.feed.toZeroProfile
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.support.zero.common.util.FeedItemMediaCache
@@ -152,7 +154,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
     ) = launch {
         val userProfile = userProfileFlow.value ?: return@launch
         val results = awaitAll(
-            async { client.fetchFeedUserProfile(userProfile.primaryZid) },
+            async { client.fetchFeedUserProfile(userProfile.primaryZIdOrWalletAddress ?: userProfile.userId) },
             async { client.fetchUserFollowingStatus(userProfile.userId) },
             async { client.fetchAllUserFeeds(userProfile.userId, USER_FEED_PAGE_SIZE, 0) },
         )
@@ -269,9 +271,9 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         client.getProfile(userId)
             .onSuccess { matrixProfile ->
                 genericActionState.value = AsyncAction.Success(Unit)
-                val primaryZId = matrixProfile.primaryZeroId
-                if (primaryZId != null) {
-                    client.fetchFeedUserProfile(primaryZId)
+                val key = matrixProfile.primaryZIdOrWalletAddress
+                if (key != null) {
+                    client.fetchFeedUserProfile(key)
                         .onSuccess { zeroProfile ->
                             userProfileFlow.value = zeroProfile
                             fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)

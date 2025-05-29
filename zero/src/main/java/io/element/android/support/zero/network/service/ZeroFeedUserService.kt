@@ -23,6 +23,11 @@ interface ZeroFeedUserService {
         @Path("user_zid") userZId: String,
     ): ApiFeedUserProfileView
 
+    @GET(value = "api/v2/users/profile/address/{address}")
+    suspend fun fetchUserProfileByAddress(
+        @Path("address") userZId: String,
+    ): ApiFeedUserProfileView
+
     @GET(value = "api/v2/user-follows/{user_id}/status")
     suspend fun fetchUserFollowingStatus(
         @Path("user_id") userId: String,

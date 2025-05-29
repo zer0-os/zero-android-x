@@ -8,5 +8,7 @@ internal fun ApiUser.toModel() = ZeroUser(
     matrixId = matrixId.orEmpty(),
     name = name.orEmpty(),
     avatarUrl = avatar,
-    primaryZeroId = primaryZID
+    primaryZeroId = primaryZID,
+    primaryWalletAddress = primaryWalletAddress,
+    thirdWebWalletAddress = thirdWebWallet?.publicAddress
 )

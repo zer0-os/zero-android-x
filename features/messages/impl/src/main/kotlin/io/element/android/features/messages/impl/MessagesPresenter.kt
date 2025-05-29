@@ -76,6 +76,7 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOwn
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendMessage
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
+import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.messages.reply.map
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
@@ -155,7 +156,7 @@ class MessagesPresenter @AssistedInject constructor(
         val roomAvatar: AsyncData<AvatarData> by remember {
             derivedStateOf { AsyncData.Success(roomInfo.avatarData()) }
         }
-        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.primaryZeroId } }
+        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.zIdOrWalletAddressDisplay } }
         val heroes by remember {
             derivedStateOf { roomInfo.heroes().toPersistentList() }
         }

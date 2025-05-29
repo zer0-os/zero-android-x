@@ -18,6 +18,8 @@ object UserProfileMapper {
             userId = UserId(userProfile.userId),
             displayName = userProfile.displayName,
             avatarUrl = userProfile.avatarUrl,
-            primaryZeroId = zeroUser?.primaryZeroId
+            primaryZeroId = zeroUser?.primaryZeroId,
+            primaryWalletAddress = zeroUser?.primaryWalletAddress,
+            thirdWebWalletAddress = zeroUser?.thirdWebWalletAddress
         )
 }

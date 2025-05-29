@@ -44,6 +44,7 @@ import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
+import io.element.android.libraries.matrix.api.zero.feed.zIdOrWalletAddressDisplay
 import io.element.android.support.zero.R
 
 @Composable
@@ -101,14 +102,17 @@ fun UserProfileHeaderView(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Text(
-                            modifier = Modifier.padding(top = 2.dp),
-                            text = state.userProfile.primaryZid,
-                            style = ElementTheme.typography.fontBodyLgRegular,
-                            color = ElementTheme.colors.textSecondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        val subHeadingText = state.userProfile.zIdOrWalletAddressDisplay
+                        if (subHeadingText != null) {
+                            Text(
+                                modifier = Modifier.padding(top = 2.dp),
+                                text = subHeadingText,
+                                style = ElementTheme.typography.fontBodyLgRegular,
+                                color = ElementTheme.colors.textSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                     if (state.shouldShowFollowButton) {
                         val buttonText = if (state.isUserFollowed == true) "Unfollow" else "Follow"

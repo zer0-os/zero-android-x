@@ -90,7 +90,6 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
-import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -1004,12 +1003,11 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?> =
+    override suspend fun fetchFeedUserProfile(key: String): Result<FeedUserProfileView?> =
         withContext(sessionDispatcher) {
             runCatching {
                 val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
-                val cleanedUserZId = userZId.replace(ZERO_CHANNEL_PREFIX, "")
-                feedUserRepo.fetchUserProfile(cleanedUserZId)?.toModel()
+                feedUserRepo.fetchUserProfile(key)?.toModel()
             }
         }
 

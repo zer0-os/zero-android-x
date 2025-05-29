@@ -40,4 +40,7 @@ data class ApiUser(
 
     val avatar
         get() = profileImage ?: profile?.profileImage
+
+    val thirdWebWallet
+        get() = wallets?.first { it.isThirdWeb }
 }

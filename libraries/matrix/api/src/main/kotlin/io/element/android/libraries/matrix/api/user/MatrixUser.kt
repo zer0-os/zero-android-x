@@ -9,6 +9,7 @@ package io.element.android.libraries.matrix.api.user
 
 import android.os.Parcelable
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -16,5 +17,16 @@ data class MatrixUser(
     val userId: UserId,
     val displayName: String? = null,
     val avatarUrl: String? = null,
-    val primaryZeroId: String? = null
+    val primaryZeroId: String? = null,
+    val primaryWalletAddress: String? = null,
+    val thirdWebWalletAddress: String? = null
 ) : Parcelable
+
+val MatrixUser.walletAddress
+    get() = primaryWalletAddress ?: thirdWebWalletAddress
+
+val MatrixUser.primaryZIdOrWalletAddress
+    get() = primaryZeroId ?: walletAddress
+
+val MatrixUser.zIdOrWalletAddressDisplay
+    get() = primaryZeroId ?: ZeroWalletUtil.walletAddressDisplayText(walletAddress)

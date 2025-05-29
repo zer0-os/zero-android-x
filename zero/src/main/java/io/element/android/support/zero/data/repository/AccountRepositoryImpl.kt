@@ -42,8 +42,7 @@ class AccountRepositoryImpl(
 
     override suspend fun checkAndInitializeThirdWeb() {
         val currentUser = zeroUserService.getCurrentUser()
-        val thirdWebWallet = currentUser.wallets?.firstOrNull { it.isThirdWeb }
-        if (thirdWebWallet == null) {
+        if (currentUser.thirdWebWallet == null) {
             // Initialize thirdWeb wallet
             zeroWalletService.initializeThirdWebWallet()
         }
