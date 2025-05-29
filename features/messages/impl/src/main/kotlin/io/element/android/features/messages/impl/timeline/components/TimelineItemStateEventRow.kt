@@ -29,15 +29,19 @@ import io.element.android.features.messages.impl.timeline.components.receipt.aRe
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
 import io.element.android.features.messages.impl.timeline.model.TimelineItemGroupPosition
 import io.element.android.features.messages.impl.timeline.model.TimelineItemReadReceipts
+import io.element.android.features.messages.impl.timeline.model.event.TimelineItemEventContent
+import io.element.android.features.messages.impl.timeline.model.event.TimelineItemStateEventContent
 import io.element.android.features.messages.impl.timeline.model.event.aTimelineItemStateEventContent
 import io.element.android.features.messages.impl.timeline.util.defaultTimelineContentPadding
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.matrix.api.room.RoomMember
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun TimelineItemStateEventRow(
     event: TimelineItem.Event,
+    roomMembers: List<RoomMember>,
     renderReadReceipts: Boolean,
     isLastOutgoingMessage: Boolean,
     isHighlighted: Boolean,
@@ -69,7 +73,7 @@ fun TimelineItemStateEventRow(
                     .widthIn(max = 320.dp)
             ) {
                 TimelineItemEventContentView(
-                    content = event.content,
+                    content = event.content.updatedContent(roomMembers),
                     onLinkClick = {},
                     onLinkLongClick = {},
                     hideMediaContent = false,
@@ -93,6 +97,18 @@ fun TimelineItemStateEventRow(
     }
 }
 
+private fun TimelineItemEventContent.updatedContent(roomMembers: List<RoomMember>): TimelineItemEventContent {
+    return (this as? TimelineItemStateEventContent)?.let { event ->
+        val regex = Regex("@[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}:[\\w.-]+")
+        val text = regex.replace(event.body) {
+            val matchedUserId = it.value
+            val user = roomMembers.first { member -> member.userId.value == matchedUserId }
+            (user.displayName ?: "").trim()
+        }
+        event.copy(body = text)
+    } ?: this
+}
+
 @PreviewsDayNight
 @Composable
 internal fun TimelineItemStateEventRowPreview() = ElementPreview {
@@ -105,6 +121,7 @@ internal fun TimelineItemStateEventRowPreview() = ElementPreview {
                 receipts = listOf(aReadReceiptData(0)).toPersistentList(),
             )
         ),
+        roomMembers = emptyList(),
         renderReadReceipts = true,
         isLastOutgoingMessage = false,
         isHighlighted = false,

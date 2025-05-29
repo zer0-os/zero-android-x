@@ -255,4 +255,5 @@ internal fun aTimelineRoomInfo(
     roomCallState = aStandByCallState(),
     pinnedEventIds = pinnedEventIds,
     typingNotificationState = typingNotificationState,
+    roomMembers = emptyList()
 )

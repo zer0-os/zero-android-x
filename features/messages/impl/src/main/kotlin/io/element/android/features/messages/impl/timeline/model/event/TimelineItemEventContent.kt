@@ -97,6 +97,27 @@ fun TimelineItemEventContent.isEdited(): Boolean = when (this) {
  */
 fun TimelineItemEventContent.isRedacted(): Boolean = this is TimelineItemRedactedContent
 
+fun TimelineItemEventContent.hasEmptyContent(): Boolean =
+    when (this) {
+        is TimelineItemStateContent -> {
+            this.body.isEmpty()
+        }
+        is TimelineItemTextBasedContent,
+        is TimelineItemAudioContent,
+        is TimelineItemEncryptedContent,
+        is TimelineItemFileContent,
+        is TimelineItemImageContent,
+        is TimelineItemStickerContent,
+        is TimelineItemLocationContent,
+        is TimelineItemPollContent,
+        is TimelineItemVoiceContent,
+        is TimelineItemVideoContent,
+        is TimelineItemRedactedContent,
+        is TimelineItemLegacyCallInviteContent,
+        is TimelineItemCallNotifyContent,
+        TimelineItemUnknownContent -> false
+    }
+
 fun TimelineItemEventContentWithAttachment.duration(): Duration? {
     return when (this) {
         is TimelineItemAudioContent -> duration

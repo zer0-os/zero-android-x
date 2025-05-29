@@ -31,7 +31,7 @@ sealed interface OtherState {
         }
     }
 
-    data class RoomUserPowerLevels(val users: Map<String, Long>) : OtherState
+    data class RoomUserPowerLevels(val users: Map<String, Long>, val previous: Map<String, Long>?) : OtherState
     data object RoomServerAcl : OtherState
     data class RoomThirdPartyInvite(val displayName: String?) : OtherState
     data object RoomTombstone : OtherState

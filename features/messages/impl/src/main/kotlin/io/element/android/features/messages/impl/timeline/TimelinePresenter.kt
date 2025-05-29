@@ -31,8 +31,8 @@ import io.element.android.features.messages.impl.timeline.factories.TimelineItem
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactoryConfig
 import io.element.android.features.messages.impl.timeline.model.NewEventState
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
-import io.element.android.features.messages.impl.timeline.model.virtual.TimelineItemTypingNotificationModel
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemTextBasedContent
+import io.element.android.features.messages.impl.timeline.model.virtual.TimelineItemTypingNotificationModel
 import io.element.android.features.messages.impl.typing.TypingNotificationState
 import io.element.android.features.messages.impl.voicemessages.timeline.RedactedVoiceMessageManager
 import io.element.android.features.poll.api.actions.EndPollAction
@@ -103,6 +103,7 @@ class TimelinePresenter @AssistedInject constructor(
         val lastReadReceiptId = rememberSaveable { mutableStateOf<EventId?>(null) }
 
         val roomInfo by room.roomInfoFlow.collectAsState()
+        val roomMembers by room.membersStateFlow.collectAsState()
 
         val syncUpdateFlow = room.syncUpdateFlow.collectAsState()
 
@@ -249,7 +250,7 @@ class TimelinePresenter @AssistedInject constructor(
 
         val typingNotificationState = typingNotificationPresenter.present()
         val roomCallState = roomCallStatePresenter.present()
-        val timelineRoomInfo by remember(typingNotificationState, roomCallState, roomInfo) {
+        val timelineRoomInfo by remember(typingNotificationState, roomCallState, roomInfo, roomMembers) {
             derivedStateOf {
                 TimelineRoomInfo(
                     name = roomInfo.name,
@@ -259,6 +260,7 @@ class TimelinePresenter @AssistedInject constructor(
                     roomCallState = roomCallState,
                     pinnedEventIds = roomInfo.pinnedEventIds.orEmpty(),
                     typingNotificationState = typingNotificationState,
+                    roomMembers = roomMembers.roomMembers().orEmpty()
                 )
             }
         }
