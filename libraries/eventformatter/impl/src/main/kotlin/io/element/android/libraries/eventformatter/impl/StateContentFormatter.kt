@@ -8,6 +8,7 @@
 package io.element.android.libraries.eventformatter.impl
 
 import io.element.android.libraries.eventformatter.impl.mode.RenderingMode
+import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.OtherState
 import io.element.android.libraries.matrix.api.timeline.item.event.StateContent
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -21,6 +22,7 @@ class StateContentFormatter @Inject constructor(
     fun format(
         stateContent: StateContent,
         senderDisambiguatedDisplayName: String,
+        sender: UserId,
         senderIsYou: Boolean,
         renderingMode: RenderingMode,
     ): CharSequence? {
@@ -167,7 +169,7 @@ class StateContentFormatter @Inject constructor(
                     null
                 }
                 RenderingMode.Timeline -> {
-                    "RoomPowerLevels"
+                    buildRoomLevelStateEventString(content.users, content.previous)
                 }
             }
             OtherState.RoomServerAcl -> when (renderingMode) {
@@ -207,6 +209,33 @@ class StateContentFormatter @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun buildRoomLevelStateEventString(users: Map<String, Long>,
+                                               previousState: Map<String, Long>?): String {
+        val eventStringBuilder = StringBuilder()
+        if (users.isNotEmpty()) {
+            users.forEach { (userId, newLevel) ->
+                if (eventStringBuilder.isNotEmpty()) {
+                    eventStringBuilder.append("\n")
+                }
+                val oldLevel = previousState?.getOrDefault(userId, 0) ?: 0
+                val message = when (Pair(oldLevel.toInt(), newLevel.toInt())) {
+                    Pair(0, 50) -> "$userId was set as moderator"
+                    Pair(0, 100) -> "$userId was set as admin"
+                    Pair(50, 0) -> "$userId was removed as moderator"
+                    Pair(50, 100) -> "$userId was set as admin"
+                    Pair(100, 50) -> "$userId was set as moderator"
+                    Pair(100, 0) -> "$userId was removed as admin"
+                    else -> ""
+                }
+                if (message.isNotEmpty()) {
+                    eventStringBuilder.append(message)
+                    eventStringBuilder.append(" by admin.")
+                }
+            }
+        }
+        return eventStringBuilder.toString().trim()
     }
 
     private fun formatRoomPinnedEvents(

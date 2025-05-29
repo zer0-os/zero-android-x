@@ -124,6 +124,7 @@ internal fun TimelineItemRow(
                     is TimelineItemStateContent, is TimelineItemLegacyCallInviteContent -> {
                         TimelineItemStateEventRow(
                             event = timelineItem,
+                            roomMembers = timelineRoomInfo.roomMembers,
                             renderReadReceipts = renderReadReceipts,
                             isLastOutgoingMessage = isLastOutgoingMessage,
                             isHighlighted = timelineItem.isEvent(focusedEventId),

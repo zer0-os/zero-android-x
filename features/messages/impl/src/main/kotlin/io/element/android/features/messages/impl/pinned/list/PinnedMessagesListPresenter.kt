@@ -89,6 +89,8 @@ class PinnedMessagesListPresenter @AssistedInject constructor(
     override fun present(): PinnedMessagesListState {
         val isDm by room.isDmAsState()
 
+        val roomMembersState = room.membersStateFlow.collectAsState()
+
         val timelineRoomInfo = remember(isDm) {
             TimelineRoomInfo(
                 isDm = isDm,
@@ -104,7 +106,8 @@ class PinnedMessagesListPresenter @AssistedInject constructor(
                     renderTypingNotifications = false,
                     typingMembers = persistentListOf(),
                     reserveSpace = false,
-                )
+                ),
+                roomMembers = roomMembersState.value.roomMembers().orEmpty()
             )
         }
         val timelineProtectionState = timelineProtectionPresenter.present()

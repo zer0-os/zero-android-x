@@ -22,7 +22,7 @@ object TimelineConfig {
         StateEventType.ROOM_GUEST_ACCESS,
         StateEventType.ROOM_HISTORY_VISIBILITY,
         StateEventType.ROOM_JOIN_RULES,
-        StateEventType.ROOM_POWER_LEVELS,
+//        StateEventType.ROOM_POWER_LEVELS,
         StateEventType.ROOM_SERVER_ACL,
         StateEventType.ROOM_TOMBSTONE,
         StateEventType.SPACE_CHILD,
