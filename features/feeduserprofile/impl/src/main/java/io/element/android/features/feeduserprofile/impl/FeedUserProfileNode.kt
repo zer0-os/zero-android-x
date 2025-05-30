@@ -42,6 +42,10 @@ class FeedUserProfileNode @AssistedInject constructor(
         callbacks.forEach { it.onOpenDm(roomId) }
     }
 
+    private fun openAvatarPreview(name: String, url: String) {
+        callbacks.forEach { it.openAvatarPreview(name, url) }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -52,6 +56,7 @@ class FeedUserProfileNode @AssistedInject constructor(
             state = state,
             onBackClick = ::navigateUp,
             onOpenDm = ::onOpenDm,
+            openAvatarPreview = ::openAvatarPreview,
             onUserFeedClick = this::onUserFeedClick
         )
     }

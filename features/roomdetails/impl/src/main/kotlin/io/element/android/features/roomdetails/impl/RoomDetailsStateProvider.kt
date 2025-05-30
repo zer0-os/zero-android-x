@@ -13,6 +13,7 @@ import io.element.android.features.leaveroom.api.aLeaveRoomState
 import io.element.android.features.roomcall.api.RoomCallState
 import io.element.android.features.roomcall.api.aStandByCallState
 import io.element.android.features.roomdetails.impl.members.aRoomMember
+import io.element.android.features.roomdetails.impl.members.aRoomMemberList
 import io.element.android.features.userprofile.api.UserProfileState
 import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.features.userprofile.shared.aUserProfileState
@@ -25,8 +26,6 @@ import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomMembershipState
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.matrix.api.room.RoomNotificationSettings
-import io.element.android.libraries.matrix.api.user.MatrixUser
-import io.element.android.libraries.matrix.ui.components.aMatrixUserList
 import kotlinx.collections.immutable.toPersistentList
 
 open class RoomDetailsStateProvider : PreviewParameterProvider<RoomDetailsState> {
@@ -48,7 +47,7 @@ open class RoomDetailsStateProvider : PreviewParameterProvider<RoomDetailsState>
             ),
             aRoomDetailsState(roomCallState = aStandByCallState(false), canInvite = false),
             aRoomDetailsState(isPublic = false),
-            aRoomDetailsState(heroes = aMatrixUserList()),
+            aRoomDetailsState(heroes = aRoomMemberList()),
             aRoomDetailsState(pinnedMessagesCount = 3),
             aRoomDetailsState(knockRequestsCount = null, canShowKnockRequests = true),
             aRoomDetailsState(knockRequestsCount = 4, canShowKnockRequests = true),
@@ -110,7 +109,7 @@ fun aRoomDetailsState(
     isFavorite: Boolean = false,
     displayAdminSettings: Boolean = false,
     isPublic: Boolean = true,
-    heroes: List<MatrixUser> = emptyList(),
+    heroes: List<RoomMember> = emptyList(),
     canShowPinnedMessages: Boolean = true,
     canShowMediaGallery: Boolean = true,
     pinnedMessagesCount: Int? = null,
@@ -153,6 +152,7 @@ fun aRoomDetailsState(
     hasMemberVerificationViolations = hasMemberVerificationViolations,
     canReportRoom = canReportRoom,
     isRoomAChannel = isRoomAChannel,
+    loggedInUser = UserId("@daniel:domain.com"),
     eventSink = eventSink,
 )
 

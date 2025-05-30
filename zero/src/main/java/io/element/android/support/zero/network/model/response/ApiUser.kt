@@ -42,5 +42,5 @@ data class ApiUser(
         get() = profileImage ?: profile?.profileImage
 
     val thirdWebWallet
-        get() = wallets?.first { it.isThirdWeb }
+        get() = wallets?.firstOrNull { it.isThirdWeb }
 }

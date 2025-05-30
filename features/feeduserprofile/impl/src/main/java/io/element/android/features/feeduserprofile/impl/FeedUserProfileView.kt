@@ -36,6 +36,7 @@ fun FeedUserProfileView(
     state: FeedUserProfileState,
     onBackClick: () -> Unit = {},
     onOpenDm: (RoomId) -> Unit = {},
+    openAvatarPreview: (name: String, url: String) -> Unit,
     onUserFeedClick: (feed: ZeroFeed) -> Unit = {}
 ) {
     Scaffold(
@@ -46,6 +47,7 @@ fun FeedUserProfileView(
                 .padding(padding)
                 .consumeWindowInsets(padding),
             state = state,
+            openAvatarPreview = openAvatarPreview,
             onBackClick = onBackClick,
             onUserFeedClick = onUserFeedClick
         )
@@ -94,12 +96,14 @@ fun FeedUserProfileView(
 private fun FeedUserProfile(
     modifier: Modifier = Modifier,
     state: FeedUserProfileState,
+    openAvatarPreview: (name: String, url: String) -> Unit,
     onBackClick: () -> Unit = {},
     onUserFeedClick: (feed: ZeroFeed) -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         UserProfileHeaderView(
             state = state,
+            openAvatarPreview = openAvatarPreview,
             onBackClick = onBackClick
         )
         UserFeedsListView(
@@ -114,5 +118,8 @@ private fun FeedUserProfile(
 fun FeedUserProfileViewPreview(
     @PreviewParameter(FeedUserProfileStateProvider::class) state: FeedUserProfileState
 ) = ElementPreview {
-    FeedUserProfileView(state = state)
+    FeedUserProfileView(
+        state = state,
+        openAvatarPreview = { _, _ -> }
+    )
 }

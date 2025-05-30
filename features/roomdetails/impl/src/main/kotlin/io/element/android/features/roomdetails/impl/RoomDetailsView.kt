@@ -76,8 +76,8 @@ import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
+import io.element.android.libraries.matrix.api.room.RoomMembershipState
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
-import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -137,9 +137,12 @@ fun RoomDetailsView(
                         roomName = state.roomName,
                         roomAlias = state.roomAlias,
                         roomSubTitle = state.roomSubTitle,
+                        memberCount = state.memberCount.toInt(),
                         heroes = state.heroes,
                         openAvatarPreview = { avatarUrl ->
-                            openAvatarPreview(state.roomName, avatarUrl)
+                            processAvatarTap(
+                                state, state.roomName, avatarUrl, openAvatarPreview, onProfileClick
+                            )
                         },
                         onSubtitleClick = { subtitle ->
                             state.eventSink(RoomDetailsEvent.CopyToClipboard(subtitle))
@@ -153,7 +156,9 @@ fun RoomDetailsView(
                         roomName = state.roomName,
                         roomSubTitle = state.roomSubTitle,
                         openAvatarPreview = { name, avatarUrl ->
-                            openAvatarPreview(name, avatarUrl)
+                            processAvatarTap(
+                                state, name, avatarUrl, openAvatarPreview, onProfileClick
+                            )
                         },
                         onSubtitleClick = { subtitle ->
                             state.eventSink(RoomDetailsEvent.CopyToClipboard(subtitle))
@@ -260,10 +265,37 @@ fun RoomDetailsView(
                 OtherActionsSection(
                     canReportRoom = state.canReportRoom,
                     onReportRoomClick = onReportRoomClick,
-                onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
+                    onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
                 )
             }
         }
+    }
+}
+
+private fun processAvatarTap(
+    state: RoomDetailsState,
+    name: String,
+    avatarUrl: String?,
+    openAvatarPreview: (name: String, url: String) -> Unit,
+    onProfileClick: (UserId, String?) -> Unit,
+) {
+    val previewAvatar: () -> Unit = {
+        avatarUrl?.let { openAvatarPreview(name, it) }
+    }
+
+    val directMemberDetails = state.roomMemberDetailsState
+    if (directMemberDetails != null) {
+        onProfileClick(directMemberDetails.userId, directMemberDetails.primaryZeroId)
+    } else if (state.memberCount.toInt() <= 2) {
+        val firstMember = state.heroes
+            .firstOrNull { it.userId != state.loggedInUser && it.membership == RoomMembershipState.JOIN }
+        if (firstMember != null) {
+            onProfileClick(firstMember.userId, firstMember.primaryZId)
+        } else {
+            previewAvatar()
+        }
+    } else {
+        previewAvatar()
     }
 }
 
@@ -383,8 +415,9 @@ private fun RoomHeaderSection(
     roomName: String,
     roomAlias: RoomAlias?,
     roomSubTitle: String?,
-    heroes: ImmutableList<MatrixUser>,
-    openAvatarPreview: (url: String) -> Unit,
+    memberCount: Int,
+    heroes: ImmutableList<RoomMember>,
+    openAvatarPreview: (url: String?) -> Unit,
     onSubtitleClick: (String) -> Unit,
 ) {
     Column(
@@ -395,11 +428,17 @@ private fun RoomHeaderSection(
     ) {
         CompositeAvatar(
             avatarData = AvatarData(roomId.value, roomName, avatarUrl, AvatarSize.RoomHeader),
-            heroes = heroes.map { user ->
-                user.getAvatarData(size = AvatarSize.RoomHeader)
-            }.toPersistentList(),
+//            heroes = heroes.map { user ->
+//                user.getAvatarData(size = AvatarSize.RoomHeader)
+//            }.toPersistentList(),
+//            heroes = (if (memberCount == 1) {
+//                listOf(heroes
+//                    .first{ it.membership == RoomMembershipState.JOIN }
+//                    .getAvatarData(size = AvatarSize.RoomHeader))
+//            } else emptyList()).toPersistentList(),
+            heroes = emptyList<AvatarData>().toPersistentList(),
             modifier = Modifier
-                .clickable(enabled = avatarUrl != null) { openAvatarPreview(avatarUrl!!) }
+                .clickable { openAvatarPreview(avatarUrl) }
                 .testTag(TestTags.roomDetailAvatar)
         )
         /*TitleAndSubtitle(

@@ -9,6 +9,7 @@ package io.element.android.features.feeduserprofile.impl.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import io.element.android.support.zero.R
 @Composable
 fun UserProfileHeaderView(
     state: FeedUserProfileState,
+    openAvatarPreview: (name: String, url: String) -> Unit,
     onBackClick: () -> Unit = {},
 ) {
     if (state.userProfile != null) {
@@ -74,7 +76,12 @@ fun UserProfileHeaderView(
                     .padding(horizontal = 24.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CompositeAvatar(avatarData = state.userProfile.avatarData())
+                    CompositeAvatar(
+                        avatarData = state.userProfile.avatarData(),
+                        modifier = Modifier.clickable(enabled = state.userProfile.profileImage != null) {
+                            openAvatarPreview(state.userProfile.firstName, state.userProfile.profileImage!!)
+                        }
+                    )
                     IconButton(
                         modifier = Modifier
                             .offset(y = 16.dp)
@@ -179,6 +186,7 @@ private fun UserProfileHeaderViewPreview(
     @PreviewParameter(FeedUserProfileStateProvider::class) state: FeedUserProfileState
 ) = ElementPreview {
     UserProfileHeaderView(
-        state = state
+        state = state,
+        openAvatarPreview = { _, _ -> }
     )
 }

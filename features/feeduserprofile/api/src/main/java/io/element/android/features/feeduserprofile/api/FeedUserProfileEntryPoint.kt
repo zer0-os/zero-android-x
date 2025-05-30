@@ -27,6 +27,7 @@ interface FeedUserProfileEntryPoint : FeatureEntryPoint {
     interface Callback : Plugin {
         fun onUserFeedClick(feed: ZeroFeed)
         fun onOpenDm(roomId: RoomId)
+        fun openAvatarPreview(name: String, url: String)
     }
 
     fun nodeBuilder(parentNode: Node, buildContext: BuildContext): NodeBuilder

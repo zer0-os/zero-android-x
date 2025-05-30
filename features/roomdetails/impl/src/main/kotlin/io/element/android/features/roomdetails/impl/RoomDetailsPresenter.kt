@@ -41,6 +41,7 @@ import io.element.android.libraries.matrix.api.room.StateEventType
 import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.room.powerlevels.canInvite
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendState
+import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
 import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.room.canHandleKnockRequestsAsState
@@ -52,6 +53,7 @@ import io.element.android.libraries.matrix.ui.room.roomMemberIdentityStateChange
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -78,6 +80,7 @@ class RoomDetailsPresenter @Inject constructor(
         val leaveRoomState = leaveRoomPresenter.present()
         val canShowNotificationSettings = remember { mutableStateOf(false) }
         val roomInfo by room.roomInfoFlow.collectAsState()
+        val roomMembers by room.membersStateFlow.collectAsState()
         val isUserAdmin = room.isOwnUserAdmin()
         val syncUpdateFlow = room.syncUpdateFlow.collectAsState()
         val roomAvatar by remember { derivedStateOf { roomInfo.avatarUrl } }
@@ -205,7 +208,7 @@ class RoomDetailsPresenter @Inject constructor(
             isFavorite = isFavorite,
             displayRolesAndPermissionsSettings = !isDm && isUserAdmin,
             isPublic = joinRule == JoinRule.Public,
-            heroes = roomInfo.heroes.toPersistentList(),
+            heroes = roomMembers.roomMembers().orEmpty().toImmutableList(),
             canShowPinnedMessages = canShowPinnedMessages,
             canShowMediaGallery = canShowMediaGallery,
             pinnedMessagesCount = pinnedMessagesCount,
@@ -216,6 +219,7 @@ class RoomDetailsPresenter @Inject constructor(
             hasMemberVerificationViolations = hasMemberVerificationViolations,
             canReportRoom = canReportRoom,
             isRoomAChannel = room.isRoomAChannel(),
+            loggedInUser = client.sessionId,
             eventSink = ::handleEvents,
         )
     }

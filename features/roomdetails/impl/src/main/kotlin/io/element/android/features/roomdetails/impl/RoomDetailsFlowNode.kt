@@ -274,6 +274,10 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                             override fun onOpenDm(roomId: RoomId) {
                                 plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
                             }
+
+                            override fun openAvatarPreview(name: String, url: String) {
+                                overlay.show(NavTarget.AvatarPreview(name, url))
+                            }
                         })
                         .build()
 //                }

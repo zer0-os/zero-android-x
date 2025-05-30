@@ -64,6 +64,8 @@ import io.element.android.features.verifysession.api.IncomingVerificationEntryPo
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.createNode
+import io.element.android.libraries.architecture.overlay.operation.hide
+import io.element.android.libraries.architecture.overlay.operation.show
 import io.element.android.libraries.architecture.waitForNavTargetAttached
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
 import io.element.android.libraries.di.AppScope
@@ -82,6 +84,7 @@ import io.element.android.libraries.matrix.api.verification.SessionVerificationS
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.services.appnavstate.api.AppNavigationStateService
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -123,6 +126,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
+    private val mediaViewerEntryPoint: MediaViewerEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -284,6 +288,9 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class FeedUserProfile(val profile: FeedUserProfileView) : NavTarget
+
+        @Parcelize
+        data class AvatarPreview(val name: String, val avatarUrl: String) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -549,7 +556,29 @@ class LoggedInFlowNode @AssistedInject constructor(
                         override fun onOpenDm(roomId: RoomId) {
                             backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                         }
+
+                        override fun openAvatarPreview(name: String, url: String) {
+                            overlay.show(NavTarget.AvatarPreview(name, url))
+                        }
                     })
+                    .build()
+            }
+            is NavTarget.AvatarPreview -> {
+                val callback = object : MediaViewerEntryPoint.Callback {
+                    override fun onDone() {
+                        overlay.hide()
+                    }
+
+                    override fun onViewInTimeline(eventId: EventId) {
+                        // Cannot happen
+                    }
+                }
+                mediaViewerEntryPoint.nodeBuilder(this, buildContext)
+                    .avatar(
+                        navTarget.name,
+                        navTarget.avatarUrl,
+                    )
+                    .callback(callback)
                     .build()
             }
         }

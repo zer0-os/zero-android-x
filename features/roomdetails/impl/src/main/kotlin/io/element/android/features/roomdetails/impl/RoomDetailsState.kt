@@ -14,6 +14,7 @@ import io.element.android.features.userprofile.api.UserProfileState
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomNotificationSettings
 import io.element.android.libraries.matrix.api.user.MatrixUser
@@ -40,7 +41,7 @@ data class RoomDetailsState(
     val isFavorite: Boolean,
     val displayRolesAndPermissionsSettings: Boolean,
     val isPublic: Boolean,
-    val heroes: ImmutableList<MatrixUser>,
+    val heroes: ImmutableList<RoomMember>,
     val canShowPinnedMessages: Boolean,
     val canShowMediaGallery: Boolean,
     val pinnedMessagesCount: Int?,
@@ -51,6 +52,7 @@ data class RoomDetailsState(
     val hasMemberVerificationViolations: Boolean,
     val canReportRoom: Boolean,
     val isRoomAChannel: Boolean,
+    val loggedInUser: UserId,
     val eventSink: (RoomDetailsEvent) -> Unit
 ) {
     val roomBadges = buildList {
