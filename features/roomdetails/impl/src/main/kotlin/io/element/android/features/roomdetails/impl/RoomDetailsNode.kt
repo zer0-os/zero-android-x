@@ -51,7 +51,7 @@ class RoomDetailsNode @AssistedInject constructor(
         fun openPinnedMessagesList()
         fun openKnockRequestsList()
         fun openSecurityAndPrivacy()
-        fun openDmUserProfile(userId: UserId)
+        fun openDmUserProfile(userId: UserId, primaryZId: String?)
         fun onJoinCall()
         fun openReportRoom()
     }
@@ -129,8 +129,8 @@ class RoomDetailsNode @AssistedInject constructor(
         callbacks.forEach { it.openSecurityAndPrivacy() }
     }
 
-    private fun onProfileClick(userId: UserId) {
-        callbacks.forEach { it.openDmUserProfile(userId) }
+    private fun onProfileClick(userId: UserId, primaryZId: String?) {
+        callbacks.forEach { it.openDmUserProfile(userId, primaryZId) }
     }
 
     private fun onReportRoomClick() {

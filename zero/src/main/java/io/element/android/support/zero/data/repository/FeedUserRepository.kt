@@ -10,7 +10,7 @@ package io.element.android.support.zero.data.repository
 import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
 
 interface FeedUserRepository {
-    suspend fun fetchUserProfile(userZId: String): ApiFeedUserProfileView?
+    suspend fun fetchUserProfile(key: String): ApiFeedUserProfileView?
 
     suspend fun fetchUserFollowingStatus(userId: String): Boolean
 

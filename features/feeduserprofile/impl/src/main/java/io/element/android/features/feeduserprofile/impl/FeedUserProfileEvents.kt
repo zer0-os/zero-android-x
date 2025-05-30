@@ -13,6 +13,8 @@ sealed interface FeedUserProfileEvents {
     data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int) : FeedUserProfileEvents
     data object LoadMoreUserFeeds : FeedUserProfileEvents
     data object ToggleFollowUser : FeedUserProfileEvents
+    data object StartDM : FeedUserProfileEvents
+    data object ClearStartDMState : FeedUserProfileEvents
 
     data object HideError : FeedUserProfileEvents
 }

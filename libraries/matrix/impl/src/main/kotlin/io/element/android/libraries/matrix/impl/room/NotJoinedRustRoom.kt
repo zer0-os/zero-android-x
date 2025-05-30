@@ -13,6 +13,7 @@ import io.element.android.libraries.matrix.api.room.NotJoinedRoom
 import io.element.android.libraries.matrix.api.room.RoomMembershipDetails
 import io.element.android.libraries.matrix.api.room.preview.RoomPreviewInfo
 import io.element.android.libraries.matrix.impl.room.member.RoomMemberMapper
+import kotlinx.coroutines.flow.firstOrNull
 
 @Immutable
 class NotJoinedRustRoom(
@@ -23,9 +24,16 @@ class NotJoinedRustRoom(
     override suspend fun membershipDetails(): Result<RoomMembershipDetails?> = runCatching {
         val room = localRoom?.innerRoom ?: return@runCatching null
         val (ownMember, senderInfo) = room.memberWithSenderInfo(sessionId.value)
+        val apiOwnMember = localRoom.zeroUserRepository?.getUser(ownMember.userId)?.firstOrNull()
+        val apiSenderInfo = senderInfo?.let {
+            localRoom.zeroUserRepository?.getUser(it.userId)?.firstOrNull()
+        }
         RoomMembershipDetails(
-            currentUserMember = RoomMemberMapper.map(ownMember),
-            senderMember = senderInfo?.let { RoomMemberMapper.map(it) },
+            currentUserMember = RoomMemberMapper.map(ownMember)
+                .copy(primaryZId = apiOwnMember?.primaryZeroId),
+            senderMember = senderInfo?.let {
+                RoomMemberMapper.map(it).copy(primaryZId = apiSenderInfo?.primaryZeroId)
+            },
         )
     }
 

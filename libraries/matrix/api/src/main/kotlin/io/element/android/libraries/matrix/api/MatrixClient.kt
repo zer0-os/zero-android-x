@@ -248,7 +248,7 @@ interface MatrixClient {
                                   includeReplies: Boolean = true,
                                   includeMeow: Boolean = true): Result<List<ZeroFeed>>
 
-    suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?>
+    suspend fun fetchFeedUserProfile(key: String): Result<FeedUserProfileView?>
 
     suspend fun fetchUserFollowingStatus(userId: String): Result<Boolean>
 

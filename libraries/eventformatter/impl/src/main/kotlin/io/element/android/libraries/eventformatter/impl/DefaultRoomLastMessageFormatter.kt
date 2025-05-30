@@ -81,7 +81,7 @@ class DefaultRoomLastMessageFormatter @Inject constructor(
                 profileChangeContentFormatter.format(content, event.sender, senderDisambiguatedDisplayName, isOutgoing)
             }
             is StateContent -> {
-                stateContentFormatter.format(content, senderDisambiguatedDisplayName, isOutgoing, RenderingMode.RoomList)
+                stateContentFormatter.format(content, senderDisambiguatedDisplayName, event.sender, isOutgoing, RenderingMode.RoomList)
             }
             is PollContent -> {
                 val message = sp.getString(CommonStrings.common_poll_summary, content.question)

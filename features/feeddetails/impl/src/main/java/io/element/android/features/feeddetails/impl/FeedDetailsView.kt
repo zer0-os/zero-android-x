@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import io.element.android.features.feeddetails.impl.components.FeedDetailsWithReplies
 import io.element.android.features.feeddetails.impl.components.FeedReplyComposer
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -60,11 +60,11 @@ fun FeedDetailsView(
             FeedReplyComposer(state)
         }
 
-        if (state.genericActionState is AsyncData.Loading) {
+        if (state.genericActionState is AsyncAction.Loading) {
             ProgressDialog(text = "Posting...")
         }
 
-        if (state.genericActionState is AsyncData.Failure) {
+        if (state.genericActionState is AsyncAction.Failure) {
             ErrorDialog(
                 content = state.genericActionState.error.message ?: stringResource(CommonStrings.error_unknown),
                 onSubmit = { state.eventSink(FeedDetailsEvents.HideError) }

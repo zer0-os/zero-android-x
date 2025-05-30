@@ -8,7 +8,9 @@
 package io.element.android.features.feeduserprofile.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
@@ -16,13 +18,15 @@ open class FeedUserProfileStateProvider : PreviewParameterProvider<FeedUserProfi
     override val values: Sequence<FeedUserProfileState>
         get() = sequenceOf(
             aFeedUserProfileState(),
+            aFeedUserProfileState(startDmActionState = AsyncAction.Loading),
         )
 }
 
 internal fun aFeedUserProfileState(
     userProfileView: FeedUserProfileView = FeedUserProfileView.placeholder,
     zeroRewards: ZeroUserRewards = ZeroUserRewards.empty(),
-    genericActionState: AsyncData<Unit> = AsyncData.Uninitialized,
+    genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
+    startDmActionState: AsyncAction<RoomId> = AsyncAction.Uninitialized,
 ) = FeedUserProfileState(
     userProfile = userProfileView,
     userRewards = zeroRewards,
@@ -31,6 +35,8 @@ internal fun aFeedUserProfileState(
     userFeedsLinkMetaDataMap = emptyMap(),
     isUserFollowed = false,
     isMyOwnProfile = false,
+    dmRoomId = null,
+    startDmActionState = startDmActionState,
     eventSink = {},
     genericActionState = genericActionState
 )

@@ -22,7 +22,7 @@ fun MatrixUser.getAvatarData(size: AvatarSize) = AvatarData(
 )
 
 fun MatrixUser.getBestName(): String {
-    return displayName?.takeIf { it.isNotEmpty() } ?: ""
+    return displayName?.takeIf { it.isNotEmpty() }.orEmpty()
 }
 
 @Composable

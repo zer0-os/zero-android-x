@@ -25,6 +25,7 @@ import io.element.android.libraries.matrix.api.room.draft.ComposerDraft
 import io.element.android.libraries.matrix.api.room.powerlevels.RoomPowerLevels
 import io.element.android.libraries.matrix.api.roomdirectory.RoomVisibility
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.impl.room.draft.into
 import io.element.android.libraries.matrix.impl.room.member.RoomMemberListFetcher
 import io.element.android.libraries.matrix.impl.room.member.RoomMemberMapper
@@ -34,9 +35,12 @@ import io.element.android.libraries.matrix.impl.timeline.toRustReceiptType
 import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.RoomInfoListener
@@ -55,7 +59,7 @@ class RustBaseRoom(
     sessionCoroutineScope: CoroutineScope,
     roomInfoMapper: RoomInfoMapper,
     initialRoomInfo: RoomInfo,
-    zeroUserRepository: UserRepository?
+    val zeroUserRepository: UserRepository?
 ) : BaseRoom {
     override val roomId = RoomId(innerRoom.id())
 
@@ -95,7 +99,8 @@ class RustBaseRoom(
         runCatching {
             innerRoom.members().use {
                 it.nextChunk(limit.toUInt()).orEmpty().map { roomMember ->
-                    RoomMemberMapper.map(roomMember)
+                    val apiMember = zeroUserRepository?.getUser(roomMember.userId)?.firstOrNull()
+                    RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
                 }
             }
         }
@@ -103,7 +108,13 @@ class RustBaseRoom(
 
     override suspend fun getUpdatedMember(userId: UserId): Result<RoomMember> = withContext(roomDispatcher) {
         runCatching {
-            RoomMemberMapper.map(innerRoom.member(userId.value))
+            val results = awaitAll(
+                async { zeroUserRepository?.getUser(userId.value)?.firstOrNull() },
+                async { innerRoom.member(userId.value) }
+            )
+            val apiMember = results[0] as? ZeroUser
+            val roomMember = results[1] as org.matrix.rustcomponents.sdk.RoomMember
+            RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
         }
     }
 
@@ -139,10 +150,11 @@ class RustBaseRoom(
     }
 
     override suspend fun leave(): Result<Unit> = withContext(roomDispatcher) {
+        val membershipBeforeLeft = roomInfoFlow.value.currentUserMembership
         runCatching {
             innerRoom.leave()
         }.onSuccess {
-            roomMembershipObserver.notifyUserLeftRoom(roomId)
+            roomMembershipObserver.notifyUserLeftRoom(roomId, membershipBeforeLeft)
         }
     }
 

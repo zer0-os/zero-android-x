@@ -5,8 +5,10 @@ import io.element.android.support.zero.network.model.response.ApiUser
 
 internal fun ApiUser.toModel() = ZeroUser(
     id = id,
-    matrixId = matrixId ?: "",
-    name = name ?: "",
+    matrixId = matrixId.orEmpty(),
+    name = name.orEmpty(),
     avatarUrl = avatar,
-    primaryZeroId = primaryZID
+    primaryZeroId = primaryZID,
+    primaryWalletAddress = primaryWalletAddress,
+    thirdWebWalletAddress = thirdWebWallet?.publicAddress
 )

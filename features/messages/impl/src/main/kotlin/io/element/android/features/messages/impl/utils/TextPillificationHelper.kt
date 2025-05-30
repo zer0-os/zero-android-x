@@ -27,9 +27,9 @@ import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.textcomposer.mentions.MentionSpan
 import io.element.android.libraries.textcomposer.mentions.MentionSpanProvider
 import io.element.android.libraries.textcomposer.mentions.getMentionSpans
+import io.element.android.support.zero.common.util.ZeroPatterns
 import io.element.android.wysiwyg.view.spans.CodeBlockSpan
 import io.element.android.wysiwyg.view.spans.InlineCodeSpan
-import io.element.android.support.zero.common.util.ZeroPatterns
 import javax.inject.Inject
 
 interface TextPillificationHelper {
@@ -123,7 +123,7 @@ class DefaultTextPillificationHelper @Inject constructor(
 
             val mentionSpanExists = spannable.getSpans<MentionSpan>(start, end + 1).isNotEmpty()
             if (!mentionSpanExists) {
-                val matrixUserId = "@${match.groupValues[2]}:${MatrixSessionCommon.getHomeServerPostfix()}"
+                val matrixUserId = MatrixSessionCommon.matrixUserIdFromIdHex(match.groupValues[2])
                 val userId = UserId(matrixUserId)
                 val permalink = permalinkBuilder.permalinkForUser(userId).getOrNull() ?: continue
                 val mentionSpan = mentionSpanProvider.getMentionSpanFor(match.value, permalink)

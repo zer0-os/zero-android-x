@@ -15,7 +15,7 @@ import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.model.HomeScreenTab
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsState
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -32,7 +32,7 @@ data class RoomListState(
     val showAvatarIndicator: Boolean,
     val hasNetworkConnection: Boolean,
     val snackbarMessage: SnackbarMessage?,
-    val genericActionState: AsyncData<Unit>,
+    val genericActionState: AsyncAction<Unit>,
     val contextMenu: ContextMenu,
     val declineInviteMenu: DeclineInviteMenu,
     val leaveRoomState: LeaveRoomState,

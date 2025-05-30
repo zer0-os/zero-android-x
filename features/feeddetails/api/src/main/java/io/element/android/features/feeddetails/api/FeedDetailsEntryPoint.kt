@@ -15,7 +15,7 @@ import io.element.android.libraries.architecture.NodeInputs
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
-interface FeedDetailsEntryPoint  : FeatureEntryPoint {
+interface FeedDetailsEntryPoint : FeatureEntryPoint {
 
     data class Params(val feed: ZeroFeed) : NodeInputs
 

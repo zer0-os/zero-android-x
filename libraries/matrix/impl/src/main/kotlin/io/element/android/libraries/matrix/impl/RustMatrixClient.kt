@@ -90,7 +90,6 @@ import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.services.toolbox.api.systemclock.SystemClock
-import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -178,7 +177,7 @@ class RustMatrixClient(
     )
     private val notificationProcessSetup = NotificationProcessSetup.SingleProcess(innerSyncService)
     private val innerNotificationClient = runBlocking { innerClient.notificationClient(notificationProcessSetup) }
-    private val notificationService = RustNotificationService(innerNotificationClient, dispatchers, clock)
+    private val notificationService = RustNotificationService(sessionId, innerNotificationClient, dispatchers, clock)
     private val notificationSettingsService = RustNotificationSettingsService(innerClient, sessionCoroutineScope, dispatchers)
     private val encryptionService = RustEncryptionService(
         client = innerClient,
@@ -216,7 +215,6 @@ class RustMatrixClient(
 
     private val roomMembershipObserver = RoomMembershipObserver()
     private val roomFactory = RustRoomFactory(
-        innerClient = innerClient,
         roomListService = roomListService,
         innerRoomListService = innerRoomListService,
         sessionId = sessionId,
@@ -1004,12 +1002,11 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?> =
+    override suspend fun fetchFeedUserProfile(key: String): Result<FeedUserProfileView?> =
         withContext(sessionDispatcher) {
             runCatching {
                 val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
-                val cleanedUserZId = userZId.replace(ZERO_CHANNEL_PREFIX, "")
-                feedUserRepo.fetchUserProfile(cleanedUserZId)?.toModel()
+                feedUserRepo.fetchUserProfile(key)?.toModel()
             }
         }
 

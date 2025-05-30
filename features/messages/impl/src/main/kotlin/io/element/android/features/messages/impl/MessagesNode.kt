@@ -15,6 +15,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -94,7 +95,7 @@ class MessagesNode @AssistedInject constructor(
         fun onRoomDetailsClick()
         fun onEventClick(isLive: Boolean, event: TimelineItem.Event): Boolean
         fun onPreviewAttachments(attachments: ImmutableList<Attachment>)
-        fun onUserDataClick(userId: UserId)
+        fun onUserDataClick(userId: UserId, primaryZId: String?)
         fun onPermalinkClick(data: PermalinkData)
         fun onShowEventDebugInfoClick(eventId: EventId?, debugInfo: TimelineItemDebugInfo)
         fun onForwardEventClick(eventId: EventId)
@@ -133,8 +134,8 @@ class MessagesNode @AssistedInject constructor(
             .orFalse()
     }
 
-    private fun onUserDataClick(userId: UserId) {
-        callbacks.forEach { it.onUserDataClick(userId) }
+    private fun onUserDataClick(userId: UserId, primaryZId: String?) {
+        callbacks.forEach { it.onUserDataClick(userId, primaryZId) }
     }
 
     private fun onLinkClick(
@@ -148,7 +149,7 @@ class MessagesNode @AssistedInject constructor(
             is PermalinkData.UserLink -> {
                 // Open the room member profile, it will fallback to
                 // the user profile if the user is not in the room
-                callbacks.forEach { it.onUserDataClick(permalink.userId) }
+                callbacks.forEach { it.onUserDataClick(permalink.userId, null) }
             }
             is PermalinkData.RoomLink -> {
                 handleRoomLinkClick(activity, permalink, eventSink)
@@ -226,6 +227,7 @@ class MessagesNode @AssistedInject constructor(
 
     @Composable
     override fun View(modifier: Modifier) {
+        val localCoroutineScope = rememberCoroutineScope()
         val activity = requireNotNull(LocalActivity.current)
         val isDark = ElementTheme.isLightTheme.not()
         CompositionLocalProvider(
@@ -243,7 +245,9 @@ class MessagesNode @AssistedInject constructor(
                 onBackClick = this::navigateUp,
                 onRoomDetailsClick = this::onRoomDetailsClick,
                 onEventContentClick = this::onEventClick,
-                onUserDataClick = this::onUserDataClick,
+                onUserDataClick = { userId ->
+                    localCoroutineScope.getUserInfo(userId)
+                },
                 onLinkClick = { url, customTab -> onLinkClick(activity, isDark, url, state.timelineState.eventSink, customTab) },
                 onSendLocationClick = this::onSendLocationClick,
                 onCreatePollClick = this::onCreatePollClick,
@@ -269,5 +273,15 @@ class MessagesNode @AssistedInject constructor(
                 focusedEventId = null
             }
         }
+    }
+
+    private fun CoroutineScope.getUserInfo(userId: UserId) = launch {
+        room.getUpdatedMember(userId)
+            .onSuccess { user ->
+                onUserDataClick(userId, user.primaryZId)
+            }
+            .onFailure {
+                onUserDataClick(userId, null)
+            }
     }
 }

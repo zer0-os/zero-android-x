@@ -42,6 +42,7 @@ import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.room.powerlevels.canInvite
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendState
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
+import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.room.canHandleKnockRequestsAsState
 import io.element.android.libraries.matrix.ui.room.getCurrentRoomMember
 import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
@@ -85,7 +86,7 @@ class RoomDetailsPresenter @Inject constructor(
 
         val roomName by remember { derivedStateOf { roomInfo.name?.trim().orEmpty() } }
         val roomTopic by remember { derivedStateOf { roomInfo.topic } }
-        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.primaryZeroId } }
+        val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.zIdOrWalletAddressDisplay } }
         val isFavorite by remember { derivedStateOf { roomInfo.isFavorite } }
         val joinRule by remember { derivedStateOf { roomInfo.joinRule } }
 

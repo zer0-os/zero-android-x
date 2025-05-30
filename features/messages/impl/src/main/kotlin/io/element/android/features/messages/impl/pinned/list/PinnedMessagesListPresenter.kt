@@ -60,7 +60,7 @@ import timber.log.Timber
 
 class PinnedMessagesListPresenter @AssistedInject constructor(
     @Assisted private val navigator: PinnedMessagesListNavigator,
-    private val room: JoinedRoom,
+    val room: JoinedRoom,
     timelineItemsFactoryCreator: TimelineItemsFactory.Creator,
     private val timelineProvider: PinnedEventsTimelineProvider,
     private val timelineProtectionPresenter: Presenter<TimelineProtectionState>,
@@ -89,6 +89,8 @@ class PinnedMessagesListPresenter @AssistedInject constructor(
     override fun present(): PinnedMessagesListState {
         val isDm by room.isDmAsState()
 
+        val roomMembersState = room.membersStateFlow.collectAsState()
+
         val timelineRoomInfo = remember(isDm) {
             TimelineRoomInfo(
                 isDm = isDm,
@@ -104,7 +106,8 @@ class PinnedMessagesListPresenter @AssistedInject constructor(
                     renderTypingNotifications = false,
                     typingMembers = persistentListOf(),
                     reserveSpace = false,
-                )
+                ),
+                roomMembers = roomMembersState.value.roomMembers().orEmpty()
             )
         }
         val timelineProtectionState = timelineProtectionPresenter.present()

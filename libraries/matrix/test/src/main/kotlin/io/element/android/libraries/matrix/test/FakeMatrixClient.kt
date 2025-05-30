@@ -442,7 +442,7 @@ class FakeMatrixClient(
         return Result.success(emptyList())
     }
 
-    override suspend fun fetchFeedUserProfile(userZId: String): Result<FeedUserProfileView?> {
+    override suspend fun fetchFeedUserProfile(key: String): Result<FeedUserProfileView?> {
         return Result.success(FeedUserProfileView.placeholder)
     }
 

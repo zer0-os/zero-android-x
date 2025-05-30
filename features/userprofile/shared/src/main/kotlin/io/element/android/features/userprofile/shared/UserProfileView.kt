@@ -111,15 +111,16 @@ fun UserProfileView(
                 onErrorDismiss = { state.eventSink(UserProfileEvents.ClearStartDMState) },
                 confirmationDialog = { data ->
                     if (data is ConfirmingStartDmWithMatrixUser) {
-                        CreateDmConfirmationBottomSheet(
-                            matrixUser = data.matrixUser,
-                            onSendInvite = {
-                                state.eventSink(UserProfileEvents.StartDM)
-                            },
-                            onDismiss = {
-                                state.eventSink(UserProfileEvents.ClearStartDMState)
-                            },
-                        )
+//                        CreateDmConfirmationBottomSheet(
+//                            matrixUser = data.matrixUser,
+//                            onSendInvite = {
+//                                state.eventSink(UserProfileEvents.StartDM)
+//                            },
+//                            onDismiss = {
+//                                state.eventSink(UserProfileEvents.ClearStartDMState)
+//                            },
+//                        )
+                        state.eventSink(UserProfileEvents.StartDM)
                     }
                 },
             )

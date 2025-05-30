@@ -8,6 +8,9 @@
 package io.element.android.libraries.matrix.api.zero.feed
 
 import android.os.Parcelable
+import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.walletAddress
+import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
@@ -182,9 +185,10 @@ data class FeedMedia(
 @Parcelize
 data class FeedUserProfileView(
     val userId: String,
-    val primaryZid: String,
+    val primaryZid: String?,
     val firstName: String,
     val profileImage: String?,
+    val publicAddress: String?,
     val followersCount: String?,
     val followingCount: String?,
 ): Parcelable {
@@ -194,10 +198,17 @@ data class FeedUserProfileView(
             primaryZid = "0://placeholder_id",
             firstName = "placeholder name",
             profileImage = null,
+            publicAddress = null,
             followersCount = "0",
             followingCount = "0")
     }
 }
+
+val FeedUserProfileView.primaryZIdOrWalletAddress
+    get() = primaryZid ?: publicAddress
+
+val FeedUserProfileView.zIdOrWalletAddressDisplay
+    get() = primaryZid ?: ZeroWalletUtil.walletAddressDisplayText(publicAddress)
 
 val FeedMedia.aspectRatio
     get() = width.div(height)
@@ -205,14 +216,25 @@ val FeedMedia.aspectRatio
 val FeedMedia.isVideo
     get() = mimeType?.contains("video") == true
 
-fun ZeroFeedAuthor.toProfileView(userZId: String) = FeedUserProfileView(
+fun ZeroFeedAuthor.toZeroProfile(userZId: String) = FeedUserProfileView(
     userId = id,
     primaryZid = userZId,
     firstName = profileSummary.firstName,
     profileImage = profileSummary.profileImage,
+    publicAddress = null,
+    followersCount = null,
+    followingCount = null
+)
+
+fun MatrixUser.toZeroProfile() = FeedUserProfileView(
+    userId = userId.extractedDisplayName,
+    primaryZid = primaryZeroId.orEmpty(),
+    firstName = displayName.orEmpty(),
+    profileImage = avatarUrl,
+    publicAddress = walletAddress,
     followersCount = null,
     followingCount = null
 )
 
 val ZeroFeed.userProfile
-    get() = userProfileView ?: user.toProfileView(zid)
+    get() = userProfileView ?: user.toZeroProfile(zid)

@@ -515,7 +515,7 @@ private fun DefaultLoadedContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                RoomPreviewDescriptionAtom(contentState.topic ?: "")
+                RoomPreviewDescriptionAtom(contentState.topic.orEmpty())
                 if (contentState.joinAuthorisationStatus is JoinAuthorisationStatus.CanKnock) {
                     Spacer(modifier = Modifier.height(24.dp))
                     val supportingText = if (knockMessage.isNotEmpty()) {

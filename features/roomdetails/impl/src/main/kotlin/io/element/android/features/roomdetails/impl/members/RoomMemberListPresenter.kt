@@ -166,7 +166,7 @@ class RoomMemberListPresenter @AssistedInject constructor(
                     if (roomModerationState.canDisplayModerationActions) {
                         roomModerationState.eventSink(RoomMembersModerationEvents.SelectRoomMember(event.roomMember))
                     } else {
-                        navigator.openRoomMemberDetails(event.roomMember.userId)
+                        navigator.openRoomMemberDetails(event.roomMember.userId, event.roomMember.primaryZId)
                     }
             }
         }

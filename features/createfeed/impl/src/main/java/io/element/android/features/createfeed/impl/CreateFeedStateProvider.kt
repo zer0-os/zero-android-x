@@ -8,7 +8,7 @@
 package io.element.android.features.createfeed.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 
@@ -17,15 +17,15 @@ open class CreateFeedStateProvider : PreviewParameterProvider<CreateFeedState> {
         get() = sequenceOf(
             aCreateFeedState(),
             aCreateFeedState(feedText = "This is a small feed text..."),
-            aCreateFeedState(genericActionState = AsyncData.Loading()),
-            aCreateFeedState(genericActionState = AsyncData.Failure(Throwable("Failed to post feed."))),
+            aCreateFeedState(genericActionState = AsyncAction.Loading),
+            aCreateFeedState(genericActionState = AsyncAction.Failure(Throwable("Failed to post feed."))),
         )
 }
 
 internal fun aCreateFeedState(
     feedText: String = "",
     matrixUser: MatrixUser = MatrixUser(userId = UserId("@id:domain"), displayName = "User#1"),
-    genericActionState: AsyncData<Unit> = AsyncData.Uninitialized,
+    genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
 ) = CreateFeedState(
     feedText = feedText,
     matrixUser = matrixUser,

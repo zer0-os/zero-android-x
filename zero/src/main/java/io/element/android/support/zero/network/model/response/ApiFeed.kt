@@ -115,7 +115,7 @@ data class ApiFeedMedia(
 data class ApiFeedUserProfileView(
     val userId: String,
     val createdAt: String? = null,
-    val primaryZid: String,
+    val primaryZid: String? = null,
     val firstName: String,
     val profileImage: String? = null,
     val publicAddress: String? = null,

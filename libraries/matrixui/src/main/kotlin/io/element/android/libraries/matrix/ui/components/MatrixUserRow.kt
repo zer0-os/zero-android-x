@@ -14,6 +14,7 @@ import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.model.getBestName
 
@@ -27,7 +28,7 @@ fun MatrixUserRow(
     avatarData = matrixUser.getAvatarData(avatarSize),
     name = matrixUser.getBestName(),
     //subtext = if (matrixUser.displayName.isNullOrEmpty()) null else matrixUser.userId.value,
-    subtext = matrixUser.primaryZeroId,
+    subtext = matrixUser.zIdOrWalletAddressDisplay,
     modifier = modifier,
     trailingContent,
 )

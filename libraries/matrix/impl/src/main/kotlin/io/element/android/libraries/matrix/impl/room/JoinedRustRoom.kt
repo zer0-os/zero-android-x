@@ -228,6 +228,7 @@ class JoinedRustRoom(
                     internalIdPrefix = internalIdPrefix,
                     dateDividerMode = dateDividerMode,
                     trackReadReceipts = trackReadReceipts,
+                    reportUtds = true,
                 )
             ).let { innerTimeline ->
                 val mode = when (createTimelineParams) {
@@ -432,7 +433,6 @@ class JoinedRustRoom(
             RustWidgetDriver(
                 widgetSettings = widgetSettings,
                 room = innerRoom,
-                joinedRustRoom = this,
                 widgetCapabilitiesProvider = object : WidgetCapabilitiesProvider {
                     override fun acquireCapabilities(capabilities: WidgetCapabilities): WidgetCapabilities {
                         return getElementCallRequiredPermissions(sessionId.value, baseRoom.deviceId.value)

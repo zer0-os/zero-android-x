@@ -152,6 +152,7 @@ internal fun SuggestionsPickerViewPreview() {
             isIgnored = false,
             role = RoomMember.Role.USER,
             membershipChangeReason = null,
+            primaryZId = null
         )
         val anAlias = remember { RoomAlias("#room:domain.org") }
         SuggestionsPickerView(

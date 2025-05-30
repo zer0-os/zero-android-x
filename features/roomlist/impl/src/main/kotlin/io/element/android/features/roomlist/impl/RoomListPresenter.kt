@@ -35,13 +35,13 @@ import io.element.android.features.leaveroom.api.LeaveRoomEvent.ShowConfirmation
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
-import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.features.roomlist.impl.datasource.RoomListDataSource
 import io.element.android.features.roomlist.impl.filters.RoomListFiltersState
 import io.element.android.features.roomlist.impl.model.HomeScreenChannel
 import io.element.android.features.roomlist.impl.model.channelId
 import io.element.android.features.roomlist.impl.search.RoomListSearchEvents
 import io.element.android.features.roomlist.impl.search.RoomListSearchState
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
@@ -70,6 +70,7 @@ import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
+import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
@@ -139,7 +140,7 @@ class RoomListPresenter @Inject constructor(
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
         val userRewards = client.userRewards.collectAsState()
 
-        val genericActionState: MutableState<AsyncData<Unit>> = remember { mutableStateOf(AsyncData.Uninitialized) }
+        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
 
         LaunchedEffect(Unit) {
@@ -200,7 +201,7 @@ class RoomListPresenter @Inject constructor(
                         }, 3_000)
                     }
                 }
-                RoomListEvents.HideError -> genericActionState.value = AsyncData.Uninitialized
+                RoomListEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
                 is RoomListEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
                 is RoomListEvents.LoadMoreFeeds -> {
                     _allFeeds.apply {
@@ -576,31 +577,31 @@ class RoomListPresenter @Inject constructor(
     private fun CoroutineScope.openChannel(
         channel: HomeScreenChannel,
         resolvedChannelRoomId: MutableState<RoomId?>,
-        genericActionState: MutableState<AsyncData<Unit>>
+        genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
-        genericActionState.value = AsyncData.Uninitialized
+        genericActionState.value = AsyncAction.Uninitialized
         val channelId = channel.channelId() ?: return@launch
         channelRoomMap[channelId]?.let { roomSummary ->
             resolvedChannelRoomId.value = roomSummary.roomId
             return@launch
         }
-        genericActionState.value = AsyncData.Loading()
+        genericActionState.value = AsyncAction.Loading
         client.resolveRoomAlias(RoomAlias(channelId)).getOrNull()?.getOrNull()?.roomId?.let { roomId ->
             resolvedChannelRoomId.value = roomId
-            genericActionState.value = AsyncData.Success(Unit)
+            genericActionState.value = AsyncAction.Success(Unit)
             return@launch
         }
         client.joinZeroChannel(channelId)
             .onSuccess { roomId ->
                 roomId?.let {
-                    genericActionState.value = AsyncData.Success(Unit)
+                    genericActionState.value = AsyncAction.Success(Unit)
                     resolvedChannelRoomId.value = RoomId(roomId)
                 } ?: run {
-                    genericActionState.value = AsyncData.Failure(Throwable("RoomId not found"))
+                    genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
                 }
             }
             .onFailure { failure ->
-                genericActionState.value = AsyncData.Failure(failure)
+                genericActionState.value = AsyncAction.Failure(failure)
             }
     }
 

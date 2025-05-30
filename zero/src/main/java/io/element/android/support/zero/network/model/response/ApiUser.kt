@@ -33,11 +33,14 @@ data class ApiUser(
     val primaryWallet: ApiWallet? = null
 ) : ApiBaseMember {
     val firstName
-        get() = profile?.firstName ?: ""
+        get() = profile?.firstName.orEmpty()
 
     val name
         get() = _name ?: profile?.run { "$firstName $lastName" }
 
     val avatar
         get() = profileImage ?: profile?.profileImage
+
+    val thirdWebWallet
+        get() = wallets?.first { it.isThirdWeb }
 }

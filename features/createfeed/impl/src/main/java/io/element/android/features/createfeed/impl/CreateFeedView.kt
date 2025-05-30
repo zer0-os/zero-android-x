@@ -34,7 +34,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.createfeed.impl.components.FullScreenTextField
 import io.element.android.features.roomlist.impl.R
-import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
@@ -89,7 +89,7 @@ fun CreateFeedView(
             state = state
         )
 
-        if (state.genericActionState is AsyncData.Success) {
+        if (state.genericActionState is AsyncAction.Success) {
             onBackClick()
         }
     }
@@ -160,11 +160,11 @@ private fun CreateFeedContent(
             }
         }
 
-        if (state.genericActionState is AsyncData.Loading) {
+        if (state.genericActionState is AsyncAction.Loading) {
             ProgressDialog(text = "Posting...")
         }
 
-        if (state.genericActionState is AsyncData.Failure) {
+        if (state.genericActionState is AsyncAction.Failure) {
             ErrorDialog(
                 content = state.genericActionState.error.message ?: stringResource(CommonStrings.error_unknown),
                 onSubmit = { state.eventSink(CreateFeedEvents.HideError) }

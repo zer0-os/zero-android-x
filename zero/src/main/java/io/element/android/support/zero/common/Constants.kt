@@ -7,3 +7,4 @@ const val BUY_MEOW_LINK =
     "https://app.uniswap.org/swap?outputCurrency=0x0eC78ED49C2D27b315D462d43B5BAB94d2C79bf8&inputCurrency=ETH&use=V2"
 
 const val ZERO_CHANNEL_PREFIX = "0://"
+const val ZERO_WALLET_ADDRESS_PREFIX = "0x"

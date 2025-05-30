@@ -178,7 +178,7 @@ class EditUserProfilePresenter @AssistedInject constructor(
                 (hasDisplayNameChanged(name, currentUser) || hasPrimaryZIdChanged(primaryZId, currentUser))
             ) {
                 val selectedZId = if (primaryZId == EditUserProfileState.PRIMARY_ZERO_ID_NONE) ""
-                else (primaryZId ?: "")
+                else (primaryZId.orEmpty())
                 results.add(matrixClient.setDisplayNameOrZid(name, selectedZId).onFailure {
                     Timber.e(it, "Failed to set user's display name")
                 })

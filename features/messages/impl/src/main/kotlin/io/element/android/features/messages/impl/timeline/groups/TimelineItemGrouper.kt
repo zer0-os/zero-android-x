@@ -9,6 +9,7 @@ package io.element.android.features.messages.impl.timeline.groups
 
 import androidx.annotation.VisibleForTesting
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
+import io.element.android.features.messages.impl.timeline.model.event.hasEmptyContent
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.libraries.matrix.api.core.UniqueId
@@ -64,7 +65,9 @@ private fun MutableList<TimelineItem>.addGroup(
         add(
             TimelineItem.GroupedEvents(
                 id = UniqueId(groupId),
-                events = groupOfItems.toImmutableList(),
+                events = groupOfItems
+                    .filter { !it.content.hasEmptyContent() }
+                    .toImmutableList(),
                 aggregatedReadReceipts = groupOfItems.flatMap { it.readReceiptState.receipts }.toImmutableList()
             )
         )

@@ -143,7 +143,7 @@ fun FeedDetailsCell(
                 }
                 FeedLinkPreviewView(
                     modifier = linkPreviewModifier,
-                    thumbnailUrl = linkMetaData.thumbnailUrl ?: "",
+                    thumbnailUrl = linkMetaData.thumbnailUrl.orEmpty(),
                     title = linkMetaData.title,
                     description = linkMetaData.description,
                     onLinkPreviewClick = {
@@ -160,13 +160,13 @@ fun FeedDetailsCell(
             ) {
                 if (media.isVideo) {
                     FeedMediaVideoView(
-                        videoUrl = media.url ?: "",
+                        videoUrl = media.url.orEmpty(),
                         modifier = Modifier
                             .clip(RoundedCornerShape(4.dp))
                     )
                 } else {
                     FeedMediaImageView(
-                        url = media.url ?: "",
+                        url = media.url.orEmpty(),
                         modifier = Modifier
                             .aspectRatio(media.aspectRatio)
                             .clip(RoundedCornerShape(4.dp))

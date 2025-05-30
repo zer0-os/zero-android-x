@@ -25,6 +25,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.ListSectionHeader
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.components.CheckableUserRow
 import io.element.android.libraries.matrix.ui.components.CheckableUserRowData
 import io.element.android.libraries.matrix.ui.components.SelectedUsersRowList
@@ -103,7 +104,7 @@ fun UserListView(
                                 avatarData = recentDirectRoom.matrixUser.getAvatarData(AvatarSize.UserListItem),
                                 name = recentDirectRoom.matrixUser.getBestName(),
                                 //subtext = recentDirectRoom.matrixUser.userId.value,
-                                subtext = recentDirectRoom.matrixUser.primaryZeroId,
+                                subtext = recentDirectRoom.matrixUser.zIdOrWalletAddressDisplay,
                             ),
                         )
                         /*if (index < state.recentDirectRooms.lastIndex) {

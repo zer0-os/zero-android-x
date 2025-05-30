@@ -11,6 +11,7 @@ import android.content.Context
 import android.view.HapticFeedbackConstants
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -34,6 +35,8 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkData
 import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesNode(RoomScope::class)
 class PinnedMessagesListNode @AssistedInject constructor(
@@ -46,7 +49,7 @@ class PinnedMessagesListNode @AssistedInject constructor(
 ) : Node(buildContext, plugins = plugins), PinnedMessagesListNavigator {
     interface Callback : Plugin {
         fun onEventClick(event: TimelineItem.Event)
-        fun onUserDataClick(userId: UserId)
+        fun onUserDataClick(userId: UserId, primaryZId: String?)
         fun onViewInTimelineClick(eventId: EventId)
         fun onRoomPermalinkClick(data: PermalinkData.RoomLink)
         fun onShowEventDebugInfoClick(eventId: EventId?, debugInfo: TimelineItemDebugInfo)
@@ -63,8 +66,8 @@ class PinnedMessagesListNode @AssistedInject constructor(
         return callbacks.forEach { it.onEventClick(event) }
     }
 
-    private fun onUserDataClick(userId: UserId) {
-        callbacks.forEach { it.onUserDataClick(userId) }
+    private fun onUserDataClick(userId: UserId, primaryZId: String?) {
+        callbacks.forEach { it.onUserDataClick(userId, primaryZId) }
     }
 
     private fun onLinkClick(context: Context, url: String) {
@@ -72,7 +75,7 @@ class PinnedMessagesListNode @AssistedInject constructor(
             is PermalinkData.UserLink -> {
                 // Open the room member profile, it will fallback to
                 // the user profile if the user is not in the room
-                callbacks.forEach { it.onUserDataClick(permalink.userId) }
+                callbacks.forEach { it.onUserDataClick(permalink.userId, null) }
             }
             is PermalinkData.RoomLink -> {
                 callbacks.forEach { it.onRoomPermalinkClick(permalink) }
@@ -101,6 +104,7 @@ class PinnedMessagesListNode @AssistedInject constructor(
         CompositionLocalProvider(
             LocalTimelineItemPresenterFactories provides timelineItemPresenterFactories,
         ) {
+            val localCoroutineScope = rememberCoroutineScope()
             val context = LocalContext.current
             val view = LocalView.current
             val state = presenter.present()
@@ -108,7 +112,9 @@ class PinnedMessagesListNode @AssistedInject constructor(
                 state = state,
                 onBackClick = ::navigateUp,
                 onEventClick = ::onEventClick,
-                onUserDataClick = ::onUserDataClick,
+                onUserDataClick = { userId ->
+                    localCoroutineScope.getUserInfo(userId)
+                },
                 onLinkClick = { link -> onLinkClick(context, link.url) },
                 onLinkLongClick = {
                     view.performHapticFeedback(
@@ -122,5 +128,15 @@ class PinnedMessagesListNode @AssistedInject constructor(
                 modifier = modifier
             )
         }
+    }
+
+    private fun CoroutineScope.getUserInfo(userId: UserId) = launch {
+        presenter.room.getUpdatedMember(userId)
+            .onSuccess { user ->
+                onUserDataClick(userId, user.primaryZId)
+            }
+            .onFailure {
+                onUserDataClick(userId, null)
+            }
     }
 }

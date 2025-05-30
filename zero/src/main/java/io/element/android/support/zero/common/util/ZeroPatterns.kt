@@ -16,7 +16,7 @@ object ZeroPatterns {
     ): String {
         val baseUrl = MATRIX_USER_LINK_BASE_URL
         val htmlBody: String = messageBody
-        val actualText: String = (text ?: "").replace("\n", "<br>")
+        val actualText: String = (text.orEmpty()).replace("\n", "<br>")
 
         // Use a regular expression to find user mentions in the format @[Name](user:UUID)
         val regexPattern = ZERO_USER_MENTION_REGEX

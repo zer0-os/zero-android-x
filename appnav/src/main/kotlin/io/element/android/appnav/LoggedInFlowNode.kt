@@ -69,6 +69,7 @@ import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatch
 import io.element.android.libraries.di.AppScope
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.MAIN_SPACE
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -537,11 +538,16 @@ class LoggedInFlowNode @AssistedInject constructor(
                     .build()
             }
             is NavTarget.FeedUserProfile -> {
+                val userId = MatrixSessionCommon.matrixUserIdFromIdHex(navTarget.profile.userId)
                 feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
-                    .params(FeedUserProfileEntryPoint.Params(navTarget.profile))
+                    .params(FeedUserProfileEntryPoint.Params(userId = UserId(userId), navTarget.profile))
                     .callback(object : FeedUserProfileEntryPoint.Callback {
                         override fun onUserFeedClick(feed: ZeroFeed) {
                             backstack.push(NavTarget.FeedDetails(feed))
+                        }
+
+                        override fun onOpenDm(roomId: RoomId) {
+                            backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                         }
                     })
                     .build()
