@@ -225,8 +225,8 @@ private fun RoomMemberActionsBottomSheet(
             Avatar(
                 avatarData = user.getAvatarData(size = AvatarSize.RoomListManageUser),
                 modifier = Modifier
-                        .padding(bottom = 28.dp)
-                        .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 28.dp)
+                    .align(Alignment.CenterHorizontally)
             )
             user.displayName?.let {
                 Text(
@@ -236,8 +236,8 @@ private fun RoomMemberActionsBottomSheet(
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                            .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                        .fillMaxWidth()
                 )
             }
             /*Text(
@@ -274,7 +274,6 @@ private fun RoomMemberActionsBottomSheet(
                             headlineContent = { Text(stringResource(R.string.screen_bottom_sheet_manage_room_member_remove)) },
                             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Close())),
                             style = ListItemStyle.Destructive,
-                            style = ListItemStyle.Destructive,
                             onClick = {
                                 coroutineScope.launch {
                                     bottomSheetState.hide()
@@ -296,10 +295,10 @@ private fun RoomMemberActionsBottomSheet(
                                 }
                             },
                             enabled = actionState.isEnabled
-                        )
+                        )*/
                     }
                     is ModerationAction.UnbanUser -> {
-                        ListItem(
+                        /*ListItem(
                             headlineContent = { Text(stringResource(R.string.screen_bottom_sheet_manage_room_member_unban)) },
                             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Restart())),
                             style = ListItemStyle.Destructive,
@@ -324,8 +323,8 @@ internal fun RoomMemberModerationViewPreview(@PreviewParameter(InternalRoomMembe
     ElementPreview {
         Box(
             modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
         ) {
             RoomMemberModerationView(
                 state = state,

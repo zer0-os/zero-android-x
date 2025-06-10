@@ -43,6 +43,7 @@ import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomdirectory.RoomVisibility
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
+import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.SyncState
@@ -720,6 +721,23 @@ class RustMatrixClient(
                 }
             })
         }.distinctUntilChanged()
+    }
+
+    override fun getRoomSummaryFlow(roomIdOrAlias: RoomIdOrAlias): Flow<Optional<RoomSummary>> {
+        val predicate: (RoomSummary) -> Boolean = when (roomIdOrAlias) {
+            is RoomIdOrAlias.Alias -> { roomSummary ->
+                roomSummary.info.aliases.contains(roomIdOrAlias.roomAlias)
+            }
+            is RoomIdOrAlias.Id -> { roomSummary ->
+                roomSummary.roomId == roomIdOrAlias.roomId
+            }
+        }
+        return roomListService.allRooms.summaries
+            .map { roomSummaries ->
+                val roomSummary = roomSummaries.firstOrNull(predicate)
+                Optional.ofNullable(roomSummary)
+            }
+            .distinctUntilChanged()
     }
 
     override suspend fun setAllSendQueuesEnabled(enabled: Boolean) {

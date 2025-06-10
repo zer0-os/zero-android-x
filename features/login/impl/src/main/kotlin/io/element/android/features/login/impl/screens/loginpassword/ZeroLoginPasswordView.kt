@@ -27,11 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -42,7 +45,6 @@ import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.components.form.textFieldState
-import io.element.android.libraries.designsystem.modifiers.autofill
 import io.element.android.libraries.designsystem.modifiers.onTabOrEnterKeyFocusNext
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -72,7 +74,12 @@ fun ZeroLoginPasswordView(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler { onBackClick() }
+    val autofillManager = LocalAutofillManager.current
+
+    BackHandler {
+        autofillManager?.cancel()
+        onBackClick()
+    }
 
     val isLoading by remember(state.loginAction) {
         derivedStateOf {
@@ -84,6 +91,8 @@ fun ZeroLoginPasswordView(
     fun submit() {
         // Clear focus to prevent keyboard issues with textfields
         focusManager.clearFocus(force = true)
+
+        autofillManager?.commit()
 
         state.eventSink(LoginPasswordEvents.Submit)
     }
@@ -97,7 +106,10 @@ fun ZeroLoginPasswordView(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = { Text(stringResource(io.element.android.support.zero.R.string.log_in)) },
-                    navigationIcon = { BackButton(onClick = onBackClick) },
+                    navigationIcon = { BackButton(onClick = {
+                        autofillManager?.cancel()
+                        onBackClick()
+                    }) },
                     colors = TopAppBarDefaults
                         .centerAlignedTopAppBarColors()
                         .copy(containerColor = Color.Transparent)
@@ -134,10 +146,10 @@ fun ZeroLoginPasswordView(
                         defaultSelectedItemIndex = ZeroAuthenticationFlowType.indexOf(loginFlow.value),
                         controlWidth = 230.dp,
                         items =
-                        listOf(
-                            stringResource(io.element.android.support.zero.R.string.web3),
-                            stringResource(io.element.android.support.zero.R.string.email)
-                        ),
+                            listOf(
+                                stringResource(io.element.android.support.zero.R.string.web3),
+                                stringResource(io.element.android.support.zero.R.string.email)
+                            ),
                         onItemSelection = { loginFlow.value = ZeroAuthenticationFlowType.get(it) }
                     )
                 }
@@ -220,14 +232,9 @@ private fun ZeroLoginForm(
                 .fillMaxWidth()
                 .onTabOrEnterKeyFocusNext(focusManager)
                 .testTag(TestTags.loginEmailUsername)
-                .autofill(
-                    autofillTypes = listOf(AutofillType.EmailAddress),
-                    onFill = {
-                        val sanitized = it.sanitize()
-                        loginFieldState = sanitized
-                        eventSink(LoginPasswordEvents.SetLogin(sanitized))
-                    }
-                ),
+                .semantics {
+                    contentType = ContentType.EmailAddress
+                },
             text = loginFieldState,
             placeholder = io.element.android.support.zero.R.string.email_address,
             onTextChanged = {
@@ -251,14 +258,9 @@ private fun ZeroLoginForm(
                 .fillMaxWidth()
                 .onTabOrEnterKeyFocusNext(focusManager)
                 .testTag(TestTags.loginPassword)
-                .autofill(
-                    autofillTypes = listOf(AutofillType.Password),
-                    onFill = {
-                        val sanitized = it.sanitize()
-                        passwordFieldState = sanitized
-                        eventSink(LoginPasswordEvents.SetPassword(sanitized))
-                    }
-                ),
+                .semantics {
+                    contentType = ContentType.Password
+                },
             placeHolder = io.element.android.support.zero.R.string.password,
             onTextChanged = {
                 val sanitized = it.sanitize()

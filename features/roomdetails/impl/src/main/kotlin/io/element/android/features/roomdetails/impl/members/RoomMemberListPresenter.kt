@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RoomMemberListPresenter @Inject constructor(
-    private val room: JoinedRoom,
+    val room: JoinedRoom,
     private val roomMemberListDataSource: RoomMemberListDataSource,
     private val coroutineDispatchers: CoroutineDispatchers,
     private val roomMembersModerationPresenter: Presenter<RoomMemberModerationState>,

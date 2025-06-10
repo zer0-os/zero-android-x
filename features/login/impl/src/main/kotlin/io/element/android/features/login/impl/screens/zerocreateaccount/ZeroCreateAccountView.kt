@@ -35,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +61,6 @@ import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.components.form.textFieldState
-import io.element.android.libraries.designsystem.modifiers.autofill
 import io.element.android.libraries.designsystem.modifiers.onTabOrEnterKeyFocusNext
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -92,7 +94,12 @@ fun ZeroCreateAccountView(
     onProceedToLoginScreen: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    BackHandler { onBackClick() }
+    val autofillManager = LocalAutofillManager.current
+
+    BackHandler {
+        autofillManager?.cancel()
+        onBackClick()
+    }
 
     val isLoading by remember(state.createAccountAction) {
         derivedStateOf {
@@ -104,6 +111,8 @@ fun ZeroCreateAccountView(
     fun submit() {
         // Clear focus to prevent keyboard issues with textfields
         focusManager.clearFocus(force = true)
+
+        autofillManager?.commit()
 
         state.eventSink(ZeroCreateAccountEvents.Submit)
     }
@@ -117,7 +126,10 @@ fun ZeroCreateAccountView(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = { Text(stringResource(io.element.android.support.zero.R.string.create_account)) },
-                    navigationIcon = { BackButton(onClick = onBackClick) },
+                    navigationIcon = { BackButton(onClick = {
+                        autofillManager?.cancel()
+                        onBackClick()
+                    }) },
                     colors = TopAppBarDefaults
                         .centerAlignedTopAppBarColors()
                         .copy(containerColor = Color.Transparent)
@@ -154,10 +166,10 @@ fun ZeroCreateAccountView(
                         defaultSelectedItemIndex = ZeroAuthenticationFlowType.indexOf(loginFlow.value),
                         controlWidth = 230.dp,
                         items =
-                        listOf(
-                            stringResource(io.element.android.support.zero.R.string.web3),
-                            stringResource(io.element.android.support.zero.R.string.email)
-                        ),
+                            listOf(
+                                stringResource(io.element.android.support.zero.R.string.web3),
+                                stringResource(io.element.android.support.zero.R.string.email)
+                            ),
                         onItemSelection = { loginFlow.value = ZeroAuthenticationFlowType.get(it) }
                     )
                 }
@@ -250,14 +262,9 @@ private fun ZeroCreateAccountForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .onTabOrEnterKeyFocusNext(focusManager)
-                .autofill(
-                    autofillTypes = listOf(AutofillType.EmailAddress),
-                    onFill = {
-                        val sanitized = it.sanitize()
-                        emailFieldState = sanitized
-                        eventSink(ZeroCreateAccountEvents.SetEmail(sanitized))
-                    }
-                ),
+                .semantics {
+                    contentType = ContentType.EmailAddress
+                },
             text = emailFieldState,
             placeholder = io.element.android.support.zero.R.string.email_address,
             onTextChanged = {
@@ -289,14 +296,9 @@ private fun ZeroCreateAccountForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .onTabOrEnterKeyFocusNext(focusManager)
-                .autofill(
-                    autofillTypes = listOf(AutofillType.Password),
-                    onFill = {
-                        val sanitized = it.sanitize()
-                        passwordFieldState = sanitized
-                        eventSink(ZeroCreateAccountEvents.SetPassword(sanitized))
-                    }
-                ),
+                .semantics {
+                    contentType = ContentType.Password
+                },
             placeHolder = io.element.android.support.zero.R.string.password,
             onTextChanged = {
                 val sanitized = it.sanitize()
@@ -320,14 +322,9 @@ private fun ZeroCreateAccountForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .onTabOrEnterKeyFocusNext(focusManager)
-                .autofill(
-                    autofillTypes = listOf(AutofillType.Password),
-                    onFill = {
-                        val sanitized = it.sanitize()
-                        confirmPasswordFieldState = sanitized
-                        eventSink(ZeroCreateAccountEvents.SetConfirmPassword(sanitized))
-                    }
-                ),
+                .semantics {
+                    contentType = ContentType.Password
+                },
             placeHolder = io.element.android.support.zero.R.string.confirm_password,
             onTextChanged = {
                 val sanitized = it.sanitize()
@@ -384,25 +381,25 @@ private fun LoginNavigationFooter(
             onClick.invoke()
         },
         text =
-        buildAnnotatedString {
-            withStyle(
-                SpanStyle(
-                    color = ElementTheme.colors.textSecondary
-                )
-            ) {
-                append(stringResource(io.element.android.support.zero.R.string.already_on_zero))
-            }
-            append(" ")
-            withStyle(
-                style = SpanStyle(
-                    color = ElementTheme.colors.zeroBrandColor,
-                    textDecoration = TextDecoration.Underline,
-                    fontWeight = FontWeight.Medium
-                )
-            ) {
-                append(stringResource(io.element.android.support.zero.R.string.log_in))
-            }
-        },
+            buildAnnotatedString {
+                withStyle(
+                    SpanStyle(
+                        color = ElementTheme.colors.textSecondary
+                    )
+                ) {
+                    append(stringResource(io.element.android.support.zero.R.string.already_on_zero))
+                }
+                append(" ")
+                withStyle(
+                    style = SpanStyle(
+                        color = ElementTheme.colors.zeroBrandColor,
+                        textDecoration = TextDecoration.Underline,
+                        fontWeight = FontWeight.Medium
+                    )
+                ) {
+                    append(stringResource(io.element.android.support.zero.R.string.log_in))
+                }
+            },
         style = ElementTheme.zeroTypography.fontBodyMdRegular,
         textAlign = TextAlign.Center
     )

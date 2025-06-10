@@ -208,7 +208,7 @@ class LoggedInFlowNode @AssistedInject constructor(
                 StateBus.userStateObservable
                     .onEach { userState ->
                         if (userState == UserState.ACCESS_TOKEN_EXPIRED) {
-                            coroutineScope.launch {
+                            sessionCoroutineScope.launch {
                                 matrixClient.logout(userInitiated = true, ignoreSdkError = true)
                             }
                         }

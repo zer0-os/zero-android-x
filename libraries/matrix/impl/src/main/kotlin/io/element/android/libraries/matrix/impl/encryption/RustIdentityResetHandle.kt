@@ -42,7 +42,7 @@ class RustPasswordIdentityResetHandle(
 ) : IdentityPasswordResetHandle {
     override suspend fun resetPassword(password: String): Result<Unit> {
         return runCatchingExceptions {
-            val accountRepository = zeroAccountRepository ?: return@runCatching
+            val accountRepository = zeroAccountRepository ?: return@runCatchingExceptions
             val isPasswordVerified = accountRepository.verifyUserPassword(password)
             if (isPasswordVerified) {
                 identityResetHandle.reset(

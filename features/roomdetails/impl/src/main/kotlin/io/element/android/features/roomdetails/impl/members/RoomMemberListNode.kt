@@ -9,6 +9,7 @@ package io.element.android.features.roomdetails.impl.members
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.bumble.appyx.core.lifecycle.subscribe
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -23,7 +24,11 @@ import io.element.android.features.roommembermoderation.api.RoomMemberModeration
 import io.element.android.features.roommembermoderation.api.RoomMemberModerationRenderer
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.services.analytics.api.AnalyticsService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesNode(RoomScope::class)
 class RoomMemberListNode @AssistedInject constructor(
@@ -76,12 +81,22 @@ class RoomMemberListNode @AssistedInject constructor(
             state = state.moderationState,
             onSelectAction = { action, target ->
                 when (action) {
-                    is ModerationAction.DisplayProfile -> openRoomMemberDetails(target.userId)
+                    is ModerationAction.DisplayProfile -> lifecycleScope.getUserInfo(target)
                     else -> state.moderationState.eventSink(RoomMemberModerationEvents.ProcessAction(action, target))
                 }
             },
             modifier = Modifier,
         )
+    }
+
+    private fun CoroutineScope.getUserInfo(user: MatrixUser) = launch {
+        presenter.room.getUpdatedMember(user.userId)
+            .onSuccess { member ->
+                openRoomMemberDetails(member.userId, member.primaryZId)
+            }
+            .onFailure {
+                openRoomMemberDetails(user.userId, null)
+            }
     }
 }
 

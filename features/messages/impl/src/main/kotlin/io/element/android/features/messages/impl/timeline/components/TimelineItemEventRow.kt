@@ -331,7 +331,7 @@ private fun TimelineItemEventRowContent(
             pinIcon,
         ) = createRefs()
 
-         val showSenderInfo = event.showSenderInformation && !timelineRoomInfo.isDm
+        val showSenderInfo = event.showSenderInformation && !timelineRoomInfo.isDm
 
         // Sender
         if (showSenderInfo) {
@@ -367,7 +367,7 @@ private fun TimelineItemEventRowContent(
                     .clickable(onClick = onUserDataClick)
                     // This is redundant when using talkback
                     .clearAndSetSemantics {
-                        invisibleToUser()
+                        hideFromAccessibility()
                         //testTag = TestTags.timelineItemSenderInfo.value
                     }
             )

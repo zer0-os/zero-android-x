@@ -63,7 +63,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
     @Composable
     private fun getDmRoomId(): State<RoomId?> {
         return produceState<RoomId?>(initialValue = null) {
-            value = client.findDM(userId)
+            value = client.findDM(userId).getOrNull()
         }
     }
 

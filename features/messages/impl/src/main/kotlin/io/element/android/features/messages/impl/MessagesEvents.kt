@@ -16,7 +16,7 @@ sealed interface MessagesEvents {
     data class HandleAction(val action: TimelineItemAction, val event: TimelineItem.Event) : MessagesEvents
     data class ToggleReaction(val emoji: String, val eventOrTransactionId: EventOrTransactionId) : MessagesEvents
     data class InviteDialogDismissed(val action: InviteDialogAction) : MessagesEvents
-    data class OnUserClicked(val user: MatrixUser) : MessagesEvents
+//    data class OnUserClicked(val user: MatrixUser) : MessagesEvents
     data object Dismiss : MessagesEvents
 }
 

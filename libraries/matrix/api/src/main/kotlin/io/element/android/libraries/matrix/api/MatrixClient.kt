@@ -31,6 +31,7 @@ import io.element.android.libraries.matrix.api.room.RoomMembershipObserver
 import io.element.android.libraries.matrix.api.room.alias.ResolvedRoomAlias
 import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
+import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
@@ -118,6 +119,13 @@ interface MatrixClient {
      * The flow will emit Optional.empty item if the room is not found.
      */
     fun getRoomInfoFlow(roomId: RoomId): Flow<Optional<RoomInfo>>
+
+    /**
+     * Get a room summary flow for a given room ID or alias.
+     * The flow will emit a new value whenever the room summary is updated.
+     * The flow will emit Optional.empty item if the room is not found.
+     */
+    fun getRoomSummaryFlow(roomIdOrAlias: RoomIdOrAlias): Flow<Optional<RoomSummary>>
 
     fun isMe(userId: UserId?) = userId == sessionId
 

@@ -61,6 +61,7 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.room.BaseRoom
 import io.element.android.libraries.matrix.api.room.alias.matches
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
+import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.libraries.mediaplayer.api.MediaPlayer
 import io.element.android.services.analytics.api.AnalyticsService
 import kotlinx.collections.immutable.ImmutableList
@@ -271,7 +272,7 @@ class MessagesNode @AssistedInject constructor(
                 state = state.roomMemberModerationState,
                 onSelectAction = { action, target ->
                     when (action) {
-                        is ModerationAction.DisplayProfile -> onUserDataClick(target.userId)
+                        is ModerationAction.DisplayProfile -> onUserDataClick(target.userId, target.primaryZIdOrWalletAddress)
                         else -> state.roomMemberModerationState.eventSink(RoomMemberModerationEvents.ProcessAction(action, target))
                     }
                 },

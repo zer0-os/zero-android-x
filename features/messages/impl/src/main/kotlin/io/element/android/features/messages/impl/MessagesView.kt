@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -68,7 +66,6 @@ import io.element.android.features.messages.impl.pinned.banner.PinnedMessagesBan
 import io.element.android.features.messages.impl.timeline.FOCUS_ON_PINNED_EVENT_DEBOUNCE_DURATION_IN_MILLIS
 import io.element.android.features.messages.impl.timeline.TimelineEvents
 import io.element.android.features.messages.impl.timeline.TimelineView
-import io.element.android.features.messages.impl.timeline.components.CallMenuItem
 import io.element.android.features.messages.impl.timeline.components.customreaction.CustomReactionBottomSheet
 import io.element.android.features.messages.impl.timeline.components.customreaction.CustomReactionEvents
 import io.element.android.features.messages.impl.timeline.components.reactionsummary.ReactionSummaryEvents
@@ -95,8 +92,8 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
-import io.element.android.libraries.designsystem.utils.HideKeyboardWhenDisposed
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+import io.element.android.libraries.designsystem.utils.HideKeyboardWhenDisposed
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
@@ -213,8 +210,9 @@ fun MessagesView(
                 onMessageLongClick = ::onMessageLongClick,
                 onUserDataClick = {
                     hidingKeyboard {
-                   state.eventSink(MessagesEvents.OnUserClicked(it))
-                }
+//                   state.eventSink(MessagesEvents.OnUserClicked(it))
+                        onUserDataClick(it.userId)
+                    }
                 },
                 onLinkClick = { link, customTab ->
                     if (customTab) {
@@ -507,14 +505,14 @@ private fun MessagesViewTopBar(
                         roomName = roomName,
                         roomAvatar = roomAvatar,
                         roomSubTitle = roomSubTitle,
-                    heroes = heroes,
-                    modifier = titleModifier
-                )
-            } else {
-                IconTitlePlaceholdersRowMolecule(
-                    iconSize = AvatarSize.TimelineRoom.dp,
-                    modifier = titleModifier
-                )}
+                        heroes = heroes,
+                        modifier = titleModifier
+                    )
+                } else {
+                    IconTitlePlaceholdersRowMolecule(
+                        iconSize = AvatarSize.TimelineRoom.dp,
+                        modifier = titleModifier
+                    )}
 
                 when (dmUserIdentityState) {
                     IdentityState.Verified -> {

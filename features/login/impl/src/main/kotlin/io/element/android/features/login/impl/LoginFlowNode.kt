@@ -125,9 +125,6 @@ class LoginFlowNode @AssistedInject constructor(
         data class CreateAccount(val url: String) : NavTarget
 
         @Parcelize
-        data class OidcView(val oidcDetails: OidcDetails) : NavTarget
-
-        @Parcelize
         data class ZeroCreateAccount(val inviteCode: String) : NavTarget
     }
 
