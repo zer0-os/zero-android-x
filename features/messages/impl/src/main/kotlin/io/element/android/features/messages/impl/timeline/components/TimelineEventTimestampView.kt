@@ -19,7 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -92,7 +92,7 @@ fun TimelineEventTimestampView(
                         .clickable(isVerifiedUserSendFailure) {
                             eventSink(TimelineEvents.ComputeVerifiedUserSendFailure(event))
                         }
-                        .semantics { invisibleToUser() }
+                        .semantics { hideFromAccessibility() }
             )
         }
 
@@ -107,7 +107,7 @@ fun TimelineEventTimestampView(
                         .clickable {
                             eventSink(TimelineEvents.ShowShieldDialog(shield))
                         }
-                        .semantics { invisibleToUser() },
+                        .semantics { hideFromAccessibility() },
                     tint = shield.toIconColor(),
                 )
                 Spacer(modifier = Modifier.width(4.dp))

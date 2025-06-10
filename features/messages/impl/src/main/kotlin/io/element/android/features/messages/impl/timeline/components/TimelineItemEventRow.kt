@@ -40,7 +40,7 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
@@ -90,6 +90,9 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileTimelineDetails
+import io.element.android.libraries.matrix.api.timeline.item.event.getAvatarUrl
+import io.element.android.libraries.matrix.api.timeline.item.event.getDisplayName
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.ui.messages.linkpreview.LinkPreviewView
 import io.element.android.libraries.matrix.ui.messages.reply.InReplyToDetails
@@ -128,7 +131,7 @@ fun TimelineItemEventRow(
     onLongClick: () -> Unit,
     onLinkClick: (Link) -> Unit,
     onLinkLongClick: (Link) -> Unit,
-    onUserDataClick: (UserId) -> Unit,
+    onUserDataClick: (MatrixUser) -> Unit,
     inReplyToClick: (EventId) -> Unit,
     onReactionClick: (emoji: String, eventId: TimelineItem.Event) -> Unit,
     onReactionLongClick: (emoji: String, eventId: TimelineItem.Event) -> Unit,
@@ -166,7 +169,12 @@ fun TimelineItemEventRow(
     }
 
     fun onUserDataClick() {
-        onUserDataClick(event.senderId)
+        val sender = MatrixUser(
+            userId = event.senderId,
+            displayName = event.senderProfile.getDisplayName(),
+            avatarUrl = event.senderProfile.getAvatarUrl(),
+        )
+        onUserDataClick(sender)
     }
 
     fun inReplyToClick() {
@@ -485,7 +493,7 @@ private fun MessageSenderInformation(
             // Add external clickable modifier with no indicator so the touch target is larger than just the display name
             .clickable(onClick = onClick, enabled = true, interactionSource = remember { MutableInteractionSource() }, indication = null)
             .clearAndSetSemantics {
-                invisibleToUser()
+                hideFromAccessibility()
             }
     ) {
         Avatar(

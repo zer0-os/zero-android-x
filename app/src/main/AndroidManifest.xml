@@ -26,6 +26,10 @@
         tools:targetApi="33"
         tools:replace="android:dataExtractionRules">
 
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -92,7 +96,7 @@
             </intent-filter>
             <!--
               Element mobile links
-              Example: https://mobile.element.io/element?account_provider=example.org&login_hint=mxid:@alice:example.org
+              Example: https://mobile.element.io/element/?account_provider=example.org&login_hint=mxid:@alice:example.org
             -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -103,7 +107,7 @@
                 <data android:scheme="https" />
                 <!-- Matching asset file: https://mobile.element.io/.well-known/assetlinks.json -->
                 <data android:host="mobile.element.io" />
-                <data android:path="/element" />
+                <data android:path="/element/" />
             </intent-filter>
             <!--
               matrix.to links
@@ -118,6 +122,17 @@
 
                 <data android:scheme="https" />
                 <data android:host="matrix.to" />
+            </intent-filter>
+            <!--
+              matrix: links
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="matrix" />
             </intent-filter>
             <!--
               links from matrix.to website

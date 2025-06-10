@@ -40,11 +40,11 @@ import io.element.android.libraries.eventformatter.test.FakeRoomLastMessageForma
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.featureflag.test.FakeFeatureFlagService
 import io.element.android.libraries.fullscreenintent.api.aFullScreenIntentPermissionsState
-import io.element.android.libraries.indicator.impl.DefaultIndicatorService
+import io.element.android.libraries.indicator.api.IndicatorService
+import io.element.android.libraries.indicator.test.FakeIndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.SessionId
-import io.element.android.libraries.matrix.api.encryption.BackupState
 import io.element.android.libraries.matrix.api.encryption.RecoveryState
 import io.element.android.libraries.matrix.api.room.CurrentUserMembership
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
@@ -121,31 +121,24 @@ class RoomListPresenterTest {
             assertThat(withUserState.matrixUser.userId).isEqualTo(A_USER_ID)
             assertThat(withUserState.matrixUser.displayName).isEqualTo(A_USER_NAME)
             assertThat(withUserState.matrixUser.avatarUrl).isEqualTo(AN_AVATAR_URL)
-            assertThat(withUserState.showAvatarIndicator).isTrue()
+            assertThat(withUserState.showAvatarIndicator).isFalse()
         }
     }
 
     @Test
     fun `present - show avatar indicator`() = runTest {
-        val encryptionService = FakeEncryptionService()
-        val sessionVerificationService = FakeSessionVerificationService()
-        val matrixClient = FakeMatrixClient(
-            encryptionService = encryptionService,
-            sessionVerificationService = sessionVerificationService,
-        )
+        val indicatorService = FakeIndicatorService()
         val presenter = createRoomListPresenter(
-            client = matrixClient,
+            indicatorService = indicatorService,
         )
         moleculeFlow(RecompositionMode.Immediate) {
             presenter.present()
         }.test {
             val initialState = awaitItem()
-            assertThat(initialState.showAvatarIndicator).isTrue()
-            assertThat(initialState.canReportBug).isTrue()
-            sessionVerificationService.emitNeedsSessionVerification(false)
-            encryptionService.emitBackupState(BackupState.ENABLED)
+            assertThat(initialState.showAvatarIndicator).isFalse()
+            indicatorService.setShowRoomListTopBarIndicator(true)
             val finalState = awaitItem()
-            assertThat(finalState.showAvatarIndicator).isFalse()
+            assertThat(finalState.showAvatarIndicator).isTrue()
         }
     }
 
@@ -511,9 +504,18 @@ class RoomListPresenterTest {
 
     @Test
     fun `present - check that the room is marked as read with correct RR and as unread`() = runTest {
-        val room = FakeBaseRoom()
-        val room2 = FakeBaseRoom(roomId = A_ROOM_ID_2)
-        val room3 = FakeBaseRoom(roomId = A_ROOM_ID_3)
+        val markAsReadResult = lambdaRecorder<ReceiptType, Result<Unit>> { Result.success(Unit) }
+        val markAsReadResult3 = lambdaRecorder<ReceiptType, Result<Unit>> { Result.success(Unit) }
+        val room = FakeBaseRoom(
+            markAsReadResult = markAsReadResult,
+        )
+        val room2 = FakeBaseRoom(
+            roomId = A_ROOM_ID_2,
+        )
+        val room3 = FakeBaseRoom(
+            roomId = A_ROOM_ID_3,
+            markAsReadResult = markAsReadResult3,
+        )
         val allRooms = setOf(room, room2, room3)
         val sessionPreferencesStore = InMemorySessionPreferencesStore()
         val matrixClient = FakeMatrixClient().apply {
@@ -537,21 +539,19 @@ class RoomListPresenterTest {
         }.test {
             val initialState = awaitItem()
             allRooms.forEach {
-                assertThat(it.markAsReadCalls).isEmpty()
                 assertThat(it.setUnreadFlagCalls).isEmpty()
             }
             initialState.eventSink.invoke(RoomListEvents.MarkAsRead(A_ROOM_ID))
-            assertThat(room.markAsReadCalls).isEqualTo(listOf(ReceiptType.READ))
+            markAsReadResult.assertions().isCalledOnce().with(value(ReceiptType.READ))
             assertThat(room.setUnreadFlagCalls).isEqualTo(listOf(false))
             clearMessagesForRoomLambda.assertions().isCalledOnce()
                 .with(value(A_SESSION_ID), value(A_ROOM_ID))
             initialState.eventSink.invoke(RoomListEvents.MarkAsUnread(A_ROOM_ID_2))
-            assertThat(room2.markAsReadCalls).isEmpty()
             assertThat(room2.setUnreadFlagCalls).isEqualTo(listOf(true))
             // Test again with private read receipts
             sessionPreferencesStore.setSendPublicReadReceipts(false)
             initialState.eventSink.invoke(RoomListEvents.MarkAsRead(A_ROOM_ID_3))
-            assertThat(room3.markAsReadCalls).isEqualTo(listOf(ReceiptType.READ_PRIVATE))
+            markAsReadResult3.assertions().isCalledOnce().with(value(ReceiptType.READ_PRIVATE))
             assertThat(room3.setUnreadFlagCalls).isEqualTo(listOf(false))
             clearMessagesForRoomLambda.assertions().isCalledExactly(2)
                 .withSequence(
@@ -686,7 +686,8 @@ class RoomListPresenterTest {
         notificationCleaner: NotificationCleaner = FakeNotificationCleaner(),
         appPreferencesStore: AppPreferencesStore = InMemoryAppPreferencesStore(),
         rageshakeFeatureAvailability: RageshakeFeatureAvailability = RageshakeFeatureAvailability { true },
-        seenInvitesStore: SeenInvitesStore = InMemorySeenInvitesStore()
+        seenInvitesStore: SeenInvitesStore = InMemorySeenInvitesStore(),
+        indicatorService: IndicatorService = FakeIndicatorService(),
     ) = RoomListPresenter(
         client = client,
         syncService = syncService,
@@ -700,14 +701,11 @@ class RoomListPresenterTest {
             ),
             coroutineDispatchers = testCoroutineDispatchers(),
             notificationSettingsService = client.notificationSettingsService(),
-            appScope = backgroundScope,
+            sessionCoroutineScope = backgroundScope,
             dateTimeObserver = FakeDateTimeObserver(),
         ),
         featureFlagService = featureFlagService,
-        indicatorService = DefaultIndicatorService(
-            sessionVerificationService = client.sessionVerificationService(),
-            encryptionService = client.encryptionService(),
-        ),
+        indicatorService = indicatorService,
         searchPresenter = searchPresenter,
         sessionPreferencesStore = sessionPreferencesStore,
         filtersPresenter = filtersPresenter,

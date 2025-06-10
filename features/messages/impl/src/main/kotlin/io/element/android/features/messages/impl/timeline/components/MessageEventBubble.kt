@@ -42,10 +42,10 @@ import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleIncomingColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+import io.element.android.libraries.designsystem.utils.LocalUiTestMode
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.utils.time.isTalkbackActive
@@ -112,7 +112,9 @@ fun MessageEventBubble(
         else -> ElementTheme.colors.zeroChatBubbleIncomingColor
 
     }
-    val bubbleShape = bubbleShape()
+    // If we're running in UI test mode, we want to use a different shape to avoid
+    // this issue: https://issuetracker.google.com/issues/366255137
+    val bubbleShape = if (LocalUiTestMode.current) RoundedCornerShape(12.dp) else bubbleShape()
     val radiusPx = (avatarRadius + SENDER_AVATAR_BORDER_WIDTH).toPx()
     val yOffsetPx = -(NEGATIVE_MARGIN_FOR_BUBBLE + avatarRadius).toPx()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl

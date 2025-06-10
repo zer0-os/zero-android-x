@@ -9,12 +9,14 @@ package io.element.android.libraries.designsystem.atomic.pages
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -95,17 +97,19 @@ fun HeaderFooterPage(
                         .run {
                             if (isScrollable) {
                                 verticalScroll(rememberScrollState())
+                                    // Make sure the scrollable content takes the full available height
+                                    .height(IntrinsicSize.Max)
                             } else {
                                 Modifier
                             }
                         }
                         // Apply insets here so if the content is scrollable it can get below the top app bar if needed
                         .padding(contentInsetsPadding)
-                        .weight(1f),
+                        .weight(1f, fill = true),
                 ) {
                     // Header
                     header()
-                    Box(modifier = Modifier.weight(1f)) {
+                    Box {
                         content()
                     }
                 }
@@ -113,7 +117,7 @@ fun HeaderFooterPage(
                 // Footer
                 Box(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                         .fillMaxWidth()
                         .padding(footerInsetsPadding)
                 ) {

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -33,7 +31,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -42,11 +39,10 @@ import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.colors.AvatarColorsProvider
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
-import io.element.android.libraries.designsystem.preview.debugPlaceholderAvatar
 import io.element.android.libraries.designsystem.text.toSp
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import timber.log.Timber
+import io.element.android.libraries.designsystem.utils.CommonDrawables
 
 @Composable
 fun Avatar(
@@ -84,39 +80,28 @@ private fun ImageAvatar(
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
 ) {
-    if (LocalInspectionMode.current) {
-        // For compose previews, use debugPlaceholderAvatar()
-        // instead of falling back to initials avatar on load failure
-        AsyncImage(
-            model = avatarData,
-            contentDescription = contentDescription,
-            placeholder = debugPlaceholderAvatar(),
-            modifier = modifier
-        )
-    } else {
-        SubcomposeAsyncImage(
-            model = avatarData,
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-        ) {
-            val collectedState by painter.state.collectAsState()
-            when (val state = collectedState) {
-                is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
-                is AsyncImagePainter.State.Error -> {
-                    /*SideEffect {
-                        Timber.e(state.result.throwable, "Error loading avatar $state\n${state.result}")
-                    }*/
-                    ZeroPlaceholderImage(
+    SubcomposeAsyncImage(
+        model = avatarData,
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+    ) {
+        val collectedState by painter.state.collectAsState()
+        when (val state = collectedState) {
+            is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
+            is AsyncImagePainter.State.Error -> {
+                /*SideEffect {
+                    Timber.e(state.result.throwable, "Error loading avatar $state\n${state.result}")
+                }*/
+                ZeroPlaceholderImage(
                         avatarData = avatarData,
                         forcedAvatarSize = forcedAvatarSize,
-                    )
-                }
-                else -> ZeroPlaceholderImage(
-                    avatarData = avatarData,
-                    forcedAvatarSize = forcedAvatarSize,
                 )
             }
+            else -> ZeroPlaceholderImage(
+                    avatarData = avatarData,
+                    forcedAvatarSize = forcedAvatarSize,
+            )
         }
     }
 }
@@ -170,7 +155,9 @@ private fun ZeroPlaceholderImage(
 @Preview(group = PreviewGroup.Avatars)
 @Composable
 internal fun AvatarPreview(@PreviewParameter(AvatarDataProvider::class) avatarData: AvatarData) =
-    ElementThemedPreview {
+    ElementThemedPreview(
+        drawableFallbackForImages = CommonDrawables.sample_avatar,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)

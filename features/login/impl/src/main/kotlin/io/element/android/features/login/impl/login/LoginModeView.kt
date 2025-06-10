@@ -89,6 +89,8 @@ fun LoginModeView(
                 is LoginMode.AccountCreation -> onCreateAccountContinue(loginModeData.url)
                 is LoginMode.ZeroCreateAccountFlow -> onCreateZeroAccount(loginModeData.inviteCode)
             }
+            // Also clear the data, to let the next screen be able to go back
+            onClearError()
         }
         AsyncData.Uninitialized -> Unit
     }

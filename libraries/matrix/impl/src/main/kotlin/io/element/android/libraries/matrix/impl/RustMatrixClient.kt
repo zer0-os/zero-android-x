@@ -14,6 +14,7 @@ import io.element.android.libraries.core.coroutine.childScope
 import io.element.android.libraries.core.coroutine.mapState
 import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.core.extensions.mapFailure
+import io.element.android.libraries.core.extensions.runCatchingExceptions
 import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
@@ -22,7 +23,6 @@ import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
 import io.element.android.libraries.matrix.api.core.UserId
-import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.createroom.CreateRoomParameters
 import io.element.android.libraries.matrix.api.createroom.RoomPreset
 import io.element.android.libraries.matrix.api.encryption.EncryptionService
@@ -35,6 +35,7 @@ import io.element.android.libraries.matrix.api.room.BaseRoom
 import io.element.android.libraries.matrix.api.room.CurrentUserMembership
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.NotJoinedRoom
+import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomMembershipObserver
 import io.element.android.libraries.matrix.api.room.alias.ResolvedRoomAlias
@@ -42,7 +43,6 @@ import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomdirectory.RoomVisibility
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
-import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.SyncState
@@ -70,6 +70,7 @@ import io.element.android.libraries.matrix.impl.pushers.RustPushersService
 import io.element.android.libraries.matrix.impl.room.GetRoomResult
 import io.element.android.libraries.matrix.impl.room.NotJoinedRustRoom
 import io.element.android.libraries.matrix.impl.room.RoomContentForwarder
+import io.element.android.libraries.matrix.impl.room.RoomInfoMapper
 import io.element.android.libraries.matrix.impl.room.RoomSyncSubscriber
 import io.element.android.libraries.matrix.impl.room.RustRoomFactory
 import io.element.android.libraries.matrix.impl.room.TimelineEventTypeFilterFactory
@@ -80,6 +81,7 @@ import io.element.android.libraries.matrix.impl.roomdirectory.RustRoomDirectoryS
 import io.element.android.libraries.matrix.impl.roomdirectory.map
 import io.element.android.libraries.matrix.impl.roomlist.RoomListFactory
 import io.element.android.libraries.matrix.impl.roomlist.RustRoomListService
+import io.element.android.libraries.matrix.impl.roomlist.roomOrNull
 import io.element.android.libraries.matrix.impl.sync.RustSyncService
 import io.element.android.libraries.matrix.impl.sync.map
 import io.element.android.libraries.matrix.impl.usersearch.UserProfileMapper
@@ -114,7 +116,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -131,6 +132,7 @@ import org.matrix.rustcomponents.sdk.ClientException
 import org.matrix.rustcomponents.sdk.IgnoredUsersListener
 import org.matrix.rustcomponents.sdk.NotificationProcessSetup
 import org.matrix.rustcomponents.sdk.PowerLevels
+import org.matrix.rustcomponents.sdk.RoomInfoListener
 import org.matrix.rustcomponents.sdk.SendQueueRoomErrorListener
 import org.matrix.rustcomponents.sdk.TaskHandle
 import org.matrix.rustcomponents.sdk.UserProfile
@@ -213,6 +215,7 @@ class RustMatrixClient(
         sessionCoroutineScope = sessionCoroutineScope,
     )
 
+    private val roomInfoMapper = RoomInfoMapper()
     private val roomMembershipObserver = RoomMembershipObserver()
     private val roomFactory = RustRoomFactory(
         roomListService = roomListService,
@@ -228,6 +231,7 @@ class RustMatrixClient(
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         featureFlagService = featureFlagService,
         roomMembershipObserver = roomMembershipObserver,
+        roomInfoMapper = roomInfoMapper,
         zeroCoreRepository = zeroCoreRepository
     )
 
@@ -285,7 +289,7 @@ class RustMatrixClient(
     }
 
     override fun userIdServerName(): String {
-        return runCatching {
+        return runCatchingExceptions {
             innerClient.userIdServerName()
         }
             .onFailure {
@@ -296,7 +300,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getUrl(url: String): Result<String> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.getUrl(url)
         }
     }
@@ -310,45 +314,46 @@ class RustMatrixClient(
     }
 
     /**
-     * Wait for the room to be available in the room list with the correct membership for the current user.
-     * @param roomIdOrAlias the room id or alias to wait for
+     * Wait for the room to be available in the client with the correct membership for the current user.
+     * @param roomId the room id to wait for
      * @param timeout the timeout to wait for the room to be available
      * @param currentUserMembership the membership to wait for
      * @throws TimeoutCancellationException if the room is not available after the timeout
      */
     private suspend fun awaitRoom(
-        roomIdOrAlias: RoomIdOrAlias,
+        roomId: RoomId,
         timeout: Duration,
         currentUserMembership: CurrentUserMembership,
-    ): RoomSummary {
+    ): RoomInfo {
         return withTimeout(timeout) {
-            getRoomSummaryFlow(roomIdOrAlias)
-                .mapNotNull { optionalRoomSummary -> optionalRoomSummary.getOrNull() }
-                .filter { roomSummary -> roomSummary.info.currentUserMembership == currentUserMembership }
-                .first()
+            getRoomInfoFlow(roomId)
+                .mapNotNull { roomInfo -> roomInfo.getOrNull() }
+                .first { info -> info.currentUserMembership == currentUserMembership }
                 // Ensure that the room is ready
-                .also { innerClient.awaitRoomRemoteEcho(it.roomId.value) }
+                .also { innerClient.awaitRoomRemoteEcho(roomId.value).destroy() }
         }
     }
 
-    override suspend fun findDM(userId: UserId): RoomId? = withContext(sessionDispatcher) {
-        innerClient.getDmRoom(userId.value)?.use { RoomId(it.id()) }
+    override suspend fun findDM(userId: UserId): Result<RoomId?> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
+            innerClient.getDmRoom(userId.value)?.use { RoomId(it.id()) }
+        }
     }
 
     override suspend fun ignoreUser(userId: UserId): Result<Unit> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.ignoreUser(userId.value)
         }
     }
 
     override suspend fun unignoreUser(userId: UserId): Result<Unit> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.unignoreUser(userId.value)
         }
     }
 
     override suspend fun createRoom(createRoomParams: CreateRoomParameters): Result<RoomId> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             val rustParams = RustCreateRoomParameters(
                 name = createRoomParams.name,
                 topic = createRoomParams.topic,
@@ -377,7 +382,7 @@ class RustMatrixClient(
             val roomId = RoomId(innerClient.createRoom(rustParams))
             // Wait to receive the room back from the sync but do not returns failure if it fails.
             try {
-                awaitRoom(roomId.toRoomIdOrAlias(), 30.seconds, CurrentUserMembership.JOINED)
+                awaitRoom(roomId, 30.seconds, CurrentUserMembership.JOINED)
             } catch (e: Exception) {
                 Timber.e(e, "Timeout waiting for the room to be available in the room list")
             }
@@ -398,7 +403,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getProfile(userId: UserId): Result<MatrixUser> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             val profiles = awaitAll(
                 async { innerClient.getProfile(userId.value) },
                 async { zeroCoreRepository?.user?.getUser(userId.value)?.firstOrNull() }
@@ -414,7 +419,7 @@ class RustMatrixClient(
 
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> =
         withContext(sessionDispatcher) {
-            runCatching {
+            runCatchingExceptions {
                 zeroCoreRepository?.user?.let { userRepo ->
                     val zeroSearchResults = userRepo.getUsers(filterName = searchTerm).firstOrNull() ?: emptyList()
                     val matrixUserProfiles = zeroSearchResults.map { zeroUser ->
@@ -432,7 +437,7 @@ class RustMatrixClient(
 
     override suspend fun setDisplayName(displayName: String): Result<Unit> =
         withContext(sessionDispatcher) {
-            val result = runCatching { innerClient.setDisplayName(displayName) }
+            val result = runCatchingExceptions { innerClient.setDisplayName(displayName) }
             if (result.isSuccess) {
                 zeroCoreRepository?.user?.updateUserProfile(userName = displayName)
             }
@@ -441,7 +446,7 @@ class RustMatrixClient(
 
     override suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit> =
         withContext(sessionDispatcher) {
-            val result = runCatching { innerClient.setDisplayName(displayName) }
+            val result = runCatchingExceptions { innerClient.setDisplayName(displayName) }
             if (result.isSuccess) {
                 zeroCoreRepository?.user?.updateUserProfile(userName = displayName, profileZId = primaryZId)
             }
@@ -450,7 +455,7 @@ class RustMatrixClient(
 
     override suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit> =
         withContext(sessionDispatcher) {
-            val result = runCatching { innerClient.uploadAvatar(mimeType, data) }
+            val result = runCatchingExceptions { innerClient.uploadAvatar(mimeType, data) }
             if (result.isSuccess) {
                 innerClient.avatarUrl()?.let {
                     zeroCoreRepository?.user?.updateUserProfile(avatarUrl = it)
@@ -461,14 +466,14 @@ class RustMatrixClient(
 
     override suspend fun removeAvatar(): Result<Unit> =
         withContext(sessionDispatcher) {
-            runCatching { innerClient.removeAvatar() }
+            runCatchingExceptions { innerClient.removeAvatar() }
         }
 
-    override suspend fun joinRoom(roomId: RoomId): Result<RoomSummary?> = withContext(sessionDispatcher) {
-        runCatching {
+    override suspend fun joinRoom(roomId: RoomId): Result<RoomInfo?> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
             innerClient.joinRoomById(roomId.value).destroy()
             try {
-                awaitRoom(roomId.toRoomIdOrAlias(), 10.seconds, CurrentUserMembership.JOINED)
+                awaitRoom(roomId, 10.seconds, CurrentUserMembership.JOINED)
             } catch (e: Exception) {
                 Timber.e(e, "Timeout waiting for the room to be available in the room list")
                 null
@@ -477,19 +482,21 @@ class RustMatrixClient(
     }.mapFailure { it.mapClientException() }
 
     override suspend fun leaveInvitedRoom(roomId: RoomId) = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             roomFactory.leaveInvitedRoom(roomId) ?: error("Failed to decline room invite")
         }
     }
 
-    override suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomSummary?> = withContext(sessionDispatcher) {
-        runCatching {
-            innerClient.joinRoomByIdOrAlias(
+    override suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomInfo?> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
+            val roomId = innerClient.joinRoomByIdOrAlias(
                 roomIdOrAlias = roomIdOrAlias.identifier,
                 serverNames = serverNames,
-            ).destroy()
+            ).use {
+                RoomId(it.id())
+            }
             try {
-                awaitRoom(roomIdOrAlias, 10.seconds, CurrentUserMembership.JOINED)
+                awaitRoom(roomId, 10.seconds, CurrentUserMembership.JOINED)
             } catch (e: Exception) {
                 Timber.e(e, "Timeout waiting for the room to be available in the room list")
                 null
@@ -497,13 +504,15 @@ class RustMatrixClient(
         }.mapFailure { it.mapClientException() }
     }
 
-    override suspend fun knockRoom(roomIdOrAlias: RoomIdOrAlias, message: String, serverNames: List<String>): Result<RoomSummary?> = withContext(
+    override suspend fun knockRoom(roomIdOrAlias: RoomIdOrAlias, message: String, serverNames: List<String>): Result<RoomInfo?> = withContext(
         sessionDispatcher
     ) {
-        runCatching {
-            innerClient.knock(roomIdOrAlias.identifier, message, serverNames).destroy()
+        runCatchingExceptions {
+            val roomId = innerClient.knock(roomIdOrAlias.identifier, message, serverNames).use {
+                RoomId(it.id())
+            }
             try {
-                awaitRoom(roomIdOrAlias, 10.seconds, CurrentUserMembership.KNOCKED)
+                awaitRoom(roomId, 10.seconds, CurrentUserMembership.KNOCKED)
             } catch (e: Exception) {
                 Timber.e(e, "Timeout waiting for the room to be available in the room list")
                 null
@@ -512,19 +521,19 @@ class RustMatrixClient(
     }
 
     override suspend fun trackRecentlyVisitedRoom(roomId: RoomId): Result<Unit> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.trackRecentlyVisitedRoom(roomId.value)
         }
     }
 
     override suspend fun getRecentlyVisitedRooms(): Result<List<RoomId>> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.getRecentlyVisitedRooms().map(::RoomId)
         }
     }
 
     override suspend fun resolveRoomAlias(roomAlias: RoomAlias): Result<Optional<ResolvedRoomAlias>> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             val result = innerClient.resolveRoomAlias(roomAlias.value)?.let {
                 ResolvedRoomAlias(
                     roomId = RoomId(it.roomId),
@@ -536,7 +545,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getRoomPreview(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<NotJoinedRoom> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             when (roomIdOrAlias) {
                 is RoomIdOrAlias.Alias -> {
                     val roomId = innerClient.resolveRoomAlias(roomIdOrAlias.roomAlias.value)?.roomId?.let { RoomId(it) }
@@ -635,7 +644,7 @@ class RustMatrixClient(
     }
 
     override fun canDeactivateAccount(): Boolean {
-        return runCatching {
+        return runCatchingExceptions {
             innerClient.canDeactivateAccount()
         }
             .getOrNull()
@@ -647,9 +656,9 @@ class RustMatrixClient(
         // Remove current delegate so we don't receive an auth error
         clientDelegateTaskHandle?.cancelAndDestroy()
         clientDelegateTaskHandle = null
-        runCatching {
+        runCatchingExceptions {
             // First call without AuthData, should fail
-            val firstAttempt = runCatching {
+            val firstAttempt = runCatchingExceptions {
                 innerClient.deactivateAccount(
                     authData = null,
                     eraseData = eraseData,
@@ -658,7 +667,7 @@ class RustMatrixClient(
             if (firstAttempt.isFailure) {
                 Timber.w(firstAttempt.exceptionOrNull(), "Expected failure, try again")
                 // This is expected, try again with the password
-                runCatching {
+                runCatchingExceptions {
                     innerClient.deactivateAccount(
                         authData = AuthData.Password(
                             passwordDetails = AuthDataPasswordDetails(
@@ -685,34 +694,32 @@ class RustMatrixClient(
 
     override suspend fun getAccountManagementUrl(action: AccountManagementAction?): Result<String?> = withContext(sessionDispatcher) {
         val rustAction = action?.toRustAction()
-        runCatching {
+        runCatchingExceptions {
             innerClient.accountUrl(rustAction)
         }
     }
 
     override suspend fun uploadMedia(mimeType: String, data: ByteArray, progressCallback: ProgressCallback?): Result<String> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.uploadMedia(mimeType, data, progressCallback?.toProgressWatcher())
         }
     }
 
     override fun roomMembershipObserver(): RoomMembershipObserver = roomMembershipObserver
 
-    override fun getRoomSummaryFlow(roomIdOrAlias: RoomIdOrAlias): Flow<Optional<RoomSummary>> {
-        val predicate: (RoomSummary) -> Boolean = when (roomIdOrAlias) {
-            is RoomIdOrAlias.Alias -> { roomSummary ->
-                roomSummary.info.aliases.contains(roomIdOrAlias.roomAlias)
+    override fun getRoomInfoFlow(roomId: RoomId): Flow<Optional<RoomInfo>> {
+        return mxCallbackFlow {
+            val roomNotFound = innerRoomListService.roomOrNull(roomId.value).use { it == null }
+            if (roomNotFound) {
+                channel.send(Optional.empty())
             }
-            is RoomIdOrAlias.Id -> { roomSummary ->
-                roomSummary.roomId == roomIdOrAlias.roomId
-            }
-        }
-        return roomListService.allRooms.summaries
-            .map { roomSummaries ->
-                val roomSummary = roomSummaries.firstOrNull(predicate)
-                Optional.ofNullable(roomSummary)
-            }
-            .distinctUntilChanged()
+            innerClient.subscribeToRoomInfo(roomId.value, object : RoomInfoListener {
+                override fun call(roomInfo: org.matrix.rustcomponents.sdk.RoomInfo) {
+                    val mappedRoomInfo = roomInfoMapper.map(roomInfo)
+                    channel.trySend(Optional.of(mappedRoomInfo))
+                }
+            })
+        }.distinctUntilChanged()
     }
 
     override suspend fun setAllSendQueuesEnabled(enabled: Boolean) {
@@ -733,19 +740,19 @@ class RustMatrixClient(
     }.buffer(Channel.UNLIMITED)
 
     override suspend fun availableSlidingSyncVersions(): Result<List<SlidingSyncVersion>> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.availableSlidingSyncVersions().map { it.map() }
         }
     }
 
     override suspend fun currentSlidingSyncVersion(): Result<SlidingSyncVersion> = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.session().slidingSyncVersion.map()
         }
     }
 
     override suspend fun canReportRoom(): Boolean = withContext(sessionDispatcher) {
-        runCatching {
+        runCatchingExceptions {
             innerClient.isReportRoomApiSupported()
         }.getOrDefault(false)
     }

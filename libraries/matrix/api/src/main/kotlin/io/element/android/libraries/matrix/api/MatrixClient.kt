@@ -31,7 +31,6 @@ import io.element.android.libraries.matrix.api.room.RoomMembershipObserver
 import io.element.android.libraries.matrix.api.room.alias.ResolvedRoomAlias
 import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
-import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
@@ -48,8 +47,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import java.util.Optional
 
 interface MatrixClient {
@@ -70,7 +67,7 @@ interface MatrixClient {
 
     suspend fun getJoinedRoom(roomId: RoomId): JoinedRoom?
     suspend fun getRoom(roomId: RoomId): BaseRoom?
-    suspend fun findDM(userId: UserId): RoomId?
+    suspend fun findDM(userId: UserId): Result<RoomId?>
     suspend fun ignoreUser(userId: UserId): Result<Unit>
     suspend fun unignoreUser(userId: UserId): Result<Unit>
     suspend fun createRoom(createRoomParams: CreateRoomParameters): Result<RoomId>
@@ -81,10 +78,10 @@ interface MatrixClient {
     suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit>
     suspend fun uploadAvatar(mimeType: String, data: ByteArray): Result<Unit>
     suspend fun removeAvatar(): Result<Unit>
-    suspend fun joinRoom(roomId: RoomId): Result<RoomSummary?>
+    suspend fun joinRoom(roomId: RoomId): Result<RoomInfo?>
     suspend fun leaveInvitedRoom(roomId: RoomId): Result<Unit>
-    suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomSummary?>
-    suspend fun knockRoom(roomIdOrAlias: RoomIdOrAlias, message: String, serverNames: List<String>): Result<RoomSummary?>
+    suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomInfo?>
+    suspend fun knockRoom(roomIdOrAlias: RoomIdOrAlias, message: String, serverNames: List<String>): Result<RoomInfo?>
     fun syncService(): SyncService
     fun sessionVerificationService(): SessionVerificationService
     fun pushersService(): PushersService
@@ -116,11 +113,11 @@ interface MatrixClient {
     fun roomMembershipObserver(): RoomMembershipObserver
 
     /**
-     * Get a room summary flow for a given room ID or alias.
-     * The flow will emit a new value whenever the room summary is updated.
+     * Get a room info flow for a given room ID.
+     * The flow will emit a new value whenever the room info is updated.
      * The flow will emit Optional.empty item if the room is not found.
      */
-    fun getRoomSummaryFlow(roomIdOrAlias: RoomIdOrAlias): Flow<Optional<RoomSummary>>
+    fun getRoomInfoFlow(roomId: RoomId): Flow<Optional<RoomInfo>>
 
     fun isMe(userId: UserId?) = userId == sessionId
 
@@ -255,17 +252,6 @@ interface MatrixClient {
     suspend fun followUser(userId: String): Result<Boolean>
 
     suspend fun unFollowUser(userId: String): Result<Boolean>
-}
-
-/**
- * Get a room info flow for a given room ID or alias.
- * The flow will emit a new value whenever the room info is updated.
- * The flow will emit Optional.empty item if the room is not found.
- */
-fun MatrixClient.getRoomInfoFlow(roomIdOrAlias: RoomIdOrAlias): Flow<Optional<RoomInfo>> {
-    return getRoomSummaryFlow(roomIdOrAlias)
-        .map { roomSummary -> roomSummary.map { it.info } }
-        .distinctUntilChanged()
 }
 
 /**

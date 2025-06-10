@@ -24,13 +24,13 @@ import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.test.AN_ACCOUNT_PROVIDER
 import io.element.android.libraries.matrix.test.AN_ACCOUNT_PROVIDER_2
 import io.element.android.libraries.matrix.test.AN_ACCOUNT_PROVIDER_3
+import io.element.android.libraries.matrix.test.AN_EXCEPTION
 import io.element.android.libraries.matrix.test.A_HOMESERVER_URL
 import io.element.android.libraries.matrix.test.A_LOGIN_HINT
-import io.element.android.libraries.matrix.test.A_THROWABLE
 import io.element.android.libraries.matrix.test.auth.FakeMatrixAuthenticationService
 import io.element.android.libraries.matrix.test.core.aBuildMeta
 import io.element.android.libraries.oidc.api.OidcActionFlow
-import io.element.android.libraries.oidc.impl.customtab.DefaultOidcActionFlow
+import io.element.android.libraries.oidc.test.customtab.FakeOidcActionFlow
 import io.element.android.tests.testutils.WarmUpRule
 import io.element.android.tests.testutils.test
 import kotlinx.coroutines.test.runTest
@@ -192,7 +192,7 @@ class OnBoardingPresenterTest {
             skipItems(3)
             awaitItem().also {
                 assertThat(it.defaultAccountProvider).isEqualTo(A_HOMESERVER_URL)
-                authenticationService.givenChangeServerError(A_THROWABLE)
+                authenticationService.givenChangeServerError(AN_EXCEPTION)
                 it.eventSink(OnBoardingEvents.OnSignIn(A_HOMESERVER_URL))
                 skipItems(1) // Loading
 
@@ -226,7 +226,7 @@ private fun createPresenter(
 )
 
 fun createLoginHelper(
-    oidcActionFlow: OidcActionFlow = DefaultOidcActionFlow(),
+    oidcActionFlow: OidcActionFlow = FakeOidcActionFlow(),
     authenticationService: MatrixAuthenticationService = FakeMatrixAuthenticationService(),
     defaultLoginUserStory: DefaultLoginUserStory = DefaultLoginUserStory(),
     webClientUrlForAuthenticationRetriever: WebClientUrlForAuthenticationRetriever = FakeWebClientUrlForAuthenticationRetriever(),
