@@ -33,4 +33,5 @@ fun aRoomMember(
     isIgnored = isIgnored,
     role = role,
     membershipChangeReason = membershipChangeReason,
+    primaryZId = null
 )

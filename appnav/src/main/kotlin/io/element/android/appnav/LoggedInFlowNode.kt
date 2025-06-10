@@ -116,6 +116,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val secureBackupEntryPoint: SecureBackupEntryPoint,
     private val userProfileEntryPoint: UserProfileEntryPoint,
     private val ftueEntryPoint: FtueEntryPoint,
+    private val mediaViewerEntryPoint: MediaViewerEntryPoint,
     @SessionCoroutineScope
     private val sessionCoroutineScope: CoroutineScope,
     private val ftueService: FtueService,
@@ -128,7 +129,6 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
-    private val mediaViewerEntryPoint: MediaViewerEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -560,7 +560,7 @@ class LoggedInFlowNode @AssistedInject constructor(
                         }
 
                         override fun openAvatarPreview(name: String, url: String) {
-                            overlay.show(NavTarget.AvatarPreview(name, url))
+//                            overlay.show(NavTarget.AvatarPreview(name, url))
                         }
                     })
                     .build()
