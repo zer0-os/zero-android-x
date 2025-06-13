@@ -5,9 +5,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MessengerInvite(
     val slug: String,
-    val remainingInvites: Int
+    val remainingInvites: Int,
+    val invitesUsed: Int
 ) {
     companion object {
-        fun empty() = MessengerInvite(slug = "", remainingInvites = 0)
+        fun empty() = MessengerInvite(slug = "", remainingInvites = 0, invitesUsed = 0)
     }
 }

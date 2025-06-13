@@ -3,6 +3,6 @@
     <string name="invite_friend_earn_rewards" translatable="false">Invite a friend.\nEarn rewards.</string>
     <string name="copy_invite_code" translatable="false">Copy Invite Code</string>
     <string name="all_invites_consumed" translatable="false">Thank you! You’ve used all of your available invites. We’ll let you know when you can invite more people.</string>
-    <string name="here_is_invite_code" translatable="false">Here\'s your invite code to ZERO Messenger:</string>
+    <string name="here_is_invite_code" translatable="false">Use this code to join me on ZERO Messenger:</string>
     <string name="download_the_app_here" translatable="false">Join early, earn more:</string>
 </resources>
