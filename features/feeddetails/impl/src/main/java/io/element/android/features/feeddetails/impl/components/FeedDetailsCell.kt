@@ -52,6 +52,7 @@ import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.ui.component.feed.FeedLinkPreviewView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
@@ -124,7 +125,10 @@ fun FeedDetailsCell(
         }
         Spacer(Modifier.height(16.dp))
         Text(
-            text = feed.annotatedText(ElementTheme.colors.zeroBrandColor),
+            text = feed.annotatedText(
+                highlightColor = ElementTheme.colors.zeroBrandColor,
+                onLinkTapped = { url -> context.openExternalUri(url) }
+            ),
             style = ElementTheme.typography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary
         )
