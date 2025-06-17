@@ -200,7 +200,7 @@ private fun InviteCodeTextField(
                 .padding(horizontal = PADDING_3X.dp),
             text = inviteCodeFieldState,
             placeholder = R.string.invite_code,
-            maxInputLength = 6,
+//            maxInputLength = 6,
             onTextChanged = {
                 inviteCodeFieldState = it
             },
