@@ -32,6 +32,7 @@ import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
+import io.element.android.libraries.fullscreenintent.api.FullScreenIntentPermissionsEvents
 import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -142,7 +143,7 @@ private fun NotificationSettingsContentView(
                         Text(stringResource(R.string.full_screen_intent_banner_message))
                     },
                     onClick = {
-                        state.fullScreenIntentPermissionsState.openFullScreenIntentSettings()
+                        state.fullScreenIntentPermissionsState.eventSink(FullScreenIntentPermissionsEvents.OpenSettings)
                     }
                 )
             }

@@ -163,7 +163,7 @@ interface JoinedRoom : BaseRoom {
     /**
      * Send an Element Call started notification if needed.
      */
-    suspend fun sendCallNotificationIfNeeded(): Result<Unit>
+    suspend fun sendCallNotificationIfNeeded(): Result<Boolean>
 
     suspend fun setSendQueueEnabled(enabled: Boolean)
 

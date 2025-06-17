@@ -139,7 +139,7 @@ private fun EmptyView(
                         onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
                     )
                 }
-                else -> Unit
+                SecurityBannerState.None -> Unit
             }
         }
     }
@@ -224,6 +224,10 @@ private fun RoomsViewList(
             SecurityBannerState.None -> if (state.fullScreenIntentPermissionsState.shouldDisplayBanner) {
                 item {
                     FullScreenIntentPermissionBanner(state = state.fullScreenIntentPermissionsState)
+                }
+            } else if (state.batteryOptimizationState.shouldDisplayBanner) {
+                item {
+                    BatteryOptimizationBanner(state = state.batteryOptimizationState)
                 }
             }*/
         }

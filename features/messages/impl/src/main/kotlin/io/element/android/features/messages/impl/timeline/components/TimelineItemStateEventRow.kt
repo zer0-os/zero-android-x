@@ -44,7 +44,6 @@ fun TimelineItemStateEventRow(
     roomMembers: List<RoomMember>,
     renderReadReceipts: Boolean,
     isLastOutgoingMessage: Boolean,
-    isHighlighted: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onReadReceiptsClick: (event: TimelineItem.Event) -> Unit,
@@ -64,7 +63,6 @@ fun TimelineItemStateEventRow(
             contentAlignment = Alignment.Center
         ) {
             MessageStateEventContainer(
-                isHighlighted = isHighlighted,
                 interactionSource = interactionSource,
                 onClick = onClick,
                 onLongClick = onLongClick,
@@ -124,7 +122,6 @@ internal fun TimelineItemStateEventRowPreview() = ElementPreview {
         roomMembers = emptyList(),
         renderReadReceipts = true,
         isLastOutgoingMessage = false,
-        isHighlighted = false,
         onClick = {},
         onLongClick = {},
         onReadReceiptsClick = {},

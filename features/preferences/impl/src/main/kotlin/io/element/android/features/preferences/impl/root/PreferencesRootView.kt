@@ -254,7 +254,7 @@ private fun ColumnScope.ManageAppSection(
     onInviteFriend: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text("Invite Friend") },
+        headlineContent = { Text("Refer A Friend") },
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Plus())),
         onClick = onInviteFriend,
     )

@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +60,7 @@ import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.ui.component.feed.FeedLinkPreviewView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaImageView
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaVideoView
@@ -149,9 +151,12 @@ fun HomeFeedRow(
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                text = feed.annotatedText(ElementTheme.colors.zeroBrandColor),
+                text = feed.annotatedText(
+                    highlightColor = ElementTheme.colors.zeroBrandColor,
+                    onLinkTapped = { url -> context.openExternalUri(url) }
+                ),
                 style = ElementTheme.typography.fontBodyLgRegular,
-                color = ElementTheme.colors.textPrimary
+                color = ElementTheme.colors.textPrimary,
             )
             if (feed.linkMetaData != null) {
                 val linkMetaData = feed.linkMetaData!!
@@ -264,7 +269,10 @@ fun ZeroFeedAuthor.avatarData() = AvatarData(
     size = AvatarSize.RoomDirectoryItem
 )
 
-fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
+fun ZeroFeed.annotatedText(
+    highlightColor: Color,
+    onLinkTapped: (String) -> Unit
+): AnnotatedString {
     return buildAnnotatedString {
         append(text)
         // Regex to match @mentions, #hashtags, and links (http, https, www)
@@ -279,6 +287,21 @@ fun ZeroFeed.annotatedText(highlightColor: Color): AnnotatedString {
                 start = match.range.first,
                 end = match.range.last + 1
             )
+
+            // Add URL annotation for links to make them clickable
+            if (isLink) {
+                val url = if (match.value.startsWith("www")) {
+                    "https://${match.value}"
+                } else {
+                    match.value
+                }
+
+                addLink(
+                    url = LinkAnnotation.Url(url, linkInteractionListener = { onLinkTapped(url) }),
+                    start = match.range.first,
+                    end = match.range.last + 1
+                )
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This class manages the audio devices for a WebView.
@@ -38,8 +40,22 @@ import java.util.concurrent.atomic.AtomicBoolean
 class WebViewAudioManager(
     private val webView: WebView,
     private val coroutineScope: CoroutineScope,
+    private val onInvalidAudioDeviceAdded: (InvalidAudioDeviceReason) -> Unit,
 ) {
-    // The list of device types that are considered as communication devices, sorted by likelihood of it being used for communication.
+    /**
+     * Whether to disable bluetooth audio devices. This must be done on Android versions lower than Android 12,
+     * since the WebView approach breaks when using the legacy Bluetooth audio APIs.
+     */
+    private val disableBluetoothAudioDevices = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+
+    /**
+     * This flag indicates whether the WebView audio is enabled or not. By default, it is enabled.
+     */
+    private val isWebViewAudioEnabled = AtomicBoolean(true)
+
+    /**
+     * The list of device types that are considered as communication devices, sorted by likelihood of it being used for communication.
+     */
     private val wantedDeviceTypes = listOf(
         // Paired bluetooth device with microphone
         AudioDeviceInfo.TYPE_BLUETOOTH_SCO,
@@ -58,6 +74,10 @@ class WebViewAudioManager(
 
     private val audioManager = webView.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+    /**
+     * This wake lock is used to turn off the screen when the proximity sensor is triggered during a call,
+     * if the selected audio device is the built-in earpiece.
+     */
     private val proximitySensorWakeLock by lazy {
         webView.context.getSystemService<PowerManager>()
             ?.takeIf { it.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK) }
@@ -221,6 +241,10 @@ class WebViewAudioManager(
             },
             onAudioPlaybackStarted = {
                 coroutineScope.launch(Dispatchers.Main) {
+                    // Even with the callback, it seems like starting the audio takes a bit on the webview side,
+                    // so we add an extra delay here to make sure it's ready
+                    delay(500.milliseconds)
+
                     // Calling this ahead of time makes the default audio device to not use the right audio stream
                     setAvailableAudioDevices()
 
@@ -290,12 +314,13 @@ class WebViewAudioManager(
      * @param availableDevices The list of available audio devices to select from. If not provided, it will use the current list of audio devices.
      */
     private fun selectDefaultAudioDevice(availableDevices: List<AudioDeviceInfo> = listAudioDevices()) {
-        val selectedDevice = availableDevices.minByOrNull {
-            wantedDeviceTypes.indexOf(it.type).let { index ->
-                // If the device type is not in the wantedDeviceTypes list, we give it a low priority
-                if (index == -1) Int.MAX_VALUE else index
+        val selectedDevice = availableDevices
+            .minByOrNull {
+                wantedDeviceTypes.indexOf(it.type).let { index ->
+                    // If the device type is not in the wantedDeviceTypes list, we give it a low priority
+                    if (index == -1) Int.MAX_VALUE else index
+                }
             }
-        }
 
         expectedNewCommunicationDeviceId = selectedDevice?.id
         audioManager.selectAudioDevice(selectedDevice)
@@ -355,6 +380,13 @@ class WebViewAudioManager(
             // On Android 11 and lower, we don't have the concept of communication devices
             // We have to call the right methods based on the device type
             if (device != null) {
+                if (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO && disableBluetoothAudioDevices) {
+                    Timber.w("Bluetooth audio devices are disabled on this Android version")
+                    setAudioEnabled(false)
+                    onInvalidAudioDeviceAdded(InvalidAudioDeviceReason.BT_AUDIO_DEVICE_DISABLED)
+                    return
+                }
+                setAudioEnabled(true)
                 isSpeakerphoneOn = device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
                 isBluetoothScoOn = device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             } else {
@@ -372,6 +404,19 @@ class WebViewAudioManager(
         } else if (proximitySensorWakeLock?.isHeld == true) {
             // If the device is no longer the earpiece, we need to release the wake lock
             proximitySensorWakeLock?.release()
+        }
+    }
+
+    /**
+     * Sets whether the audio is enabled for Element Call in the WebView.
+     * It will only perform the change if the audio state has changed.
+     */
+    private fun setAudioEnabled(enabled: Boolean) {
+        coroutineScope.launch(Dispatchers.Main) {
+            Timber.d("Setting audio enabled in Element Call: $enabled")
+            if (isWebViewAudioEnabled.getAndSet(enabled) != enabled) {
+                webView.evaluateJavascript("controls.setAudioEnabled($enabled);", null)
+            }
         }
     }
 }
@@ -426,6 +471,10 @@ private fun isBuiltIn(type: Int): Boolean = when (type) {
     AudioDeviceInfo.TYPE_BUILTIN_MIC,
     AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE -> true
     else -> false
+}
+
+enum class InvalidAudioDeviceReason {
+    BT_AUDIO_DEVICE_DISABLED,
 }
 
 /**
