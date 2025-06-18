@@ -30,6 +30,7 @@ import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.TransactionId
 import io.element.android.libraries.matrix.api.core.UniqueId
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.room.tombstone.PredecessorRoom
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.matrix.api.timeline.item.event.LocalEventSendState
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
@@ -247,6 +248,7 @@ internal fun aTimelineRoomInfo(
     userHasPermissionToSendMessage: Boolean = true,
     pinnedEventIds: List<EventId> = emptyList(),
     typingNotificationState: TypingNotificationState = aTypingNotificationState(),
+    predecessorRoom: PredecessorRoom? = null,
 ) = TimelineRoomInfo(
     isDm = isDm,
     name = name,
@@ -255,5 +257,6 @@ internal fun aTimelineRoomInfo(
     roomCallState = aStandByCallState(),
     pinnedEventIds = pinnedEventIds,
     typingNotificationState = typingNotificationState,
+    predecessorRoom = predecessorRoom,
     roomMembers = emptyList()
 )

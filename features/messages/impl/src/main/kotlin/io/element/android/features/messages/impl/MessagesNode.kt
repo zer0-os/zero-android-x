@@ -50,12 +50,14 @@ import io.element.android.libraries.architecture.NodeInputs
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
+import io.element.android.libraries.di.ApplicationContext
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
 import io.element.android.libraries.matrix.api.analytics.toAnalyticsViewRoom
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
 import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.room.BaseRoom
@@ -63,6 +65,7 @@ import io.element.android.libraries.matrix.api.room.alias.matches
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.libraries.mediaplayer.api.MediaPlayer
+import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -72,6 +75,7 @@ import kotlinx.coroutines.launch
 class MessagesNode @AssistedInject constructor(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
+    @ApplicationContext private val context: Context,
     @SessionCoroutineScope
     private val sessionCoroutineScope: CoroutineScope,
     private val room: BaseRoom,
@@ -159,7 +163,7 @@ class MessagesNode @AssistedInject constructor(
                 callbacks.forEach { it.onUserDataClick(permalink.userId, null) }
             }
             is PermalinkData.RoomLink -> {
-                handleRoomLinkClick(activity, permalink, eventSink)
+                handleRoomLinkClick(permalink, eventSink)
             }
             is PermalinkData.FallbackLink -> {
                 if (customTab) {
@@ -175,7 +179,6 @@ class MessagesNode @AssistedInject constructor(
     }
 
     private fun handleRoomLinkClick(
-        context: Context,
         roomLink: PermalinkData.RoomLink,
         eventSink: (TimelineEvents) -> Unit,
     ) {
@@ -185,7 +188,7 @@ class MessagesNode @AssistedInject constructor(
                 eventSink(TimelineEvents.FocusOnEvent(eventId))
             } else {
                 // Click on the same room, ignore
-                context.toast("Already viewing this room!")
+                displaySameRoomToast()
             }
         } else {
             callbacks.forEach { it.onPermalinkClick(roomLink) }
@@ -212,6 +215,15 @@ class MessagesNode @AssistedInject constructor(
         callbacks.forEach { it.onPreviewAttachments(attachments) }
     }
 
+    override fun onNavigateToRoom(roomId: RoomId) {
+        if (roomId == room.roomId) {
+            displaySameRoomToast()
+        } else {
+            val permalinkData = PermalinkData.RoomLink(roomId.toRoomIdOrAlias())
+            callbacks.forEach { it.onPermalinkClick(permalinkData) }
+        }
+    }
+
     private fun onViewAllPinnedMessagesClick() {
         callbacks.forEach { it.onViewAllPinnedEvents() }
     }
@@ -230,6 +242,10 @@ class MessagesNode @AssistedInject constructor(
 
     private fun onViewKnockRequestsClick() {
         callbacks.forEach { it.onViewKnockRequests() }
+    }
+
+    private fun displaySameRoomToast() {
+        context.toast(CommonStrings.screen_room_permalink_same_room_android)
     }
 
     @Composable
@@ -260,13 +276,13 @@ class MessagesNode @AssistedInject constructor(
                 onCreatePollClick = this::onCreatePollClick,
                 onJoinCallClick = this::onJoinCallClick,
                 onViewAllPinnedMessagesClick = this::onViewAllPinnedMessagesClick,
+                modifier = modifier,
                 knockRequestsBannerView = {
                     knockRequestsBannerRenderer.View(
                         modifier = Modifier,
                         onViewRequestsClick = this::onViewKnockRequestsClick
                     )
                 },
-                modifier = modifier,
             )
             roomMemberModerationRenderer.Render(
                 state = state.roomMemberModerationState,

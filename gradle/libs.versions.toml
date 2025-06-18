@@ -39,7 +39,7 @@ serialization_json = "1.8.1"
 #other
 detekt = "1.23.8"
 coil = "3.2.0"
-showkase = "1.0.3"
+showkase = "1.0.4"
 appyx = "1.7.1"
 sqldelight = "2.1.0"
 wysiwyg = "2.38.3"
@@ -195,8 +195,8 @@ opusencoder = "io.element.android:opusencoder:1.2.0"
 zxing_cpp = "io.github.zxing-cpp:android:2.3.0"
 
 # Analytics
-posthog = "com.posthog:posthog-android:3.18.0"
-sentry = "io.sentry:sentry-android:8.13.2"
+posthog = "com.posthog:posthog-android:3.19.0"
+sentry = "io.sentry:sentry-android:8.13.3"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"
 

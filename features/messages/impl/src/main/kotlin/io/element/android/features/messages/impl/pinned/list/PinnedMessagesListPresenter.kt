@@ -109,6 +109,7 @@ class PinnedMessagesListPresenter @AssistedInject constructor(
                     typingMembers = persistentListOf(),
                     reserveSpace = false,
                 ),
+                predecessorRoom = room.predecessorRoom(),
                 roomMembers = roomMembersState.value.roomMembers().orEmpty()
             )
         }
