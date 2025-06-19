@@ -415,8 +415,27 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun getUserProfile(): Result<MatrixUser> = getProfile(sessionId)
-        .onSuccess { _userProfile.tryEmit(it) }
+    override suspend fun getUserProfile(): Result<MatrixUser> {
+        return runCatchingExceptions {
+            getProfile(sessionId)
+                .onSuccess {
+                    _userProfile.tryEmit(it)
+                    zeroCoreRepository?.account?.saveLoggedInUserInfo(it)
+                }
+                .onFailure {
+                    _userProfile.emit(getFallbackUserProfile())
+                }
+        }.getOrElse {
+            val fallbackProfile = getFallbackUserProfile()
+            _userProfile.tryEmit(fallbackProfile)
+            Result.success(fallbackProfile)
+        }
+    }
+
+    private fun getFallbackUserProfile(): MatrixUser {
+        return zeroCoreRepository?.account?.getLoggedInUser() ?: MatrixUser(sessionId)
+    }
+
 
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> =
         withContext(sessionDispatcher) {
@@ -826,7 +845,7 @@ class RustMatrixClient(
         }
 
     override suspend fun isZeroProfileCompletionPending(): Boolean {
-        return zeroCoreRepository?.user?.getCurrentUser()
+        return zeroCoreRepository?.user?.getCurrentUser(sessionId)
             ?.firstOrNull()?.let { user ->
                 user.name.isBlank() || user.nameIsMatrixHex()
             } ?: false
@@ -903,7 +922,7 @@ class RustMatrixClient(
     override suspend fun fetchAllMyFeeds(limit: Int, skip: Int, includeReplies: Boolean, includeMeow: Boolean) {
         val allMyFeeds = runCatching {
             val feedRepo = zeroCoreRepository?.feed ?: return
-            val currentUser = zeroCoreRepository.user.getCurrentUser().firstOrNull()
+            val currentUser = zeroCoreRepository.user.getCurrentUser(sessionId).firstOrNull()
             val primaryZId = currentUser?.primaryZeroId ?: return
             feedRepo.fetchAllMyFeeds(primaryZId, limit, skip)
                 .map { it.toModel() }

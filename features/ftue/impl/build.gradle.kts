@@ -41,6 +41,7 @@ dependencies {
     implementation(projects.features.verifysession.api)
     implementation(projects.services.analytics.api)
     implementation(projects.features.lockscreen.api)
+    implementation(projects.features.networkmonitor.api)
     implementation(projects.libraries.permissions.api)
     implementation(projects.libraries.mediapickers.api)
     implementation(projects.libraries.mediaupload.api)

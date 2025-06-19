@@ -1,5 +1,6 @@
 package io.element.android.support.zero.data.delegate
 
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.data.model.UserRewards
 
 interface Preferences {
@@ -18,4 +19,8 @@ interface Preferences {
     suspend fun saveUserRewards(rewards: UserRewards)
 
     fun userRewards(): UserRewards
+
+    suspend fun saveLoggedInUserInfo(info: MatrixUser)
+
+    fun loggedInUserInfo(): MatrixUser?
 }

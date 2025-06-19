@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.common.extension.runBlockingWithTimeOut
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
@@ -54,10 +55,22 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
             }.firstOrNull()?.decodeJson()
         } ?: UserRewards.empty()
 
+    suspend fun saveLoggedInUserInfo(info: MatrixUser) {
+        dataStore.edit { preferences -> preferences[LOGGED_IN_USER_INFO] = info.toJson() }
+    }
+
+    fun loggedInUserInfo(): MatrixUser? =
+        runBlockingWithTimeOut {
+            dataStore.data.map {
+                preferences -> preferences[LOGGED_IN_USER_INFO]
+            }.firstOrNull()?.decodeJson()
+        }
+
     internal companion object {
         internal val USER_ID = stringPreferencesKey("USER_ID")
         internal val ZOS_TOKEN = stringPreferencesKey("ZOS_TOKEN")
         internal val MATRIX_TOKEN = stringPreferencesKey("MATRIX_TOKEN")
         internal val USER_REWARDS = stringPreferencesKey("USER_REWARDS")
+        internal val LOGGED_IN_USER_INFO = stringPreferencesKey("LOGGED_IN_USER_INFO")
     }
 }

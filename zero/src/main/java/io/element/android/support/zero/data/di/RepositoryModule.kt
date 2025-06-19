@@ -90,8 +90,9 @@ object RepositoryModule {
     @SingleIn(AppScope::class)
     fun bindUserRepository(
         zeroUserService: ZeroUserService,
-        zeroMatrixUserService: ZeroMatrixUserService
-    ): UserRepository = UserRepositoryImpl(zeroUserService, zeroMatrixUserService)
+        zeroMatrixUserService: ZeroMatrixUserService,
+        preferences: Preferences
+    ): UserRepository = UserRepositoryImpl(zeroUserService, zeroMatrixUserService, preferences)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -112,7 +113,8 @@ object RepositoryModule {
         zeroAccountService: ZeroAccountService,
         zeroUserService: ZeroUserService,
         zeroWalletService: ZeroWalletService,
-    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService, zeroWalletService)
+        preferences: Preferences
+    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService, zeroWalletService, preferences)
 
     @Provides
     @SingleIn(AppScope::class)

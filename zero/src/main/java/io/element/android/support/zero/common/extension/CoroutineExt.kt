@@ -2,6 +2,7 @@ package io.element.android.support.zero.common.extension
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ProducerScope
@@ -26,6 +27,11 @@ inline fun <T> withIOScope(crossinline block: suspend () -> T) =
 
 inline fun <T> withScopeAsync(dispatcher: CoroutineDispatcher, crossinline block: suspend () -> T) =
 	CoroutineScope(dispatcher).async { block() }
+
+inline fun <T> CoroutineScope.safeAsync(crossinline block: suspend () -> T): Deferred<Result<T>> =
+    async {
+        runCatching { block() }
+    }
 
 suspend inline fun <T> runOnMainThread(crossinline block: suspend () -> T) =
 	withContext(Dispatchers.Main) { block() }

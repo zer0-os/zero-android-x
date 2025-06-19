@@ -69,6 +69,7 @@ import io.element.android.libraries.push.api.battery.BatteryOptimizationState
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
 import io.element.android.support.zero.common.util.FeedItemMediaCache
@@ -147,7 +148,7 @@ class RoomListPresenter @Inject constructor(
 
         LaunchedEffect(Unit) {
             roomListDataSource.launchIn(this)
-            coroutineScope.fetchInitialData()
+            fetchInitialData()
         }
 
         var securityBannerDismissed by rememberSaveable { mutableStateOf(false) }
@@ -453,15 +454,15 @@ class RoomListPresenter @Inject constructor(
     private fun CoroutineScope.fetchInitialData() = launch {
         awaitAll(
             // Check zero thirdWeb wallet
-            async { client.checkZeroThirdWebWallet() },
+            safeAsync { client.checkZeroThirdWebWallet() },
             // Fetch user rewards
-            async { client.getUserRewards(shouldCheckRewardsIntimation = true) },
+            safeAsync { client.getUserRewards(shouldCheckRewardsIntimation = true) },
             // Fetch home channels
-            async { client.getUserZIds() },
+            safeAsync { client.getUserZIds() },
             // Fetch all home feeds
-            async { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            safeAsync { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
             // Fetch all my feeds
-            async { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
     }
 

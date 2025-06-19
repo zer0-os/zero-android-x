@@ -1,5 +1,6 @@
 package io.element.android.support.zero.data.delegate
 
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.datastore.AppPreferences
 
@@ -28,4 +29,10 @@ class PreferencesImpl(private val appPreferences: AppPreferences) :
     }
 
     override fun userRewards(): UserRewards = appPreferences.userRewards()
+
+    override suspend fun saveLoggedInUserInfo(info: MatrixUser) {
+        appPreferences.saveLoggedInUserInfo(info)
+    }
+
+    override fun loggedInUserInfo() = appPreferences.loggedInUserInfo()
 }

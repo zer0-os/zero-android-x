@@ -1,5 +1,8 @@
 package io.element.android.support.zero.data.repository
 
+import io.element.android.libraries.matrix.api.core.UserId
+import io.element.android.libraries.matrix.api.user.MatrixUser
+
 interface AccountRepository {
     suspend fun deleteUserAccount()
 
@@ -10,4 +13,8 @@ interface AccountRepository {
     suspend fun fetchUserZIds(): List<String>
 
     suspend fun checkAndInitializeThirdWeb()
+
+    suspend fun saveLoggedInUserInfo(user: MatrixUser)
+
+    fun getLoggedInUser(): MatrixUser?
 }

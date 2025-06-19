@@ -11,7 +11,9 @@ import android.os.Parcelable
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Parcelize
 data class MatrixUser(
     val userId: UserId,

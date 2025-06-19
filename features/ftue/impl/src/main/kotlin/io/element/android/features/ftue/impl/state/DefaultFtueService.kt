@@ -14,6 +14,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import io.element.android.features.ftue.api.state.FtueService
 import io.element.android.features.ftue.api.state.FtueState
 import io.element.android.features.lockscreen.api.LockScreenService
+import io.element.android.features.networkmonitor.api.NetworkMonitor
+import io.element.android.features.networkmonitor.api.NetworkStatus
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
@@ -45,6 +47,7 @@ class DefaultFtueService @Inject constructor(
     private val lockScreenService: LockScreenService,
     private val sessionVerificationService: SessionVerificationService,
     private val sessionPreferencesStore: SessionPreferencesStore,
+    private val networkMonitor: NetworkMonitor,
     private val client: MatrixClient,
 ) : FtueService {
     override val state = MutableStateFlow<FtueState>(FtueState.Unknown)
@@ -81,7 +84,9 @@ class DefaultFtueService @Inject constructor(
 
     suspend fun getNextStep(currentStep: FtueStep? = null): FtueStep? =
         when (currentStep) {
-            null -> if (!isSessionVerificationStateReady()) {
+            null -> if (networkMonitor.connectivity.value == NetworkStatus.Disconnected) {
+                getNextStep(FtueStep.WaitingForInitialState)
+            } else if (!isSessionVerificationStateReady()) {
                 FtueStep.WaitingForInitialState
             } else {
                 getNextStep(FtueStep.WaitingForInitialState)

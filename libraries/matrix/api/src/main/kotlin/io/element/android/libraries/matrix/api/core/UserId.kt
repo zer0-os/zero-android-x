@@ -15,6 +15,7 @@ import java.io.Serializable
  *
  * https://spec.matrix.org/v1.8/appendices/#user-identifiers
  */
+@kotlinx.serialization.Serializable
 @JvmInline
 value class UserId(val value: String) : Serializable {
     init {

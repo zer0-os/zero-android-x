@@ -1,5 +1,7 @@
 package io.element.android.support.zero.data.repository
 
+import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import io.element.android.support.zero.network.service.ZeroAccountService
@@ -10,6 +12,7 @@ class AccountRepositoryImpl(
     private val zeroAccountService: ZeroAccountService,
     private val zeroUserService: ZeroUserService,
     private val zeroWalletService: ZeroWalletService,
+    private val preferences: Preferences
 ): AccountRepository {
 
     override suspend fun deleteUserAccount() {
@@ -41,10 +44,20 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun checkAndInitializeThirdWeb() {
-        val currentUser = zeroUserService.getCurrentUser()
-        if (currentUser.thirdWebWallet == null) {
-            // Initialize thirdWeb wallet
-            zeroWalletService.initializeThirdWebWallet()
+        runCatching {
+            val currentUser = zeroUserService.getCurrentUser()
+            if (currentUser.thirdWebWallet == null) {
+                // Initialize thirdWeb wallet
+                zeroWalletService.initializeThirdWebWallet()
+            }
         }
+    }
+
+    override suspend fun saveLoggedInUserInfo(user: MatrixUser) {
+        preferences.saveLoggedInUserInfo(user)
+    }
+
+    override fun getLoggedInUser(): MatrixUser? {
+        return preferences.loggedInUserInfo()
     }
 }
