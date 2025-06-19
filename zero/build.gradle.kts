@@ -58,4 +58,7 @@ dependencies {
     implementation(libs.network.retrofit)
     implementation(libs.network.retrofit.converter.serialization)
     implementation(libs.serialization.json)
+
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.google.firebase.remote.configs)
 }

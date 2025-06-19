@@ -16,17 +16,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumble.appyx.core.integration.NodeHost
 import com.bumble.appyx.core.integrationpoint.NodeActivity
 import com.bumble.appyx.core.plugin.NodeReadyObserver
-import io.element.android.compound.theme.ElementTheme
 import com.reown.appkit.client.AppKit
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.lockscreen.api.LockScreenEntryPoint
 import io.element.android.features.lockscreen.api.LockScreenLockState
 import io.element.android.features.lockscreen.api.LockScreenService
@@ -36,9 +39,9 @@ import io.element.android.libraries.core.log.logger.LoggerTag
 import io.element.android.libraries.designsystem.theme.ElementThemeApp
 import io.element.android.libraries.designsystem.utils.snackbar.LocalSnackbarDispatcher
 import io.element.android.services.analytics.compose.LocalAnalyticsService
+import io.element.android.support.zero.config.ZeroRemoteConfigsManager
 import io.element.android.x.di.AppBindings
 import io.element.android.x.intent.SafeUriHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -66,6 +69,11 @@ class MainActivity : NodeActivity() {
     @Composable
     private fun MainContent(appBindings: AppBindings) {
         val migrationState = appBindings.migrationEntryPoint().present()
+
+        val remoteConfigManager = remember { ZeroRemoteConfigsManager }
+        val forceUpdateEnabled by remoteConfigManager.forceUpdateEnabled.collectAsStateWithLifecycle()
+        val maintenanceModeEnabled by remoteConfigManager.maintenanceModeEnabled.collectAsStateWithLifecycle()
+
         ElementThemeApp(
             appPreferencesStore = appBindings.preferencesStore(),
             enterpriseService = appBindings.enterpriseService(),
@@ -88,6 +96,14 @@ class MainActivity : NodeActivity() {
                             state = migrationState,
                             modifier = Modifier,
                         )
+                    }
+                    // show force update screen if required
+                    if (forceUpdateEnabled) {
+                        AppForceUpdateView()
+                    }
+                    // show maintenance screen if required
+                    if (maintenanceModeEnabled) {
+                        AppMaintenanceModeView()
                     }
                 }
             }

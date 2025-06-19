@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
+import androidx.core.net.toUri
 
 fun Context.getActivity(): Activity? =
     when (this) {
@@ -21,7 +21,7 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 fun Context.openExternalUri(url: String) {
     this.getActivity()?.let {
         try {
-            val uri = Uri.parse(url)
+            val uri = url.toUri()
             val intent = Intent(Intent.ACTION_VIEW, uri)
             it.startActivity(intent)
         } catch (e: Exception) {

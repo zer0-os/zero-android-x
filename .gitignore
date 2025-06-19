@@ -113,3 +113,4 @@ checkouts/**
 app/gplay/release/output-metadata.json
 zero/production.properties
 zero/development.properties
+app/google-services.json
