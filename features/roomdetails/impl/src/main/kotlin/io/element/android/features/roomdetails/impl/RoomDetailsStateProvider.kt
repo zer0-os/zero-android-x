@@ -32,7 +32,7 @@ open class RoomDetailsStateProvider : PreviewParameterProvider<RoomDetailsState>
     override val values: Sequence<RoomDetailsState>
         get() = sequenceOf(
             aRoomDetailsState(displayAdminSettings = true),
-            aRoomDetailsState(roomTopic = RoomTopicState.Hidden),
+            aRoomDetailsState(roomTopic = RoomTopicState.Hidden, showDebugInfo = true),
             aRoomDetailsState(roomTopic = RoomTopicState.CanAddTopic),
             aRoomDetailsState(isEncrypted = false),
             aRoomDetailsState(roomAlias = null),
@@ -52,6 +52,7 @@ open class RoomDetailsStateProvider : PreviewParameterProvider<RoomDetailsState>
             aRoomDetailsState(knockRequestsCount = null, canShowKnockRequests = true),
             aRoomDetailsState(knockRequestsCount = 4, canShowKnockRequests = true),
             aRoomDetailsState(hasMemberVerificationViolations = true),
+            aRoomDetailsState(isTombstoned = true),
             aDmRoomDetailsState(dmRoomMemberVerificationState = UserProfileVerificationState.VERIFIED),
             aDmRoomDetailsState(dmRoomMemberVerificationState = UserProfileVerificationState.VERIFICATION_VIOLATION),
             // Add other state here
@@ -119,6 +120,8 @@ fun aRoomDetailsState(
     canShowSecurityAndPrivacy: Boolean = true,
     hasMemberVerificationViolations: Boolean = false,
     canReportRoom: Boolean = true,
+    isTombstoned: Boolean = false,
+    showDebugInfo: Boolean = false,
     isRoomAChannel: Boolean = false,
     eventSink: (RoomDetailsEvent) -> Unit = {},
 ) = RoomDetailsState(
@@ -151,6 +154,8 @@ fun aRoomDetailsState(
     canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
     hasMemberVerificationViolations = hasMemberVerificationViolations,
     canReportRoom = canReportRoom,
+    isTombstoned = isTombstoned,
+    showDebugInfo = showDebugInfo,
     isRoomAChannel = isRoomAChannel,
     loggedInUser = UserId("@daniel:domain.com"),
     eventSink = eventSink,

@@ -10,7 +10,6 @@ package io.element.android.libraries.designsystem.components.avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,29 +23,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
-import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.R
-import io.element.android.libraries.designsystem.colors.AvatarColorsProvider
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
-import io.element.android.libraries.designsystem.text.toSp
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 
 @Composable
 fun Avatar(
     avatarData: AvatarData,
+    avatarType: AvatarType,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
     // If not null, will be used instead of the size from avatarData
@@ -107,36 +100,6 @@ private fun ImageAvatar(
 }
 
 @Composable
-private fun InitialsAvatar(
-    avatarData: AvatarData,
-    forcedAvatarSize: Dp?,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-) {
-    val avatarColors = AvatarColorsProvider.provide(avatarData.id)
-    Box(
-        modifier.background(color = avatarColors.background)
-    ) {
-        val fontSize = (forcedAvatarSize ?: avatarData.size.dp).toSp() / 2
-        val originalFont = ElementTheme.zeroTypography.fontHeadingMdBold
-        val ratio = fontSize.value / originalFont.fontSize.value
-        val lineHeight = originalFont.lineHeight * ratio
-        Text(
-            modifier = Modifier
-                .clearAndSetSemantics {
-                    contentDescription?.let {
-                        this.contentDescription = it
-                    }
-                }
-                .align(Alignment.Center),
-            text = avatarData.initial,
-            style = originalFont.copy(fontSize = fontSize, lineHeight = lineHeight, letterSpacing = 0.sp),
-            color = avatarColors.foreground,
-        )
-    }
-}
-
-@Composable
 private fun ZeroPlaceholderImage(
     avatarData: AvatarData,
     forcedAvatarSize: Dp?,
@@ -162,7 +125,10 @@ internal fun AvatarPreview(@PreviewParameter(AvatarDataProvider::class) avatarDa
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Avatar(avatarData)
+            Avatar(
+                avatarData = avatarData,
+                avatarType = AvatarType.User,
+            )
             Text(text = avatarData.size.name + " " + avatarData.size.dp)
         }
     }

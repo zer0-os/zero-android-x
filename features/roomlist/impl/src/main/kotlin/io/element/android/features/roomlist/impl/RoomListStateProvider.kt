@@ -8,8 +8,8 @@
 package io.element.android.features.roomlist.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteEvents
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteState
-import io.element.android.features.invite.api.acceptdecline.anAcceptDeclineInviteState
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.leaveroom.api.aLeaveRoomState
 import io.element.android.features.logout.api.direct.DirectLogoutState
@@ -101,6 +101,16 @@ internal fun aRoomListState(
     directLogoutState = directLogoutState,
     hideInvitesAvatars = hideInvitesAvatars,
     canReportRoom = canReportRoom,
+    eventSink = eventSink,
+)
+
+internal fun anAcceptDeclineInviteState(
+    acceptAction: AsyncAction<RoomId> = AsyncAction.Uninitialized,
+    declineAction: AsyncAction<RoomId> = AsyncAction.Uninitialized,
+    eventSink: (AcceptDeclineInviteEvents) -> Unit = {}
+) = AcceptDeclineInviteState(
+    acceptAction = acceptAction,
+    declineAction = declineAction,
     eventSink = eventSink,
 )
 

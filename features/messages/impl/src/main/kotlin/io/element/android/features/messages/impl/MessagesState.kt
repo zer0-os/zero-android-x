@@ -32,8 +32,8 @@ import kotlinx.collections.immutable.ImmutableList
 @Immutable
 data class MessagesState(
     val roomId: RoomId,
-    val roomName: AsyncData<String>,
-    val roomAvatar: AsyncData<AvatarData>,
+    val roomName: String?,
+    val roomAvatar: AvatarData,
     val roomSubTitle: String?,
     val heroes: ImmutableList<AvatarData>,
     val userEventPermissions: UserEventPermissions,
@@ -60,4 +60,6 @@ data class MessagesState(
     val roomMemberModerationState: RoomMemberModerationState,
     val successorRoom: SuccessorRoom?,
     val eventSink: (MessagesEvents) -> Unit
-)
+) {
+    val isTombstoned = successorRoom != null
+}

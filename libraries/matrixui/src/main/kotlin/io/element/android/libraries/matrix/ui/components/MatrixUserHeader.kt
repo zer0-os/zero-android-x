@@ -8,12 +8,10 @@
 package io.element.android.libraries.matrix.ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
@@ -67,6 +66,7 @@ private fun MatrixUserHeaderContent(
             modifier = Modifier
                 .padding(vertical = 12.dp),
             avatarData = matrixUser.getAvatarData(size = AvatarSize.UserHeader),
+            avatarType = AvatarType.User,
         )
         Spacer(modifier = Modifier.size(16.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

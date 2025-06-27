@@ -30,6 +30,7 @@ import io.element.android.features.preferences.impl.R
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.preferences.PreferenceDropDownSimple
 import io.element.android.libraries.designsystem.components.preferences.SimpleDropdownOption
@@ -102,6 +103,7 @@ fun EditUserProfileView(
                 displayName = state.displayName,
                 avatarUrl = state.userAvatarUrl,
                 avatarSize = AvatarSize.EditProfileDetails,
+                avatarType = AvatarType.User,
                 onAvatarClick = { onAvatarClick() },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )

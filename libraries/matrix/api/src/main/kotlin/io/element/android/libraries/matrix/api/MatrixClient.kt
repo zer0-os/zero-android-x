@@ -190,6 +190,11 @@ interface MatrixClient {
      */
     suspend fun canReportRoom(): Boolean
 
+    /**
+     * Return true if Livekit Rtc is supported, i.e. if Element Call is available.
+     */
+    suspend fun isLivekitRtcSupported(): Boolean
+
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
 

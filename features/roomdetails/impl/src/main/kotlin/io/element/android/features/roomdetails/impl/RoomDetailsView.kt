@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -41,6 +42,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.userprofile.api.UserProfileVerificationState
+import io.element.android.libraries.androidutils.system.copyToClipboard
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
 import io.element.android.libraries.designsystem.atomic.atoms.MatrixBadgeAtom
 import io.element.android.libraries.designsystem.atomic.molecules.MatrixBadgeRowMolecule
@@ -48,7 +50,7 @@ import io.element.android.libraries.designsystem.components.ClickableLinkText
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
-import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.components.button.MainActionButton
 import io.element.android.libraries.designsystem.components.list.ListItemContent
@@ -139,6 +141,7 @@ fun RoomDetailsView(
                         roomSubTitle = state.roomSubTitle,
                         memberCount = state.memberCount.toInt(),
                         heroes = state.heroes,
+                        isTombstoned = state.isTombstoned,
                         openAvatarPreview = { avatarUrl ->
                             processAvatarTap(
                                 state, state.roomName, avatarUrl, openAvatarPreview, onProfileClick
@@ -268,6 +271,12 @@ fun RoomDetailsView(
                     onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
                 )
             }
+
+/*            if (state.showDebugInfo) {
+                DebugInfoSection(
+                    roomId = state.roomId,
+                )
+            }*/
         }
     }
 }
@@ -417,6 +426,7 @@ private fun RoomHeaderSection(
     roomSubTitle: String?,
     memberCount: Int,
     heroes: ImmutableList<RoomMember>,
+    isTombstoned: Boolean,
     openAvatarPreview: (url: String?) -> Unit,
     onSubtitleClick: (String) -> Unit,
 ) {
@@ -426,17 +436,14 @@ private fun RoomHeaderSection(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CompositeAvatar(
+        Avatar(
             avatarData = AvatarData(roomId.value, roomName, avatarUrl, AvatarSize.RoomHeader),
-//            heroes = heroes.map { user ->
-//                user.getAvatarData(size = AvatarSize.RoomHeader)
-//            }.toPersistentList(),
-//            heroes = (if (memberCount == 1) {
-//                listOf(heroes
-//                    .first{ it.membership == RoomMembershipState.JOIN }
-//                    .getAvatarData(size = AvatarSize.RoomHeader))
-//            } else emptyList()).toPersistentList(),
-            heroes = emptyList<AvatarData>().toPersistentList(),
+            avatarType = AvatarType.Room(
+                heroes = heroes.map { user ->
+                    user.getAvatarData(size = AvatarSize.RoomHeader)
+                }.toPersistentList(),
+                isTombstoned = isTombstoned,
+            ),
             modifier = Modifier
                 .clickable { openAvatarPreview(avatarUrl) }
                 .testTag(TestTags.roomDetailAvatar)
@@ -754,6 +761,33 @@ private fun OtherActionsSection(
             leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Leave())),
             style = ListItemStyle.Destructive,
             onClick = onLeaveRoomClick,
+        )
+    }
+}
+
+@Composable
+private fun DebugInfoSection(roomId: RoomId) {
+    val context = LocalContext.current
+    PreferenceCategory(showTopDivider = true) {
+        ListItem(
+            headlineContent = {
+                Text("Internal room ID")
+            },
+            supportingContent = {
+                Text(
+                    text = roomId.value,
+                    style = ElementTheme.typography.fontBodySmRegular,
+                    color = ElementTheme.colors.textSecondary,
+                )
+            },
+            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Code())),
+            trailingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Copy())),
+            onClick = {
+                context.copyToClipboard(
+                    roomId.value,
+                    context.getString(CommonStrings.common_copied_to_clipboard)
+                )
+            },
         )
     }
 }

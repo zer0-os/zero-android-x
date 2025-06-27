@@ -81,6 +81,7 @@ internal fun MessageShield.toText(): String {
             is MessageShield.UnverifiedIdentity -> CommonStrings.event_shield_reason_unverified_identity
             is MessageShield.SentInClear -> CommonStrings.event_shield_reason_sent_in_clear
             is MessageShield.VerificationViolation -> CommonStrings.event_shield_reason_previously_verified
+            is MessageShield.MismatchedSender -> CommonStrings.event_shield_mismatched_sender
         }
     )
 }
@@ -92,7 +93,8 @@ internal fun MessageShield.toIcon(): ImageVector {
         is MessageShield.UnknownDevice,
         is MessageShield.UnsignedDevice,
         is MessageShield.UnverifiedIdentity,
-        is MessageShield.VerificationViolation -> CompoundIcons.HelpSolid()
+        is MessageShield.VerificationViolation,
+        is MessageShield.MismatchedSender -> CompoundIcons.HelpSolid()
         is MessageShield.SentInClear -> CompoundIcons.LockOff()
     }
 }
@@ -122,6 +124,9 @@ internal fun MessageShieldViewPreview() {
             )
             MessageShieldView(
                 shield = MessageShield.VerificationViolation(false)
+            )
+            MessageShieldView(
+                shield = MessageShield.MismatchedSender(false)
             )
         }
     }
