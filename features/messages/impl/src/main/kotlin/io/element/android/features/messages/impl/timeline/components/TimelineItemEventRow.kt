@@ -364,7 +364,8 @@ private fun TimelineItemEventRowContent(
                     .clearAndSetSemantics {
                         hideFromAccessibility()
                         //testTag = TestTags.timelineItemSenderInfo.value
-                    }
+                    },
+                avatarType = AvatarType.User
             )
         }
 

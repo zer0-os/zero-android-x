@@ -32,9 +32,10 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileEvents
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileState
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileStateProvider
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
-import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -76,11 +77,12 @@ fun UserProfileHeaderView(
                     .padding(horizontal = 24.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    CompositeAvatar(
+                    Avatar(
                         avatarData = state.userProfile.avatarData(),
                         modifier = Modifier.clickable(enabled = state.userProfile.profileImage != null) {
                             openAvatarPreview(state.userProfile.firstName, state.userProfile.profileImage!!)
-                        }
+                        },
+                        avatarType = AvatarType.User
                     )
                     IconButton(
                         modifier = Modifier

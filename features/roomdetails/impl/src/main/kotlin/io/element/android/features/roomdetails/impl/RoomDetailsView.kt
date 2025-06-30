@@ -445,7 +445,7 @@ private fun RoomHeaderSection(
                 isTombstoned = isTombstoned,
             ),
             modifier = Modifier
-                .clickable { openAvatarPreview(avatarUrl) }
+                .clickable { avatarUrl?.let(openAvatarPreview) }
                 .testTag(TestTags.roomDetailAvatar)
         )
         /*TitleAndSubtitle(
@@ -485,7 +485,8 @@ private fun DmHeaderSection(
                 .clickable(enabled = avatarData.url != null) {
                     avatarData.url?.let { openAvatarPreview(roomName, it) }
                 }
-                .testTag(TestTags.memberDetailAvatar)
+                .testTag(TestTags.memberDetailAvatar),
+            avatarType = AvatarType.User
         )
         /*DmAvatars(
             userAvatarData = me.getAvatarData(size = AvatarSize.DmCluster),

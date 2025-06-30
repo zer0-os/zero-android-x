@@ -26,8 +26,9 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
 import io.element.android.features.roomlist.impl.model.RoomListRoomSummaryProvider
 import io.element.android.features.roomlist.impl.model.RoomSummaryDisplayType
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
-import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
@@ -71,11 +72,11 @@ fun HomeNotificationRow(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CompositeAvatar(
+        Avatar(
             avatarData = room.avatarData.copy(
                 size = AvatarSize.RoomDirectoryItem
             ),
-            heroes = room.heroes,
+            avatarType = AvatarType.User,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(

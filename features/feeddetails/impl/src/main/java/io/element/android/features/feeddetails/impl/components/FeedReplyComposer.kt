@@ -33,6 +33,7 @@ import io.element.android.features.feeddetails.impl.FeedDetailsEvents
 import io.element.android.features.feeddetails.impl.FeedDetailsState
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
@@ -77,6 +78,7 @@ fun FeedReplyComposer(
                 modifier = Modifier
                     .padding(vertical = 12.dp),
                 avatarData = state.matrixUser.getAvatarData(size = AvatarSize.UserListItem),
+                avatarType = AvatarType.User
             )
             FeedReplyComposerTextField(
                 modifier = Modifier

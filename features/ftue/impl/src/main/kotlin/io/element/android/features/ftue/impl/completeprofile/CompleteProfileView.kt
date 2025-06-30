@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.modifiers.clearFocusOnTap
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -117,6 +118,7 @@ fun CompleteProfileView(
                     avatarSize = AvatarSize.EditProfileDetails,
                     onAvatarClick = { onAvatarClick() },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
+                    avatarType = AvatarType.User
                 )
 
                 Spacer(modifier = Modifier.height(SPACING_10X.dp))

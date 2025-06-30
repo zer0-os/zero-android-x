@@ -37,7 +37,8 @@ import io.element.android.features.roomlist.impl.components.FeedMeowActionButton
 import io.element.android.features.roomlist.impl.components.annotatedText
 import io.element.android.features.roomlist.impl.components.arweaveLink
 import io.element.android.features.roomlist.impl.components.avatarData
-import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
+import io.element.android.libraries.designsystem.components.avatar.Avatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
@@ -79,11 +80,12 @@ fun FeedDetailsCell(
             .padding(16.dp)
     ) {
         Row {
-            CompositeAvatar(
+            Avatar(
                 modifier = Modifier.clickable {
                     onFeedUserClick(feed.userProfile)
                 },
-                avatarData = feed.user.avatarData()
+                avatarData = feed.user.avatarData(),
+                avatarType = AvatarType.User
             )
             Column(
                 modifier = modifier

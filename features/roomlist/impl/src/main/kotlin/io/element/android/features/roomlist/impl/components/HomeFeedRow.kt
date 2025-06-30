@@ -43,9 +43,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
-import io.element.android.libraries.designsystem.components.avatar.CompositeAvatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
@@ -95,9 +96,10 @@ fun HomeFeedRow(
         verticalAlignment = Alignment.Top
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CompositeAvatar(
+            Avatar(
                 modifier = Modifier.clickable { onFeedUserClick() },
-                avatarData = feed.user.avatarData()
+                avatarData = feed.user.avatarData(),
+                avatarType = AvatarType.User
             )
             if (showThreadLine) {
                 VerticalDivider(modifier = Modifier.padding(top = 8.dp))
