@@ -105,12 +105,23 @@ fun UserProfileHeaderView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = state.userProfile.firstName,
-                            style = ElementTheme.typography.fontHeadingSmMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Row {
+                            Text(
+                                text = state.userProfile.firstName,
+                                style = ElementTheme.typography.fontHeadingSmMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            if (state.userProfile.isZeroProSubscriber == true) {
+                                Icon(
+                                    modifier = Modifier.padding(horizontal = 6.dp),
+                                    imageVector = CompoundIcons.Verified(),
+                                    contentDescription = null,
+                                    tint = ElementTheme.colors.zeroBrandColor
+                                )
+                            }
+                        }
                         val subHeadingText = state.userProfile.zIdOrWalletAddressDisplay
                         if (subHeadingText != null) {
                             Text(

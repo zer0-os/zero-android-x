@@ -9,7 +9,8 @@ data class ZeroUser(
     val avatarUrl: String? = null,
     val primaryZeroId: String? = null,
     val primaryWalletAddress: String? = null,
-    val thirdWebWalletAddress: String? = null
+    val thirdWebWalletAddress: String? = null,
+    val isZeroProSubscriber: Boolean = false
 )
 
 val ZeroUser.walletAddress

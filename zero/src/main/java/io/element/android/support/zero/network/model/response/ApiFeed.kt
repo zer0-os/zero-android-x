@@ -121,4 +121,5 @@ data class ApiFeedUserProfileView(
     val publicAddress: String? = null,
     val followersCount: String? = null,
     val followingCount: String? = null,
+    val isZeroProSubscriber: Boolean
 )

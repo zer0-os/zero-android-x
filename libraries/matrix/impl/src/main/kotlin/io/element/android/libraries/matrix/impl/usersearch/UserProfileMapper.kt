@@ -20,6 +20,7 @@ object UserProfileMapper {
             avatarUrl = userProfile.avatarUrl,
             primaryZeroId = zeroUser?.primaryZeroId,
             primaryWalletAddress = zeroUser?.primaryWalletAddress,
-            thirdWebWalletAddress = zeroUser?.thirdWebWalletAddress
+            thirdWebWalletAddress = zeroUser?.thirdWebWalletAddress,
+            isZeroProSubscriber = zeroUser?.isZeroProSubscriber ?: false
         )
 }

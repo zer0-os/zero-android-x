@@ -8,6 +8,7 @@
 package io.element.android.libraries.matrix.ui.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,12 +21,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
@@ -70,15 +74,26 @@ private fun MatrixUserHeaderContent(
         )
         Spacer(modifier = Modifier.size(16.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Name
-            Text(
-                modifier = Modifier.clipToBounds(),
-                text = matrixUser.getBestName(),
-                maxLines = 1,
-                style = ElementTheme.zeroTypography.fontHeadingSmMedium,
-                overflow = TextOverflow.Ellipsis,
-                color = ElementTheme.colors.textPrimary,
-            )
+            Row {
+                // Name
+                Text(
+                    modifier = Modifier.clipToBounds(),
+                    text = matrixUser.getBestName(),
+                    maxLines = 1,
+                    style = ElementTheme.zeroTypography.fontHeadingSmMedium,
+                    overflow = TextOverflow.Ellipsis,
+                    color = ElementTheme.colors.textPrimary,
+                )
+
+                if (matrixUser.isZeroProSubscriber) {
+                    Icon(
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = null,
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
+            }
             // zero id
             if (matrixUser.primaryZeroId.isNullOrEmpty().not()) {
                 Text(

@@ -191,6 +191,7 @@ data class FeedUserProfileView(
     val publicAddress: String?,
     val followersCount: String?,
     val followingCount: String?,
+    val isZeroProSubscriber: Boolean?
 ): Parcelable {
     companion object {
         val placeholder: FeedUserProfileView = FeedUserProfileView(
@@ -200,7 +201,8 @@ data class FeedUserProfileView(
             profileImage = null,
             publicAddress = null,
             followersCount = "0",
-            followingCount = "0")
+            followingCount = "0",
+            isZeroProSubscriber = false)
     }
 }
 
@@ -223,7 +225,8 @@ fun ZeroFeedAuthor.toZeroProfile(userZId: String) = FeedUserProfileView(
     profileImage = profileSummary.profileImage,
     publicAddress = null,
     followersCount = null,
-    followingCount = null
+    followingCount = null,
+    isZeroProSubscriber = false
 )
 
 fun MatrixUser.toZeroProfile() = FeedUserProfileView(
@@ -233,7 +236,8 @@ fun MatrixUser.toZeroProfile() = FeedUserProfileView(
     profileImage = avatarUrl,
     publicAddress = walletAddress,
     followersCount = null,
-    followingCount = null
+    followingCount = null,
+    isZeroProSubscriber = isZeroProSubscriber
 )
 
 val ZeroFeed.userProfile

@@ -113,5 +113,6 @@ fun ApiFeedUserProfileView.toModel() = FeedUserProfileView(
     profileImage = profileImage,
     publicAddress = publicAddress,
     followersCount = followersCount,
-    followingCount = followingCount
+    followingCount = followingCount,
+    isZeroProSubscriber = isZeroProSubscriber
 )

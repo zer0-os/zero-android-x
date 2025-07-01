@@ -30,7 +30,8 @@ data class ApiUser(
     val primaryZID: String? = null,
     val primaryWalletAddress: String? = null,
     val wallets: List<ApiWallet>? = null,
-    val primaryWallet: ApiWallet? = null
+    val primaryWallet: ApiWallet? = null,
+    val subscriptions: ZeroSubscription
 ) : ApiBaseMember {
     val firstName
         get() = profile?.firstName.orEmpty()
@@ -44,3 +45,9 @@ data class ApiUser(
     val thirdWebWallet
         get() = wallets?.firstOrNull { it.isThirdWeb }
 }
+
+@Serializable
+data class ZeroSubscription(
+    val wilderPro: Boolean,
+    val zeroPro: Boolean
+)

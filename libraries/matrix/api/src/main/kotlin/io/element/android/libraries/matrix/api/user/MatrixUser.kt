@@ -21,7 +21,8 @@ data class MatrixUser(
     val avatarUrl: String? = null,
     val primaryZeroId: String? = null,
     val primaryWalletAddress: String? = null,
-    val thirdWebWalletAddress: String? = null
+    val thirdWebWalletAddress: String? = null,
+    val isZeroProSubscriber: Boolean = false
 ) : Parcelable
 
 val MatrixUser.walletAddress
