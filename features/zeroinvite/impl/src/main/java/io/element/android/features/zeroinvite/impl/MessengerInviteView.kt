@@ -217,7 +217,7 @@ fun ColumnScope.InviteCodeContent(
             InviteInfoBox(
                 modifier = Modifier.weight(1f),
                 title = "Pro subs",
-                value = "0"
+                value = messengerInvite.proSubscriptionsCount.toString()
             )
         }
 

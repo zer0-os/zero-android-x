@@ -7,5 +7,6 @@ fun MessengerInvite.map() =
     ZeroMessengerInvite(
         slug = this.slug,
         remainingInvites = this.remainingInvites,
-        invitesUsed = this.invitesUsed
+        invitesUsed = this.invitesUsed,
+        proSubscriptionsCount = proSubscriptionsCount
     )

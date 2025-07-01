@@ -6,5 +6,6 @@ import io.element.android.support.zero.network.model.response.ApiInvite
 internal fun ApiInvite.toModel() = MessengerInvite(
     slug = slug,
     remainingInvites = remainingInvites,
-    invitesUsed = invitesUsed ?: 0
+    invitesUsed = invitesUsed ?: 0,
+    proSubscriptionsCount = proSubscriptions ?: 0
 )
