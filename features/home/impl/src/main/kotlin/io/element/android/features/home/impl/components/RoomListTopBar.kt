@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.appconfig.RoomListConfig
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.home.impl.R
 import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.filters.RoomListFiltersView
 import io.element.android.features.home.impl.filters.aRoomListFiltersState
@@ -95,6 +96,7 @@ private val avatarBloomSize = 430.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomListTopBar(
+    title: String = "",
     matrixUser: MatrixUser,
     showAvatarIndicator: Boolean,
     areSearchResultsDisplayed: Boolean,
@@ -112,6 +114,7 @@ fun RoomListTopBar(
     onDismissRewardsTooltip: (Boolean) -> Unit,
 ) {
     DefaultRoomListTopBar(
+        title = title,
         matrixUser = matrixUser,
         showAvatarIndicator = showAvatarIndicator,
         areSearchResultsDisplayed = areSearchResultsDisplayed,
@@ -133,6 +136,7 @@ fun RoomListTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DefaultRoomListTopBar(
+    title: String,
     matrixUser: MatrixUser,
     showAvatarIndicator: Boolean,
     areSearchResultsDisplayed: Boolean,
@@ -222,7 +226,7 @@ private fun DefaultRoomListTopBar(
                         scrolledContainerColor = Color.Transparent,
                     ),
                     title = {
-                        //Text(text = stringResource(id = R.string.screen_roomlist_main_space_title))
+//                        Text(text = title)
                         Column {
                             Text(
                                 text = matrixUser.getBestName(),
@@ -461,6 +465,7 @@ private fun UserRewardsToolTip(
 @Composable
 internal fun DefaultRoomListTopBarPreview() = ElementPreview {
     DefaultRoomListTopBar(
+        title = stringResource(R.string.screen_roomlist_main_space_title),
         matrixUser = MatrixUser(UserId("@id:domain"), "Alice"),
         showAvatarIndicator = false,
         areSearchResultsDisplayed = false,
@@ -482,6 +487,7 @@ internal fun DefaultRoomListTopBarPreview() = ElementPreview {
 @Composable
 internal fun DefaultRoomListTopBarWithIndicatorPreview() = ElementPreview {
     DefaultRoomListTopBar(
+        title = stringResource(R.string.screen_roomlist_main_space_title),
         matrixUser = MatrixUser(UserId("@id:domain"), "Alice"),
         showAvatarIndicator = true,
         areSearchResultsDisplayed = false,

@@ -15,6 +15,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -33,6 +34,8 @@ import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
 import io.element.android.libraries.designsystem.utils.snackbar.collectSnackbarMessageAsState
+import io.element.android.libraries.featureflag.api.FeatureFlagService
+import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.indicator.api.IndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.RoomAlias
@@ -69,6 +72,7 @@ class HomePresenter @Inject constructor(
     private val roomListPresenter: Presenter<RoomListState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
+    private val featureFlagService: FeatureFlagService,
 ) : Presenter<HomeState> {
 
     private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
@@ -83,6 +87,15 @@ class HomePresenter @Inject constructor(
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug = remember { rageshakeFeatureAvailability.isAvailable() }
         val roomListState = roomListPresenter.present()
+        val isSpaceFeatureEnabled by remember {
+            featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
+        }.collectAsState(initial = false)
+        var currentHomeNavigationBarItemOrdinal by rememberSaveable { mutableIntStateOf(HomeNavigationBarItem.Chats.ordinal) }
+        val currentHomeNavigationBarItem by remember {
+            derivedStateOf {
+                HomeNavigationBarItem.from(currentHomeNavigationBarItemOrdinal)
+            }
+        }
 
         var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
@@ -96,14 +109,15 @@ class HomePresenter @Inject constructor(
             client.getUserProfile()
             fetchInitialData()
         }
-
         // Avatar indicator
         val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()
-
         val directLogoutState = logoutPresenter.present()
 
         fun handleEvents(event: HomeEvents) {
             when (event) {
+                is HomeEvents.SelectHomeNavigationBarItem -> {
+                    currentHomeNavigationBarItemOrdinal = event.item.ordinal
+                }
                 is HomeEvents.DismissRewardsIntimation -> {
                     if (event.immediate) {
                         shouldShowRoomIntimation = false
@@ -171,6 +185,7 @@ class HomePresenter @Inject constructor(
             showAvatarIndicator = showAvatarIndicator,
             hasNetworkConnection = isOnline,
             genericActionState = genericActionState.value,
+            currentHomeNavigationBarItem = currentHomeNavigationBarItem,
             roomListState = roomListState,
             channelContentState = channelContentState,
             allFeedsContentState = allFeedsContentState,
@@ -181,6 +196,7 @@ class HomePresenter @Inject constructor(
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,
+            isSpaceFeatureEnabled = isSpaceFeatureEnabled,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
             eventSink = ::handleEvents,

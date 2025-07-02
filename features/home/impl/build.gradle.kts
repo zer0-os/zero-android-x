@@ -52,6 +52,8 @@ dependencies {
     implementation(projects.services.analytics.api)
     implementation(projects.zero)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
     implementation(projects.features.reportroom.api)
     api(projects.features.home.api)
 

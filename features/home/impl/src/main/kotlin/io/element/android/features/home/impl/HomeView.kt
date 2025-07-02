@@ -267,6 +267,7 @@ internal fun HomeScreenContent(
     when (selectedHomeScreenTab) {
         HomeScreenTab.CHAT -> {
             RoomListContentView(
+                modifier = modifier,
                 contentState = state.roomListState.contentState,
                 filtersState = state.roomListState.filtersState,
                 hideInvitesAvatars = state.roomListState.hideInvitesAvatars,
@@ -275,7 +276,6 @@ internal fun HomeScreenContent(
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = onRoomClick,
                 onCreateRoomClick = onCreateRoomClick,
-                modifier = modifier
             )
         }
         HomeScreenTab.CHANNEL -> {
