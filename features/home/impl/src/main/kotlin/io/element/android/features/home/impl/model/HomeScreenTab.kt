@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.model
+package io.element.android.features.home.impl.model
 
 import androidx.annotation.DrawableRes
 import io.element.android.support.zero.R

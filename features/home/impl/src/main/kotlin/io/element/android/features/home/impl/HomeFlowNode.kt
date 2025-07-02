@@ -113,15 +113,15 @@ class HomeFlowNode @AssistedInject constructor(
     }
 
     private fun onFeedClick(feed: ZeroFeed) {
-        plugins<RoomListEntryPoint.Callback>().forEach { it.onFeedClick(feed) }
+        plugins<HomeEntryPoint.Callback>().forEach { it.onFeedClick(feed) }
     }
 
     private fun onCreateFeedClick() {
-        plugins<RoomListEntryPoint.Callback>().forEach { it.onCreateFeedClick() }
+        plugins<HomeEntryPoint.Callback>().forEach { it.onCreateFeedClick() }
     }
 
     private fun onFeedUserClick(profile: FeedUserProfileView) {
-        plugins<RoomListEntryPoint.Callback>().forEach { it.onFeedUserClick(profile) }
+        plugins<HomeEntryPoint.Callback>().forEach { it.onFeedUserClick(profile) }
     }
 
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {

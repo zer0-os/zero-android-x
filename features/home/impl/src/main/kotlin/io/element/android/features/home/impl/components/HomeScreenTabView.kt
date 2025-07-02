@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.components
+package io.element.android.features.home.impl.components
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.roomlist.impl.model.HomeScreenTab
+import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor

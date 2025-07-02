@@ -29,9 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.home.impl.components.HomeChannelListContentView
+import io.element.android.features.home.impl.components.HomeFeedListContentView
+import io.element.android.features.home.impl.components.HomeNotificationListContentView
+import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.RoomListContentView
 import io.element.android.features.home.impl.components.RoomListMenuAction
 import io.element.android.features.home.impl.components.RoomListTopBar
+import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
 import io.element.android.features.home.impl.roomlist.RoomListDeclineInviteMenu
@@ -40,16 +45,6 @@ import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
-import io.element.android.features.roomlist.impl.components.HomeChannelListContentView
-import io.element.android.features.roomlist.impl.components.HomeFeedListContentView
-import io.element.android.features.roomlist.impl.components.HomeNotificationListContentView
-import io.element.android.features.roomlist.impl.components.HomeScreenTabView
-import io.element.android.features.roomlist.impl.components.RoomListContentView
-import io.element.android.features.roomlist.impl.components.RoomListMenuAction
-import io.element.android.features.roomlist.impl.components.RoomListTopBar
-import io.element.android.features.roomlist.impl.model.HomeScreenTab
-import io.element.android.features.roomlist.impl.model.RoomListRoomSummary
-import io.element.android.features.roomlist.impl.search.RoomListSearchView
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
@@ -84,12 +79,12 @@ fun HomeView(
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
-    val state: RoomListState = homeState.roomListState
+    val roomListState: RoomListState = homeState.roomListState
     val coroutineScope = rememberCoroutineScope()
     val firstThrottler = remember { FirstThrottler(300, coroutineScope) }
 
-    val resolvedChannelRoomId by remember(state.resolvedChannelRoom) {
-        derivedStateOf { state.resolvedChannelRoom }
+    val resolvedChannelRoomId by remember(homeState.resolvedChannelRoom) {
+        derivedStateOf { homeState.resolvedChannelRoom }
     }
     resolvedChannelRoomId?.let { onRoomClick(it) }
 
@@ -98,25 +93,25 @@ fun HomeView(
         isOnline = homeState.hasNetworkConnection,
     ) { topPadding ->
         Box {
-            if (state.contextMenu is RoomListState.ContextMenu.Shown) {
+            if (roomListState.contextMenu is RoomListState.ContextMenu.Shown) {
                 RoomListContextMenu(
-                    contextMenu = state.contextMenu,
-                    canReportRoom = state.canReportRoom,
-                    eventSink = state.eventSink,
+                    contextMenu = roomListState.contextMenu,
+                    canReportRoom = roomListState.canReportRoom,
+                    eventSink = roomListState.eventSink,
                     onRoomSettingsClick = onRoomSettingsClick,
                     onReportRoomClick = onReportRoomClick,
                 )
             }
-            if (state.declineInviteMenu is RoomListState.DeclineInviteMenu.Shown) {
+            if (roomListState.declineInviteMenu is RoomListState.DeclineInviteMenu.Shown) {
                 RoomListDeclineInviteMenu(
-                    menu = state.declineInviteMenu,
-                    canReportRoom = state.canReportRoom,
-                    eventSink = state.eventSink,
+                    menu = roomListState.declineInviteMenu,
+                    canReportRoom = roomListState.canReportRoom,
+                    eventSink = roomListState.eventSink,
                     onDeclineAndBlockClick = onDeclineInviteAndBlockUser,
                 )
             }
 
-            LeaveRoomView(state = state.leaveRoomState)
+            LeaveRoomView(state = roomListState.leaveRoomState)
 
             HomeScaffold(
                 state = homeState,
@@ -133,9 +128,9 @@ fun HomeView(
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
-                state = state.searchState,
-                eventSink = state.eventSink,
-                hideInvitesAvatars = state.hideInvitesAvatars,
+                state = roomListState.searchState,
+                eventSink = roomListState.eventSink,
+                hideInvitesAvatars = roomListState.hideInvitesAvatars,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 modifier = Modifier
                     .statusBarsPadding()
@@ -145,14 +140,14 @@ fun HomeView(
             )
             acceptDeclineInviteView()
 
-            if (state.genericActionState is AsyncAction.Loading) {
+            if (homeState.genericActionState is AsyncAction.Loading) {
                 ProgressDialog()
             }
 
-            if (state.genericActionState is AsyncAction.Failure) {
+            if (homeState.genericActionState is AsyncAction.Failure) {
                 ErrorDialog(
                     content = stringResource(CommonStrings.error_unknown),
-                    onSubmit = { state.eventSink(RoomListEvents.HideError) }
+                    onSubmit = { homeState.eventSink(HomeEvents.HideError) }
                 )
             }
         }
@@ -203,7 +198,7 @@ private fun HomeScaffold(
                 shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
                 userRewards = state.userRewards,
                 onDismissRewardsTooltip = { immediate ->
-                    state.eventSink(RoomListEvents.DismissRewardsIntimation(immediate))
+                    state.eventSink(HomeEvents.DismissRewardsIntimation(immediate))
                 }
             )
         },
@@ -255,7 +250,7 @@ private fun HomeScaffold(
 
 @Composable
 internal fun HomeScreenContent(
-    state: RoomListState,
+    state: HomeState,
     selectedHomeScreenTab: HomeScreenTab,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
@@ -272,10 +267,10 @@ internal fun HomeScreenContent(
     when (selectedHomeScreenTab) {
         HomeScreenTab.CHAT -> {
             RoomListContentView(
-                contentState = state.contentState,
-                filtersState = state.filtersState,
-                hideInvitesAvatars = state.hideInvitesAvatars,
-                eventSink = state.eventSink,
+                contentState = state.roomListState.contentState,
+                filtersState = state.roomListState.filtersState,
+                hideInvitesAvatars = state.roomListState.hideInvitesAvatars,
+                eventSink = state.roomListState.eventSink,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = onRoomClick,
@@ -305,9 +300,9 @@ internal fun HomeScreenContent(
         }
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
-                contentState = state.contentState,
-                filtersState = state.filtersState,
-                eventSink = state.eventSink,
+                contentState = state.roomListState.contentState,
+                filtersState = state.roomListState.filtersState,
+                eventSink = state.roomListState.eventSink,
                 onNotificationClick = ::onNotificationClick,
                 modifier = modifier
             )

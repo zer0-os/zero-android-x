@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.components
+package io.element.android.features.home.impl.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,9 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import io.element.android.features.roomlist.impl.ChannelListContentState
-import io.element.android.features.roomlist.impl.ChannelListContentStateProvider
-import io.element.android.features.roomlist.impl.RoomListEvents
+import io.element.android.features.home.impl.ChannelListContentState
+import io.element.android.features.home.impl.ChannelListContentStateProvider
+import io.element.android.features.home.impl.HomeEvents
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -28,7 +28,7 @@ import io.element.android.libraries.designsystem.theme.components.HorizontalDivi
 @Composable
 fun HomeChannelListContentView(
     contentState: ChannelListContentState,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (HomeEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -80,7 +80,7 @@ private fun EmptyView(
 @Composable
 private fun ChannelsViewList(
     state: ChannelListContentState.Channels,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (HomeEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -95,7 +95,7 @@ private fun ChannelsViewList(
             HomeChannelRow(
                 channel = channel,
                 onChannelClick = {
-                    eventSink(RoomListEvents.OpenChannel(channel))
+                    eventSink(HomeEvents.OpenChannel(channel))
                 }
             )
             if (index != state.channels.lastIndex) {

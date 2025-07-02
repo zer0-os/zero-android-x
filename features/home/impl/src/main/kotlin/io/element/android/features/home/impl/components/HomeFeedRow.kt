@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.components
+package io.element.android.features.home.impl.components
 
 import android.content.Intent
 import android.net.Uri

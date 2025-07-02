@@ -24,10 +24,6 @@ import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.matrix.api.core.RoomId
-import io.element.android.libraries.matrix.api.core.UserId
-import io.element.android.libraries.matrix.api.user.MatrixUser
-import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
-import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.push.api.battery.aBatteryOptimizationState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -49,37 +45,23 @@ open class RoomListStateProvider : PreviewParameterProvider<RoomListState> {
 }
 
 internal fun aRoomListState(
-    genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
     contextMenu: RoomListState.ContextMenu = RoomListState.ContextMenu.Hidden,
     declineInviteMenu: RoomListState.DeclineInviteMenu = RoomListState.DeclineInviteMenu.Hidden,
     leaveRoomState: LeaveRoomState = aLeaveRoomState(),
     searchState: RoomListSearchState = aRoomListSearchState(),
     filtersState: RoomListFiltersState = aRoomListFiltersState(),
     contentState: RoomListContentState = aRoomsContentState(),
-    channelContentState: ChannelListContentState = aPlaceholderChannelListContentState(),
-    allFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
-    myFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
-    feedMediaMap: Map<String, FeedMedia> = emptyMap(),
-    feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
-    resolvedChannelRoom: RoomId? = null,
     acceptDeclineInviteState: AcceptDeclineInviteState = anAcceptDeclineInviteState(),
     hideInvitesAvatars: Boolean = false,
     canReportRoom: Boolean = true,
     eventSink: (RoomListEvents) -> Unit = {}
 ) = RoomListState(
-    genericActionState = genericActionState,
     contextMenu = contextMenu,
     declineInviteMenu = declineInviteMenu,
     leaveRoomState = leaveRoomState,
     filtersState = filtersState,
     searchState = searchState,
     contentState = contentState,
-    channelContentState = channelContentState,
-    allFeedsContentState = allFeedsContentState,
-    myFeedsContentState = myFeedsContentState,
-    feedMediaMap = feedMediaMap,
-    feedLinkMetaDataMap = feedLinkMetaDataMap,
-    resolvedChannelRoom = resolvedChannelRoom,
     acceptDeclineInviteState = acceptDeclineInviteState,
     hideInvitesAvatars = hideInvitesAvatars,
     canReportRoom = canReportRoom,

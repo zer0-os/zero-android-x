@@ -5,10 +5,10 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl
+package io.element.android.features.home.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import io.element.android.features.roomlist.impl.model.HomeScreenChannel
+import io.element.android.features.home.impl.model.HomeScreenChannel
 import kotlinx.collections.immutable.toPersistentList
 
 open class ChannelListContentStateProvider : PreviewParameterProvider<ChannelListContentState> {

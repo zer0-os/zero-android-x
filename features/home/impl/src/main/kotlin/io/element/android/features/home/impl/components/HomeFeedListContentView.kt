@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.roomlist.impl.components
+package io.element.android.features.home.impl.components
 
 import android.os.Handler
 import android.os.Looper
@@ -31,10 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import io.element.android.features.roomlist.impl.FeedListContentState
-import io.element.android.features.roomlist.impl.FeedListContentStateProvider
-import io.element.android.features.roomlist.impl.RoomListEvents
-import io.element.android.features.roomlist.impl.model.FeedsScreenTab
+import io.element.android.features.home.impl.FeedListContentState
+import io.element.android.features.home.impl.FeedListContentStateProvider
+import io.element.android.features.home.impl.HomeEvents
+import io.element.android.features.home.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -50,7 +50,7 @@ fun HomeFeedListContentView(
     contentState: FeedListContentState,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (HomeEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -63,7 +63,7 @@ fun HomeFeedListContentView(
             FeedsScreenTabView(
                 onTabSelected = { tab ->
                     selectedFeedTab.value = tab
-                    eventSink(RoomListEvents.RefreshFeeds(
+                    eventSink(HomeEvents.RefreshFeeds(
                         followingFeeds = tab == FeedsScreenTab.FOLLOWING
                     ))
                 }
@@ -131,7 +131,7 @@ private fun FeedsViewList(
     state: FeedListContentState.Feeds,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (HomeEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     isProfileFeedList: Boolean,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -146,9 +146,9 @@ private fun FeedsViewList(
     val pullRefreshState = rememberPullRefreshState(refreshing, {
         refreshing = true
         if (isProfileFeedList) {
-            eventSink(RoomListEvents.RefreshMyFeeds)
+            eventSink(HomeEvents.RefreshMyFeeds)
         } else {
-            eventSink(RoomListEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
+            eventSink(HomeEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
         }
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
@@ -167,9 +167,9 @@ private fun FeedsViewList(
         if (shouldLoadMoreFeed && !isLoadingMoreItems) {
             isLoadingMoreItems = true
             if (isProfileFeedList) {
-                eventSink(RoomListEvents.LoadMoreMyFeeds(state.feeds))
+                eventSink(HomeEvents.LoadMoreMyFeeds(state.feeds))
             } else {
-                eventSink(RoomListEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
+                eventSink(HomeEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
             }
         }
     }
@@ -201,7 +201,7 @@ private fun FeedsViewList(
                         onFeedUserClick(feed.userProfile)
                     },
                     onAddMeowToFeed = { meowCount ->
-                        eventSink(RoomListEvents.AddMeowToFeed(feed, meowCount))
+                        eventSink(HomeEvents.AddMeowToFeed(feed, meowCount))
                     }
                 )
                 if (index != state.feeds.lastIndex) {

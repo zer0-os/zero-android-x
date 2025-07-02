@@ -7,21 +7,59 @@
 
 package io.element.android.features.home.impl
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.features.home.impl.model.channelId
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
+import io.element.android.libraries.architecture.AsyncAction
+import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
 import io.element.android.libraries.designsystem.utils.snackbar.collectSnackbarMessageAsState
 import io.element.android.libraries.indicator.api.IndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.core.RoomAlias
+import io.element.android.libraries.matrix.api.core.RoomId
+import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
+import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
+import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.support.zero.common.extension.safeAsync
+import io.element.android.support.zero.common.extension.withIOScope
+import io.element.android.support.zero.common.extension.withScope
+import io.element.android.support.zero.common.util.FeedItemMediaCache
+import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.jvm.optionals.getOrNull
+
+private const val HOME_FEED_PAGE_SIZE = 15
 
 class HomePresenter @Inject constructor(
     private val client: MatrixClient,
@@ -32,16 +70,31 @@ class HomePresenter @Inject constructor(
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
 ) : Presenter<HomeState> {
+
+    private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
+
+    private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
+    private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
+
     @Composable
     override fun present(): HomeState {
+        val coroutineScope = rememberCoroutineScope()
         val matrixUser = client.userProfile.collectAsState()
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug = remember { rageshakeFeatureAvailability.isAvailable() }
         val roomListState = roomListPresenter.present()
 
+        var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
+        val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
+        val userRewards = client.userRewards.collectAsState()
+
+        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
+            fetchInitialData()
         }
 
         // Avatar indicator
@@ -50,20 +103,329 @@ class HomePresenter @Inject constructor(
         val directLogoutState = logoutPresenter.present()
 
         fun handleEvents(event: HomeEvents) {
-            // TODO
+            when (event) {
+                is HomeEvents.DismissRewardsIntimation -> {
+                    if (event.immediate) {
+                        shouldShowRoomIntimation = false
+                    } else {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            shouldShowRoomIntimation = false
+                        }, 3_000)
+                    }
+                }
+                HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
+                is HomeEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                is HomeEvents.LoadMoreFeeds -> {
+                    _allFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
+                }
+                is HomeEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds(event.followingFeeds)
+                is HomeEvents.LoadMoreMyFeeds -> {
+                    _myFeeds.apply {
+                        clear()
+                        addAll(event.currentFeeds)
+                    }
+                    coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
+                }
+                HomeEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
+                is HomeEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount)
+            }
         }
 
         val snackbarMessage by snackbarDispatcher.collectSnackbarMessageAsState()
+
+        val channelContentState = channelListContentState()
+        createChannelRoomMap(
+            (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
+        )
+
+        val allFeedsContentState = allFeedsListContentState()
+        val myFeedsContentState = allMyFeedsListContentState()
+
+        /*val feedMediaMap = rememberSaveable(
+            saver = mapSaver(
+                save = { it.toMap() },
+                restore = {
+                    mutableStateMapOf<String, FeedMedia>().apply {
+                        putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+                    }
+                }
+            )
+        ) { mutableStateMapOf() }*/
+        val feedMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
+        val feedLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
+
+        LaunchedEffect(Unit) {
+            feedMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
+            feedLinkMetaDataMap.putAll(FeedItemMediaCache.getCachedFeedItemLinkMetaDataMap())
+        }
+        val allCombinedFeeds = extractFeedsToFetchData(allFeedsContentState, myFeedsContentState)
+        fetchFeedMediaIfRequired(allCombinedFeeds, feedMediaMap)
+        fetchLinksMetaDataIfRequired(allCombinedFeeds, feedLinkMetaDataMap)
 
         return HomeState(
             matrixUser = matrixUser.value,
             showAvatarIndicator = showAvatarIndicator,
             hasNetworkConnection = isOnline,
+            genericActionState = genericActionState.value,
             roomListState = roomListState,
+            channelContentState = channelContentState,
+            allFeedsContentState = allFeedsContentState,
+            myFeedsContentState = myFeedsContentState,
+            feedMediaMap = feedMediaMap,
+            feedLinkMetaDataMap = feedLinkMetaDataMap,
+            resolvedChannelRoom = resolvedChannelRoomId.value,
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,
+            shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
+            userRewards = userRewards.value,
             eventSink = ::handleEvents,
         )
+    }
+
+    private fun CoroutineScope.fetchInitialData() = launch {
+        awaitAll(
+            // Check zero thirdWeb wallet
+            safeAsync { client.checkZeroThirdWebWallet() },
+            // Fetch user rewards
+            safeAsync { client.getUserRewards(shouldCheckRewardsIntimation = true) },
+            // Fetch home channels
+            safeAsync { client.getUserZIds() },
+            // Fetch all home feeds
+            safeAsync { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            // Fetch all my feeds
+            safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+        )
+    }
+
+    @Composable
+    private fun channelListContentState(): ChannelListContentState {
+        val homeChannelsState by produceState(initialValue = AsyncData.Loading()) {
+            client.userZIds.collect {
+                value = AsyncData.Success(it)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (homeChannelsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                homeChannelsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> ChannelListContentState.Empty
+            showSkeleton -> ChannelListContentState.Skeleton(20)
+            else -> {
+                val mappedChannels = homeChannelsState.dataOrNull()
+                    .orEmpty()
+                    .sorted()
+                    .map { HomeScreenChannel(channelFullName = it) }
+                    .distinctBy { it.channelId() }
+                    .toPersistentList()
+                ChannelListContentState.Channels(mappedChannels)
+            }
+        }
+    }
+
+    @Composable
+    private fun allFeedsListContentState(): FeedListContentState {
+        val homeFeedsState by produceState(initialValue = AsyncData.Loading()) {
+            client.allFeeds.collect {
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_allFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (homeFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                homeFeedsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> FeedListContentState.Empty
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
+            else -> {
+                val mappedAllFeeds = homeFeedsState.dataOrNull()
+                    .orEmpty()
+                    .toPersistentList()
+                FeedListContentState.Feeds(mappedAllFeeds)
+            }
+        }
+    }
+
+    @Composable
+    private fun allMyFeedsListContentState(): FeedListContentState {
+        val myFeedsState by produceState(initialValue = AsyncData.Loading()) {
+            client.allMyFeeds.collect {
+                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
+                    addAll(_myFeeds)
+                    addAll(it)
+                }.distinctBy { it.id }
+                value = AsyncData.Success(feeds)
+            }
+        }
+        val showEmpty by remember {
+            derivedStateOf {
+                (myFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
+            }
+        }
+        val showSkeleton by remember {
+            derivedStateOf {
+                myFeedsState is AsyncData.Loading
+            }
+        }
+        return when {
+            showEmpty -> FeedListContentState.Empty
+            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
+            else -> {
+                val mappedMyFeeds = myFeedsState.dataOrNull()
+                    .orEmpty()
+                    .toPersistentList()
+                FeedListContentState.Feeds(mappedMyFeeds)
+            }
+        }
+    }
+
+    private fun createChannelRoomMap(channels: List<HomeScreenChannel>) = withScope(Dispatchers.IO) {
+        for (channel in channels) {
+            channel.channelId()?.let { channelId ->
+                val roomSummary = client.getRoomSummaryFlow(RoomAlias(channelId).toRoomIdOrAlias())
+                    .firstOrNull()
+                    ?.getOrNull()
+                roomSummary?.let { summary ->
+                    channel.notificationsCount = summary.info.numUnreadMessages.toInt()
+                    channelRoomMap.put(channelId, summary)
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.openChannel(
+        channel: HomeScreenChannel,
+        resolvedChannelRoomId: MutableState<RoomId?>,
+        genericActionState: MutableState<AsyncAction<Unit>>
+    ) = launch {
+        genericActionState.value = AsyncAction.Uninitialized
+        val channelId = channel.channelId() ?: return@launch
+        channelRoomMap[channelId]?.let { roomSummary ->
+            resolvedChannelRoomId.value = roomSummary.roomId
+            return@launch
+        }
+        genericActionState.value = AsyncAction.Loading
+        client.resolveRoomAlias(RoomAlias(channelId)).getOrNull()?.getOrNull()?.roomId?.let { roomId ->
+            resolvedChannelRoomId.value = roomId
+            genericActionState.value = AsyncAction.Success(Unit)
+            return@launch
+        }
+        client.joinZeroChannel(channelId)
+            .onSuccess { roomId ->
+                roomId?.let {
+                    genericActionState.value = AsyncAction.Success(Unit)
+                    resolvedChannelRoomId.value = RoomId(roomId)
+                } ?: run {
+                    genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
+                }
+            }
+            .onFailure { failure ->
+                genericActionState.value = AsyncAction.Failure(failure)
+            }
+    }
+
+    private fun CoroutineScope.loadMoreHomeFeeds(followingFeedsOnly: Boolean, skip: Int) = launch {
+        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = skip)
+    }
+
+    private fun CoroutineScope.forceRefreshHomeFeeds(followingFeedsOnly: Boolean) = launch {
+        _allFeeds.clear()
+        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = 0)
+    }
+
+    private fun CoroutineScope.loadMoreMyFeeds(skip: Int) = launch {
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
+    }
+
+    private fun CoroutineScope.forceRefreshMyFeeds() = launch {
+        _myFeeds.clear()
+        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
+    }
+
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
+        client.addMeowToFeed(feed, meowCount)
+    }
+
+    private fun extractFeedsToFetchData(
+        allFeedsContentState: FeedListContentState,
+        myFeedsContentState: FeedListContentState,
+    ): List<ZeroFeed> {
+        val allFeeds = (allFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+        val myFeeds = (myFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
+        val feeds = mutableListOf<ZeroFeed>().apply {
+            addAll(allFeeds)
+            addAll(myFeeds)
+        }.distinctBy { it.id }.toList()
+        return feeds
+    }
+
+    private fun fetchFeedMediaIfRequired(
+        feeds: List<ZeroFeed>,
+        feedMediaMap: SnapshotStateMap<String, FeedMedia>
+    ) {
+        withIOScope {
+            coroutineScope {
+                val feedsToFetch = feeds.mapNotNull { feed ->
+                    val mediaId = feed.media?.id ?: return@mapNotNull null
+                    if (feedMediaMap.contains(feed.id) || FeedItemMediaCache.containsMedia(feed.id)) return@mapNotNull null
+                    else feed
+                }
+                val results = feedsToFetch.map { feed ->
+                    async { feed.id to client.fetchFeedMedia(feed.media!!.id) }
+                }.awaitAll()
+                results.forEach { (feedId, media) ->
+                    media.getOrNull()?.let { feedMedia ->
+                        FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
+                        feedMediaMap[feedId] = feedMedia
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchLinksMetaDataIfRequired(
+        feeds: List<ZeroFeed>,
+        feedLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
+    ) {
+        withIOScope {
+            coroutineScope {
+                val feedsToFetch = feeds.mapNotNull { feed ->
+                    val availableYoutubeUrl = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text) ?: return@mapNotNull null
+                    if (feedLinkMetaDataMap.contains(feed.id) || FeedItemMediaCache.containsUrlMetaData(feed.id)) return@mapNotNull null
+                    else feed
+                }
+                val results = feedsToFetch.map { feed ->
+                    val url = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text)!!
+                    async { feed.id to client.fetchUrlMetaData(url) }
+                }.awaitAll()
+                results.forEach { (feedId, urlMetaData) ->
+                    urlMetaData.getOrNull()?.let { metaData ->
+                        FeedItemMediaCache.addLinkMetaData(feedId, metaData)
+                        feedLinkMetaDataMap[feedId] = metaData
+                    }
+                }
+            }
+        }
     }
 }

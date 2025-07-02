@@ -20,7 +20,7 @@ dependencies {
     implementation(projects.libraries.designsystem)
     implementation(projects.libraries.uiStrings)
     implementation(projects.zero)
-    implementation(projects.features.roomlist.impl)
+    implementation(projects.features.home.impl)
     implementation(projects.features.createroom.api)
 
     testImplementation(libs.test.junit)
