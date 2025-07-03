@@ -200,14 +200,12 @@ private fun InviteCodeTextField(
                 .padding(horizontal = PADDING_3X.dp),
             text = inviteCodeFieldState,
             placeholder = R.string.invite_code,
-//            maxInputLength = 6,
             onTextChanged = {
                 inviteCodeFieldState = it
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done,
-                capitalization = KeyboardCapitalization.Characters
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = {
                 onValidateInviteCode.invoke(inviteCodeFieldState)
