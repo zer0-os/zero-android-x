@@ -4,9 +4,9 @@
 [versions]
 # Project
 android_gradle_plugin = "8.11.0"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlinpoet = "2.2.0"
-ksp = "2.1.21-2.0.2"
+ksp = "2.2.0-2.0.2"
 firebaseAppDistribution = "5.1.1"
 
 # AndroidX
@@ -36,8 +36,8 @@ accompanist = "0.37.3"
 test_core = "1.6.1"
 
 # Jetbrain
-datetime = "0.6.2"
-serialization_json = "1.8.1"
+datetime = "0.7.0"
+serialization_json = "1.9.0"
 
 #other
 detekt = "1.23.8"
@@ -172,7 +172,7 @@ coil_network_okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 coil_compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil_gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
 coil_test = { module = "io.coil-kt.coil3:coil-test", version.ref = "coil" }
-compound = { module = "io.element.android:compound-android", version = "25.4.4" }
+compound = { module = "io.element.android:compound-android", version = "25.7.4" }
 datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 serialization_json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization_json" }
 kotlinx_collections_immutable = "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0"
@@ -182,7 +182,7 @@ jsoup = "org.jsoup:jsoup:1.21.1"
 appyx_core = { module = "com.bumble.appyx:core", version.ref = "appyx" }
 molecule-runtime = "app.cash.molecule:molecule-runtime:2.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.7.2"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.7.3"
 matrix_richtexteditor = { module = "io.element.android:wysiwyg", version.ref = "wysiwyg" }
 matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose", version.ref = "wysiwyg" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
@@ -223,7 +223,7 @@ anvil_compiler_api = { module = "dev.zacsweers.anvil:compiler-api", version.ref 
 anvil_compiler_utils = { module = "dev.zacsweers.anvil:compiler-utils", version.ref = "anvil" }
 
 # Element Call
-element_call_embedded = "io.element.android:element-call-embedded:0.13.0"
+element_call_embedded = "io.element.android:element-call-embedded:0.13.1"
 
 # Auto services
 google_autoservice = { module = "com.google.auto.service:auto-service", version.ref = "autoservice" }

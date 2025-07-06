@@ -56,7 +56,6 @@ import io.element.android.libraries.designsystem.components.button.MainActionBut
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
 import io.element.android.libraries.designsystem.components.preferences.PreferenceSwitch
-import io.element.android.libraries.designsystem.modifiers.a11yClickLabel
 import io.element.android.libraries.designsystem.modifiers.niceClickable
 import io.element.android.libraries.designsystem.preview.ElementPreviewDark
 import io.element.android.libraries.designsystem.preview.ElementPreviewLight
@@ -273,11 +272,11 @@ fun RoomDetailsView(
                 )
             }
 
-/*            if (state.showDebugInfo) {
-                DebugInfoSection(
-                    roomId = state.roomId,
-                )
-            }*/
+            /*            if (state.showDebugInfo) {
+                            DebugInfoSection(
+                                roomId = state.roomId,
+                            )
+                        }*/
         }
     }
 }
@@ -437,7 +436,6 @@ private fun RoomHeaderSection(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val actionView = stringResource(CommonStrings.action_view)
         Avatar(
             avatarData = AvatarData(roomId.value, roomName, avatarUrl, AvatarSize.RoomHeader),
             avatarType = AvatarType.Room(
@@ -448,9 +446,13 @@ private fun RoomHeaderSection(
             ),
             contentDescription = avatarUrl?.let { stringResource(CommonStrings.a11y_room_avatar) },
             modifier = Modifier
-                .clickable { avatarUrl?.let(openAvatarPreview) }
+                .clickable(
+                    enabled = avatarUrl != null,
+                    onClickLabel = stringResource(CommonStrings.action_view),
+                ) {
+                    openAvatarPreview(avatarUrl!!)
+                }
                 .testTag(TestTags.roomDetailAvatar)
-                .a11yClickLabel(avatarUrl?.let { actionView })
         )
         /*TitleAndSubtitle(
             title = roomName,

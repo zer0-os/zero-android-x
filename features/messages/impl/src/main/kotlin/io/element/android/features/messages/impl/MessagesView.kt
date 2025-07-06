@@ -37,6 +37,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -182,7 +184,10 @@ fun MessagesView(
 
     val expandableState = rememberExpandableBottomSheetLayoutState()
     ExpandableBottomSheetLayout(
-        modifier = modifier.fillMaxSize().imePadding().systemBarsPadding(),
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding()
+            .systemBarsPadding(),
         content = {
             Scaffold(
                 contentWindowInsets = WindowInsets.statusBars,
@@ -194,17 +199,17 @@ fun MessagesView(
                             roomAvatar = state.roomAvatar,
                             isTombstoned = state.isTombstoned,
                             roomSubTitle = state.roomSubTitle,
-                    heroes = state.heroes,
-                    roomCallState = state.roomCallState,
-                    dmUserIdentityState = state.dmUserVerificationState,
-                    onBackClick = { hidingKeyboard { onBackClick() } },
-                    onRoomDetailsClick = { hidingKeyboard { onRoomDetailsClick() } },
-                    onJoinCallClick = onJoinCallClick,
-                )
-            }
-        },
-        content = { padding ->
-            Box(
+                            heroes = state.heroes,
+                            roomCallState = state.roomCallState,
+                            dmUserIdentityState = state.dmUserVerificationState,
+                            onBackClick = { hidingKeyboard { onBackClick() } },
+                            onRoomDetailsClick = { hidingKeyboard { onRoomDetailsClick() } },
+                            onJoinCallClick = onJoinCallClick,
+                        )
+                    }
+                },
+                content = { padding ->
+                    Box(
                         modifier = Modifier
                             .padding(padding)
                             .consumeWindowInsets(padding)
@@ -215,8 +220,8 @@ fun MessagesView(
                             onMessageLongClick = ::onMessageLongClick,
                             onUserDataClick = {
                                 hidingKeyboard {
-                 //                   state.eventSink(MessagesEvents.OnUserClicked(it))
-                        onUserDataClick(it.userId)
+                                    //                   state.eventSink(MessagesEvents.OnUserClicked(it))
+                                    onUserDataClick(it.userId)
                                 }
                             },
                             onLinkClick = { link, customTab ->
@@ -391,7 +396,7 @@ private fun MessagesViewContent(
 
         Box {
             val scrollBehavior = PinnedMessagesBannerViewDefaults.rememberScrollBehavior(
-                pinnedMessagesCount = state.pinnedMessagesBannerState.pinnedMessagesCount(),
+                pinnedMessagesCount = (state.pinnedMessagesBannerState as? PinnedMessagesBannerState.Visible)?.pinnedMessagesCount() ?: 0,
             )
             TimelineView(
                 state = state.timelineState,
@@ -426,7 +431,7 @@ private fun MessagesViewContent(
                 )
             }
             // knockRequestsBannerView()
-                }
+        }
 
     }
 }
@@ -505,10 +510,9 @@ private fun MessagesViewTopBar(
                     roomAvatar = roomAvatar,
                     isTombstoned = isTombstoned,
                     roomSubTitle = roomSubTitle,
-                        heroes = heroes,
-                        modifier = titleModifier
-                    )
-
+                    heroes = heroes,
+                    modifier = titleModifier
+                )
 
                 when (dmUserIdentityState) {
                     IdentityState.Verified -> {
@@ -562,10 +566,14 @@ private fun RoomAvatarAndNameRow(
         )
         Column {
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .semantics {
+                        heading()
+                    },
                 text = roomName ?: stringResource(CommonStrings.common_no_room_name),
                 style = ElementTheme.zeroTypography.fontBodyLgMedium,
-            fontStyle = FontStyle.Italic.takeIf { roomName == null },
+                fontStyle = FontStyle.Italic.takeIf { roomName == null },
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

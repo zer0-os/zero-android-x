@@ -226,7 +226,6 @@ private fun DefaultRoomListTopBar(
                         scrolledContainerColor = Color.Transparent,
                     ),
                     title = {
-//                        Text(text = title)
                         Column {
                             Text(
                                 text = matrixUser.getBestName(),
@@ -361,7 +360,7 @@ private fun NavigationIcon(
                 }
                 Avatar(
                     avatarData = avatarData,
-                    avatarType = AvatarType.User,contentDescription = stringResource(CommonStrings.common_settings),
+                    avatarType = AvatarType.User, contentDescription = stringResource(CommonStrings.common_settings),
                 )
                 if (showAvatarIndicator) {
                     RedIndicatorAtom(

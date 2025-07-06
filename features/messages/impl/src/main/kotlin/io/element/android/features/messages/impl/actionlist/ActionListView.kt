@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextAlign
@@ -452,19 +451,11 @@ private fun EmojiButton(
             .size(48.dp)
             .background(backgroundColor, CircleShape)
             .clickable(
-                enabled = true,
+                onClickLabel = a11yClickLabel,
                 onClick = { onClick(emoji) },
                 indication = ripple(bounded = false, radius = emojiRippleRadius),
                 interactionSource = remember { MutableInteractionSource() }
-            )
-            .semantics {
-                onClick(
-                    label = a11yClickLabel,
-                ) {
-                    onClick(emoji)
-                    true
-                }
-            },
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(

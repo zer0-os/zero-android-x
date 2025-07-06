@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -48,7 +50,10 @@ fun IconTitleSubtitleMolecule(
         Text(
             text = title,
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .semantics {
+                    heading()
+                },
             textAlign = TextAlign.Center,
             style = ElementTheme.zeroTypography.fontHeadingMdBold,
             color = ElementTheme.colors.textPrimary,
