@@ -14,6 +14,9 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -29,6 +32,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
 @Composable
 fun FeedDetailsView(
@@ -38,6 +42,10 @@ fun FeedDetailsView(
     onFeedReplyClick: (reply: ZeroFeed) -> Unit = {},
     onFeedUserClick: (user: FeedUserProfileView) -> Unit = {},
 ) {
+    val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
+        mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -55,6 +63,9 @@ fun FeedDetailsView(
                 onFeedUserClick = onFeedUserClick,
                 onAddMeowToFeed = { feed, meowCount ->
                     state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
+                },
+                onLoadFeedMedia = { mediaId ->
+                    state.eventSink(FeedDetailsEvents.LoadFeedMedia(mediaId))
                 }
             )
             FeedReplyComposer(state)
@@ -70,6 +81,12 @@ fun FeedDetailsView(
                 onSubmit = { state.eventSink(FeedDetailsEvents.HideError) }
             )
         }
+    }
+
+    if (showFeedMediaPreview) {
+        FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
+            state.eventSink(FeedDetailsEvents.DismissFeedMedia)
+        })
     }
 }
 

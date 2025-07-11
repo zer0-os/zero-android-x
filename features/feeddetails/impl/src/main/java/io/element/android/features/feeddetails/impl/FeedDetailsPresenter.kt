@@ -65,6 +65,9 @@ class FeedDetailsPresenter @AssistedInject constructor(
         val feedRepliesMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
         val feedRepliesLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
 
+        val feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>> =
+            remember { mutableStateOf(AsyncAction.Uninitialized) }
+
         val postReplyText: MutableState<String> = remember { mutableStateOf("") }
         val newFeedAttachmentState: MutableState<CreateFeedMediaAttachment?> = remember { mutableStateOf(null) }
 
@@ -90,6 +93,10 @@ class FeedDetailsPresenter @AssistedInject constructor(
                 }
                 FeedDetailsEvents.RemoveMedia -> newFeedAttachmentState.value = null
                 FeedDetailsEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
+                is FeedDetailsEvents.LoadFeedMedia -> {
+                    coroutineScope.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
+                }
+                FeedDetailsEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
             }
         }
 
@@ -113,6 +120,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
             feedCommentsLinkMetaDataMap = feedRepliesLinkMetaDataMap,
             postReplyText = postReplyText.value,
             postReplyAttachment = newFeedAttachmentState.value,
+            feedMediaPreviewState = feedMediaPreviewActionState.value,
             eventSink = ::handleEvents,
             genericActionState = genericActionState.value
         )
@@ -229,5 +237,22 @@ class FeedDetailsPresenter @AssistedInject constructor(
                 newFeedAttachmentState.value = media
             }
         }
+    }
+
+    private fun CoroutineScope.loadFeedMediaPreview(
+        mediaId: String, feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>>
+    ) = launch {
+        feedMediaPreviewActionState.value = AsyncAction.Loading
+        client.fetchFeedMedia(mediaId, isPreview = false)
+            .onSuccess { media ->
+                media?.let {
+                    feedMediaPreviewActionState.value = AsyncAction.Success(it)
+                } ?: run {
+                    feedMediaPreviewActionState.value = AsyncAction.Failure(Throwable("Media not found."))
+                }
+            }
+            .onFailure { failure ->
+                feedMediaPreviewActionState.value = AsyncAction.Failure(failure)
+            }
     }
 }

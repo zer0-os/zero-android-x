@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -62,6 +63,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
 @Composable
 fun HomeView(
@@ -181,6 +183,9 @@ private fun HomeScaffold(
     val roomListState: RoomListState = state.roomListState
 
     val selectedNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
+    val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
+        mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
+    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -248,6 +253,12 @@ private fun HomeScaffold(
             )
         }
     )
+
+    if (showFeedMediaPreview) {
+        FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
+            state.eventSink(HomeEvents.DismissFeedMedia)
+        })
+    }
 }
 
 @Composable

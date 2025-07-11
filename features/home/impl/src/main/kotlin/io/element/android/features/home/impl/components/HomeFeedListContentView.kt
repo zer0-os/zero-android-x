@@ -202,6 +202,9 @@ private fun FeedsViewList(
                     },
                     onAddMeowToFeed = { meowCount ->
                         eventSink(HomeEvents.AddMeowToFeed(feed, meowCount))
+                    },
+                    onMediaTapped = { mediaId ->
+                        eventSink(HomeEvents.LoadFeedMedia(mediaId))
                     }
                 )
                 if (index != state.feeds.lastIndex) {

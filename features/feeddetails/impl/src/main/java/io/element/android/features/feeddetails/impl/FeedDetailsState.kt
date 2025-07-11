@@ -27,6 +27,7 @@ data class FeedDetailsState(
     val feedCommentsLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     val postReplyText: String,
     val postReplyAttachment: CreateFeedMediaAttachment?,
+    val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
 
     val eventSink: (FeedDetailsEvents) -> Unit,
     val genericActionState: AsyncAction<Unit>,

@@ -958,11 +958,11 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?> = withContext(sessionDispatcher) {
+    override suspend fun fetchFeedMedia(mediaId: String, isPreview: Boolean): Result<FeedMedia?> = withContext(sessionDispatcher) {
         runCatching {
             val metaDataRepo = zeroCoreRepository?.metaData
                 ?: return@withContext Result.failure(Throwable("MetaData repository is not initialized yet."))
-            metaDataRepo.fetchFeedMedia(mediaId)?.toModel()
+            metaDataRepo.fetchFeedMedia(mediaId, isPreview)?.toModel()
         }
     }
 

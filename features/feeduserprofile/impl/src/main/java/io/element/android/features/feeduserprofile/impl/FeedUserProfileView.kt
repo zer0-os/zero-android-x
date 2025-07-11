@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -29,6 +32,7 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
 @Composable
 fun FeedUserProfileView(
@@ -39,6 +43,10 @@ fun FeedUserProfileView(
     openAvatarPreview: (name: String, url: String) -> Unit,
     onUserFeedClick: (feed: ZeroFeed) -> Unit = {}
 ) {
+    val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
+        mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
+    }
+
     Scaffold(
         modifier = modifier
     ) { padding ->
@@ -89,6 +97,12 @@ fun FeedUserProfileView(
                 }
             },
         )
+    }
+
+    if (showFeedMediaPreview) {
+        FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
+            state.eventSink(FeedUserProfileEvents.DismissFeedMedia)
+        })
     }
 }
 

@@ -28,6 +28,7 @@ data class FeedUserProfileState(
     val isMyOwnProfile: Boolean,
     val dmRoomId: RoomId?,
     val startDmActionState: AsyncAction<RoomId>,
+    val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
     val eventSink: (FeedUserProfileEvents) -> Unit,
     val genericActionState: AsyncAction<Unit>,
 ) {

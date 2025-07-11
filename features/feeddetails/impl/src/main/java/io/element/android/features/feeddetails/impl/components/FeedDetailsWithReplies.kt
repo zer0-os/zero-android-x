@@ -46,6 +46,7 @@ fun FeedDetailsWithReplies(
     onReplyClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onAddMeowToFeed: (ZeroFeed, Int) -> Unit,
+    onLoadFeedMedia: (String) -> Unit
 ) {
     var refreshing by remember(state) { mutableStateOf(false) }
     var isLoadingMoreItems by remember(state) { mutableStateOf(false) }
@@ -93,7 +94,8 @@ fun FeedDetailsWithReplies(
                         onAddMeowToFeed = { meowCount ->
                             onAddMeowToFeed(state.zeroFeed, meowCount)
                         },
-                        onFeedUserClick = onFeedUserClick
+                        onFeedUserClick = onFeedUserClick,
+                        onMediaTapped = onLoadFeedMedia
                     )
                     HorizontalDivider()
                 }
@@ -120,7 +122,8 @@ fun FeedDetailsWithReplies(
                     },
                     onAddMeowToFeed = { meowCount ->
                         onAddMeowToFeed(comment, meowCount)
-                    }
+                    },
+                    onMediaTapped = onLoadFeedMedia
                 )
                 if (index != state.feedComments.lastIndex) {
                     HorizontalDivider()

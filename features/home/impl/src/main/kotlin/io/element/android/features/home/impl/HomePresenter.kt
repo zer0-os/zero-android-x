@@ -104,6 +104,9 @@ class HomePresenter @Inject constructor(
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
 
+        val feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>> =
+            remember { mutableStateOf(AsyncAction.Uninitialized) }
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
@@ -146,6 +149,10 @@ class HomePresenter @Inject constructor(
                 }
                 HomeEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
                 is HomeEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount)
+                is HomeEvents.LoadFeedMedia -> {
+                    coroutineScope.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
+                }
+                HomeEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
             }
         }
 
@@ -199,6 +206,7 @@ class HomePresenter @Inject constructor(
             isSpaceFeatureEnabled = isSpaceFeatureEnabled,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
+            feedMediaPreviewState = feedMediaPreviewActionState.value,
             eventSink = ::handleEvents,
         )
     }
@@ -443,5 +451,22 @@ class HomePresenter @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun CoroutineScope.loadFeedMediaPreview(
+        mediaId: String, feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>>
+    ) = launch {
+        feedMediaPreviewActionState.value = AsyncAction.Loading
+        client.fetchFeedMedia(mediaId, isPreview = false)
+            .onSuccess { media ->
+                media?.let {
+                    feedMediaPreviewActionState.value = AsyncAction.Success(it)
+                } ?: run {
+                    feedMediaPreviewActionState.value = AsyncAction.Failure(Throwable("Media not found."))
+                }
+            }
+            .onFailure { failure ->
+                feedMediaPreviewActionState.value = AsyncAction.Failure(failure)
+            }
     }
 }

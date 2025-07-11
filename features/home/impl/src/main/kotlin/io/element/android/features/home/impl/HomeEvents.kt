@@ -23,6 +23,8 @@ sealed interface HomeEvents {
     data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean): HomeFeedEvents
     data class RefreshFeeds(val followingFeeds: Boolean): HomeFeedEvents
     data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int): HomeFeedEvents
+    data class LoadFeedMedia(val mediaId: String): HomeFeedEvents
+    data object DismissFeedMedia: HomeFeedEvents
 
     sealed interface HomeProfileEvents: HomeEvents
     data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>): HomeProfileEvents

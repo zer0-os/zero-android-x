@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.common.ui.component.feed
 
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,10 +18,11 @@ import java.io.File
 @Composable
 fun FeedMediaImageView(
     url: String,
+    onTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
-        modifier = modifier,
+        modifier = modifier.clickable{ onTap() },
         model = url,
         contentScale = ContentScale.Fit,
         alignment = Alignment.Center,
@@ -31,10 +33,11 @@ fun FeedMediaImageView(
 @Composable
 fun FeedMediaImageView(
     file: File,
+    onTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
-        modifier = modifier,
+        modifier = modifier.clickable{ onTap() },
         model = file,
         contentScale = ContentScale.Fit,
         alignment = Alignment.Center,

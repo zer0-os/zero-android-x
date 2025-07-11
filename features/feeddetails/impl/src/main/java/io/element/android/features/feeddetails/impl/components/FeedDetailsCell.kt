@@ -66,6 +66,7 @@ fun FeedDetailsCell(
     isMyOwnFeed: Boolean = false,
     onAddMeowToFeed: (Int) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
+    onMediaTapped: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val openExternalLink: (Uri) -> Unit = { uri ->
@@ -167,12 +168,14 @@ fun FeedDetailsCell(
                 if (media.isVideo) {
                     FeedMediaVideoView(
                         videoUrl = media.url.orEmpty(),
+                        onTap = { onMediaTapped(media.id) },
                         modifier = Modifier
                             .clip(RoundedCornerShape(4.dp))
                     )
                 } else {
                     FeedMediaImageView(
                         url = media.url.orEmpty(),
+                        onTap = { onMediaTapped(media.id) },
                         modifier = Modifier
                             .aspectRatio(media.aspectRatio)
                             .clip(RoundedCornerShape(4.dp))
@@ -218,6 +221,7 @@ internal fun FeedDetailsCellPreview() = ElementPreview {
         feed = ZeroFeed.placeholder,
         zeroUserRewards = ZeroUserRewards.empty(),
         onAddMeowToFeed = {},
-        onFeedUserClick = {}
+        onFeedUserClick = {},
+        onMediaTapped = {},
     )
 }

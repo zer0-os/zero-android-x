@@ -31,7 +31,8 @@ interface ZeroMetaDataService {
 
     @GET(value = "api/media/{media_id}")
     suspend fun fetchFeedMedia(
-        @Path("media_id") mediaId: String
+        @Path("media_id") mediaId: String,
+        @Query("is_preview") isPreview: Boolean = true
     ): ApiFeedMediaResponse
 
     @Multipart

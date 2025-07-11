@@ -16,7 +16,7 @@ import java.io.File
 interface MetaDataRepository {
     suspend fun fetchLinkPreview(url: String): ApiLinkPreview?
 
-    suspend fun fetchFeedMedia(mediaId: String): ApiFeedMediaResponse?
+    suspend fun fetchFeedMedia(mediaId: String, isPreview: Boolean = true): ApiFeedMediaResponse?
 
     suspend fun uploadFeedMedia(media: File, mimeType: String): ApiUploadFeedMedia?
 

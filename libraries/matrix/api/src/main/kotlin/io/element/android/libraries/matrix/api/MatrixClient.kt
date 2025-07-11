@@ -236,7 +236,7 @@ interface MatrixClient {
                                  includeMeow: Boolean = true
     ): Result<ZeroFeed?>
 
-    suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?>
+    suspend fun fetchFeedMedia(mediaId: String, isPreview: Boolean = true): Result<FeedMedia?>
 
     suspend fun fetchFeedReplies(
         feedId: String,

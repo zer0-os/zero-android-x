@@ -423,7 +423,7 @@ class FakeMatrixClient(
         return Result.success(ZeroFeed.placeholder)
     }
 
-    override suspend fun fetchFeedMedia(mediaId: String): Result<FeedMedia?> {
+    override suspend fun fetchFeedMedia(mediaId: String, isPreview: Boolean): Result<FeedMedia?> {
         return Result.success(FeedMedia.placeholder)
     }
 

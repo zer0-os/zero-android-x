@@ -39,6 +39,7 @@ data class HomeState(
     val isSpaceFeatureEnabled: Boolean,
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
+    val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
     val eventSink: (HomeEvents) -> Unit,
 ) {
     private val displayActions = true

@@ -116,7 +116,8 @@ private fun FeedReplyComposerAttachment(
                 .background(Color.Black, RoundedCornerShape(4.dp))
                 .clip(RoundedCornerShape(4.dp))
                 .align(Alignment.Center)
-                .padding(12.dp)
+                .padding(12.dp),
+            onTap = {}
         )
         IconButton(
             modifier = Modifier

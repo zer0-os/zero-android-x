@@ -7,6 +7,7 @@
 
 package io.element.android.features.feeddetails.impl
 
+import android.adservices.adid.AdId
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 sealed interface FeedDetailsEvents {
@@ -17,6 +18,8 @@ sealed interface FeedDetailsEvents {
     data object PostReply : FeedDetailsEvents
     data object SelectMedia : FeedDetailsEvents
     data object RemoveMedia : FeedDetailsEvents
+    data class LoadFeedMedia(val mediaId: String): FeedDetailsEvents
+    data object DismissFeedMedia: FeedDetailsEvents
 
     data object HideError : FeedDetailsEvents
 }

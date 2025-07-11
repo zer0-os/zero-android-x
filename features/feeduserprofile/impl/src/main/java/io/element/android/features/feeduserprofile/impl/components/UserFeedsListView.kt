@@ -86,6 +86,9 @@ fun UserFeedsListView(
                     onFeedUserClick = {},
                     onAddMeowToFeed = { meowCount ->
                         state.eventSink(FeedUserProfileEvents.AddMeowToFeed(feed, meowCount))
+                    },
+                    onMediaTapped = { mediaId ->
+                        state.eventSink(FeedUserProfileEvents.LoadFeedMedia(mediaId))
                     }
                 )
                 if (index != state.userFeeds.lastIndex) {

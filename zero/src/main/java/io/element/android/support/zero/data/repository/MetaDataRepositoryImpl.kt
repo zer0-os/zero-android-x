@@ -29,9 +29,9 @@ data class MetaDataRepositoryImpl(
         }.getOrNull()
     }
 
-    override suspend fun fetchFeedMedia(mediaId: String): ApiFeedMediaResponse? {
+    override suspend fun fetchFeedMedia(mediaId: String, isPreview: Boolean): ApiFeedMediaResponse? {
         return runCatching {
-            zeroMetaDataService.fetchFeedMedia(mediaId)
+            zeroMetaDataService.fetchFeedMedia(mediaId, isPreview)
         }.getOrNull()
     }
 

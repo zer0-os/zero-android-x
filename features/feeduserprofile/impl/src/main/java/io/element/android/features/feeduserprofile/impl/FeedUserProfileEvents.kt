@@ -15,6 +15,8 @@ sealed interface FeedUserProfileEvents {
     data object ToggleFollowUser : FeedUserProfileEvents
     data object StartDM : FeedUserProfileEvents
     data object ClearStartDMState : FeedUserProfileEvents
+    data class LoadFeedMedia(val mediaId: String) : FeedUserProfileEvents
+    data object DismissFeedMedia : FeedUserProfileEvents
 
     data object HideError : FeedUserProfileEvents
 }
