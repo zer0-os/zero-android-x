@@ -24,14 +24,14 @@ import kotlinx.collections.immutable.persistentMapOf
 /**
  * Room list.
  */
-@Composable
-fun ElementTheme.roomListRoomName() = colors.textPrimary
+val SemanticColors.roomListRoomName
+    get() = textPrimary
 
-@Composable
-fun ElementTheme.roomListRoomMessage() = colors.textSecondary
+val SemanticColors.roomListRoomMessage
+    get() = textSecondary
 
-@Composable
-fun ElementTheme.roomListRoomMessageDate() = colors.textSecondary
+val SemanticColors.roomListRoomMessageDate
+    get() = textSecondary
 
 val SemanticColors.unreadIndicator
     get() = iconAccentTertiary
@@ -53,11 +53,6 @@ val SemanticColors.messageFromOtherBackground
 @OptIn(CoreColorToken::class)
 val SemanticColors.progressIndicatorTrackColor
     get() = if (isLight) LightColorTokens.colorAlphaGray500 else DarkColorTokens.colorAlphaGray500
-
-// This color is not present in Semantic color, so put hard-coded value for now
-@OptIn(CoreColorToken::class)
-val SemanticColors.iconSuccessPrimaryBackground
-    get() = if (isLight) LightColorTokens.colorGreen300 else DarkColorTokens.colorGreen300
 
 // This color is not present in Semantic color, so put hard-coded value for now
 @OptIn(CoreColorToken::class)
@@ -136,18 +131,15 @@ internal fun ColorAliasesPreview() = ElementPreview {
         backgroundColor = Color.Black,
         foregroundColor = Color.White,
         colors = persistentMapOf(
-            "roomListRoomName" to ElementTheme.roomListRoomName(),
-            "roomListRoomMessage" to ElementTheme.roomListRoomMessage(),
-            "roomListRoomMessageDate" to ElementTheme.roomListRoomMessageDate(),
+            "roomListRoomName" to ElementTheme.colors.roomListRoomName,
+            "roomListRoomMessage" to ElementTheme.colors.roomListRoomMessage,
+            "roomListRoomMessageDate" to ElementTheme.colors.roomListRoomMessageDate,
             "unreadIndicator" to ElementTheme.colors.unreadIndicator,
             "placeholderBackground" to ElementTheme.colors.placeholderBackground,
             "messageFromMeBackground" to ElementTheme.colors.messageFromMeBackground,
             "messageFromOtherBackground" to ElementTheme.colors.messageFromOtherBackground,
             "progressIndicatorTrackColor" to ElementTheme.colors.progressIndicatorTrackColor,
             "temporaryColorBgSpecial" to ElementTheme.colors.temporaryColorBgSpecial,
-            "iconSuccessPrimaryBackground" to ElementTheme.colors.iconSuccessPrimaryBackground,
-            "bigCheckmarkBorderColor" to ElementTheme.colors.bigCheckmarkBorderColor,
-            "highlightedMessageBackgroundColor" to ElementTheme.colors.highlightedMessageBackgroundColor,
         )
     )
 }

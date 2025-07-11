@@ -14,10 +14,6 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.Badge
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.badgeNegativeBackgroundColor
-import io.element.android.libraries.designsystem.theme.badgeNegativeContentColor
-import io.element.android.libraries.designsystem.theme.badgeNeutralBackgroundColor
-import io.element.android.libraries.designsystem.theme.badgeNeutralContentColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
 
@@ -41,21 +37,21 @@ object MatrixBadgeAtom {
     ) {
         val backgroundColor = when (data.type) {
             Type.Positive -> ElementTheme.colors.zeroBrandColorAlpha15
-            Type.Neutral -> ElementTheme.colors.badgeNeutralBackgroundColor
-            Type.Negative -> ElementTheme.colors.badgeNegativeBackgroundColor
+            Type.Neutral -> ElementTheme.colors.bgBadgeDefault
+            Type.Negative -> ElementTheme.colors.bgCriticalSubtle
             Type.Info -> ElementTheme.colors.bgBadgeInfo
         }
         val textColor = when (data.type) {
             Type.Positive -> ElementTheme.colors.zeroBrandColor
-            Type.Neutral -> ElementTheme.colors.badgeNeutralContentColor
-            Type.Negative -> ElementTheme.colors.badgeNegativeContentColor
+            Type.Neutral -> ElementTheme.colors.textPrimary
+            Type.Negative -> ElementTheme.colors.textCriticalPrimary
             Type.Info -> ElementTheme.colors.textBadgeInfo
         }
         val iconColor = when (data.type) {
             Type.Positive -> ElementTheme.colors.zeroBrandColor
-            Type.Neutral -> ElementTheme.colors.iconSecondary
+            Type.Neutral -> ElementTheme.colors.iconPrimary
             Type.Negative -> ElementTheme.colors.iconCriticalPrimary
-            Type.Info -> ElementTheme.colors.textBadgeInfo
+            Type.Info -> ElementTheme.colors.iconInfoPrimary
         }
         Badge(
             text = data.text,
