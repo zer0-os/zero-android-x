@@ -12,8 +12,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PostNewFeedRequest(
     val text: String,
-    val replyTo: String?,
-    val mediaId: String?
+    val replyTo: String? = null,
+    val mediaId: String? = null
 ) {
     companion object {
         fun newRequest(text: String, mediaId: String?, replyToPost: String?) = PostNewFeedRequest(text, replyToPost, mediaId)
