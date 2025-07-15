@@ -191,21 +191,21 @@ fun FeedDetailsCell(
             maxLines = 1
         )
         Spacer(Modifier.height(16.dp))
-        Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier.weight(1f)) {
-                FeedActionButton(
-                    iconResId = R.drawable.ic_post_reply,
-                    supportingText = (feed.replies?.count() ?: 0).toString(),
-                    enabled = false
-                )
-                Spacer(Modifier.width(60.dp))
-                FeedMeowActionButton(
-                    meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
-                    highlighted = !feed.meows.isNullOrEmpty(),
-                    enabled = !isMyOwnFeed,
-                    onAddMeowToFeed = onAddMeowToFeed
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            FeedActionButton(
+                iconResId = R.drawable.ic_post_reply,
+                supportingText = (feed.replies?.count() ?: 0).toString(),
+                enabled = false
+            )
+            FeedMeowActionButton(
+                meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
+                highlighted = !feed.meows.isNullOrEmpty(),
+                enabled = !isMyOwnFeed,
+                onAddMeowToFeed = onAddMeowToFeed
+            )
             FeedActionButton(
                 iconResId = R.drawable.ic_post_arweave,
                 onClick = { openExternalLink(feed.arweaveLink.toUri()) }

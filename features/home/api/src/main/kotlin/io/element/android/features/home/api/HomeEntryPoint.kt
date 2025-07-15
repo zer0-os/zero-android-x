@@ -34,5 +34,6 @@ interface HomeEntryPoint : FeatureEntryPoint {
         fun onFeedClick(feed: ZeroFeed)
         fun onCreateFeedClick()
         fun onFeedUserClick(profile: FeedUserProfileView)
+        fun onUserProfileClick()
     }
 }

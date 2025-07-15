@@ -8,8 +8,8 @@
 package io.element.android.features.home.impl.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,16 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.features.home.impl.contentType
-import io.element.android.features.home.impl.filters.RoomListFilter
-import io.element.android.features.home.impl.filters.RoomListFiltersState
-import io.element.android.features.home.impl.filters.aRoomListFiltersState
+import io.element.android.features.home.impl.model.NotificationsScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.features.home.impl.roomlist.RoomListContentState
@@ -35,46 +33,58 @@ import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
+import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun HomeNotificationListContentView(
     contentState: RoomListContentState,
-    filtersState: RoomListFiltersState,
     eventSink: (RoomListEvents) -> Unit,
     onNotificationClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        when (contentState) {
-            is RoomListContentState.Skeleton -> {
-                SkeletonView(
-                    count = contentState.count,
-                )
+    val selectedNotificationTab = remember { mutableStateOf(NotificationsScreenTab.ALL) }
+    Column(modifier = modifier) {
+        NotificationsScreenTabView(
+            onTabSelected = { tab ->
+                selectedNotificationTab.value = tab
             }
-            is RoomListContentState.Empty -> {
-                EmptyView(modifier = modifier)
-            }
-            is RoomListContentState.Rooms -> {
-                val items = contentState.summaries
-                    .filter { it.hasNewContent && it.displayType !in (RoomSummaryDisplayType.KNOCKED..RoomSummaryDisplayType.PLACEHOLDER) }
-                    .let { roomListRoomSummaries ->
-                        if (filtersState.selectedFilters().contains(RoomListFilter.Rooms)) {
-                            roomListRoomSummaries.filter { !it.isAChannel }
-                        } else {
-                            roomListRoomSummaries
-                        }
-                    }
-                    .toPersistentList()
-                if (items.isEmpty()) {
-                    EmptyView(modifier = modifier)
-                } else {
-                    NotificationsViewList(
-                        items = items,
-                        eventSink = eventSink,
-                        onNotificationClick = onNotificationClick
+        )
+        Box {
+            when (contentState) {
+                is RoomListContentState.Skeleton -> {
+                    SkeletonView(
+                        count = contentState.count,
                     )
+                }
+                is RoomListContentState.Empty -> {
+                    HomeTabContentEmptyView(modifier = modifier, text = "No new notifications")
+                }
+                is RoomListContentState.Rooms -> {
+                    val items = contentState.summaries
+                        .filter { it.hasNewContent && it.displayType !in (RoomSummaryDisplayType.KNOCKED..RoomSummaryDisplayType.PLACEHOLDER) }
+                        .let { roomListRoomSummaries ->
+                            when (selectedNotificationTab.value) {
+                                NotificationsScreenTab.ALL -> roomListRoomSummaries
+                                NotificationsScreenTab.HIGHLIGHTS -> roomListRoomSummaries.filter {
+                                    it.numberOfUnreadMentions > 0
+                                }
+                                NotificationsScreenTab.MUTED -> roomListRoomSummaries.filter {
+                                    it.userDefinedNotificationMode == RoomNotificationMode.MUTE
+                                }
+                            }
+                        }
+                        .toPersistentList()
+                    if (items.isEmpty()) {
+                        HomeTabContentEmptyView(modifier = modifier, text = "No new notifications")
+                    } else {
+                        NotificationsViewList(
+                            items = items,
+                            eventSink = eventSink,
+                            onNotificationClick = onNotificationClick
+                        )
+                    }
                 }
             }
         }
@@ -92,16 +102,6 @@ private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun EmptyView(modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize()) {
-        EmptyScaffold(
-            title = "No new notifications",
-            modifier = Modifier.align(Alignment.Center),
-        )
     }
 }
 
@@ -153,7 +153,6 @@ private fun NotificationsViewList(
 internal fun HomeNotificationListContentViewPreview(@PreviewParameter(RoomListContentStateProvider::class) state: RoomListContentState) = ElementPreview {
     HomeNotificationListContentView(
         contentState = state,
-        filtersState = aRoomListFiltersState(),
         eventSink = {},
         onNotificationClick = {},
     )

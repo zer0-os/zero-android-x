@@ -291,7 +291,9 @@ private fun <R : TestRule> AndroidComposeTestRule<R, ComponentActivity>.setRoomL
             onReportRoomClick = onReportRoomClick,
             acceptDeclineInviteView = {},
             onCreateFeedClick = {},
-            onFeedClick = {}
+            onFeedClick = {},
+            onUserProfileClick = {},
+            onFeedUserClick = {}
         )
     }
 }

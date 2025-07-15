@@ -9,6 +9,7 @@ package io.element.android.features.home.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,21 +25,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.components.HomeChannelListContentView
+import io.element.android.features.home.impl.components.HomeFabButton
 import io.element.android.features.home.impl.components.HomeFeedListContentView
 import io.element.android.features.home.impl.components.HomeNotificationListContentView
 import io.element.android.features.home.impl.components.HomeScreenTabView
+import io.element.android.features.home.impl.components.HomeScreenTopBar
 import io.element.android.features.home.impl.components.RoomListContentView
 import io.element.android.features.home.impl.components.RoomListMenuAction
-import io.element.android.features.home.impl.components.RoomListTopBar
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
@@ -54,8 +55,6 @@ import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.FloatingActionButton
-import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
@@ -79,6 +78,7 @@ fun HomeView(
     onDeclineInviteAndBlockUser: (roomSummary: RoomListRoomSummary) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
+    onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
@@ -127,6 +127,7 @@ fun HomeView(
                 onMenuActionClick = onMenuActionClick,
                 onFeedClick = onFeedClick,
                 onFeedUserClick = onFeedUserClick,
+                onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
                 modifier = Modifier.padding(top = topPadding),
             )
@@ -170,6 +171,7 @@ private fun HomeScaffold(
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
+    onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -187,64 +189,68 @@ private fun HomeScaffold(
         mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
     }
 
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            RoomListTopBar(
-                matrixUser = state.matrixUser,
-                showAvatarIndicator = state.showAvatarIndicator,
-                areSearchResultsDisplayed = roomListState.searchState.isSearchActive,
-                onToggleSearch = { roomListState.eventSink(RoomListEvents.ToggleSearchResults) },
-                onMenuActionClick = onMenuActionClick,
-                onOpenSettings = onOpenSettings,
-                scrollBehavior = scrollBehavior,
-                displayMenuItems = state.showDisplayMenuItems(selectedNavigationTab.value),
-                displayFilters = roomListState.shouldDisplayFilters(selectedNavigationTab.value),
-                filtersState = roomListState.filtersState,
-                canReportBug = state.canReportBug,
-                shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
-                userRewards = state.userRewards,
-                onDismissRewardsTooltip = { immediate ->
-                    state.eventSink(HomeEvents.DismissRewardsIntimation(immediate))
-                }
-            )
-        },
-        content = { padding ->
-            HomeScreenContent(
-                state = state,
-                selectedHomeScreenTab = selectedNavigationTab.value,
-                onSetUpRecoveryClick = onSetUpRecoveryClick,
-                onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
-                onRoomClick = ::onRoomClick,
-                onCreateRoomClick = onCreateRoomClick,
-                onFeedClick = onFeedClick,
-                onFeedUserClick = onFeedUserClick,
-                modifier = Modifier
-                    .padding(padding)
-                    .consumeWindowInsets(padding)
-            )
-        },
-        floatingActionButton = {
+    Box {
+        Scaffold(
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                HomeScreenTopBar(
+                    matrixUser = state.matrixUser,
+                    showAvatarIndicator = state.showAvatarIndicator,
+                    areSearchResultsDisplayed = roomListState.searchState.isSearchActive,
+                    onToggleSearch = { roomListState.eventSink(RoomListEvents.ToggleSearchResults) },
+                    onMenuActionClick = onMenuActionClick,
+                    onOpenSettings = onOpenSettings,
+                    onOpenProfile = onUserProfileClick,
+                    scrollBehavior = scrollBehavior,
+                    displayMenuItems = state.showDisplayMenuItems(selectedNavigationTab.value),
+                    displayFilters = roomListState.shouldDisplayFilters(selectedNavigationTab.value),
+                    filtersState = roomListState.filtersState,
+                    canReportBug = state.canReportBug,
+                    shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
+                    userRewards = state.userRewards,
+                    onDismissRewardsTooltip = { immediate ->
+                        state.eventSink(HomeEvents.DismissRewardsIntimation(immediate))
+                    }
+                )
+            },
+            content = { padding ->
+                HomeScreenContent(
+                    state = state,
+                    selectedHomeScreenTab = selectedNavigationTab.value,
+                    onSetUpRecoveryClick = onSetUpRecoveryClick,
+                    onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
+                    onRoomClick = ::onRoomClick,
+                    onCreateRoomClick = onCreateRoomClick,
+                    onFeedClick = onFeedClick,
+                    onFeedUserClick = onFeedUserClick,
+                    modifier = Modifier
+                        .padding(padding)
+                        .consumeWindowInsets(padding)
+                )
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp)
+        ) {
+            // Floating Action button
             if (state.shouldDisplayActions(selectedNavigationTab.value)) {
-                FloatingActionButton(
-                    containerColor = ElementTheme.colors.iconPrimary,
+                HomeFabButton(
+                    modifier = Modifier.align(Alignment.End)
+                        .padding(horizontal = 16.dp),
                     onClick = {
                         when {
                             selectedNavigationTab.value == HomeScreenTab.CHAT -> onCreateRoomClick()
                             else -> onCreateFeedClick()
                         }
                     }
-                ) {
-                    Icon(
-                        imageVector = CompoundIcons.Plus(),
-                        contentDescription = stringResource(id = R.string.screen_roomlist_a11y_create_message),
-                        tint = ElementTheme.colors.iconOnSolidPrimary,
-                    )
-                }
+                )
             }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
+
+            // Home tab view
             HomeScreenTabView(
                 selectedNavigationTab = selectedNavigationTab.value,
                 onTabSelected = { tab ->
@@ -252,7 +258,7 @@ private fun HomeScaffold(
                 }
             )
         }
-    )
+    }
 
     if (showFeedMediaPreview) {
         FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
@@ -315,13 +321,12 @@ internal fun HomeScreenContent(
         HomeScreenTab.NOTIFICATION -> {
             HomeNotificationListContentView(
                 contentState = state.roomListState.contentState,
-                filtersState = state.roomListState.filtersState,
                 eventSink = state.roomListState.eventSink,
                 onNotificationClick = ::onNotificationClick,
                 modifier = modifier
             )
         }
-        HomeScreenTab.PROFILE -> {
+        /*HomeScreenTab.PROFILE -> {
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
                 feedMediaMap = state.feedMediaMap,
@@ -333,7 +338,7 @@ internal fun HomeScreenContent(
                 onFeedUserClick = onFeedUserClick,
                 modifier = modifier
             )
-        }
+        }*/
     }
 }
 
@@ -354,6 +359,7 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onMenuActionClick = {},
         onFeedClick = {},
         onFeedUserClick = {},
+        onUserProfileClick = {},
         onCreateFeedClick = {},
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},
