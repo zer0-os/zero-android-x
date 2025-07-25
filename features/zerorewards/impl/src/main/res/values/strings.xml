@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><resources>
-    <string name="rewards_screen_title" translatable="false">ZIB</string>
-    <string name="rewards_screen_faq_title" translatable="false">ZIB Faq</string>
+    <string name="rewards_screen_title" translatable="false">ZBI</string>
+    <string name="rewards_screen_faq_title" translatable="false">ZBI Faq</string>
     <string name="earn_by_messaging" translatable="false">Earn by messaging, inviting friends, and when those you invited mint a Domain or invite their friends.</string>
 </resources>
