@@ -8,10 +8,12 @@
     <item quantity="other">"%1$d digits entered"</item>
   </plurals>
   <string name="a11y_edit_avatar">"Edit avatar"</string>
+  <string name="a11y_edit_room_address_hint">"The full address will be %1$s"</string>
   <string name="a11y_encryption_details">"Encryption details"</string>
   <string name="a11y_hide_password">"Hide password"</string>
   <string name="a11y_join_call">"Join call"</string>
   <string name="a11y_jump_to_bottom">"Jump to bottom"</string>
+  <string name="a11y_move_the_map_to_my_location">"Move the map to my location"</string>
   <string name="a11y_notifications_mentions_only">"Mentions only"</string>
   <string name="a11y_notifications_muted">"Muted"</string>
   <string name="a11y_notifications_new_mentions">"New mentions"</string>

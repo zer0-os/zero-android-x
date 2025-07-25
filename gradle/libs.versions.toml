@@ -14,7 +14,7 @@ core = "1.16.0"
 datastore = "1.1.7"
 constraintlayout = "2.2.1"
 constraintlayout_compose = "1.1.1"
-lifecycle = "2.9.1"
+lifecycle = "2.9.2"
 activity = "1.10.1"
 media3 = "1.7.1"
 camera = "1.4.2"
@@ -41,19 +41,19 @@ serialization_json = "1.9.0"
 
 #other
 detekt = "1.23.8"
-coil = "3.2.0"
+coil = "3.3.0"
 showkase = "1.0.4"
 appyx = "1.7.1"
 sqldelight = "2.1.0"
-wysiwyg = "2.38.4"
+wysiwyg = "2.38.5"
 telephoto = "0.16.0"
-haze = "1.6.7"
+haze = "1.6.9"
 
 # Dependency analysis
 dependencyAnalysis = "2.19.0"
 
 # DI
-dagger = "2.56.2"
+dagger = "2.57"
 anvil = "0.4.1"
 
 # Auto service
@@ -102,6 +102,9 @@ androidx_lifecycle_process = { module = "androidx.lifecycle:lifecycle-process", 
 androidx_splash = "androidx.core:core-splashscreen:1.0.1"
 androidx_media3_exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx_media3_ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+androidx_media3_transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
+androidx_media3_effect = { module = "androidx.media3:media3-effect", version.ref = "media3" }
+androidx_media3_common = { module = "androidx.media3:media3-common", version.ref = "media3" }
 androidx_biometric = "androidx.biometric:biometric-ktx:1.2.0-alpha05"
 
 androidx_activity_activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -155,7 +158,7 @@ test_corektx = { module = "androidx.test:core-ktx", version.ref = "test_core" }
 test_arch_core = "androidx.arch.core:core-testing:2.2.0"
 test_junit = "junit:junit:4.13.2"
 test_runner = "androidx.test:runner:1.6.2"
-test_mockk = "io.mockk:mockk:1.14.4"
+test_mockk = "io.mockk:mockk:1.14.5"
 test_konsist = "com.lemonappdev:konsist:0.17.3"
 test_turbine = "app.cash.turbine:turbine:1.2.1"
 test_truth = "com.google.truth:truth:1.4.4"
@@ -182,7 +185,7 @@ jsoup = "org.jsoup:jsoup:1.21.1"
 appyx_core = { module = "com.bumble.appyx:core", version.ref = "appyx" }
 molecule-runtime = "app.cash.molecule:molecule-runtime:2.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.7.10"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.7.23"
 matrix_richtexteditor = { module = "io.element.android:wysiwyg", version.ref = "wysiwyg" }
 matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose", version.ref = "wysiwyg" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
@@ -192,7 +195,6 @@ sqlcipher = "net.zetetic:sqlcipher-android:4.9.0"
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
 sqlite = "androidx.sqlite:sqlite-ktx:2.5.2"
 unifiedpush = "org.unifiedpush.android:connector:3.0.10"
-otaliastudios_transcoder = "com.otaliastudios:transcoder:0.11.2"
 vanniktech_blurhash = "com.vanniktech:blurhash:0.3.0"
 telephoto_zoomableimage = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
 telephoto_flick = { module = "me.saket.telephoto:flick-android", version.ref = "telephoto" }
@@ -206,7 +208,7 @@ haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze_materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 
 # Analytics
-posthog = "com.posthog:posthog-android:3.19.2"
+posthog = "com.posthog:posthog-android:3.20.0"
 sentry = "io.sentry:sentry-android:8.17.0"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"

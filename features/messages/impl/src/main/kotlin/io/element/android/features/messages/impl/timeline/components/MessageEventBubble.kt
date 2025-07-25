@@ -10,6 +10,7 @@ package io.element.android.features.messages.impl.timeline.components
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
@@ -39,7 +39,6 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.toDp
 import io.element.android.libraries.designsystem.text.toPx
-import io.element.android.libraries.designsystem.theme.components.Surface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleIncomingColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingColor
@@ -62,7 +61,7 @@ fun MessageEventBubble(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = {},
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     fun bubbleShape(): Shape {
         val topLeftCorner = if (state.cutTopStart) 0.dp else BUBBLE_RADIUS
@@ -116,9 +115,12 @@ fun MessageEventBubble(
     BoxWithConstraints(
         modifier = modifier
             .graphicsLayer {
+                shape = bubbleShape
+                clip = true
                 compositingStrategy = CompositingStrategy.Offscreen
             }
             .drawWithContent {
+                drawRect(backgroundBubbleColor)
                 drawContent()
 //                if (state.cutTopStart) {
 //                    drawCircle(
@@ -136,7 +138,7 @@ fun MessageEventBubble(
         // when content width is low.
         contentAlignment = if (state.isMine) Alignment.CenterEnd else Alignment.CenterStart
     ) {
-        Surface(
+        Box(
             modifier = Modifier
                 .testTag(TestTags.messageBubble)
                 .widthIn(
@@ -145,11 +147,8 @@ fun MessageEventBubble(
                         .toInt()
                         .toDp()
                 )
-                .clip(bubbleShape)
                 .then(clickableModifier),
-            color = backgroundBubbleColor,
-            shape = bubbleShape,
-            content = content
+            content = content,
         )
     }
 }

@@ -23,7 +23,6 @@ import io.element.android.libraries.matrix.api.room.IntentionalMention
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.room.location.AssetType
-import io.element.android.libraries.matrix.api.room.message.ReplyParameters
 import io.element.android.libraries.matrix.api.timeline.MatrixTimelineItem
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
 import io.element.android.libraries.matrix.api.timeline.Timeline
@@ -37,7 +36,6 @@ import io.element.android.libraries.matrix.impl.media.toMSC3246range
 import io.element.android.libraries.matrix.impl.poll.toInner
 import io.element.android.libraries.matrix.impl.room.RoomContentForwarder
 import io.element.android.libraries.matrix.impl.room.location.toInner
-import io.element.android.libraries.matrix.impl.room.message.map
 import io.element.android.libraries.matrix.impl.timeline.item.event.EventTimelineItemMapper
 import io.element.android.libraries.matrix.impl.timeline.item.event.TimelineEventContentMapper
 import io.element.android.libraries.matrix.impl.timeline.item.virtual.VirtualTimelineItemMapper
@@ -208,18 +206,18 @@ class RustTimeline(
         _timelineItems,
         backwardPaginationStatus,
         forwardPaginationStatus,
-        joinedRoom.roomInfoFlow.map { it.creator to it.isDm }.distinctUntilChanged(),
+        joinedRoom.roomInfoFlow.map { it.creators to it.isDm }.distinctUntilChanged(),
     ) { timelineItems,
         backwardPaginationStatus,
         forwardPaginationStatus,
-        (roomCreator, isDm) ->
+        (roomCreators, isDm) ->
         withContext(dispatcher) {
             timelineItems
                 .let { items ->
                     roomBeginningPostProcessor.process(
                         items = items,
                         isDm = isDm,
-                        roomCreator = roomCreator,
+                        roomCreator = roomCreators.firstOrNull(),
                         hasMoreToLoadBackwards = backwardPaginationStatus.hasMoreToLoad,
                     )
                 }
@@ -326,7 +324,7 @@ class RustTimeline(
     }
 
     override suspend fun replyMessage(
-        replyParameters: ReplyParameters,
+        repliedToEventId: EventId,
         body: String,
         htmlBody: String?,
         intentionalMentions: List<IntentionalMention>,
@@ -336,7 +334,7 @@ class RustTimeline(
             val msg = MessageEventContent.from(body, htmlBody, intentionalMentions)
             inner.sendReply(
                 msg = msg,
-                replyParams = replyParameters.map(),
+                eventId = repliedToEventId.value,
             )
         }
         if (result.isSuccess) {
@@ -352,7 +350,7 @@ class RustTimeline(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         val result = sendAttachment(listOfNotNull(file, thumbnailFile)) {
@@ -365,7 +363,7 @@ class RustTimeline(
                     },
                     useSendQueue = useSendQueue,
                     mentions = null,
-                    replyParams = replyParameters?.map(),
+                    inReplyTo = inReplyToEventId?.value,
                 ),
                 thumbnailPath = thumbnailFile?.path,
                 imageInfo = imageInfo.map(),
@@ -385,7 +383,7 @@ class RustTimeline(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         val result = sendAttachment(listOfNotNull(file, thumbnailFile)) {
@@ -398,7 +396,7 @@ class RustTimeline(
                     },
                     useSendQueue = useSendQueue,
                     mentions = null,
-                    replyParams = replyParameters?.map(),
+                    inReplyTo = inReplyToEventId?.value,
                 ),
                 thumbnailPath = thumbnailFile?.path,
                 videoInfo = videoInfo.map(),
@@ -417,7 +415,7 @@ class RustTimeline(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         val result = sendAttachment(listOf(file)) {
@@ -430,7 +428,7 @@ class RustTimeline(
                     },
                     useSendQueue = useSendQueue,
                     mentions = null,
-                    replyParams = replyParameters?.map(),
+                    inReplyTo = inReplyToEventId?.value,
                 ),
                 audioInfo = audioInfo.map(),
                 progressWatcher = progressCallback?.toProgressWatcher()
@@ -448,7 +446,7 @@ class RustTimeline(
         caption: String?,
         formattedCaption: String?,
         progressCallback: ProgressCallback?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         val result = sendAttachment(listOf(file)) {
@@ -461,7 +459,7 @@ class RustTimeline(
                     },
                     useSendQueue = useSendQueue,
                     mentions = null,
-                    replyParams = replyParameters?.map(),
+                    inReplyTo = inReplyToEventId?.value,
                 ),
                 fileInfo = fileInfo.map(),
                 progressWatcher = progressCallback?.toProgressWatcher(),
@@ -500,7 +498,7 @@ class RustTimeline(
         description: String?,
         zoomLevel: Int?,
         assetType: AssetType?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<Unit> = withContext(dispatcher) {
         runCatchingExceptions {
             inner.sendLocation(
@@ -509,7 +507,7 @@ class RustTimeline(
                 description = description,
                 zoomLevel = zoomLevel?.toUByte(),
                 assetType = assetType?.toInner(),
-                replyParams = replyParameters?.map(),
+                repliedToEventId = inReplyToEventId?.value,
             )
         }
     }
@@ -519,7 +517,7 @@ class RustTimeline(
         audioInfo: AudioInfo,
         waveform: List<Float>,
         progressCallback: ProgressCallback?,
-        replyParameters: ReplyParameters?,
+        inReplyToEventId: EventId?,
     ): Result<MediaUploadHandler> {
         val useSendQueue = featureFlagsService.isFeatureEnabled(FeatureFlags.MediaUploadOnSendQueue)
         val result = sendAttachment(listOf(file)) {
@@ -531,7 +529,7 @@ class RustTimeline(
                     formattedCaption = null,
                     useSendQueue = useSendQueue,
                     mentions = null,
-                    replyParams = replyParameters?.map(),
+                    inReplyTo = inReplyToEventId?.value,
                 ),
                 audioInfo = audioInfo.map(),
                 waveform = waveform.toMSC3246range(),
