@@ -7,7 +7,6 @@
 
 package io.element.android.features.preferences.impl.root
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,19 +14,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -42,6 +41,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreviewDark
 import io.element.android.libraries.designsystem.preview.ElementPreviewLight
 import io.element.android.libraries.designsystem.preview.PreviewWithLargeHeight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.ListItemStyle
@@ -58,6 +58,7 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.ui.components.MatrixUserProvider
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
+import io.element.android.support.zero.common.ui.theme.SPACING_6X
 import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @Composable
@@ -98,6 +99,8 @@ fun PreferencesRootView(
             user = state.myUser,
         )
 
+        HorizontalDivider()
+
         // 'Zero User Rewards' section
         RewardsSection(
             shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
@@ -108,14 +111,28 @@ fun PreferencesRootView(
             }
         )
 
-        // 'Manage my app' section
+        HorizontalDivider()
+
+        // 'Zero Settings' section
+        ZeroSettingsSection(
+            state = state,
+            onOpenNotificationSettings = onOpenNotificationSettings,
+            onSecureBackupClick = onSecureBackupClick,
+            onInviteFriend = onInviteFriend,
+            onOpenDeveloperSettings = onOpenDeveloperSettings,
+            onSignOutClick = onSignOutClick,
+        )
+
+        HorizontalDivider()
+
+        /*// 'Manage my app' section
         ManageAppSection(
             state = state,
             onOpenNotificationSettings = onOpenNotificationSettings,
             onOpenLockScreenSettings = onOpenLockScreenSettings,
             onSecureBackupClick = onSecureBackupClick,
             onInviteFriend = onInviteFriend
-        )
+        )*/
 
         /*// 'Account' section
         ManageAccountSection(
@@ -125,7 +142,7 @@ fun PreferencesRootView(
         )*/
 
         // General section
-        GeneralSection(
+        /*GeneralSection(
             state = state,
             onOpenAbout = onOpenAbout,
             onOpenAnalytics = onOpenAnalytics,
@@ -134,17 +151,18 @@ fun PreferencesRootView(
             onOpenDeveloperSettings = onOpenDeveloperSettings,
             onSignOutClick = onSignOutClick,
             onDeactivateClick = onDeactivateClick,
-        )
+        )*/
 
-        /*Footer(
+        Footer(
             version = state.version,
             deviceId = state.deviceId,
-            onClick = if (!state.showDeveloperSettings) {
-                { state.eventSink(PreferencesRootEvents.OnVersionInfoClick) }
-            } else {
-                null
-            }
-        )*/
+            onClick = {}
+//            onClick = if (!state.showDeveloperSettings) {
+//                { state.eventSink(PreferencesRootEvents.OnVersionInfoClick) }
+//            } else {
+//                null
+//            }
+        )
     }
 }
 
@@ -160,86 +178,118 @@ private fun ColumnScope.RewardsSection(
             onDismissRewardsIntimation()
         }
     }
-    Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-        Card(
-            modifier = Modifier
-                .align(Alignment.Center),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.dp, ElementTheme.colors.zeroBrandColorAlpha20),
-            onClick = onRewardsClicked,
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 80.dp, vertical = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box {
-                    if (shouldShowNewRewardsIntimation) {
-                        Box(modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(start = 80.dp, bottom = 30.dp)
-                        ) {
-                            Box(
-                                modifier =
-                                Modifier
-                                    .size(18.dp)
-                                    .align(Alignment.Center)
-                                    .background(color = Color.Transparent, shape = CircleShape)
-                                    .border(
-                                        width = 1.dp,
-                                        color = ElementTheme.colors.zeroBrandColorAlpha20,
-                                        shape = CircleShape
-                                    )
-                            )
-                            Box(
-                                modifier =
-                                Modifier
-                                    .size(14.dp)
-                                    .align(Alignment.Center)
-                                    .background(color = Color.Transparent, shape = CircleShape)
-                                    .border(
-                                        width = 1.dp,
-                                        color = ElementTheme.colors.zeroBrandColorAlpha50,
-                                        shape = CircleShape
-                                    )
-                            )
-                            Box(
-                                modifier =
-                                Modifier
-                                    .size(10.dp)
-                                    .align(Alignment.Center)
-                                    .background(color = ElementTheme.colors.zeroBrandColor, shape = CircleShape)
-                            )
-                        }
-                    }
 
-                    val refPrice = RewardsUtil.getRefPrice(
-                        zero = userRewards.zero,
-                        decimals = userRewards.decimals,
-                        refPrice = userRewards.price
+    Column(
+        modifier = Modifier
+            .clickable { onRewardsClicked() }
+            .fillMaxWidth()
+            .padding(20.dp),
+    ) {
+        Text(
+            text = "Rewards",
+            style = ElementTheme.zeroTypography.fontBodyLgRegular,
+            color = ElementTheme.colors.textPrimary
+        )
+
+        Box(modifier = Modifier.padding(top = 12.dp)) {
+            if (shouldShowNewRewardsIntimation) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(start = 80.dp, bottom = 30.dp)
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(18.dp)
+                                .align(Alignment.Center)
+                                .background(color = Color.Transparent, shape = CircleShape)
+                                .border(
+                                    width = 1.dp,
+                                    color = ElementTheme.colors.zeroBrandColorAlpha20,
+                                    shape = CircleShape
+                                )
                     )
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "\$$refPrice".trim(),
-                        style = ElementTheme.zeroTypography.fontHeadingSmMediumRoboto,
-                        color = ElementTheme.colors.textPrimary
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(14.dp)
+                                .align(Alignment.Center)
+                                .background(color = Color.Transparent, shape = CircleShape)
+                                .border(
+                                    width = 1.dp,
+                                    color = ElementTheme.colors.zeroBrandColorAlpha50,
+                                    shape = CircleShape
+                                )
+                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(10.dp)
+                                .align(Alignment.Center)
+                                .background(color = ElementTheme.colors.zeroBrandColor, shape = CircleShape)
                     )
                 }
-
-                val credits = RewardsUtil.getEarnedRewardsFormatted(
-                    zero = userRewards.zero,
-                    decimals = userRewards.decimals
-                )
-                Text(
-                    text = "$credits MEOW",
-                    style = ElementTheme.zeroTypography.fontBodySmRegularRoboto,
-                    color = ElementTheme.colors.textSecondary
-                )
             }
+
+            val refPrice = RewardsUtil.getRefPrice(
+                zero = userRewards.zero,
+                decimals = userRewards.decimals,
+                refPrice = userRewards.price
+            )
+            Text(
+                text = "$$refPrice".trim(),
+                style = ElementTheme.zeroTypography.fontHeadingLgMediumRoboto,
+                color = ElementTheme.colors.textPrimary
+            )
         }
+
+        val credits = RewardsUtil.getEarnedRewardsFormatted(
+            zero = userRewards.zero,
+            decimals = userRewards.decimals
+        )
+        Text(
+            text = "$credits MEOW",
+            style = ElementTheme.zeroTypography.fontBodyLgRegularRoboto,
+            color = ElementTheme.colors.textSecondary
+        )
     }
+}
+
+@Composable
+private fun ColumnScope.ZeroSettingsSection(
+    state: PreferencesRootState,
+    onOpenNotificationSettings: () -> Unit,
+    onSecureBackupClick: () -> Unit,
+    onInviteFriend: () -> Unit,
+    onOpenDeveloperSettings: () -> Unit,
+    onSignOutClick: () -> Unit,
+) {
+    Spacer(Modifier.size(SPACING_4X.dp))
+
+    ListItem(
+        headlineContent = { Text("Refer A Friend") },
+        onClick = onInviteFriend,
+    )
+
+    ListItem(
+        headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
+        onClick = onOpenNotificationSettings,
+    )
+
+    ListItem(
+        headlineContent = { Text(stringResource(id = CommonStrings.common_encryption)) },
+        trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
+        onClick = onSecureBackupClick,
+    )
+
+    DeveloperPreferencesView(onOpenDeveloperSettings)
+
+    ListItem(
+        headlineContent = { Text(stringResource(id = CommonStrings.action_signout)) },
+        style = ListItemStyle.Destructive,
+        onClick = onSignOutClick,
+    )
 
     Spacer(Modifier.size(SPACING_4X.dp))
 }
@@ -389,18 +439,25 @@ private fun ColumnScope.Footer(
     val text = remember(version, deviceId) {
         buildString {
             append(version)
-            if (deviceId != null) {
-                append("\n")
-                append(deviceId)
-            }
+//            if (deviceId != null) {
+//                append("\n")
+//                append(deviceId)
+//            }
         }
     }
+    Spacer(Modifier.size(SPACING_6X.dp))
+
+    Icon(
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally),
+        imageVector = ImageVector.vectorResource(io.element.android.support.zero.R.drawable.zero_logo_icon_small),
+        contentDescription = "Zero logo"
+    )
     Text(
         modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .padding(top = 16.dp)
             .clickable(enabled = onClick != null, onClick = onClick ?: {})
-            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 24.dp),
+            .padding(top = 8.dp),
         textAlign = TextAlign.Center,
         text = text,
         style = ElementTheme.zeroTypography.fontBodySmRegular,
@@ -413,7 +470,7 @@ private fun DeveloperPreferencesView(onOpenDeveloperSettings: () -> Unit) {
     ListItem(
         //headlineContent = { Text(stringResource(id = CommonStrings.common_developer_options)) },
         headlineContent = { Text(stringResource(id = CommonStrings.common_advanced_settings)) },
-        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Code())),
+//        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Code())),
         onClick = onOpenDeveloperSettings
     )
 }

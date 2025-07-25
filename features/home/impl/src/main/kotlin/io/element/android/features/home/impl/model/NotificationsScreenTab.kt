@@ -7,9 +7,10 @@
 
 package io.element.android.features.home.impl.model
 
-enum class FeedsScreenTab(
+enum class NotificationsScreenTab(
     val title: String,
 ) {
-    FOLLOWING("Following"),
-    ALL("Everything"),
+    ALL("All"),
+    HIGHLIGHTS("Highlights"),
+    MUTED("Muted"),
 }

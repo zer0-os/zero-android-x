@@ -25,6 +25,9 @@ object ZeroTypographyTokens {
     val fontBodyLgRegular = TypographyTokens.fontBodyLgRegular
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
 
+    val fontBodyLgRegularRoboto = TypographyTokens.fontBodyLgRegular
+        .copy(fontFamily = ZeroFontFamily.RobotoMonoFontFamily)
+
     val fontBodyMdMedium = TypographyTokens.fontBodyMdMedium
         .copy(fontFamily = ZeroFontFamily.InterFontFamily)
 

@@ -46,7 +46,7 @@ data class HomeState(
 
     fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {
         return displayActions &&
-            selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.FEED, HomeScreenTab.PROFILE)
+            selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.FEED)
     }
 
     fun showDisplayMenuItems(selectedHomeTab: HomeScreenTab): Boolean {

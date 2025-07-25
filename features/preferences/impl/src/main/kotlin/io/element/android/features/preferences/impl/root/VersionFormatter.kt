@@ -29,11 +29,12 @@ class DefaultVersionFormatter @Inject constructor(
             buildMeta.versionName,
             buildMeta.versionCode.toString()
         )
-        return if (buildMeta.gitBranchName == "main") {
-            base
-        } else {
-            // In case of a build not from main, we display the branch name and the revision
-            "$base\n${buildMeta.gitBranchName} (${buildMeta.gitRevision})"
-        }
+        return base
+//        return if (buildMeta.gitBranchName == "main") {
+//            base
+//        } else {
+//            // In case of a build not from main, we display the branch name and the revision
+//            "$base\n${buildMeta.gitBranchName} (${buildMeta.gitRevision})"
+//        }
     }
 }

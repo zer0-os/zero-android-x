@@ -77,7 +77,7 @@ fun HomeFeedListContentView(
                     )
                 }
                 is FeedListContentState.Empty -> {
-                    EmptyView(modifier = modifier)
+                    HomeTabContentEmptyView(modifier = modifier, text = "No feeds yet")
                 }
                 is FeedListContentState.Feeds -> {
                     FeedsViewList(
@@ -110,18 +110,6 @@ private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun EmptyView(
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier.fillMaxSize()) {
-        EmptyScaffold(
-            title = "No feeds yet",
-            modifier = Modifier.align(Alignment.Center),
-        )
     }
 }
 

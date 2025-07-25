@@ -353,6 +353,10 @@ class LoggedInFlowNode @AssistedInject constructor(
                     override fun onFeedUserClick(profile: FeedUserProfileView) {
                         backstack.push(NavTarget.FeedUserProfile(profile))
                     }
+
+                    override fun onUserProfileClick() {
+                        backstack.push(NavTarget.UserProfile(userId = matrixClient.sessionId))
+                    }
                 }
                 homeEntryPoint
                     .nodeBuilder(this, buildContext)
@@ -409,7 +413,7 @@ class LoggedInFlowNode @AssistedInject constructor(
                 createNode<RoomFlowNode>(buildContext, plugins = listOf(inputs, callback))
             }
             is NavTarget.UserProfile -> {
-                val callback = object : UserProfileEntryPoint.Callback {
+                /*val callback = object : UserProfileEntryPoint.Callback {
                     override fun onOpenRoom(roomId: RoomId) {
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                     }
@@ -417,6 +421,22 @@ class LoggedInFlowNode @AssistedInject constructor(
                 userProfileEntryPoint.nodeBuilder(this, buildContext)
                     .params(UserProfileEntryPoint.Params(userId = navTarget.userId))
                     .callback(callback)
+                    .build()*/
+                feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
+                    .params(FeedUserProfileEntryPoint.Params(userId = navTarget.userId, null))
+                    .callback(object : FeedUserProfileEntryPoint.Callback {
+                        override fun onUserFeedClick(feed: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(feed))
+                        }
+
+                        override fun onOpenDm(roomId: RoomId) {
+                            backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
+                        }
+
+                        override fun openAvatarPreview(name: String, url: String) {
+//                            overlay.show(NavTarget.AvatarPreview(name, url))
+                        }
+                    })
                     .build()
             }
             is NavTarget.Settings -> {

@@ -124,6 +124,10 @@ class HomeFlowNode @AssistedInject constructor(
         plugins<HomeEntryPoint.Callback>().forEach { it.onFeedUserClick(profile) }
     }
 
+    private fun onUserProfileClick() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onUserProfileClick() }
+    }
+
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {
         when (roomListMenuAction) {
             RoomListMenuAction.InviteFriends -> {
@@ -153,6 +157,7 @@ class HomeFlowNode @AssistedInject constructor(
                 onDeclineInviteAndBlockUser = this::onDeclineInviteAndBlockUserClick,
                 onFeedClick = this::onFeedClick,
                 onFeedUserClick = this::onFeedUserClick,
+                onUserProfileClick = this::onUserProfileClick,
                 onCreateFeedClick = this::onCreateFeedClick,
                 modifier = modifier,
             ) {

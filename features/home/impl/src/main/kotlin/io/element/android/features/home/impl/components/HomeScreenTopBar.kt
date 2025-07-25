@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,16 +41,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.element.android.appconfig.RoomListConfig
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.home.impl.R
 import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.filters.RoomListFiltersView
-import io.element.android.features.home.impl.filters.aRoomListFiltersState
 import io.element.android.libraries.designsystem.atomic.atoms.RedIndicatorAtom
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
@@ -79,17 +81,20 @@ import io.element.android.libraries.matrix.ui.model.getBestName
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.R
 import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoomListTopBar(
+fun HomeScreenTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
     matrixUser: MatrixUser,
     showAvatarIndicator: Boolean,
+    customTabs: (@Composable () -> Unit)? = null,
     areSearchResultsDisplayed: Boolean,
     onToggleSearch: () -> Unit,
+    onOpenProfile: () -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onOpenSettings: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -101,24 +106,94 @@ fun RoomListTopBar(
     userRewards: ZeroUserRewards,
     onDismissRewardsTooltip: (Boolean) -> Unit,
 ) {
-    DefaultRoomListTopBar(
-        title = title,
+    ZeroStyledTopBar(
         matrixUser = matrixUser,
         showAvatarIndicator = showAvatarIndicator,
-        areSearchResultsDisplayed = areSearchResultsDisplayed,
+        customTabs = customTabs,
         onOpenSettings = onOpenSettings,
         onSearchClick = onToggleSearch,
-        onMenuActionClick = onMenuActionClick,
+        onOpenProfile = onOpenProfile,
         scrollBehavior = scrollBehavior,
         displayMenuItems = displayMenuItems,
-        displayFilters = displayFilters,
-        filtersState = filtersState,
-        canReportBug = canReportBug,
         modifier = modifier,
         shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation,
         userRewards = userRewards,
         onDismissRewardsTooltip = onDismissRewardsTooltip
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ZeroStyledTopBar(
+    matrixUser: MatrixUser,
+    showAvatarIndicator: Boolean,
+    scrollBehavior: TopAppBarScrollBehavior,
+    customTabs: (@Composable () -> Unit)? = null,
+    onOpenSettings: () -> Unit,
+    onSearchClick: () -> Unit,
+    onOpenProfile: () -> Unit,
+    displayMenuItems: Boolean,
+    modifier: Modifier = Modifier,
+    shouldShowNewRewardsIntimation: Boolean,
+    userRewards: ZeroUserRewards,
+    onDismissRewardsTooltip: (Boolean) -> Unit = {},
+) {
+    val avatarData by remember(matrixUser) {
+        derivedStateOf {
+            matrixUser.getAvatarData(size = AvatarSize.CurrentUserTopBar)
+        }
+    }
+
+    Box(modifier = modifier) {
+        Column {
+            CenterAlignedTopAppBar(
+                modifier = Modifier.statusBarsPadding(),
+                title = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.home_zero_title),
+                        contentDescription = "User Profile",
+                    )
+                },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent,
+                ),
+                navigationIcon = {
+                    NavigationIcon(
+                        avatarData = avatarData,
+                        showAvatarIndicator = showAvatarIndicator,
+                        onClick = onOpenSettings,
+                        shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation,
+                        userRewards = userRewards,
+                        onDismissRewardsTooltip = onDismissRewardsTooltip
+                    )
+                },
+                actions = {
+                    if (displayMenuItems) {
+                        IconButton(
+                            onClick = onSearchClick,
+                        ) {
+                            Icon(
+                                imageVector = CompoundIcons.Search(),
+                                contentDescription = stringResource(CommonStrings.action_search),
+                            )
+                        }
+                    }
+                    IconButton(
+                        onClick = onOpenProfile,
+                    ) {
+                        Icon(
+                            painter = painterResource( R.drawable.home_tab_profile_icon),
+                            contentDescription = "User Profile",
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                windowInsets = WindowInsets(0.dp),
+            )
+            customTabs?.invoke()
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -408,7 +483,7 @@ private fun UserRewardsToolTip(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @PreviewsDayNight
 @Composable
 internal fun DefaultRoomListTopBarPreview() = ElementPreview {
@@ -428,25 +503,20 @@ internal fun DefaultRoomListTopBarPreview() = ElementPreview {
         shouldShowNewRewardsIntimation = true,
         userRewards = ZeroUserRewards.empty()
     )
-}
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewsDayNight
 @Composable
 internal fun DefaultRoomListTopBarWithIndicatorPreview() = ElementPreview {
-    DefaultRoomListTopBar(
-        title = stringResource(R.string.screen_roomlist_main_space_title),
+    ZeroStyledTopBar(
         matrixUser = MatrixUser(UserId("@id:domain"), "Alice"),
         showAvatarIndicator = true,
-        areSearchResultsDisplayed = false,
         scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState()),
         onOpenSettings = {},
         onSearchClick = {},
         displayMenuItems = true,
-        displayFilters = true,
-        filtersState = aRoomListFiltersState(),
-        canReportBug = true,
-        onMenuActionClick = {},
+        onOpenProfile = {},
         shouldShowNewRewardsIntimation = true,
         userRewards = ZeroUserRewards.empty()
     )
