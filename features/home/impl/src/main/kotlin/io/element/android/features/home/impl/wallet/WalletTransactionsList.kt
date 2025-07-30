@@ -1,0 +1,273 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.features.home.impl.wallet
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.home.impl.HomeEvents
+import io.element.android.features.home.impl.components.HomeTabContentEmptyView
+import io.element.android.libraries.designsystem.R
+import io.element.android.libraries.designsystem.atomic.atoms.PlaceholderAtom
+import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.components.IconButton
+import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.placeholderBackground
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.isMeowTransaction
+import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
+import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+
+@Composable
+fun WalletTransactionsList(
+    state: WalletContentState,
+    modifier: Modifier = Modifier,
+) {
+    val contentState = state.transactionsListState
+    Box(modifier = modifier) {
+        when (contentState) {
+            is WalletTransactionsListState.Skeleton -> {
+                SkeletonView(
+                    count = contentState.count,
+                )
+            }
+            is WalletTransactionsListState.Empty -> {
+                HomeTabContentEmptyView(modifier = modifier, text = "No transactions")
+            }
+            is WalletTransactionsListState.Transactions -> {
+                TransactionsList(
+                    state = contentState,
+                    meowPrice = state.meowPrice,
+                    hasNextPage = state.transactionsPaginationParams != null,
+                    onLoadMoreTransactions = {
+                        state.eventSink(
+                            HomeEvents.LoadMoreTransactions(contentState.transactions)
+                        )
+                    },
+                    onTransactionTapped = { transaction ->
+                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction.hash))
+                    })
+            }
+        }
+    }
+}
+
+@Composable
+private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
+        repeat(count) { index ->
+            item {
+                WalletTokenTransactionPlaceholderRow()
+            }
+        }
+    }
+}
+
+@Composable
+private fun WalletTokenTransactionPlaceholderRow(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(AvatarSize.RoomListItem.dp)
+                .background(color = ElementTheme.colors.placeholderBackground, shape = CircleShape)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+        ) {
+            Column {
+                PlaceholderAtom(
+                    width = 250.dp,
+                    height = 7.dp
+                )
+                Spacer(Modifier.height(8.dp))
+                PlaceholderAtom(
+                    width = 250.dp,
+                    height = 7.dp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Column {
+                PlaceholderAtom(
+                    width = 100.dp,
+                    height = 7.dp
+                )
+                Spacer(Modifier.height(8.dp))
+                PlaceholderAtom(
+                    width = 100.dp,
+                    height = 7.dp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionsList(
+    state: WalletTransactionsListState.Transactions,
+    meowPrice: ZeroMeowPrice?,
+    hasNextPage: Boolean,
+    onLoadMoreTransactions: () -> Unit,
+    onTransactionTapped: (ZeroWalletTransaction) -> Unit
+) {
+    var isLoadingMoreItems by remember(state) { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
+
+    val shouldLoadMoreFeed by remember(state) {
+        derivedStateOf {
+            val lastVisibleItemIndex = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            // Start loading next page when 2nd last item is visible
+            lastVisibleItemIndex == state.transactions.lastIndex - 1
+        }
+    }
+    // Load more items when second last item becomes visible
+    LaunchedEffect(shouldLoadMoreFeed) {
+        if (shouldLoadMoreFeed && !isLoadingMoreItems && hasNextPage) {
+            isLoadingMoreItems = true
+            onLoadMoreTransactions()
+        }
+    }
+    LazyColumn(
+        state = lazyListState,
+        contentPadding = PaddingValues(bottom = 16.dp)
+    ) {
+        items(items = state.transactions, key = { trans -> trans.hash }) { transaction ->
+            TransactionRow(transaction = transaction, meowPrice = meowPrice, onTransactionTapped = {
+                onTransactionTapped(transaction)
+            })
+        }
+        item {
+            Spacer(Modifier.size(100.dp))
+        }
+    }
+}
+
+@Composable
+private fun TransactionRow(
+    modifier: Modifier = Modifier,
+    transaction: ZeroWalletTransaction,
+    meowPrice: ZeroMeowPrice?,
+    onTransactionTapped: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onTransactionTapped() }
+            .padding(horizontal = 16.dp, vertical = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(56.dp)
+                .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
+                .clip(CircleShape),
+            model = transaction.token.logo,
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
+            contentDescription = null,
+            placeholder = painterResource(R.drawable.ic_zero_avatar_default)
+        )
+
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 12.dp)
+        ) {
+            Row {
+                Text(
+                    text = if (transaction.isTransactionReceived) "Received from" else "Sent to",
+                    style = ElementTheme.typography.fontBodySmRegular,
+                    color = ElementTheme.colors.textSecondary
+                )
+                Icon(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    painter = painterResource(io.element.android.support.zero.R.drawable.ic_zchain),
+                    contentDescription = null
+                )
+                val walletAddress = if (transaction.isTransactionReceived) {
+                    ZeroWalletUtil.walletAddressDisplayText(transaction.from)
+                } else {
+                    ZeroWalletUtil.walletAddressDisplayText(transaction.to)
+                }
+                Text(
+                    text = walletAddress ?: "",
+                    style = ElementTheme.typography.fontBodySmRegular,
+                    color = ElementTheme.colors.textSecondary
+                )
+            }
+            Text(
+                text = transaction.token.name,
+                style = ElementTheme.typography.fontHeadingSmRegular,
+                color = ElementTheme.colors.textPrimary
+            )
+        }
+
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(horizontal = 8.dp)) {
+            val tokenAmount = "${transaction.amount} ${transaction.token.symbol.uppercase()}"
+            Text(
+                tokenAmount,
+                style = ElementTheme.typography.fontBodyLgRegular,
+                color = ElementTheme.colors.textPrimary
+            )
+
+            if (transaction.isMeowTransaction && meowPrice != null) {
+                val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(transaction.tokenAmount, meowPrice)
+                Text(
+                    "$$meowPrice",
+                    style = ElementTheme.typography.fontBodyLgRegular,
+                    color = ElementTheme.colors.zeroBrandColor
+                )
+            }
+        }
+
+        IconButton(onClick = onTransactionTapped, modifier = Modifier.size(24.dp)) {
+            Icon(imageVector = CompoundIcons.ChevronRight(), contentDescription = null)
+        }
+    }
+}

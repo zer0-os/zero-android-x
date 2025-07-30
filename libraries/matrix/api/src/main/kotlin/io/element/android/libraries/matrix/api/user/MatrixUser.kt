@@ -9,7 +9,7 @@ package io.element.android.libraries.matrix.api.user
 
 import android.os.Parcelable
 import io.element.android.libraries.matrix.api.core.UserId
-import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 

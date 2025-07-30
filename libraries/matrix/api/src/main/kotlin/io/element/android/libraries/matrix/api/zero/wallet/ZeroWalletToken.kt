@@ -26,6 +26,12 @@ data class ZeroWalletToken(
     val decimals: Int
 ): Parcelable
 
+val ZeroWalletToken.isMeowToken: Boolean
+    get() = symbol.equals("Meow", true)
+
+val ZeroWalletToken.tokenAmount: Double
+    get() = amount.toDoubleOrNull() ?: 0.0
+
 @Parcelize
 data class ZeroWalletTokensPaginationParams(
     val itemsCount: Int,

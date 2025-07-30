@@ -29,6 +29,15 @@ data class ZeroWalletTransaction(
     val type: String
 ) : Parcelable
 
+val ZeroWalletTransaction.isMeowTransaction: Boolean
+    get() = token.symbol.equals("Meow", true)
+
+val ZeroWalletTransaction.tokenAmount: Double
+    get() = amount?.toDoubleOrNull() ?: 0.0
+
+val ZeroWalletTransaction.isTransactionReceived: Boolean
+    get() = action.equals("Receive", true)
+
 @Parcelize
 data class ZeroWalletTransactionToken(
     val symbol: String,

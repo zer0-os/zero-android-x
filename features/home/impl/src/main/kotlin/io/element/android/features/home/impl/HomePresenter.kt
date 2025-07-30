@@ -57,10 +57,15 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
+import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
@@ -127,6 +132,7 @@ class HomePresenter @Inject constructor(
 
         val showWalletBalance = remember { mutableStateOf(true) }
         val userWalletBalance = remember { mutableDoubleStateOf(0.0) }
+        val meowPrice: MutableState<ZeroMeowPrice?> = remember { mutableStateOf(null) }
         val walletTokensListState: MutableState<WalletTokensListState> = remember {
             mutableStateOf(WalletTokensListState.Skeleton(10))
         }
@@ -146,7 +152,7 @@ class HomePresenter @Inject constructor(
             client.userProfile.collectLatest {
                 it.walletAddress?.let { userWalletAddress ->
                     fetchWalletData(
-                        userWalletAddress, userWalletBalance,
+                        meowPrice, userWalletAddress, userWalletBalance,
                         walletTokensListState, walletTransactionsListState,
                         walletTokenPaginationParams, walletTransactionsPaginationParams
                     )
@@ -196,10 +202,24 @@ class HomePresenter @Inject constructor(
                 }
                 HomeEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
                 is HomeEvents.LoadMoreTokens -> {
-
+                    matrixUser.value.walletAddress?.let { address ->
+                        coroutineScope.loadMoreWalletTokens(
+                            walletAddress = address,
+                            currentList = event.currentTokens,
+                            walletTokensListState = walletTokensListState,
+                            tokenPaginationParams = walletTokenPaginationParams
+                        )
+                    }
                 }
                 is HomeEvents.LoadMoreTransactions -> {
-
+                    matrixUser.value.walletAddress?.let { address ->
+                        coroutineScope.loadMoreWalletTransactions(
+                            walletAddress = address,
+                            currentList = event.currentTransactions,
+                            walletTransactionsListState = walletTransactionsListState,
+                            transactionPaginationParams = walletTransactionsPaginationParams
+                        )
+                    }
                 }
                 is HomeEvents.ViewWalletTransaction -> {
                     coroutineScope.loadWalletTransaction(
@@ -269,6 +289,7 @@ class HomePresenter @Inject constructor(
                 transactionsListState = walletTransactionsListState.value,
                 tokensPaginationParams = walletTokenPaginationParams.value,
                 transactionsPaginationParams = walletTransactionsPaginationParams.value,
+                meowPrice = meowPrice.value,
                 eventSink = ::handleEvents
             ),
             eventSink = ::handleEvents,
@@ -535,25 +556,27 @@ class HomePresenter @Inject constructor(
     }
 
     private fun CoroutineScope.fetchWalletData(
+        meowPrice: MutableState<ZeroMeowPrice?>,
         walletAddress: String,
         userWalletBalance: MutableDoubleState,
         walletTokensListState: MutableState<WalletTokensListState>,
         walletTransactionsListState: MutableState<WalletTransactionsListState>,
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
         transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
-    ) = launch {
+    ) = launch(context = Dispatchers.IO) {
         val results = awaitAll(
-            //TODO: also fetch meow price here
             async { client.getMeowPrice() },
             async { client.getWalletTokens(walletAddress, tokenPaginationParams.value) },
             async { client.getWalletTransactions(walletAddress, transactionPaginationParams.value) },
         )
         (results[0] as? Result<ZeroMeowPrice>)?.let {
-
+            meowPrice.value = it.getOrNull()
         }
         (results[1] as? Result<ZeroWalletTokensResponse>)?.let {
             it.onSuccess { result ->
-                walletTokensListState.value = WalletTokensListState.Tokens(result.tokens.toPersistentList())
+                val tokensList = result.tokens
+                setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
+                walletTokensListState.value = WalletTokensListState.Tokens(tokensList.toPersistentList())
                 tokenPaginationParams.value = result.paginationParams
             }.onFailure {
                 walletTokensListState.value = WalletTokensListState.Empty
@@ -569,11 +592,52 @@ class HomePresenter @Inject constructor(
         }
     }
 
+    private fun CoroutineScope.loadMoreWalletTokens(
+        walletAddress: String,
+        currentList: List<ZeroWalletToken>,
+        walletTokensListState: MutableState<WalletTokensListState>,
+        tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
+    ) = launch {
+        client.getWalletTokens(walletAddress, tokenPaginationParams.value)
+            .onSuccess {
+                val newList = mutableListOf<ZeroWalletToken>().apply {
+                    addAll(currentList)
+                    addAll(it.tokens)
+                }.distinctBy { token -> token.tokenAddress }
+                walletTokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
+                tokenPaginationParams.value = it.paginationParams
+            }
+            .onFailure {
+                //Failed to load tokens next page
+            }
+    }
+
+    private fun CoroutineScope.loadMoreWalletTransactions(
+        walletAddress: String,
+        currentList: List<ZeroWalletTransaction>,
+        walletTransactionsListState: MutableState<WalletTransactionsListState>,
+        transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
+    ) = launch {
+        client.getWalletTransactions(walletAddress, transactionPaginationParams.value)
+            .onSuccess {
+                val newList = mutableListOf<ZeroWalletTransaction>().apply {
+                    addAll(currentList)
+                    addAll(it.transactions)
+                }.distinctBy { trans -> trans.hash }
+                walletTransactionsListState.value = WalletTransactionsListState.Transactions(newList.toPersistentList())
+                transactionPaginationParams.value = it.paginationParams
+            }
+            .onFailure {
+                //Failed to load transactions next page
+            }
+    }
+
     private fun CoroutineScope.loadWalletTransaction(
         transactionId: String,
         context: Context,
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
+        genericActionState.value = AsyncAction.Loading
         client.getTransactionReceipt(transactionId)
             .onSuccess {
                 genericActionState.value = AsyncAction.Success(Unit)
@@ -582,5 +646,18 @@ class HomePresenter @Inject constructor(
             .onFailure {
                 genericActionState.value = AsyncAction.Failure(it)
             }
+    }
+
+    private fun setWalletBalance(tokensList: List<ZeroWalletToken>,
+                                 meowPrice: ZeroMeowPrice?,
+                                 userWalletBalance: MutableDoubleState
+    ) {
+        val meowPrice = meowPrice ?: return
+        val meowTokens = tokensList.filter { it.isMeowToken }
+        val userBalance = ZeroWalletUtil.getWalletBalance(
+            meowTokenAmount = meowTokens.sumOf { it.tokenAmount },
+            meowPrice = meowPrice
+        )
+        userWalletBalance.doubleValue = userBalance
     }
 }

@@ -12,17 +12,25 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 open class WalletContentStateProvider : PreviewParameterProvider<WalletContentState> {
     override val values: Sequence<WalletContentState>
         get() = sequenceOf(
-            aWalletContentState()
+            aWalletContentState(showWalletBalance = true),
+            aWalletContentState(showWalletBalance = false),
+            aWalletContentState(tokensListState = WalletTokensListState.Skeleton(10)),
+            aWalletContentState(transactionsListState = WalletTransactionsListState.Skeleton(10)),
         )
 }
 
-internal fun aWalletContentState() = WalletContentState(
+internal fun aWalletContentState(
+    showWalletBalance: Boolean = true,
+    tokensListState: WalletTokensListState = WalletTokensListState.Empty,
+    transactionsListState: WalletTransactionsListState = WalletTransactionsListState.Empty,
+) = WalletContentState(
     userName = "Jade David",
-    showWalletBalance = true,
+    showWalletBalance = showWalletBalance,
     walletBalance = 0.0,
-    tokensListState = WalletTokensListState.Empty,
-    transactionsListState = WalletTransactionsListState.Empty,
+    tokensListState = tokensListState,
+    transactionsListState = transactionsListState,
     tokensPaginationParams = null,
     transactionsPaginationParams = null,
+    meowPrice = null,
     eventSink = {}
 )

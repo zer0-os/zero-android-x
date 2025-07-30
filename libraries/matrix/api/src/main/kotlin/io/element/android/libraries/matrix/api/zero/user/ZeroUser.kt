@@ -1,6 +1,6 @@
 package io.element.android.libraries.matrix.api.zero.user
 
-import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 
 data class ZeroUser(
     val id: String,

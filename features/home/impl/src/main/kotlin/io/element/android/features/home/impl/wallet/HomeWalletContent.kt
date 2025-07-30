@@ -16,6 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,6 +27,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.home.impl.HomeEvents
+import io.element.android.features.home.impl.model.WalletContentTab
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
@@ -35,21 +41,29 @@ fun HomeWalletContent(
     state: WalletContentState,
     modifier: Modifier = Modifier,
 ) {
+    var selectedWalletTab by remember { mutableStateOf(WalletContentTab.TOKENS) }
     Column(
         modifier = modifier
             .background(color = ElementTheme.colors.bgCanvasDefault)
     ) {
         ZeroWalletCard(
-            walletUserName = "Lefty Wilder",
-            walletBalance = "0",
-            onToggleWalletBalance = {}
+            walletUserName = state.userName,
+            walletBalance = state.userWalletBalance,
+            showWalletBalance = state.showWalletBalance,
+            onToggleWalletBalance = {
+                state.eventSink(HomeEvents.ToggleWalletBalance)
+            }
         )
         WalletContentTabView(
             modifier = Modifier.padding(horizontal = 16.dp),
             onTabSelected = { walletTab ->
-
+                selectedWalletTab = walletTab
             }
         )
+        when (selectedWalletTab) {
+            WalletContentTab.TOKENS -> WalletTokensList(state)
+            WalletContentTab.TRANSACTIONS -> WalletTransactionsList(state)
+        }
     }
 }
 
@@ -57,7 +71,8 @@ fun HomeWalletContent(
 private fun ZeroWalletCard(
     walletUserName: String,
     walletBalance: String,
-    onToggleWalletBalance: (Boolean) -> Unit
+    showWalletBalance: Boolean,
+    onToggleWalletBalance: () -> Unit
 ) {
     Box {
         Image(
@@ -80,18 +95,22 @@ private fun ZeroWalletCard(
                 Spacer(Modifier.size(SPACING_2X.dp))
 
                 IconButton(
-                    onClick = {},
+                    onClick = onToggleWalletBalance,
                     modifier = Modifier.size(16.dp)
                 ) {
                     Icon(
-                        imageVector = CompoundIcons.VisibilityOn(),
+                        imageVector = if (showWalletBalance) {
+                            CompoundIcons.VisibilityOff()
+                        } else {
+                            CompoundIcons.VisibilityOn()
+                        },
                         contentDescription = null,
                         tint = ElementTheme.colors.textSecondary
                     )
                 }
             }
             Text(
-                text = "$${walletBalance}",
+                text = walletBalance,
                 style = ElementTheme.typography.fontHeadingMdBold,
                 color = ElementTheme.colors.textPrimary,
             )

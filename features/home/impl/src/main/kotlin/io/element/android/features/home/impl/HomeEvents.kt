@@ -10,9 +10,7 @@ package io.element.android.features.home.impl
 import io.element.android.features.home.impl.model.HomeScreenChannel
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 
 sealed interface HomeEvents {
     data class SelectHomeNavigationBarItem(val item: HomeNavigationBarItem) : HomeEvents
@@ -35,12 +33,8 @@ sealed interface HomeEvents {
     data object RefreshMyFeeds: HomeProfileEvents
 
     sealed interface HomeWalletEvents: HomeEvents
-    data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>,
-                              val paginationParams: ZeroWalletTokensPaginationParams?
-    ): HomeWalletEvents
-    data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>,
-                                    val paginationParams: ZeroWalletTransactionsPaginationParams?
-    ): HomeWalletEvents
+    data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>): HomeWalletEvents
+    data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>): HomeWalletEvents
     data class ViewWalletTransaction(val transactionId: String): HomeWalletEvents
     data object ToggleWalletBalance: HomeWalletEvents
 }

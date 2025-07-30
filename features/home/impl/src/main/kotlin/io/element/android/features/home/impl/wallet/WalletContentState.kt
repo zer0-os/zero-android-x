@@ -9,6 +9,7 @@ package io.element.android.features.home.impl.wallet
 
 import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.HomeEvents
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
@@ -25,10 +26,14 @@ data class WalletContentState(
     val transactionsListState: WalletTransactionsListState,
     val tokensPaginationParams: ZeroWalletTokensPaginationParams?,
     val transactionsPaginationParams: ZeroWalletTransactionsPaginationParams?,
+    val meowPrice: ZeroMeowPrice?,
 
     val eventSink: (HomeEvents.HomeWalletEvents) -> Unit,
 ) {
-    var userWalletBalance: String = ""
+    val userWalletBalance: String
+        get() = if (showWalletBalance) {
+            "$${walletBalance}"
+        } else "****"
 }
 
 @Immutable
