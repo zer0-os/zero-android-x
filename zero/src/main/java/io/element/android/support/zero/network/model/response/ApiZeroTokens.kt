@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiZeroTokens(
-	val diff: Double,
-	val price: Double,
-	val reference: String
+	val price: Double?,
+	val reference: String?
 )

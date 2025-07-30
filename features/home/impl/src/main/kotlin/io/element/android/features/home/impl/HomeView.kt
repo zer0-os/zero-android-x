@@ -32,21 +32,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.home.impl.components.HomeChannelListContentView
+import io.element.android.features.home.impl.channel.HomeChannelListContentView
 import io.element.android.features.home.impl.components.HomeFabButton
-import io.element.android.features.home.impl.components.HomeFeedListContentView
-import io.element.android.features.home.impl.components.HomeNotificationListContentView
 import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
-import io.element.android.features.home.impl.components.RoomListContentView
-import io.element.android.features.home.impl.components.RoomListMenuAction
+import io.element.android.features.home.impl.roomlist.RoomListContentView
+import io.element.android.features.home.impl.roomlist.RoomListMenuAction
+import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
+import io.element.android.features.home.impl.notification.HomeNotificationListContentView
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
 import io.element.android.features.home.impl.roomlist.RoomListDeclineInviteMenu
 import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
+import io.element.android.features.home.impl.wallet.HomeWalletContent
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
@@ -323,6 +324,12 @@ internal fun HomeScreenContent(
                 contentState = state.roomListState.contentState,
                 eventSink = state.roomListState.eventSink,
                 onNotificationClick = ::onNotificationClick,
+                modifier = modifier
+            )
+        }
+        HomeScreenTab.WALLET -> {
+            HomeWalletContent(
+                state = state.walletContentState,
                 modifier = modifier
             )
         }

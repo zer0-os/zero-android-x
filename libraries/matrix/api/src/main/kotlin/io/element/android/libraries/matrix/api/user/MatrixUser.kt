@@ -26,7 +26,8 @@ data class MatrixUser(
 ) : Parcelable
 
 val MatrixUser.walletAddress
-    get() = primaryWalletAddress ?: thirdWebWalletAddress
+//    get() = primaryWalletAddress ?: thirdWebWalletAddress
+    get() = thirdWebWalletAddress
 
 val MatrixUser.primaryZIdOrWalletAddress
     get() = primaryZeroId ?: walletAddress

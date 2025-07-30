@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.home.impl.components
+package io.element.android.features.home.impl.feed
 
 import android.os.Handler
 import android.os.Looper
@@ -31,9 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import io.element.android.features.home.impl.FeedListContentState
-import io.element.android.features.home.impl.FeedListContentStateProvider
 import io.element.android.features.home.impl.HomeEvents
+import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.features.home.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight

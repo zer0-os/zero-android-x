@@ -1,11 +1,11 @@
 /*
- * Copyright 2024 New Vector Ltd.
+ * Copyright 2025 New Vector Ltd.
  *
  * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.home.impl.components
+package io.element.android.features.home.impl.notification
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.features.home.impl.contentType
 import io.element.android.features.home.impl.model.NotificationsScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary

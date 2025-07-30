@@ -1,0 +1,50 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.features.home.impl.wallet
+
+import androidx.compose.runtime.Immutable
+import io.element.android.features.home.impl.HomeEvents
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
+import kotlinx.collections.immutable.ImmutableList
+
+@Immutable
+data class WalletContentState(
+    val userName: String,
+    val showWalletBalance: Boolean,
+    private val walletBalance: Double,
+
+    val tokensListState: WalletTokensListState,
+    val transactionsListState: WalletTransactionsListState,
+    val tokensPaginationParams: ZeroWalletTokensPaginationParams?,
+    val transactionsPaginationParams: ZeroWalletTransactionsPaginationParams?,
+
+    val eventSink: (HomeEvents.HomeWalletEvents) -> Unit,
+) {
+    var userWalletBalance: String = ""
+}
+
+@Immutable
+sealed interface WalletTokensListState {
+    data class Skeleton(val count: Int) : WalletTokensListState
+    data object Empty : WalletTokensListState
+    data class Tokens(
+        val tokens: ImmutableList<ZeroWalletToken>
+    ) : WalletTokensListState
+}
+
+@Immutable
+sealed interface WalletTransactionsListState {
+    data class Skeleton(val count: Int) : WalletTransactionsListState
+    data object Empty : WalletTransactionsListState
+    data class Transactions(
+        val transactions: ImmutableList<ZeroWalletTransaction>
+    ) : WalletTransactionsListState
+}

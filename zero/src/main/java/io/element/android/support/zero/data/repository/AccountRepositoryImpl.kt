@@ -6,12 +6,10 @@ import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroUserService
-import io.element.android.support.zero.network.service.ZeroWalletService
 
 class AccountRepositoryImpl(
     private val zeroAccountService: ZeroAccountService,
     private val zeroUserService: ZeroUserService,
-    private val zeroWalletService: ZeroWalletService,
     private val preferences: Preferences
 ): AccountRepository {
 
@@ -41,16 +39,6 @@ class AccountRepositoryImpl(
         return runCatching {
             zeroAccountService.fetchUserZIds()
         }.getOrDefault(emptyList())
-    }
-
-    override suspend fun checkAndInitializeThirdWeb() {
-        runCatching {
-            val currentUser = zeroUserService.getCurrentUser()
-            if (currentUser.thirdWebWallet == null) {
-                // Initialize thirdWeb wallet
-                zeroWalletService.initializeThirdWebWallet()
-            }
-        }
     }
 
     override suspend fun saveLoggedInUserInfo(user: MatrixUser) {

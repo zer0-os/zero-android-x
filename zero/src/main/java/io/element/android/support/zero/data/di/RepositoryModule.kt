@@ -27,6 +27,8 @@ import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
+import io.element.android.support.zero.data.repository.WalletRepository
+import io.element.android.support.zero.data.repository.WalletRepositoryImpl
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroAuthService
@@ -58,6 +60,7 @@ object RepositoryModule {
         rewardsRepository: RewardsRepository,
         userRepository: UserRepository,
         metaDataRepository: MetaDataRepository,
+        walletRepository: WalletRepository
     ): ZeroCoreRepository = ZeroCoreRepository(
         auth = authRepository,
         account = accountRepository,
@@ -68,7 +71,8 @@ object RepositoryModule {
         invite = inviteRepository,
         rewards = rewardsRepository,
         user = userRepository,
-        metaData = metaDataRepository
+        metaData = metaDataRepository,
+        wallet = walletRepository
     )
 
     @Provides
@@ -112,9 +116,8 @@ object RepositoryModule {
     fun bindAccountRepository(
         zeroAccountService: ZeroAccountService,
         zeroUserService: ZeroUserService,
-        zeroWalletService: ZeroWalletService,
         preferences: Preferences
-    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService, zeroWalletService, preferences)
+    ): AccountRepository = AccountRepositoryImpl(zeroAccountService, zeroUserService, preferences)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -139,4 +142,11 @@ object RepositoryModule {
     fun bindMetaDataRepository(
         zeroMetaDataService: ZeroMetaDataService
     ): MetaDataRepository = MetaDataRepositoryImpl(zeroMetaDataService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindWalletRepository(
+        zeroUserService: ZeroUserService,
+        zeroWalletService: ZeroWalletService
+    ): WalletRepository = WalletRepositoryImpl(zeroUserService, zeroWalletService)
 }

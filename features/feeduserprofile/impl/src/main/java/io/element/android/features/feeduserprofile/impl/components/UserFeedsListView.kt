@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileEvents
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileState
 import io.element.android.features.feeduserprofile.impl.FeedUserProfileStateProvider
-import io.element.android.features.home.impl.components.HomeFeedRow
+import io.element.android.features.home.impl.feed.HomeFeedRow
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider

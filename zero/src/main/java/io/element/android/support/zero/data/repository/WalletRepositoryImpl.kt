@@ -1,0 +1,51 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.support.zero.data.repository
+
+import io.element.android.support.zero.network.model.response.ApiWalletTokens
+import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
+import io.element.android.support.zero.network.model.response.ApiWalletTransactions
+import io.element.android.support.zero.network.model.response.NextPageParams
+import io.element.android.support.zero.network.model.response.TransactionNextPageParams
+import io.element.android.support.zero.network.model.response.toQueryMap
+import io.element.android.support.zero.network.service.ZeroUserService
+import io.element.android.support.zero.network.service.ZeroWalletService
+
+class WalletRepositoryImpl(
+    private val zeroUserService: ZeroUserService,
+    private val zeroWalletService: ZeroWalletService
+): WalletRepository {
+
+    override suspend fun checkAndInitializeThirdWeb() {
+        runCatching {
+            val currentUser = zeroUserService.getCurrentUser()
+            if (currentUser.thirdWebWallet == null) {
+                // Initialize thirdWeb wallet
+                zeroWalletService.initializeThirdWebWallet()
+            }
+        }
+    }
+
+    override suspend fun getTokens(walletAddress: String, nextPageParams: NextPageParams?): ApiWalletTokens {
+        return zeroWalletService.getTokens(
+            walletAddress = walletAddress,
+            nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
+        )
+    }
+
+    override suspend fun getTransactions(walletAddress: String, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions {
+        return zeroWalletService.getTransactions(
+            walletAddress = walletAddress,
+            nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
+        )
+    }
+
+    override suspend fun getTransactionReceipt(transactionHash: String): ApiWalletTransactionReceipt {
+        return zeroWalletService.getTransactionReceipt(transactionHash)
+    }
+}

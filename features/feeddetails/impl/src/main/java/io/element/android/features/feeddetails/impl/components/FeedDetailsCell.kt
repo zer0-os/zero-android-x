@@ -32,11 +32,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.home.impl.components.FeedActionButton
-import io.element.android.features.home.impl.components.FeedMeowActionButton
-import io.element.android.features.home.impl.components.annotatedText
-import io.element.android.features.home.impl.components.arweaveLink
-import io.element.android.features.home.impl.components.avatarData
+import io.element.android.features.home.impl.feed.FeedActionButton
+import io.element.android.features.home.impl.feed.FeedMeowActionButton
+import io.element.android.features.home.impl.feed.annotatedText
+import io.element.android.features.home.impl.feed.arweaveLink
+import io.element.android.features.home.impl.feed.avatarData
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview

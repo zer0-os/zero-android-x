@@ -8,8 +8,11 @@
 package io.element.android.features.home.impl
 
 import androidx.compose.runtime.Immutable
+import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.roomlist.RoomListState
+import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
@@ -40,6 +43,7 @@ data class HomeState(
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
     val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
+    val walletContentState: WalletContentState,
     val eventSink: (HomeEvents) -> Unit,
 ) {
     private val displayActions = true

@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.home.impl.components
+package io.element.android.features.home.impl.roomlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,8 +29,11 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 
+/**
+ * https://www.figma.com/file/0MMNu7cTOzLOlWb7ctTkv3/Element-X?node-id=6547%3A147623
+ */
 @Composable
-internal fun HomeNotificationPlaceholderRow(
+internal fun RoomSummaryPlaceholderRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -37,7 +41,6 @@ internal fun HomeNotificationPlaceholderRow(
             .fillMaxWidth()
             .height(minHeight)
             .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
@@ -45,21 +48,38 @@ internal fun HomeNotificationPlaceholderRow(
                 .align(Alignment.CenterVertically)
                 .background(color = ElementTheme.colors.placeholderBackground, shape = CircleShape)
         )
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)
+                .padding(start = 20.dp, top = 19.dp, end = 4.dp)
         ) {
-            PlaceholderAtom(width = 400.dp, height = 7.dp)
-            Spacer(Modifier.height(8.dp))
-            PlaceholderAtom(width = 200.dp, height = 7.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(22.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PlaceholderAtom(width = 40.dp, height = 7.dp)
+                Spacer(modifier = Modifier.width(7.dp))
+                PlaceholderAtom(width = 45.dp, height = 7.dp)
+                Spacer(modifier = Modifier.weight(1f))
+                PlaceholderAtom(width = 22.dp, height = 4.dp)
+            }
+            Row(
+                modifier = Modifier
+                    .height(25.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PlaceholderAtom(width = 70.dp, height = 6.dp)
+                Spacer(modifier = Modifier.width(6.dp))
+                PlaceholderAtom(width = 70.dp, height = 6.dp)
+            }
         }
     }
 }
 
 @PreviewsDayNight
 @Composable
-internal fun HomeNotificationPlaceholderRowPreview() = ElementPreview {
-    HomeNotificationPlaceholderRow()
+internal fun RoomSummaryPlaceholderRowPreview() = ElementPreview {
+    RoomSummaryPlaceholderRow()
 }

@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.home.impl.components
+package io.element.android.features.home.impl.notification
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

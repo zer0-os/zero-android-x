@@ -44,7 +44,13 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -267,6 +273,18 @@ interface MatrixClient {
     suspend fun followUser(userId: String): Result<Boolean>
 
     suspend fun unFollowUser(userId: String): Result<Boolean>
+
+    suspend fun getMeowPrice(): Result<ZeroMeowPrice>
+
+    suspend fun getWalletTokens(walletAddress: String,
+                                paginationParams: ZeroWalletTokensPaginationParams?
+    ): Result<ZeroWalletTokensResponse>
+
+    suspend fun getWalletTransactions(walletAddress: String,
+                                paginationParams: ZeroWalletTransactionsPaginationParams?
+    ): Result<ZeroWalletTransactionsResponse>
+
+    suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
 }
 
 /**
