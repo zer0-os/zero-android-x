@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -33,18 +34,19 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.home.impl.channel.HomeChannelListContentView
+import io.element.android.features.home.impl.components.ClaimRewardsSheet
 import io.element.android.features.home.impl.components.HomeFabButton
 import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
-import io.element.android.features.home.impl.roomlist.RoomListContentView
-import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.notification.HomeNotificationListContentView
+import io.element.android.features.home.impl.roomlist.RoomListContentView
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
 import io.element.android.features.home.impl.roomlist.RoomListDeclineInviteMenu
 import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
 import io.element.android.features.home.impl.wallet.HomeWalletContent
@@ -56,6 +58,7 @@ import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
@@ -63,6 +66,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
 @Composable
@@ -190,6 +194,8 @@ private fun HomeScaffold(
         mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
     }
 
+    val claimRewardsSheetState = rememberModalBottomSheetState()
+
     Box {
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -240,7 +246,8 @@ private fun HomeScaffold(
             // Floating Action button
             if (state.shouldDisplayActions(selectedNavigationTab.value)) {
                 HomeFabButton(
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(horizontal = 16.dp),
                     onClick = {
                         when {
@@ -265,6 +272,29 @@ private fun HomeScaffold(
         FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
             state.eventSink(HomeEvents.DismissFeedMedia)
         })
+    }
+
+    if (state.showClaimRewardsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                StateBus.onRewardsClaimed()
+            },
+            sheetState = claimRewardsSheetState,
+            dragHandle = null,
+            content = {
+                ClaimRewardsSheet(
+                    userRewards = state.userRewards,
+                    actionState = state.claimRewardActionState,
+                    meowPrice = state.walletContentState.meowPrice,
+                    onViewTransaction = { transaction ->
+                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction))
+                    },
+                    onClaimRewards = {
+                        state.eventSink(HomeEvents.ClaimRewards)
+                    }
+                )
+            }
+        )
     }
 }
 

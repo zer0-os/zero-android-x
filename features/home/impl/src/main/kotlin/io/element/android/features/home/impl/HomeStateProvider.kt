@@ -91,5 +91,6 @@ internal fun aHomeState(
     directLogoutState = directLogoutState,
     isSpaceFeatureEnabled = isSpaceFeatureEnabled,
     walletContentState = walletContentState,
+    showClaimRewardsSheet = false,
     eventSink = eventSink,
 )

@@ -495,5 +495,9 @@ class FakeMatrixClient(
         return Result.failure(Throwable("test"))
     }
 
+    override suspend fun claimRewards(walletAddress: String): Result<String> {
+        return Result.success("test_transaction_hash")
+    }
+
     //endregion
 }

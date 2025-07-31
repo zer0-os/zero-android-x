@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.preferences.impl.ClaimRewardsButton
 import io.element.android.features.preferences.impl.R
 import io.element.android.features.preferences.impl.user.UserPreferences
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -79,6 +80,7 @@ fun PreferencesRootView(
     onSignOutClick: () -> Unit,
     onDeactivateClick: () -> Unit,
     onOpenRewards: () -> Unit,
+    onClaimRewards: () -> Unit,
     onInviteFriend: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -106,6 +108,7 @@ fun PreferencesRootView(
             shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
             userRewards = state.userRewards,
             onRewardsClicked = onOpenRewards,
+            onClaimRewards = onClaimRewards,
             onDismissRewardsIntimation = {
                 state.eventSink(PreferencesRootEvents.DismissRewardsIntimation)
             }
@@ -171,6 +174,7 @@ private fun ColumnScope.RewardsSection(
     shouldShowNewRewardsIntimation: Boolean,
     userRewards: ZeroUserRewards,
     onRewardsClicked: () -> Unit,
+    onClaimRewards: () -> Unit,
     onDismissRewardsIntimation: () -> Unit
 ) {
     LaunchedEffect(userRewards) {
@@ -253,7 +257,25 @@ private fun ColumnScope.RewardsSection(
             style = ElementTheme.zeroTypography.fontBodyLgRegularRoboto,
             color = ElementTheme.colors.textSecondary
         )
+
+        if (userRewards.hasUnclaimedRewards) {
+            val unclaimedRewardsPrice = RewardsUtil.getRefPrice(
+                zero = userRewards.unclaimedRewards,
+                decimals = userRewards.decimals,
+                refPrice = userRewards.price
+            )
+            Text(
+                text = "You can now claim $$unclaimedRewardsPrice".trim(),
+                style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                color = ElementTheme.colors.textSecondary
+            )
+        }
     }
+    ClaimRewardsButton(
+        modifier = Modifier.padding(horizontal = 10.dp),
+        enabled = userRewards.hasUnclaimedRewards,
+        onClick = onClaimRewards
+    )
 }
 
 @Composable
@@ -505,6 +527,7 @@ private fun ContentToPreview(matrixUser: MatrixUser) {
         onSignOutClick = {},
         onDeactivateClick = {},
         onOpenRewards = {},
+        onClaimRewards = {},
         onInviteFriend = {}
     )
 }

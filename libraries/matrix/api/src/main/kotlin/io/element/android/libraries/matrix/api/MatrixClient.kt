@@ -285,6 +285,8 @@ interface MatrixClient {
     ): Result<ZeroWalletTransactionsResponse>
 
     suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
+
+    suspend fun claimRewards(walletAddress: String): Result<String>
 }
 
 /**

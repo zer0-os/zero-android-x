@@ -44,6 +44,8 @@ data class HomeState(
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
     val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
     val walletContentState: WalletContentState,
+    val showClaimRewardsSheet: Boolean,
+    val claimRewardActionState: AsyncAction<String> = AsyncAction.Uninitialized,
     val eventSink: (HomeEvents) -> Unit,
 ) {
     private val displayActions = true

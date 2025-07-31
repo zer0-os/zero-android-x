@@ -52,6 +52,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
+import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -70,6 +71,7 @@ import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
+import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.collections.immutable.toPersistentList
@@ -123,6 +125,8 @@ class HomePresenter @Inject constructor(
         var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
         val userRewards = client.userRewards.collectAsState()
+        val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
+        val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
@@ -227,6 +231,8 @@ class HomePresenter @Inject constructor(
                     )
                 }
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
+                HomeEvents.ClaimRewards -> coroutineScope
+                    .claimUserRewards(matrixUser.value, claimRewardsActionState)
             }
         }
 
@@ -284,7 +290,7 @@ class HomePresenter @Inject constructor(
             walletContentState = WalletContentState(
                 userName = matrixUser.value.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
-                walletBalance = userWalletBalance.value,
+                walletBalance = userWalletBalance.doubleValue,
                 tokensListState = walletTokensListState.value,
                 transactionsListState = walletTransactionsListState.value,
                 tokensPaginationParams = walletTokenPaginationParams.value,
@@ -292,6 +298,8 @@ class HomePresenter @Inject constructor(
                 meowPrice = meowPrice.value,
                 eventSink = ::handleEvents
             ),
+            showClaimRewardsSheet = showClaimRewardsSheet.value,
+            claimRewardActionState = claimRewardsActionState.value,
             eventSink = ::handleEvents,
         )
     }
@@ -659,5 +667,21 @@ class HomePresenter @Inject constructor(
             meowPrice = meowPrice
         )
         userWalletBalance.doubleValue = userBalance
+    }
+
+    private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,
+                                                claimRewardsActionState: MutableState<AsyncAction<String>>
+    ) = launch {
+        matrixUser.walletAddress?.let {
+            claimRewardsActionState.value = AsyncAction.Loading
+            client.claimRewards(it)
+                .onSuccess { transaction ->
+                    claimRewardsActionState.value = AsyncAction.Success(transaction)
+                    client.getUserRewards()
+                }
+                .onFailure { error ->
+                    claimRewardsActionState.value = AsyncAction.Failure(error)
+                }
+        }
     }
 }

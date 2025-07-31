@@ -1134,6 +1134,13 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun claimRewards(walletAddress: String): Result<String> = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.claimRewards(walletAddress).transactionHash
+        }
+    }
+
     private suspend fun postCreateFeed(replyToPost: String?) {
         withContext(sessionDispatcher) {
             runCatching {

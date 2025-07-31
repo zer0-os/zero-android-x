@@ -24,6 +24,7 @@ import io.element.android.features.logout.api.direct.DirectLogoutView
 import io.element.android.libraries.androidutils.browser.openUrlInChromeCustomTab
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.support.zero.common.state.StateBus
 
 @ContributesNode(SessionScope::class)
 class PreferencesRootNode @AssistedInject constructor(
@@ -148,6 +149,10 @@ class PreferencesRootNode @AssistedInject constructor(
             },
             onDeactivateClick = this::onOpenAccountDeactivation,
             onOpenRewards = this::onOpenRewards,
+            onClaimRewards = {
+                StateBus.onClaimUserRewards()
+                navigateUp()
+            },
             onInviteFriend = this::onInviteFriend
         )
 

@@ -16,6 +16,7 @@ sealed interface HomeEvents {
     data class SelectHomeNavigationBarItem(val item: HomeNavigationBarItem) : HomeEvents
 
     data class DismissRewardsIntimation(val immediate: Boolean = true) : HomeEvents
+    data object ClaimRewards : HomeEvents
     data object HideError : HomeEvents
 
     sealed interface HomeChannelEvents : HomeEvents
