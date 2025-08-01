@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.conversion
 
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
@@ -15,6 +16,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
+import io.element.android.support.zero.network.model.response.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.ApiWalletTokens
 import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
 import io.element.android.support.zero.network.model.response.ApiWalletTransactions
@@ -75,6 +77,10 @@ fun ApiWalletTransactions.toModel(): ZeroWalletTransactionsResponse {
 
 fun ApiWalletTransactionReceipt.toModel(): ZeroWalletTransactionReceipt {
     return ZeroWalletTransactionReceipt(status, blockExplorerUrl, transactionHash)
+}
+
+fun ApiWalletRecipient.toModel(): ZeroWalletRecipient {
+    return ZeroWalletRecipient(userId, matrixId, publicAddress, name, profileImage, primaryZid)
 }
 
 fun ZeroWalletTokensPaginationParams.toApi() = NextPageParams(itemsCount, tokenName, tokenType, value)

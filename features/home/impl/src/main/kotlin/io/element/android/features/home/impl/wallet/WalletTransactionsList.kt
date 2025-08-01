@@ -55,6 +55,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isMeowTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.support.zero.common.ui.ZChainIcon
 
 @Composable
 fun WalletTransactionsList(
@@ -225,11 +226,7 @@ private fun TransactionRow(
                     style = ElementTheme.typography.fontBodySmRegular,
                     color = ElementTheme.colors.textSecondary
                 )
-                Icon(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    painter = painterResource(io.element.android.support.zero.R.drawable.ic_zchain),
-                    contentDescription = null
-                )
+                ZChainIcon(Modifier.padding(horizontal = 4.dp))
                 val walletAddress = if (transaction.isTransactionReceived) {
                     ZeroWalletUtil.walletAddressDisplayText(transaction.from)
                 } else {

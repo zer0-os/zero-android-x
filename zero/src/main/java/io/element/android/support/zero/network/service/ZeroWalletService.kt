@@ -7,13 +7,17 @@
 
 package io.element.android.support.zero.network.service
 
-import io.element.android.support.zero.network.model.response.ApiWalletTokens
+import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
 import io.element.android.support.zero.network.model.response.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.ApiWalletRecipientsResponse
+import io.element.android.support.zero.network.model.response.ApiWalletTokens
 import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
 import io.element.android.support.zero.network.model.response.ApiWalletTransactions
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface ZeroWalletService {
@@ -41,5 +45,16 @@ interface ZeroWalletService {
     @POST(value = "api/wallet/{wallet_address}/claim-rewards")
     suspend fun claimRewards(
         @Path("wallet_address") walletAddress: String
+    ): ApiTransactionPerformed
+
+    @GET(value = "api/wallet/search-recipients")
+    suspend fun searchRecipient(
+        @Query("query") searchQuery: String
+    ): ApiWalletRecipientsResponse
+
+    @POST(value = "api/wallet/{sender_address}/transactions/transfer-token")
+    suspend fun transferToken(
+        @Path("sender_address") senderWalletAddress: String,
+        @Body request: TransferWalletTokenRequest
     ): ApiTransactionPerformed
 }

@@ -128,6 +128,14 @@ class HomeFlowNode @AssistedInject constructor(
         plugins<HomeEntryPoint.Callback>().forEach { it.onUserProfileClick() }
     }
 
+    private fun onSendWalletToken() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onSendWalletToken() }
+    }
+
+    private fun onReceiveWalletToken() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onReceiveWalletToken() }
+    }
+
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {
         when (roomListMenuAction) {
             RoomListMenuAction.InviteFriends -> {
@@ -159,6 +167,8 @@ class HomeFlowNode @AssistedInject constructor(
                 onFeedUserClick = this::onFeedUserClick,
                 onUserProfileClick = this::onUserProfileClick,
                 onCreateFeedClick = this::onCreateFeedClick,
+                onSendWalletToken = this::onSendWalletToken,
+                onReceiveWalletToken = this::onReceiveWalletToken,
                 modifier = modifier,
             ) {
                 acceptDeclineInviteView.Render(

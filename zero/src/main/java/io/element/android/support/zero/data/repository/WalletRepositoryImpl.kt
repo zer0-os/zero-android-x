@@ -7,8 +7,10 @@
 
 package io.element.android.support.zero.data.repository
 
-import io.element.android.support.zero.network.model.response.ApiWalletTokens
+import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
 import io.element.android.support.zero.network.model.response.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.ApiWalletRecipient
+import io.element.android.support.zero.network.model.response.ApiWalletTokens
 import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
 import io.element.android.support.zero.network.model.response.ApiWalletTransactions
 import io.element.android.support.zero.network.model.response.NextPageParams
@@ -52,5 +54,16 @@ class WalletRepositoryImpl(
 
     override suspend fun claimRewards(walletAddress: String): ApiTransactionPerformed {
         return zeroWalletService.claimRewards(walletAddress)
+    }
+
+    override suspend fun searchRecipients(query: String): List<ApiWalletRecipient> {
+        return zeroWalletService.searchRecipient(query).recipients
+    }
+
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiTransactionPerformed {
+        return zeroWalletService.transferToken(
+            senderWalletAddress = sender,
+            request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token)
+        )
     }
 }

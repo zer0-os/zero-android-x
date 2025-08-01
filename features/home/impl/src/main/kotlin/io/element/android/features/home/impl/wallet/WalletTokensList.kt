@@ -8,6 +8,7 @@
 package io.element.android.features.home.impl.wallet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -63,7 +64,7 @@ fun WalletTokensList(
     Box(modifier = modifier) {
         when (contentState) {
             is WalletTokensListState.Skeleton -> {
-                SkeletonView(
+                TokenSkeletonView(
                     count = contentState.count,
                 )
             }
@@ -86,7 +87,7 @@ fun WalletTokensList(
 }
 
 @Composable
-private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
+fun TokenSkeletonView(count: Int, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         repeat(count) { index ->
             item {
@@ -136,11 +137,12 @@ private fun WalletTokenPlaceholderRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TokensList(
+fun TokensList(
     state: WalletTokensListState.Tokens,
     meowPrice: ZeroMeowPrice?,
     hasNextPage: Boolean,
-    onLoadMoreTokens: () -> Unit
+    onLoadMoreTokens: () -> Unit,
+    onTokenClick: (ZeroWalletToken) -> Unit = {}
 ) {
     var isLoadingMoreItems by remember(state) { mutableStateOf(false) }
 
@@ -165,7 +167,9 @@ private fun TokensList(
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         items(items = state.tokens, key = { token -> token.tokenAddress }) { token ->
-            TokenRow(token = token, meowPrice = meowPrice)
+            TokenRow(token = token, meowPrice = meowPrice, onTap = {
+                onTokenClick(token)
+            })
         }
         item {
             Spacer(Modifier.size(100.dp))
@@ -177,11 +181,13 @@ private fun TokensList(
 private fun TokenRow(
     modifier: Modifier = Modifier,
     token: ZeroWalletToken,
-    meowPrice: ZeroMeowPrice?
+    meowPrice: ZeroMeowPrice?,
+    onTap: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable { onTap() }
             .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -61,6 +61,7 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -1140,6 +1141,22 @@ class RustMatrixClient(
             walletRepo.claimRewards(walletAddress).transactionHash
         }
     }
+
+    override suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                walletRepo.searchRecipients(query).map { it.toModel() }
+            }
+        }
+
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                walletRepo.transferToken(sender, recipient, amount, token).transactionHash
+            }
+        }
 
     private suspend fun postCreateFeed(replyToPost: String?) {
         withContext(sessionDispatcher) {

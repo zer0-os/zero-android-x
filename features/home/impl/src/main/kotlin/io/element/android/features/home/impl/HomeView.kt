@@ -85,6 +85,8 @@ fun HomeView(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
+    onSendWalletToken: () -> Unit,
+    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -134,6 +136,8 @@ fun HomeView(
                 onFeedUserClick = onFeedUserClick,
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
+                onSendWalletToken = onSendWalletToken,
+                onReceiveWalletToken = onReceiveWalletToken,
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
@@ -178,6 +182,8 @@ private fun HomeScaffold(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
+    onSendWalletToken: () -> Unit,
+    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -230,6 +236,8 @@ private fun HomeScaffold(
                     onCreateRoomClick = onCreateRoomClick,
                     onFeedClick = onFeedClick,
                     onFeedUserClick = onFeedUserClick,
+                    onSendWalletToken = onSendWalletToken,
+                    onReceiveWalletToken = onReceiveWalletToken,
                     modifier = Modifier
                         .padding(padding)
                         .consumeWindowInsets(padding)
@@ -308,6 +316,8 @@ internal fun HomeScreenContent(
     onCreateRoomClick: () -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
+    onSendWalletToken: () -> Unit = {},
+    onReceiveWalletToken: () -> Unit = {},
     modifier: Modifier,
 ) {
     fun onNotificationClick(room: RoomListRoomSummary) {
@@ -359,8 +369,10 @@ internal fun HomeScreenContent(
         }
         HomeScreenTab.WALLET -> {
             HomeWalletContent(
+                modifier = modifier,
                 state = state.walletContentState,
-                modifier = modifier
+                onSendWalletToken = onSendWalletToken,
+                onReceiveWalletToken = onReceiveWalletToken
             )
         }
         /*HomeScreenTab.PROFILE -> {
@@ -400,5 +412,7 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onCreateFeedClick = {},
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},
+        onSendWalletToken = {},
+        onReceiveWalletToken = {}
     )
 }

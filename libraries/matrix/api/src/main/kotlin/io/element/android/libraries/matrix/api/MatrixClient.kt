@@ -46,6 +46,7 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -287,6 +288,10 @@ interface MatrixClient {
     suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
 
     suspend fun claimRewards(walletAddress: String): Result<String>
+
+    suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>>
+
+    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String>
 }
 
 /**

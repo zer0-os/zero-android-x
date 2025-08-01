@@ -190,7 +190,10 @@ fun ClaimRewardsSheet(
 
             Row(Modifier.fillMaxWidth()) {
                 if (actionState is AsyncAction.Success || actionState is AsyncAction.Failure) {
-                    SecondaryButton(text = secondaryButtonText, onClick = onSecondaryButtonClick)
+                    SecondaryButton(
+                        text = secondaryButtonText,
+                        onClick = onSecondaryButtonClick
+                    )
                     Spacer(Modifier.size(12.dp))
                     CloseButton()
                 }
@@ -215,9 +218,9 @@ fun RowScope.SecondaryButton(
             ),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors().copy(
-            containerColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.15f)
+            containerColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f)
         ),
-        onClick = { StateBus.onRewardsClaimed() }
+        onClick = onClick
     ) {
         Text(
             text,

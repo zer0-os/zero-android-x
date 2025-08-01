@@ -1,4 +1,11 @@
-package io.element.android.features.zeroinvite.impl
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package io.element.android.features.wallettransactions.impl.transfertoken
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,17 +18,17 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.libraries.di.SessionScope
 
 @ContributesNode(SessionScope::class)
-class InviteNode @AssistedInject constructor(
+class TransferTokenNode @AssistedInject constructor(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
-    private val presenter: InvitePresenter,
+    private val presenter: TransferTokenPresenter,
 ) : Node(buildContext, plugins = plugins) {
 
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
 
-        MessengerInviteView(
+        TransferTokenRootView(
             modifier = modifier,
             state = state,
             onBackClick = ::navigateUp

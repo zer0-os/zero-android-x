@@ -44,6 +44,7 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -496,6 +497,14 @@ class FakeMatrixClient(
     }
 
     override suspend fun claimRewards(walletAddress: String): Result<String> {
+        return Result.success("test_transaction_hash")
+    }
+
+    override suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>> {
+        return Result.success(emptyList())
+    }
+
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String> {
         return Result.success("test_transaction_hash")
     }
 
