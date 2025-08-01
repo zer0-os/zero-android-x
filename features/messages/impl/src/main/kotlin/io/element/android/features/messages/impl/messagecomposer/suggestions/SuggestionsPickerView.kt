@@ -159,7 +159,7 @@ internal fun SuggestionsPickerViewPreview() {
             powerLevel = 0L,
             normalizedPowerLevel = 0L,
             isIgnored = false,
-            role = RoomMember.Role.USER,
+            role = RoomMember.Role.User,
             membershipChangeReason = null,
             primaryZId = null
         )
