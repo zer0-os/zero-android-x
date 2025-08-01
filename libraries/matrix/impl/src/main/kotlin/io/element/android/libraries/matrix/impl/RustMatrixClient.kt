@@ -1150,11 +1150,11 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String> =
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.transferToken(sender, recipient, amount, token).transactionHash
+                walletRepo.transferToken(sender, recipient, amount, token).toModel()
             }
         }
 

@@ -82,7 +82,11 @@ fun ConfirmTransferView(
     ) {
         if (token != null) {
             SenderView(sender, token, onAmountEntered = {
-                transferAmount.value = it
+                if (it.isNotEmpty()) {
+                    transferAmount.value = it
+                } else {
+                    transferAmount.value = "0"
+                }
             })
         }
 

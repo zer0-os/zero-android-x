@@ -220,7 +220,7 @@ private fun TransactionRow(
                 .weight(1f)
                 .padding(horizontal = 12.dp)
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = if (transaction.isTransactionReceived) "Received from" else "Sent to",
                     style = ElementTheme.typography.fontBodySmRegular,

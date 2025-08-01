@@ -60,10 +60,11 @@ class WalletRepositoryImpl(
         return zeroWalletService.searchRecipient(query).recipients
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiTransactionPerformed {
-        return zeroWalletService.transferToken(
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiWalletTransactionReceipt {
+        val transaction = zeroWalletService.transferToken(
             senderWalletAddress = sender,
             request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token)
         )
+        return getTransactionReceipt(transaction.transactionHash)
     }
 }

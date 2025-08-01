@@ -28,5 +28,5 @@ interface WalletRepository {
 
     suspend fun searchRecipients(query: String): List<ApiWalletRecipient>
 
-    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiTransactionPerformed
+    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiWalletTransactionReceipt
 }

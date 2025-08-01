@@ -504,8 +504,8 @@ class FakeMatrixClient(
         return Result.success(emptyList())
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String> {
-        return Result.success("test_transaction_hash")
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
+        return Result.failure(Throwable("test"))
     }
 
     //endregion

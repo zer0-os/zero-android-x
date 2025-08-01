@@ -291,7 +291,7 @@ interface MatrixClient {
 
     suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>>
 
-    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<String>
+    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt>
 }
 
 /**

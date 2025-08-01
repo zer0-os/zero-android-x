@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.CompletedTransferView
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.ConfirmTransferView
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.TransactionInProgressView
@@ -35,6 +36,8 @@ import io.element.android.features.wallettransactions.impl.transfertoken.token.S
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,11 +67,23 @@ fun TransferTokenRootView(
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
-                    BackButton(onClick = { handleBackClick(state, onBackClick) })
+                    if (state.flowStep != TransferTokenFlowStep.COMPLETED &&
+                        state.flowStep != TransferTokenFlowStep.ERROR &&
+                        state.flowStep != TransferTokenFlowStep.IN_PROGRESS) {
+                        BackButton(onClick = { handleBackClick(state, onBackClick) })
+                    }
                 },
                 title = { Text(topBarText(), style = ElementTheme.typography.fontBodyLgMedium) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
-                    .copy(containerColor = Color.Black)
+                    .copy(containerColor = Color.Black),
+                actions = {
+                    if (state.flowStep == TransferTokenFlowStep.COMPLETED ||
+                        state.flowStep == TransferTokenFlowStep.ERROR) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(imageVector = CompoundIcons.Close(), contentDescription = null, tint = ElementTheme.colors.textPrimary)
+                        }
+                    }
+                }
             )
         },
         content = {
@@ -85,7 +100,7 @@ fun TransferTokenRootView(
                     TransferTokenFlowStep.CONFIRMATION -> ConfirmTransferView(state = state)
                     TransferTokenFlowStep.IN_PROGRESS -> TransactionInProgressView()
                     TransferTokenFlowStep.COMPLETED,
-                    TransferTokenFlowStep.ERROR -> CompletedTransferView(state = state)
+                    TransferTokenFlowStep.ERROR -> CompletedTransferView(state = state, onClose = onBackClick)
                 }
             }
         }
@@ -96,6 +111,9 @@ private fun handleBackClick(state: TransferTokenState, onRootBackClick: () -> Un
     when (state.flowStep) {
         TransferTokenFlowStep.TOKEN -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.RECIPIENT))
         TransferTokenFlowStep.CONFIRMATION -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.TOKEN))
+        TransferTokenFlowStep.IN_PROGRESS -> {
+            //not allowed
+        }
         else -> onRootBackClick()
     }
 }

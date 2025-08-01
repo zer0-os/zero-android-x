@@ -14,6 +14,7 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -30,6 +31,7 @@ data class TransferTokenState(
     val meowPrice: ZeroMeowPrice?,
 
     val transferAmount: String? = null,
+    val transactionReceipt: ZeroWalletTransactionReceipt? = null,
 
     val eventSink: (TransferTokenEvents) -> Unit
 ) {

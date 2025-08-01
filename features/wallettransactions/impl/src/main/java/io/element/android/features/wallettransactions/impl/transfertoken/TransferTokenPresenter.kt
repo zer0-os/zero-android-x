@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import io.element.android.features.home.impl.wallet.WalletTokensListState
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -26,6 +27,8 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
+import io.element.android.support.zero.common.extension.openExternalUri
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -38,6 +41,7 @@ class TransferTokenPresenter @Inject constructor(
     @Composable
     override fun present(): TransferTokenState {
         val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
         val currentUser = client.userProfile.collectAsState()
         val flowStep = rememberSaveable { mutableStateOf(TransferTokenFlowStep.RECIPIENT) }
 
@@ -54,7 +58,8 @@ class TransferTokenPresenter @Inject constructor(
         }
         val selectedToken: MutableState<ZeroWalletToken?> = remember { mutableStateOf(null) }
 
-        var transferAmount by rememberSaveable { mutableStateOf<String?>(null) }
+        val transferAmount = rememberSaveable { mutableStateOf<String?>(null) }
+        val transferReceipt = rememberSaveable { mutableStateOf<ZeroWalletTransactionReceipt?>(null) }
 
         LaunchedEffect(Unit) {
             currentUser.value.walletAddress?.let {
@@ -99,14 +104,18 @@ class TransferTokenPresenter @Inject constructor(
                 }
                 is TransferTokenEvents.ConfirmTransaction -> {
                     flowStep.value = TransferTokenFlowStep.IN_PROGRESS
-                    transferAmount = event.amount
+                    transferAmount.value = event.amount
                     coroutineScope.transferToken(
                         currentUser.value,
                         selectedRecipient.value,
                         selectedToken.value,
-                        transferAmount,
+                        transferAmount.value,
+                        transferReceipt,
                         flowStep
                     )
+                }
+                is TransferTokenEvents.ViewTransaction -> {
+                    context.openExternalUri(event.url)
                 }
             }
         }
@@ -120,7 +129,8 @@ class TransferTokenPresenter @Inject constructor(
             tokensListState = walletTokensListState.value,
             tokensPaginationParams = walletTokenPaginationParams.value,
             meowPrice = meowPrice.value,
-            transferAmount = transferAmount,
+            transferAmount = transferAmount.value,
+            transactionReceipt = transferReceipt.value,
             eventSink = ::handleEvents
         )
     }
@@ -172,10 +182,14 @@ class TransferTokenPresenter @Inject constructor(
             }
     }
 
-    private fun CoroutineScope.transferToken(sender: MatrixUser,
-                                             recipient: ZeroWalletRecipient?,
-                                             token: ZeroWalletToken?,
-                                             amount: String?, flowStep: MutableState<TransferTokenFlowStep>) = launch {
+    private fun CoroutineScope.transferToken(
+        sender: MatrixUser,
+        recipient: ZeroWalletRecipient?,
+        token: ZeroWalletToken?,
+        amount: String?,
+        transferReceiptFlow: MutableState<ZeroWalletTransactionReceipt?>,
+        flowStep: MutableState<TransferTokenFlowStep>
+    ) = launch {
         val recipient = recipient ?: return@launch
         val token = token ?: return@launch
         val senderWalletAddress = sender.walletAddress ?: return@launch
@@ -186,6 +200,7 @@ class TransferTokenPresenter @Inject constructor(
             amount = amount,
             token = token.tokenAddress
         ).onSuccess {
+            transferReceiptFlow.value = it
             flowStep.value = TransferTokenFlowStep.COMPLETED
         }.onFailure {
             flowStep.value = TransferTokenFlowStep.ERROR
