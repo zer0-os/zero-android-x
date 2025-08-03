@@ -10,7 +10,7 @@ package io.element.android.libraries.matrix.api.zero.feed
 import android.os.Parcelable
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
-import io.element.android.libraries.matrix.api.zero.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger

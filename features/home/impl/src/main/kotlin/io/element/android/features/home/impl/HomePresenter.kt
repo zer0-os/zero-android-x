@@ -7,14 +7,17 @@
 
 package io.element.android.features.home.impl
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,9 +27,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.platform.LocalContext
+import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
 import io.element.android.features.home.impl.model.channelId
 import io.element.android.features.home.impl.roomlist.RoomListState
+import io.element.android.features.home.impl.wallet.WalletContentState
+import io.element.android.features.home.impl.wallet.WalletTokensListState
+import io.element.android.features.home.impl.wallet.WalletTransactionsListState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.AsyncAction
@@ -43,12 +52,26 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
+import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.walletAddress
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
+import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
+import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.collections.immutable.toPersistentList
@@ -57,6 +80,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -82,6 +106,7 @@ class HomePresenter @Inject constructor(
 
     @Composable
     override fun present(): HomeState {
+        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         val matrixUser = client.userProfile.collectAsState()
         val isOnline by syncService.isOnline.collectAsState()
@@ -100,6 +125,8 @@ class HomePresenter @Inject constructor(
         var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
         val userRewards = client.userRewards.collectAsState()
+        val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
+        val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
@@ -107,9 +134,34 @@ class HomePresenter @Inject constructor(
         val feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>> =
             remember { mutableStateOf(AsyncAction.Uninitialized) }
 
+        val showWalletBalance = remember { mutableStateOf(true) }
+        val userWalletBalance = remember { mutableDoubleStateOf(0.0) }
+        val meowPrice: MutableState<ZeroMeowPrice?> = remember { mutableStateOf(null) }
+        val walletTokensListState: MutableState<WalletTokensListState> = remember {
+            mutableStateOf(WalletTokensListState.Skeleton(10))
+        }
+        val walletTokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?> = remember {
+            mutableStateOf(null)
+        }
+        val walletTransactionsListState: MutableState<WalletTransactionsListState> = remember {
+            mutableStateOf(WalletTransactionsListState.Skeleton(10))
+        }
+        val walletTransactionsPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?> =
+            remember { mutableStateOf(null) }
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
+            // Check user wallet address to fetch wallet data
+            client.userProfile.collectLatest {
+                it.walletAddress?.let { userWalletAddress ->
+                    fetchWalletData(
+                        meowPrice, userWalletAddress, userWalletBalance,
+                        walletTokensListState, walletTransactionsListState,
+                        walletTokenPaginationParams, walletTransactionsPaginationParams
+                    )
+                }
+            }
             fetchInitialData()
         }
         // Avatar indicator
@@ -153,6 +205,34 @@ class HomePresenter @Inject constructor(
                     coroutineScope.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
                 }
                 HomeEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
+                is HomeEvents.LoadMoreTokens -> {
+                    matrixUser.value.walletAddress?.let { address ->
+                        coroutineScope.loadMoreWalletTokens(
+                            walletAddress = address,
+                            currentList = event.currentTokens,
+                            walletTokensListState = walletTokensListState,
+                            tokenPaginationParams = walletTokenPaginationParams
+                        )
+                    }
+                }
+                is HomeEvents.LoadMoreTransactions -> {
+                    matrixUser.value.walletAddress?.let { address ->
+                        coroutineScope.loadMoreWalletTransactions(
+                            walletAddress = address,
+                            currentList = event.currentTransactions,
+                            walletTransactionsListState = walletTransactionsListState,
+                            transactionPaginationParams = walletTransactionsPaginationParams
+                        )
+                    }
+                }
+                is HomeEvents.ViewWalletTransaction -> {
+                    coroutineScope.loadWalletTransaction(
+                        event.transactionId, context, genericActionState
+                    )
+                }
+                HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
+                HomeEvents.ClaimRewards -> coroutineScope
+                    .claimUserRewards(matrixUser.value, claimRewardsActionState)
             }
         }
 
@@ -207,6 +287,19 @@ class HomePresenter @Inject constructor(
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
             feedMediaPreviewState = feedMediaPreviewActionState.value,
+            walletContentState = WalletContentState(
+                userName = matrixUser.value.displayName ?: "",
+                showWalletBalance = showWalletBalance.value,
+                walletBalance = userWalletBalance.doubleValue,
+                tokensListState = walletTokensListState.value,
+                transactionsListState = walletTransactionsListState.value,
+                tokensPaginationParams = walletTokenPaginationParams.value,
+                transactionsPaginationParams = walletTransactionsPaginationParams.value,
+                meowPrice = meowPrice.value,
+                eventSink = ::handleEvents
+            ),
+            showClaimRewardsSheet = showClaimRewardsSheet.value,
+            claimRewardActionState = claimRewardsActionState.value,
             eventSink = ::handleEvents,
         )
     }
@@ -468,5 +561,127 @@ class HomePresenter @Inject constructor(
             .onFailure { failure ->
                 feedMediaPreviewActionState.value = AsyncAction.Failure(failure)
             }
+    }
+
+    private fun CoroutineScope.fetchWalletData(
+        meowPrice: MutableState<ZeroMeowPrice?>,
+        walletAddress: String,
+        userWalletBalance: MutableDoubleState,
+        walletTokensListState: MutableState<WalletTokensListState>,
+        walletTransactionsListState: MutableState<WalletTransactionsListState>,
+        tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
+        transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
+    ) = launch(context = Dispatchers.IO) {
+        val results = awaitAll(
+            async { client.getMeowPrice() },
+            async { client.getWalletTokens(walletAddress, tokenPaginationParams.value) },
+            async { client.getWalletTransactions(walletAddress, transactionPaginationParams.value) },
+        )
+        (results[0] as? Result<ZeroMeowPrice>)?.let {
+            meowPrice.value = it.getOrNull()
+        }
+        (results[1] as? Result<ZeroWalletTokensResponse>)?.let {
+            it.onSuccess { result ->
+                val tokensList = result.tokens
+                setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
+                walletTokensListState.value = WalletTokensListState.Tokens(tokensList.toPersistentList())
+                tokenPaginationParams.value = result.paginationParams
+            }.onFailure {
+                walletTokensListState.value = WalletTokensListState.Empty
+            }
+        }
+        (results[2] as? Result<ZeroWalletTransactionsResponse>)?.let {
+            it.onSuccess { result ->
+                walletTransactionsListState.value = WalletTransactionsListState.Transactions(result.transactions.toPersistentList())
+                transactionPaginationParams.value = result.paginationParams
+            }.onFailure {
+                walletTransactionsListState.value = WalletTransactionsListState.Empty
+            }
+        }
+    }
+
+    private fun CoroutineScope.loadMoreWalletTokens(
+        walletAddress: String,
+        currentList: List<ZeroWalletToken>,
+        walletTokensListState: MutableState<WalletTokensListState>,
+        tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
+    ) = launch {
+        client.getWalletTokens(walletAddress, tokenPaginationParams.value)
+            .onSuccess {
+                val newList = mutableListOf<ZeroWalletToken>().apply {
+                    addAll(currentList)
+                    addAll(it.tokens)
+                }.distinctBy { token -> token.tokenAddress }
+                walletTokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
+                tokenPaginationParams.value = it.paginationParams
+            }
+            .onFailure {
+                //Failed to load tokens next page
+            }
+    }
+
+    private fun CoroutineScope.loadMoreWalletTransactions(
+        walletAddress: String,
+        currentList: List<ZeroWalletTransaction>,
+        walletTransactionsListState: MutableState<WalletTransactionsListState>,
+        transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
+    ) = launch {
+        client.getWalletTransactions(walletAddress, transactionPaginationParams.value)
+            .onSuccess {
+                val newList = mutableListOf<ZeroWalletTransaction>().apply {
+                    addAll(currentList)
+                    addAll(it.transactions)
+                }.distinctBy { trans -> trans.hash }
+                walletTransactionsListState.value = WalletTransactionsListState.Transactions(newList.toPersistentList())
+                transactionPaginationParams.value = it.paginationParams
+            }
+            .onFailure {
+                //Failed to load transactions next page
+            }
+    }
+
+    private fun CoroutineScope.loadWalletTransaction(
+        transactionId: String,
+        context: Context,
+        genericActionState: MutableState<AsyncAction<Unit>>
+    ) = launch {
+        genericActionState.value = AsyncAction.Loading
+        client.getTransactionReceipt(transactionId)
+            .onSuccess {
+                genericActionState.value = AsyncAction.Success(Unit)
+                context.openExternalUri(it.blockExplorerUrl)
+            }
+            .onFailure {
+                genericActionState.value = AsyncAction.Failure(it)
+            }
+    }
+
+    private fun setWalletBalance(tokensList: List<ZeroWalletToken>,
+                                 meowPrice: ZeroMeowPrice?,
+                                 userWalletBalance: MutableDoubleState
+    ) {
+        val meowPrice = meowPrice ?: return
+        val meowTokens = tokensList.filter { it.isMeowToken }
+        val userBalance = ZeroWalletUtil.getWalletBalance(
+            meowTokenAmount = meowTokens.sumOf { it.tokenAmount },
+            meowPrice = meowPrice
+        )
+        userWalletBalance.doubleValue = userBalance
+    }
+
+    private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,
+                                                claimRewardsActionState: MutableState<AsyncAction<String>>
+    ) = launch {
+        matrixUser.walletAddress?.let {
+            claimRewardsActionState.value = AsyncAction.Loading
+            client.claimRewards(it)
+                .onSuccess { transaction ->
+                    claimRewardsActionState.value = AsyncAction.Success(transaction)
+                    client.getUserRewards()
+                }
+                .onFailure { error ->
+                    claimRewardsActionState.value = AsyncAction.Failure(error)
+                }
+        }
     }
 }

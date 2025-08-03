@@ -8,11 +8,17 @@
 package io.element.android.features.home.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.channel.aPlaceholderChannelListContentState
+import io.element.android.features.home.impl.feed.FeedListContentState
+import io.element.android.features.home.impl.feed.aPlaceholderFeedListContentState
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.roomlist.RoomListStateProvider
 import io.element.android.features.home.impl.roomlist.aRoomListState
 import io.element.android.features.home.impl.roomlist.aRoomsContentState
 import io.element.android.features.home.impl.roomlist.generateRoomListRoomSummaryList
+import io.element.android.features.home.impl.wallet.WalletContentState
+import io.element.android.features.home.impl.wallet.aWalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.logout.api.direct.aDirectLogoutState
 import io.element.android.libraries.architecture.AsyncAction
@@ -65,6 +71,7 @@ internal fun aHomeState(
     canReportBug: Boolean = true,
     isSpaceFeatureEnabled: Boolean = false,
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
+    walletContentState: WalletContentState = aWalletContentState(),
     eventSink: (HomeEvents) -> Unit = {}
 ) = HomeState(
     matrixUser = matrixUser,
@@ -83,5 +90,7 @@ internal fun aHomeState(
     canReportBug = canReportBug,
     directLogoutState = directLogoutState,
     isSpaceFeatureEnabled = isSpaceFeatureEnabled,
+    walletContentState = walletContentState,
+    showClaimRewardsSheet = false,
     eventSink = eventSink,
 )

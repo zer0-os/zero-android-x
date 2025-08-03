@@ -35,5 +35,7 @@ interface HomeEntryPoint : FeatureEntryPoint {
         fun onCreateFeedClick()
         fun onFeedUserClick(profile: FeedUserProfileView)
         fun onUserProfileClick()
+        fun onSendWalletToken()
+        fun onReceiveWalletToken()
     }
 }

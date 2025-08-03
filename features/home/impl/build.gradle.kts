@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.haze.materials)
     implementation(projects.features.reportroom.api)
     api(projects.features.home.api)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.androidx.compose.ui.test.junit)
     testReleaseImplementation(libs.androidx.compose.ui.test.manifest)

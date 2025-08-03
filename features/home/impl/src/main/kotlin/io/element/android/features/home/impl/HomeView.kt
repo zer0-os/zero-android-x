@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -32,21 +33,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.home.impl.components.HomeChannelListContentView
+import io.element.android.features.home.impl.channel.HomeChannelListContentView
+import io.element.android.features.home.impl.components.ClaimRewardsSheet
 import io.element.android.features.home.impl.components.HomeFabButton
-import io.element.android.features.home.impl.components.HomeFeedListContentView
-import io.element.android.features.home.impl.components.HomeNotificationListContentView
 import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
-import io.element.android.features.home.impl.components.RoomListContentView
-import io.element.android.features.home.impl.components.RoomListMenuAction
+import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
+import io.element.android.features.home.impl.notification.HomeNotificationListContentView
+import io.element.android.features.home.impl.roomlist.RoomListContentView
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
 import io.element.android.features.home.impl.roomlist.RoomListDeclineInviteMenu
 import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
+import io.element.android.features.home.impl.wallet.HomeWalletContent
 import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
@@ -55,6 +58,7 @@ import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
@@ -62,6 +66,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
 @Composable
@@ -80,6 +85,8 @@ fun HomeView(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
+    onSendWalletToken: () -> Unit,
+    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -129,6 +136,8 @@ fun HomeView(
                 onFeedUserClick = onFeedUserClick,
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
+                onSendWalletToken = onSendWalletToken,
+                onReceiveWalletToken = onReceiveWalletToken,
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
@@ -173,6 +182,8 @@ private fun HomeScaffold(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
+    onSendWalletToken: () -> Unit,
+    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -188,6 +199,8 @@ private fun HomeScaffold(
     val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
         mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
     }
+
+    val claimRewardsSheetState = rememberModalBottomSheetState()
 
     Box {
         Scaffold(
@@ -223,6 +236,8 @@ private fun HomeScaffold(
                     onCreateRoomClick = onCreateRoomClick,
                     onFeedClick = onFeedClick,
                     onFeedUserClick = onFeedUserClick,
+                    onSendWalletToken = onSendWalletToken,
+                    onReceiveWalletToken = onReceiveWalletToken,
                     modifier = Modifier
                         .padding(padding)
                         .consumeWindowInsets(padding)
@@ -239,7 +254,8 @@ private fun HomeScaffold(
             // Floating Action button
             if (state.shouldDisplayActions(selectedNavigationTab.value)) {
                 HomeFabButton(
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(horizontal = 16.dp),
                     onClick = {
                         when {
@@ -265,6 +281,29 @@ private fun HomeScaffold(
             state.eventSink(HomeEvents.DismissFeedMedia)
         })
     }
+
+    if (state.showClaimRewardsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                StateBus.onRewardsClaimed()
+            },
+            sheetState = claimRewardsSheetState,
+            dragHandle = null,
+            content = {
+                ClaimRewardsSheet(
+                    userRewards = state.userRewards,
+                    actionState = state.claimRewardActionState,
+                    meowPrice = state.walletContentState.meowPrice,
+                    onViewTransaction = { transaction ->
+                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction))
+                    },
+                    onClaimRewards = {
+                        state.eventSink(HomeEvents.ClaimRewards)
+                    }
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -277,6 +316,8 @@ internal fun HomeScreenContent(
     onCreateRoomClick: () -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
+    onSendWalletToken: () -> Unit = {},
+    onReceiveWalletToken: () -> Unit = {},
     modifier: Modifier,
 ) {
     fun onNotificationClick(room: RoomListRoomSummary) {
@@ -326,6 +367,14 @@ internal fun HomeScreenContent(
                 modifier = modifier
             )
         }
+        HomeScreenTab.WALLET -> {
+            HomeWalletContent(
+                modifier = modifier,
+                state = state.walletContentState,
+                onSendWalletToken = onSendWalletToken,
+                onReceiveWalletToken = onReceiveWalletToken
+            )
+        }
         /*HomeScreenTab.PROFILE -> {
             HomeFeedListContentView(
                 contentState = state.myFeedsContentState,
@@ -363,5 +412,7 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onCreateFeedClick = {},
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},
+        onSendWalletToken = {},
+        onReceiveWalletToken = {}
     )
 }

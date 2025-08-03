@@ -42,7 +42,14 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.test.encryption.FakeEncryptionService
 import io.element.android.libraries.matrix.test.media.FakeMatrixMediaLoader
 import io.element.android.libraries.matrix.test.media.FakeMediaPreviewService
@@ -471,6 +478,34 @@ class FakeMatrixClient(
 
     override suspend fun unFollowUser(userId: String): Result<Boolean> {
         return Result.success(true)
+    }
+
+    override suspend fun getMeowPrice(): Result<ZeroMeowPrice> {
+        return Result.failure(Throwable("test"))
+    }
+
+    override suspend fun getWalletTokens(walletAddress: String, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
+        return Result.failure(Throwable("test"))
+    }
+
+    override suspend fun getWalletTransactions(walletAddress: String, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
+        return Result.failure(Throwable("test"))
+    }
+
+    override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt> {
+        return Result.failure(Throwable("test"))
+    }
+
+    override suspend fun claimRewards(walletAddress: String): Result<String> {
+        return Result.success("test_transaction_hash")
+    }
+
+    override suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>> {
+        return Result.success(emptyList())
+    }
+
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
+        return Result.failure(Throwable("test"))
     }
 
     //endregion

@@ -14,4 +14,15 @@ object StateBus {
 	fun onUserStateChanged(state: UserState) {
 		userStateFlow.value = state
 	}
+
+    private val claimRewardsStateFlow = MutableStateFlow(false)
+    val claimRewardsStateObservable: Flow<Boolean> = claimRewardsStateFlow
+
+    fun onClaimUserRewards() {
+        claimRewardsStateFlow.value = true
+    }
+
+    fun onRewardsClaimed() {
+        claimRewardsStateFlow.value = false
+    }
 }

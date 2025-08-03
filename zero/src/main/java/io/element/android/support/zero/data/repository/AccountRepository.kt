@@ -12,8 +12,6 @@ interface AccountRepository {
 
     suspend fun fetchUserZIds(): List<String>
 
-    suspend fun checkAndInitializeThirdWeb()
-
     suspend fun saveLoggedInUserInfo(user: MatrixUser)
 
     fun getLoggedInUser(): MatrixUser?

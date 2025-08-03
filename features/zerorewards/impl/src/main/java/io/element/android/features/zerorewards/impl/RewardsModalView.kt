@@ -47,6 +47,7 @@ import io.element.android.support.zero.common.ui.theme.PADDING_3X
 import io.element.android.support.zero.common.ui.theme.PADDING_8X
 import io.element.android.support.zero.common.ui.theme.SPACING_10X
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
+import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,6 +171,20 @@ fun ColumnScope.RewardCredits(
                 style = ElementTheme.zeroTypography.fontBodyMdRegularRoboto,
                 color = ElementTheme.colors.textSecondary
             )
+
+            if (rewards.hasUnclaimedRewards) {
+                Spacer(modifier = Modifier.size(SPACING_4X.dp))
+                val unclaimedRewardsPrice = RewardsUtil.getRefPrice(
+                    zero = rewards.unclaimedRewards,
+                    decimals = rewards.decimals,
+                    refPrice = rewards.price
+                )
+                Text(
+                    text = "You can now claim $$unclaimedRewardsPrice".trim(),
+                    style = ElementTheme.zeroTypography.fontBodyMdRegularRoboto,
+                    color = ElementTheme.colors.textSecondary
+                )
+            }
         }
     }
 

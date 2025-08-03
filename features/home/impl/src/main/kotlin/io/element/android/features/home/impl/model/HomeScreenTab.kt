@@ -18,5 +18,6 @@ enum class HomeScreenTab(
     CHANNEL("Channels", R.drawable.home_tab_channel_icon),
     FEED("Feed", R.drawable.home_tab_feed_icon),
     NOTIFICATION("Notifications", R.drawable.home_tab_notification_icon),
+    WALLET("Wallet", R.drawable.home_tab_wallet_icon),
 //    PROFILE("Profile", R.drawable.home_tab_profile_icon),
 }

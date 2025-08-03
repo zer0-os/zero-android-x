@@ -32,7 +32,7 @@ class RewardsRepositoryImpl(
                 val apiZeroRewards =
                     awaitAll(
                         async { zeroRewardService.fetchMyRewards() },
-                        async { zeroRewardService.fetchZeroTokens() }
+                        async { getMeowPrice() }
                     )
                 val userRewards = (apiZeroRewards.first() as? ApiUserRewards)
                     ?.toModel(apiZeroRewards[1] as? ApiZeroTokens)
@@ -51,6 +51,10 @@ class RewardsRepositoryImpl(
                 }
             }
         }
+    }
+
+    override suspend fun getMeowPrice(): ApiZeroTokens {
+        return zeroRewardService.fetchZeroTokens()
     }
 
     override suspend fun dismissRewardsIntimation() {

@@ -57,10 +57,18 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.impl.conversion.map
+import io.element.android.libraries.matrix.impl.conversion.toModel
 import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.exception.mapClientException
@@ -99,6 +107,7 @@ import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import io.element.android.support.zero.data.conversion.toApi
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
@@ -379,7 +388,7 @@ class RustMatrixClient(
                 powerLevelContentOverride = defaultRoomCreationPowerLevels.copy(
                     invite = if (createRoomParams.joinRuleOverride == JoinRule.Knock) {
                         // override the invite power level so it's the same as kick.
-                        RoomMember.Role.MODERATOR.powerLevel.toInt()
+                        RoomMember.Role.Moderator.powerLevel.toInt()
                     } else {
                         null
                     }
@@ -1001,8 +1010,8 @@ class RustMatrixClient(
     }
 
     override suspend fun checkZeroThirdWebWallet() {
-        val zeroAccountRepo = zeroCoreRepository?.account ?: return
-        zeroAccountRepo.checkAndInitializeThirdWeb()
+        val zeroWalletRepo = zeroCoreRepository?.wallet ?: return
+        zeroWalletRepo.checkAndInitializeThirdWeb()
         getUserProfile()
     }
 
@@ -1089,6 +1098,63 @@ class RustMatrixClient(
             runCatching {
                 val feedUserRepo = zeroCoreRepository?.feedUser ?: return@withContext Result.failure(Throwable("Feed user repository is not initialized yet."))
                 feedUserRepo.unFollowUser(userId)
+            }
+        }
+
+    override suspend fun getMeowPrice(): Result<ZeroMeowPrice> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val rewardsRepo = zeroCoreRepository?.rewards ?: return@withContext Result.failure(Throwable("Rewards repository is not initialized yet."))
+                rewardsRepo.getMeowPrice().toModel()
+            }
+        }
+
+    override suspend fun getWalletTokens(walletAddress: String,
+                                         paginationParams: ZeroWalletTokensPaginationParams?
+    ): Result<ZeroWalletTokensResponse> = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.getTokens(walletAddress, paginationParams?.toApi()).toModel()
+        }
+    }
+
+    override suspend fun getWalletTransactions(walletAddress: String,
+                                               paginationParams: ZeroWalletTransactionsPaginationParams?
+    ): Result<ZeroWalletTransactionsResponse> = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.getTransactions(walletAddress, paginationParams?.toApi()).toModel()
+        }
+    }
+
+    override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
+    = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.getTransactionReceipt(transactionId).toModel()
+        }
+    }
+
+    override suspend fun claimRewards(walletAddress: String): Result<String> = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.claimRewards(walletAddress).transactionHash
+        }
+    }
+
+    override suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                walletRepo.searchRecipients(query).map { it.toModel() }
+            }
+        }
+
+    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                walletRepo.transferToken(sender, recipient, amount, token).toModel()
             }
         }
 

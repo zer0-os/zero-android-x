@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.element.android.features.feeddetails.impl.FeedDetailsEvents
 import io.element.android.features.feeddetails.impl.FeedDetailsState
-import io.element.android.features.home.impl.components.HomeFeedRow
+import io.element.android.features.home.impl.feed.HomeFeedRow
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed

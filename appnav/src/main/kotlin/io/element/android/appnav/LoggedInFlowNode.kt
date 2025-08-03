@@ -62,6 +62,7 @@ import io.element.android.features.securebackup.api.SecureBackupEntryPoint
 import io.element.android.features.share.api.ShareEntryPoint
 import io.element.android.features.userprofile.api.UserProfileEntryPoint
 import io.element.android.features.verifysession.api.IncomingVerificationEntryPoint
+import io.element.android.features.wallettransactions.api.WalletTransactionsEntryPoint
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.createNode
@@ -130,6 +131,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
+    private val walletTransactionsEntryPoint: WalletTransactionsEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -295,6 +297,12 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class AvatarPreview(val name: String, val avatarUrl: String) : NavTarget
+
+        @Parcelize
+        data object SendWalletToken : NavTarget
+
+//        @Parcelize
+//        data object ReceiveWalletToken : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -356,6 +364,14 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onUserProfileClick() {
                         backstack.push(NavTarget.UserProfile(userId = matrixClient.sessionId))
+                    }
+
+                    override fun onSendWalletToken() {
+                        backstack.push(NavTarget.SendWalletToken)
+                    }
+
+                    override fun onReceiveWalletToken() {
+                        //TODO: backstack.push(NavTarget.ReceiveWalletToken)
                     }
                 }
                 homeEntryPoint
@@ -605,6 +621,18 @@ class LoggedInFlowNode @AssistedInject constructor(
                     .callback(callback)
                     .build()
             }
+            NavTarget.SendWalletToken -> {
+                walletTransactionsEntryPoint.nodeBuilder(this, buildContext)
+                    .params(
+                        WalletTransactionsEntryPoint.Params(
+                            transactionType = WalletTransactionsEntryPoint.TransactionType.Token
+                        )
+                    )
+                    .build()
+            }
+//            NavTarget.ReceiveWalletToken -> {
+//
+//            }
         }
     }
 

@@ -25,7 +25,7 @@ import dagger.assisted.AssistedInject
 import im.vector.app.features.analytics.plan.MobileScreen
 import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.home.api.HomeEntryPoint
-import io.element.android.features.home.impl.components.RoomListMenuAction
+import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.invite.api.InviteData
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteView
@@ -128,6 +128,14 @@ class HomeFlowNode @AssistedInject constructor(
         plugins<HomeEntryPoint.Callback>().forEach { it.onUserProfileClick() }
     }
 
+    private fun onSendWalletToken() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onSendWalletToken() }
+    }
+
+    private fun onReceiveWalletToken() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onReceiveWalletToken() }
+    }
+
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {
         when (roomListMenuAction) {
             RoomListMenuAction.InviteFriends -> {
@@ -159,6 +167,8 @@ class HomeFlowNode @AssistedInject constructor(
                 onFeedUserClick = this::onFeedUserClick,
                 onUserProfileClick = this::onUserProfileClick,
                 onCreateFeedClick = this::onCreateFeedClick,
+                onSendWalletToken = this::onSendWalletToken,
+                onReceiveWalletToken = this::onReceiveWalletToken,
                 modifier = modifier,
             ) {
                 acceptDeclineInviteView.Render(
