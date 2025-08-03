@@ -42,7 +42,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 // Note: 2 digits max for each value
 private const val versionMajor = 0
-private const val versionMinor = 10
+private const val versionMinor = 11
 
 // Note: even values are reserved for regular release, odd values for hotfix release.
 // When creating a hotfix, you should decrease the value, since the current value
