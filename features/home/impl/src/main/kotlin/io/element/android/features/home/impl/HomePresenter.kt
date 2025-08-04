@@ -81,7 +81,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.jvm.optionals.getOrNull
@@ -152,17 +154,20 @@ class HomePresenter @Inject constructor(
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
-            // Check user wallet address to fetch wallet data
-            client.userProfile.collectLatest {
-                it.walletAddress?.let { userWalletAddress ->
+            // Fetch initial zero data
+            fetchInitialData()
+        }
+        LaunchedEffect(Unit) {
+            client.userProfile
+                .mapNotNull { it.walletAddress }
+                .distinctUntilChanged()
+                .collectLatest {
                     fetchWalletData(
-                        meowPrice, userWalletAddress, userWalletBalance,
+                        meowPrice, it, userWalletBalance,
                         walletTokensListState, walletTransactionsListState,
                         walletTokenPaginationParams, walletTransactionsPaginationParams
                     )
                 }
-            }
-            fetchInitialData()
         }
         // Avatar indicator
         val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()

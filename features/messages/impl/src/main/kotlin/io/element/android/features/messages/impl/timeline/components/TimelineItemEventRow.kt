@@ -407,6 +407,7 @@ private fun TimelineItemEventRowContent(
                         senderProfile = event.senderProfile,
                         senderNameMode = SenderNameMode.Timeline(ElementTheme.colors.zeroBrandColor),
                         modifier = Modifier
+                            .clickable(onClick = onUserDataClick)
                             .padding(top = 8.dp, start = 12.dp, bottom = 0.dp, end = 12.dp)
                     )
                 }

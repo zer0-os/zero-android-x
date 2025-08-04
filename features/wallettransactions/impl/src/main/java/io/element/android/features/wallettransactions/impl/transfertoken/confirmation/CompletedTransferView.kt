@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
@@ -132,7 +133,7 @@ fun TokenInfoView(
                 contentDescription = null,
                 placeholder = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
-            ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd))
+            ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
         }
 
         Spacer(Modifier.size(16.dp))

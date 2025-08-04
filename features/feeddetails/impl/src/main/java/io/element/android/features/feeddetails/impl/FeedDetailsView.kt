@@ -9,6 +9,7 @@ package io.element.android.features.feeddetails.impl
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ fun FeedDetailsView(
         Column(modifier = Modifier
             .padding(padding)
             .consumeWindowInsets(padding)
+            .imePadding()
         ) {
             FeedDetailsWithReplies(
                 modifier = Modifier.weight(1f),

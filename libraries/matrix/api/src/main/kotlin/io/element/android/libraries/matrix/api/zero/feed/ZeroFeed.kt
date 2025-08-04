@@ -108,8 +108,9 @@ data class ZeroFeed(
 fun ZeroFeed.totalMeowCount(decimal: Int): String {
     val value = postsMeowsSummary?.totalMeowAmount ?: "0"
     return try {
+        val maxDecimals = maxOf(decimal, 18)
         val bigIntValue = BigInteger(value)
-        val divisor = BigInteger.TEN.pow(decimal)
+        val divisor = BigInteger.TEN.pow(maxDecimals)
 
         (bigIntValue / divisor).toString()
     } catch (e: NumberFormatException) {

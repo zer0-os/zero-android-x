@@ -16,6 +16,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.network.model.response.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.ApiWalletTokens
 import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
@@ -26,11 +27,12 @@ import io.element.android.support.zero.network.model.response.TransactionNextPag
 fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
     return ZeroWalletTokensResponse(
         tokens = tokens.map { token ->
+            val tokenAmount = token.amount.toDoubleOrNull() ?: 0.0
             ZeroWalletToken(
                 token.tokenAddress,
                 token.symbol,
                 token.name,
-                token.amount,
+                ZeroWalletUtil.getFormattedNumber(tokenAmount, false),
                 token.logo,
                 token.decimals
             )
@@ -49,6 +51,7 @@ fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
 fun ApiWalletTransactions.toModel(): ZeroWalletTransactionsResponse {
     return ZeroWalletTransactionsResponse(
         transactions = transactions.map { transaction ->
+            val transactionAmount = transaction.amount?.toDoubleOrNull() ?: 0.0
             ZeroWalletTransaction(
                 transaction.hash,
                 transaction.from,
@@ -60,7 +63,7 @@ fun ApiWalletTransactions.toModel(): ZeroWalletTransactionsResponse {
                     transaction.token.logo,
                     transaction.token.decimals
                 ),
-                transaction.amount,
+                ZeroWalletUtil.getFormattedNumber(transactionAmount, false),
                 transaction.timestamp,
                 transaction.tokenId,
                 transaction.type

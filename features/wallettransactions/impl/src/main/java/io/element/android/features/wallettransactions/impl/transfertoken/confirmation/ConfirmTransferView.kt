@@ -42,8 +42,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.wallettransactions.impl.transfertoken.TransferTokenEvents
@@ -312,7 +314,7 @@ fun TokenView(
                 placeholder = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
 
-            ZChainIcon(Modifier.align(Alignment.BottomEnd))
+            ZChainIcon(Modifier.align(Alignment.BottomEnd).zIndex(1f))
         }
 
         Spacer(Modifier.size(12.dp))
@@ -320,7 +322,9 @@ fun TokenView(
         Column(horizontalAlignment = Alignment.Start) {
             Text(
                 text = token.name.uppercase(),
-                style = ElementTheme.typography.fontHeadingSmRegular
+                style = ElementTheme.typography.fontHeadingSmRegular,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "Z Chain",
