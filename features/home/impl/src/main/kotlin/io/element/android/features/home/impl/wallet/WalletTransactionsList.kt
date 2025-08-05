@@ -206,14 +206,14 @@ private fun TransactionRow(
     ) {
         AsyncImage(
             modifier = Modifier
-                .size(56.dp)
+                .size(40.dp)
                 .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
                 .clip(CircleShape),
             model = transaction.token.logo,
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,
             contentDescription = null,
-            placeholder = painterResource(R.drawable.ic_zero_avatar_default)
+            error = painterResource(R.drawable.ic_zero_avatar_default),
         )
 
         Column(
@@ -236,12 +236,14 @@ private fun TransactionRow(
                 Text(
                     text = walletAddress ?: "",
                     style = ElementTheme.typography.fontBodySmRegular,
-                    color = ElementTheme.colors.textSecondary
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
                 text = transaction.token.name,
-                style = ElementTheme.typography.fontHeadingSmRegular,
+                style = ElementTheme.typography.fontBodyLgRegular,
                 color = ElementTheme.colors.textPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -252,7 +254,7 @@ private fun TransactionRow(
             val tokenAmount = "${transaction.amount} ${transaction.token.symbol.uppercase()}"
             Text(
                 tokenAmount,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.typography.fontBodyMdRegular,
                 color = ElementTheme.colors.textPrimary
             )
 
@@ -260,7 +262,7 @@ private fun TransactionRow(
                 val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(transaction.tokenAmount, meowPrice)
                 Text(
                     "$$meowPrice",
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.typography.fontBodyMdRegular,
                     color = ElementTheme.colors.zeroBrandColor
                 )
             }

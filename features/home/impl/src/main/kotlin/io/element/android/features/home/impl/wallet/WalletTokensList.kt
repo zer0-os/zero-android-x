@@ -194,14 +194,14 @@ private fun TokenRow(
     ) {
         AsyncImage(
             modifier = Modifier
-                .size(56.dp)
+                .size(40.dp)
                 .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
                 .clip(CircleShape),
             model = token.logo,
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,
             contentDescription = null,
-            placeholder = painterResource(R.drawable.ic_zero_avatar_default)
+            error = painterResource(R.drawable.ic_zero_avatar_default)
         )
 
         Text(
@@ -209,7 +209,7 @@ private fun TokenRow(
                 .weight(1f)
                 .padding(horizontal = 12.dp),
             text = token.name,
-            style = ElementTheme.typography.fontHeadingSmRegular,
+            style = ElementTheme.typography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -219,7 +219,7 @@ private fun TokenRow(
             val tokenAmount = "${token.amount} ${token.symbol.uppercase()}"
             Text(
                 tokenAmount,
-                style = ElementTheme.typography.fontBodyLgRegular,
+                style = ElementTheme.typography.fontBodyMdRegular,
                 color = ElementTheme.colors.textPrimary
             )
 
@@ -227,7 +227,7 @@ private fun TokenRow(
                 val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
                 Text(
                     "$$meowPrice",
-                    style = ElementTheme.typography.fontBodyLgRegular,
+                    style = ElementTheme.typography.fontBodyMdRegular,
                     color = ElementTheme.colors.zeroBrandColor
                 )
             }

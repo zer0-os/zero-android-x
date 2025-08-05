@@ -304,14 +304,14 @@ fun TokenView(
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(56.dp)
                     .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
                     .clip(CircleShape),
                 model = token.logo,
                 contentScale = ContentScale.Fit,
                 alignment = Alignment.Center,
                 contentDescription = null,
-                placeholder = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
+                error = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
 
             ZChainIcon(Modifier.align(Alignment.BottomEnd).zIndex(1f))

@@ -131,7 +131,7 @@ fun TokenInfoView(
                 contentScale = ContentScale.Fit,
                 alignment = Alignment.Center,
                 contentDescription = null,
-                placeholder = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
+                error = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
             ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
         }
@@ -147,10 +147,11 @@ fun TokenInfoView(
         val amount = transferAmount.toDoubleOrNull() ?: 0.0
         if (token.isMeowToken && amount > 0) {
             Spacer(Modifier.size(6.dp))
+            val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(amount, meowPrice)
             Text(
-                text = ZeroWalletUtil.getMeowTokenPriceFormatted(amount, meowPrice),
+                text = "$$meowPrice",
                 style = ElementTheme.typography.fontBodyLgRegular,
-                color = ElementTheme.colors.textSecondary
+                color = ElementTheme.colors.zeroBrandColor
             )
         }
     }

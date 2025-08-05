@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,6 +59,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.ui.components.MatrixUserProvider
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_6X
 import io.element.android.support.zero.data.model.helper.RewardsUtil
@@ -195,13 +197,22 @@ private fun ColumnScope.RewardsSection(
             color = ElementTheme.colors.textPrimary
         )
 
-        Box(modifier = Modifier.padding(top = 12.dp)) {
+        Spacer(Modifier.size(SPACING_2X.dp))
+
+        val refPrice = RewardsUtil.getRefPrice(
+            zero = userRewards.zero,
+            decimals = userRewards.decimals,
+            refPrice = userRewards.price
+        )
+        Row {
+            Text(
+                text = "$$refPrice".trim(),
+                style = ElementTheme.zeroTypography.fontHeadingLgMediumRoboto,
+                color = ElementTheme.colors.textPrimary
+            )
+
             if (shouldShowNewRewardsIntimation) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(start = 80.dp, bottom = 30.dp)
-                ) {
+                Box {
                     Box(
                         modifier =
                             Modifier
@@ -235,17 +246,6 @@ private fun ColumnScope.RewardsSection(
                     )
                 }
             }
-
-            val refPrice = RewardsUtil.getRefPrice(
-                zero = userRewards.zero,
-                decimals = userRewards.decimals,
-                refPrice = userRewards.price
-            )
-            Text(
-                text = "$$refPrice".trim(),
-                style = ElementTheme.zeroTypography.fontHeadingLgMediumRoboto,
-                color = ElementTheme.colors.textPrimary
-            )
         }
 
         val credits = RewardsUtil.getEarnedRewardsFormatted(

@@ -22,7 +22,7 @@ data class ApiWalletToken(
     val symbol: String,
     val name: String,
     val amount: String,
-    val logo: String?,
+    val logo: String? = null,
     val decimals: Int
 )
 
@@ -31,9 +31,9 @@ data class NextPageParams(
     @SerialName("items_count")
     val itemsCount: Int,
     @SerialName("token_name")
-    val tokenName: String?,
+    val tokenName: String? = null,
     @SerialName("token_type")
-    val tokenType: String?,
+    val tokenType: String? = null,
     val value: Int
 )
 

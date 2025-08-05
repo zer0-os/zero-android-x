@@ -216,7 +216,9 @@ class HomePresenter @Inject constructor(
                             walletAddress = address,
                             currentList = event.currentTokens,
                             walletTokensListState = walletTokensListState,
-                            tokenPaginationParams = walletTokenPaginationParams
+                            tokenPaginationParams = walletTokenPaginationParams,
+                            meowPrice = meowPrice,
+                            userWalletBalance = userWalletBalance
                         )
                     }
                 }
@@ -589,7 +591,11 @@ class HomePresenter @Inject constructor(
             it.onSuccess { result ->
                 val tokensList = result.tokens
                 setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
-                walletTokensListState.value = WalletTokensListState.Tokens(tokensList.toPersistentList())
+                walletTokensListState.value = WalletTokensListState.Tokens(
+                    tokensList
+                        .distinctBy { token -> token.tokenAddress }
+                        .toPersistentList()
+                )
                 tokenPaginationParams.value = result.paginationParams
             }.onFailure {
                 walletTokensListState.value = WalletTokensListState.Empty
@@ -597,7 +603,11 @@ class HomePresenter @Inject constructor(
         }
         (results[2] as? Result<ZeroWalletTransactionsResponse>)?.let {
             it.onSuccess { result ->
-                walletTransactionsListState.value = WalletTransactionsListState.Transactions(result.transactions.toPersistentList())
+                walletTransactionsListState.value = WalletTransactionsListState.Transactions(
+                    result.transactions
+                        .distinctBy { transaction -> transaction.hash }
+                        .toPersistentList()
+                )
                 transactionPaginationParams.value = result.paginationParams
             }.onFailure {
                 walletTransactionsListState.value = WalletTransactionsListState.Empty
@@ -610,6 +620,8 @@ class HomePresenter @Inject constructor(
         currentList: List<ZeroWalletToken>,
         walletTokensListState: MutableState<WalletTokensListState>,
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
+        meowPrice: MutableState<ZeroMeowPrice?>,
+        userWalletBalance: MutableDoubleState,
     ) = launch {
         client.getWalletTokens(walletAddress, tokenPaginationParams.value)
             .onSuccess {
@@ -617,11 +629,13 @@ class HomePresenter @Inject constructor(
                     addAll(currentList)
                     addAll(it.tokens)
                 }.distinctBy { token -> token.tokenAddress }
+                setWalletBalance(newList, meowPrice.value, userWalletBalance)
                 walletTokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
                 tokenPaginationParams.value = it.paginationParams
             }
             .onFailure {
                 //Failed to load tokens next page
+                walletTokensListState.value = WalletTokensListState.Tokens(currentList.toPersistentList())
             }
     }
 
@@ -642,6 +656,7 @@ class HomePresenter @Inject constructor(
             }
             .onFailure {
                 //Failed to load transactions next page
+                walletTransactionsListState.value = WalletTransactionsListState.Transactions(currentList.toPersistentList())
             }
     }
 

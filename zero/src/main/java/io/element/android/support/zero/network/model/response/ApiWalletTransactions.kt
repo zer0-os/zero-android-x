@@ -23,9 +23,9 @@ data class ApiWalletTransaction(
     val to: String,
     val action: String,
     val token: ApiTransactionToken,
-    val amount: String?,
+    val amount: String? = null,
     val timestamp: String,
-    val tokenId: String?,
+    val tokenId: String? = null,
     val type: String
 )
 
@@ -33,7 +33,7 @@ data class ApiWalletTransaction(
 data class ApiTransactionToken(
     val symbol: String,
     val name: String,
-    val logo: String?,
+    val logo: String? = null,
     val decimals: Int
 )
 
