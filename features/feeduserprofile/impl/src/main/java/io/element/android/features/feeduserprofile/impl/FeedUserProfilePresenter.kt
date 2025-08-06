@@ -167,7 +167,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
             async { client.fetchAllUserFeeds(userProfile.userId, USER_FEED_PAGE_SIZE, 0) },
         )
         (results[0] as? Result<FeedUserProfileView?>)?.getOrNull()?.let {
-            userProfileFlow.value = it
+            userProfileFlow.value = it.copy(profileImage = userProfile.profileImage)
         }
         (results[1] as? Result<Boolean>)?.getOrNull()?.let {
             userProfileFollowingFlow.value = it
@@ -283,7 +283,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
                 if (key != null) {
                     client.fetchFeedUserProfile(key)
                         .onSuccess { zeroProfile ->
-                            userProfileFlow.value = zeroProfile
+                            userProfileFlow.value = zeroProfile?.copy(profileImage = matrixProfile.avatarUrl)
                             fetchUserProfileData(userProfileFlow, userProfileFollowingFlow, userFeedsFlow)
                         }
                         .onFailure { error ->

@@ -59,6 +59,7 @@ fun ClaimRewardsSheet(
     actionState: AsyncAction<String>,
     onViewTransaction: (String) -> Unit = {},
     onClaimRewards: () -> Unit = {},
+    onRewardsClaimed: () -> Unit = {},
 ) {
     LaunchedEffect(Unit) {
         onClaimRewards()
@@ -99,6 +100,10 @@ fun ClaimRewardsSheet(
             }
             else -> {}
         }
+    }
+
+    if (actionState is AsyncAction.Success) {
+        onRewardsClaimed()
     }
 
     Box(

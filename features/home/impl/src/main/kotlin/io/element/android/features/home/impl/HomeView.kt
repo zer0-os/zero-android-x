@@ -299,6 +299,9 @@ private fun HomeScaffold(
                     },
                     onClaimRewards = {
                         state.eventSink(HomeEvents.ClaimRewards)
+                    },
+                    onRewardsClaimed = {
+                        state.eventSink(HomeEvents.RefreshWalletBalance)
                     }
                 )
             }

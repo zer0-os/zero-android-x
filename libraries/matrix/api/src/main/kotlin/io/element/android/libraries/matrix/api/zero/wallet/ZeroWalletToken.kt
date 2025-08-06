@@ -29,6 +29,12 @@ data class ZeroWalletToken(
 val ZeroWalletToken.isMeowToken: Boolean
     get() = symbol.equals("Meow", true)
 
+val ZeroWalletToken.isVMeowToken: Boolean
+    get() = symbol.equals("vMeow", true)
+
+val ZeroWalletToken.isClaimableToken: Boolean
+    get() = isVMeowToken || isMeowToken
+
 val ZeroWalletToken.tokenAmount: Double
     get() = amount.toDoubleOrNull() ?: 0.0
 

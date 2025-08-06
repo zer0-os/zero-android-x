@@ -53,7 +53,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
+import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 
 @Composable
@@ -216,14 +216,14 @@ private fun TokenRow(
         )
 
         Column(horizontalAlignment = Alignment.End) {
-            val tokenAmount = "${token.amount} ${token.symbol.uppercase()}"
+            val tokenAmount = "${ZeroWalletUtil.thousandSeparatedFormat(token.amount)} ${token.symbol.uppercase()}"
             Text(
                 tokenAmount,
                 style = ElementTheme.typography.fontBodyMdRegular,
                 color = ElementTheme.colors.textPrimary
             )
 
-            if (token.isMeowToken && meowPrice != null) {
+            if (token.isClaimableToken && meowPrice != null) {
                 val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
                 Text(
                     "$$meowPrice",

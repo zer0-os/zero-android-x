@@ -59,7 +59,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.displayName
-import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
+import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.support.zero.common.ui.ZChainIcon
 import java.time.LocalDateTime
@@ -69,6 +69,7 @@ import java.util.Locale
 @Composable
 fun CompletedTransferView(
     state: TransferTokenState,
+    isTransferSuccess: Boolean,
     onClose: () -> Unit,
 ) {
     Column(
@@ -91,16 +92,14 @@ fun CompletedTransferView(
             )
         }
 
-        if (state.transactionReceipt != null) {
-            TransactionInfoView(
-                transactionReceipt = state.transactionReceipt,
-                isSuccess = state.flowStep == TransferTokenFlowStep.COMPLETED,
-                onClose = onClose,
-                viewTransaction = { transactionUrl ->
-                    state.eventSink(TransferTokenEvents.ViewTransaction(transactionUrl))
-                }
-            )
-        }
+        TransactionInfoView(
+            transactionReceipt = state.transactionReceipt,
+            isSuccess = state.flowStep == TransferTokenFlowStep.COMPLETED,
+            onClose = onClose,
+            viewTransaction = { transactionUrl ->
+                state.eventSink(TransferTokenEvents.ViewTransaction(transactionUrl))
+            }
+        )
     }
 }
 
@@ -145,7 +144,7 @@ fun TokenInfoView(
         )
 
         val amount = transferAmount.toDoubleOrNull() ?: 0.0
-        if (token.isMeowToken && amount > 0) {
+        if (token.isClaimableToken && amount > 0) {
             Spacer(Modifier.size(6.dp))
             val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(amount, meowPrice)
             Text(
@@ -231,7 +230,7 @@ fun UsersInfoView(
 
 @Composable
 fun TransactionInfoView(
-    transactionReceipt: ZeroWalletTransactionReceipt,
+    transactionReceipt: ZeroWalletTransactionReceipt?,
     isSuccess: Boolean,
     onClose: () -> Unit,
     viewTransaction: (String) -> Unit
@@ -267,7 +266,7 @@ fun TransactionInfoView(
         Spacer(Modifier.size(12.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             CloseButton(onClick = onClose)
-            if (isSuccess) {
+            if (isSuccess && transactionReceipt != null) {
                 Spacer(Modifier.size(12.dp))
                 ViewTransactionButton(onClick = {
                     viewTransaction(transactionReceipt.blockExplorerUrl)
@@ -331,5 +330,5 @@ fun RowScope.CloseButton(
 fun CompletedTransferViewPreview(
     @PreviewParameter(TransferTokenStateProvider::class) state: TransferTokenState
 ) = ElementPreview {
-    CompletedTransferView(state = state, onClose = {})
+    CompletedTransferView(state = state, isTransferSuccess = true, onClose = {})
 }

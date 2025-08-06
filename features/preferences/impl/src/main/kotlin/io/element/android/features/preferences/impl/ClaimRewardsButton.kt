@@ -25,7 +25,7 @@ fun ClaimRewardsButton(
 ) {
     TextButton(
         modifier = modifier,
-        text = "Claim Rewards",
+        text = "Claim Earnings",
         onClick = onClick,
         enabled = enabled,
         size = ButtonSize.Small,

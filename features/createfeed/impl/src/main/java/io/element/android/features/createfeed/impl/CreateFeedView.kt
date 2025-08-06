@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -69,7 +70,8 @@ fun CreateFeedView(
         },
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.padding(vertical = 24.dp),
+                modifier = Modifier.padding(vertical = 24.dp)
+                    .imePadding(),
                 containerColor = ElementTheme.colors.iconPrimary,
                 onClick = {
                     state.eventSink(CreateFeedEvents.SelectMedia)
@@ -126,9 +128,9 @@ private fun CreateFeedContent(
     state: CreateFeedState
 ) {
     Box {
-        Column {
+        Column(modifier.imePadding()) {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(horizontal = 16.dp),

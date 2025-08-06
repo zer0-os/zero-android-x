@@ -51,6 +51,7 @@ fun TransferTokenRootView(
         when (state.flowStep) {
             TransferTokenFlowStep.TOKEN -> "Select Asset"
             TransferTokenFlowStep.COMPLETED -> "Sent"
+            TransferTokenFlowStep.ERROR -> "Failed"
             else -> "Send"
         }
     }
@@ -100,7 +101,11 @@ fun TransferTokenRootView(
                     TransferTokenFlowStep.CONFIRMATION -> ConfirmTransferView(state = state)
                     TransferTokenFlowStep.IN_PROGRESS -> TransactionInProgressView()
                     TransferTokenFlowStep.COMPLETED,
-                    TransferTokenFlowStep.ERROR -> CompletedTransferView(state = state, onClose = onBackClick)
+                    TransferTokenFlowStep.ERROR -> CompletedTransferView(
+                        state = state,
+                        isTransferSuccess = state.flowStep == TransferTokenFlowStep.COMPLETED,
+                        onClose = onBackClick
+                    )
                 }
             }
         }

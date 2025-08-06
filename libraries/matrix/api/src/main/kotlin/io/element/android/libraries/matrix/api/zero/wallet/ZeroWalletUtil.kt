@@ -44,15 +44,14 @@ object ZeroWalletUtil {
 
     @SuppressLint("DefaultLocale")
     fun getFormattedNumber(count: Double, withAbbreviations: Boolean = true): String {
-        if (count < 1000) return String.format("%.2f", count)
-        val exp = (ln(count) / ln(1000.0)).toInt()
-        val value = count / 1000.0.pow(exp.toDouble())
         return if (withAbbreviations) {
+            val exp = (ln(count) / ln(1000.0)).toInt()
+            val value = count / 1000.0.pow(exp.toDouble())
             val suffixes = "KMBTPE"
             val suffix = if (exp - 1 in suffixes.indices) suffixes[exp - 1] else ' '
             String.format("%.2f%c", value, suffix)
         } else {
-            String.format("%.2f", value)
+            String.format("%.2f", count)
         }
     }
 

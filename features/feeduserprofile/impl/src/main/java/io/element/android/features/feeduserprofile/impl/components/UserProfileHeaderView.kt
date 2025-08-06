@@ -84,18 +84,20 @@ fun UserProfileHeaderView(
                         },
                         avatarType = AvatarType.User
                     )
-                    IconButton(
-                        modifier = Modifier
-                            .offset(y = 16.dp)
-                            .background(ElementTheme.colors.bgCanvasDefaultLevel1, CircleShape)
-                            .size(64.dp),
-                        onClick = {
-                            state.eventSink(FeedUserProfileEvents.StartDM)
+                    if (!state.isMyOwnProfile) {
+                        IconButton(
+                            modifier = Modifier
+                                .offset(y = 16.dp)
+                                .background(ElementTheme.colors.bgCanvasDefaultLevel1, CircleShape)
+                                .size(64.dp),
+                            onClick = {
+                                state.eventSink(FeedUserProfileEvents.StartDM)
+                            }
+                        ) {
+                            Icon(CompoundIcons.Chat(),
+                                contentDescription = "StartDMAction",
+                                tint = ElementTheme.colors.zeroBrandColor)
                         }
-                    ) {
-                        Icon(CompoundIcons.Chat(),
-                            contentDescription = "StartDMAction",
-                            tint = ElementTheme.colors.zeroBrandColor)
                     }
                 }
                 Row(

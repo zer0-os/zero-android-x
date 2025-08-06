@@ -23,7 +23,7 @@ data class ZeroWalletTransaction(
     val to: String,
     val action: String,
     val token: ZeroWalletTransactionToken,
-    val amount: String?,
+    val amount: String,
     val timestamp: String,
     val tokenId: String?,
     val type: String
@@ -32,8 +32,14 @@ data class ZeroWalletTransaction(
 val ZeroWalletTransaction.isMeowTransaction: Boolean
     get() = token.symbol.equals("Meow", true)
 
+val ZeroWalletTransaction.isVMeowTransaction: Boolean
+    get() = token.symbol.equals("vMeow", true)
+
+val ZeroWalletTransaction.isClaimableTransaction: Boolean
+    get() = isMeowTransaction || isVMeowTransaction
+
 val ZeroWalletTransaction.tokenAmount: Double
-    get() = amount?.toDoubleOrNull() ?: 0.0
+    get() = amount.toDoubleOrNull() ?: 0.0
 
 val ZeroWalletTransaction.isTransactionReceived: Boolean
     get() = action.equals("Receive", true)

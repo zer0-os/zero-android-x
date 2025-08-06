@@ -53,7 +53,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.libraries.matrix.api.zero.wallet.isMeowTransaction
+import io.element.android.libraries.matrix.api.zero.wallet.isClaimableTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 import io.element.android.support.zero.common.ui.ZChainIcon
@@ -251,14 +251,14 @@ private fun TransactionRow(
         }
 
         Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(horizontal = 8.dp)) {
-            val tokenAmount = "${transaction.amount} ${transaction.token.symbol.uppercase()}"
+            val tokenAmount = "${ZeroWalletUtil.thousandSeparatedFormat(transaction.amount)} ${transaction.token.symbol.uppercase()}"
             Text(
                 tokenAmount,
                 style = ElementTheme.typography.fontBodyMdRegular,
                 color = ElementTheme.colors.textPrimary
             )
 
-            if (transaction.isMeowTransaction && meowPrice != null) {
+            if (transaction.isClaimableTransaction && meowPrice != null) {
                 val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(transaction.tokenAmount, meowPrice)
                 Text(
                     "$$meowPrice",

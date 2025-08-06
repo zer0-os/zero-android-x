@@ -37,6 +37,7 @@ import io.element.android.libraries.designsystem.text.rememberTypeface
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.SingleIn
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -76,10 +77,10 @@ class MentionSpanTheme(val currentUserId: UserId) {
     @Suppress("ComposableNaming")
     @Composable
     fun updateStyles() {
-        currentUserTextColor = ElementTheme.colors.textBadgeAccent.toArgb()
-        currentUserBackgroundColor = ElementTheme.colors.bgBadgeAccent.toArgb()
-        otherTextColor = ElementTheme.colors.textPrimary.toArgb()
-        otherBackgroundColor = ElementTheme.colors.bgBadgeDefault.toArgb()
+        currentUserTextColor = ElementTheme.colors.zeroBrandColor.toArgb()
+        currentUserBackgroundColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f).toArgb()
+        otherTextColor = ElementTheme.colors.zeroBrandColor.toArgb()
+        otherBackgroundColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f).toArgb()
 
         typeface.value = ElementTheme.zeroTypography.fontBodyLgMedium.rememberTypeface().value
         val density = LocalDensity.current
@@ -141,7 +142,7 @@ internal fun MentionSpanThemePreview() {
             )
         }
 
-        val textColor = ElementTheme.colors.textPrimary.toArgb()
+        val textColor = ElementTheme.colors.zeroBrandColor.toArgb()
         fun mentionSpanMe() = provider.getMentionSpanFor("mention", "https://matrix.to/#/@me:matrix.org")
         fun mentionSpanOther() = provider.getMentionSpanFor("mention", "https://matrix.to/#/@other:matrix.org")
         fun mentionSpanRoom() = provider.getMentionSpanFor("room:matrix.org", "https://matrix.to/#/#room:matrix.org")

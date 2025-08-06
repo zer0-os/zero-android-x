@@ -65,7 +65,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
+import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
@@ -240,6 +240,20 @@ class HomePresenter @Inject constructor(
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> coroutineScope
                     .claimUserRewards(matrixUser.value, claimRewardsActionState)
+                HomeEvents.RefreshWalletBalance -> {
+                    matrixUser.value.walletAddress?.let { address ->
+                        val currentList = (walletTokensListState.value as? WalletTokensListState.Tokens)
+                            ?.tokens ?: emptyList()
+                        coroutineScope.loadMoreWalletTokens(
+                            walletAddress = address,
+                            currentList = currentList,
+                            walletTokensListState = walletTokensListState,
+                            tokenPaginationParams = walletTokenPaginationParams,
+                            meowPrice = meowPrice,
+                            userWalletBalance = userWalletBalance
+                        )
+                    }
+                }
             }
         }
 
@@ -681,7 +695,7 @@ class HomePresenter @Inject constructor(
                                  userWalletBalance: MutableDoubleState
     ) {
         val meowPrice = meowPrice ?: return
-        val meowTokens = tokensList.filter { it.isMeowToken }
+        val meowTokens = tokensList.filter { it.isClaimableToken }
         val userBalance = ZeroWalletUtil.getWalletBalance(
             meowTokenAmount = meowTokens.sumOf { it.tokenAmount },
             meowPrice = meowPrice
