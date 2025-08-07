@@ -31,6 +31,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.tokens.generated.CompoundIcons
@@ -126,9 +128,9 @@ private fun RoomListSearchContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester),
-                        value = filter,
+                        value = TextFieldValue(filter, selection = TextRange(filter.length)),
                         singleLine = true,
-                        onValueChange = { state.eventSink(RoomListSearchEvents.QueryChanged(it)) },
+                        onValueChange = { state.eventSink(RoomListSearchEvents.QueryChanged(it.text)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,

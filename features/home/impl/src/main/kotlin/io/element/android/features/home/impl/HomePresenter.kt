@@ -191,6 +191,7 @@ class HomePresenter @Inject constructor(
                 }
                 HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
                 is HomeEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                HomeEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
                 is HomeEvents.LoadMoreFeeds -> {
                     _allFeeds.apply {
                         clear()
@@ -469,23 +470,25 @@ class HomePresenter @Inject constructor(
             return@launch
         }
         genericActionState.value = AsyncAction.Loading
-        client.resolveRoomAlias(RoomAlias(channelId)).getOrNull()?.getOrNull()?.roomId?.let { roomId ->
-            resolvedChannelRoomId.value = roomId
+        val channelRoomId = client.resolveRoomAlias(RoomAlias(channelId))
+            .getOrNull()?.getOrNull()?.roomId
+        if (channelRoomId != null) {
+            resolvedChannelRoomId.value = channelRoomId
             genericActionState.value = AsyncAction.Success(Unit)
-            return@launch
-        }
-        client.joinZeroChannel(channelId)
-            .onSuccess { roomId ->
-                roomId?.let {
-                    genericActionState.value = AsyncAction.Success(Unit)
-                    resolvedChannelRoomId.value = RoomId(roomId)
-                } ?: run {
-                    genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
+        } else {
+            client.joinZeroChannel(channelId)
+                .onSuccess { roomId ->
+                    roomId?.let {
+                        genericActionState.value = AsyncAction.Success(Unit)
+                        resolvedChannelRoomId.value = RoomId(roomId)
+                    } ?: run {
+                        genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
+                    }
                 }
-            }
-            .onFailure { failure ->
-                genericActionState.value = AsyncAction.Failure(failure)
-            }
+                .onFailure { failure ->
+                    genericActionState.value = AsyncAction.Failure(failure)
+                }
+        }
     }
 
     private fun CoroutineScope.loadMoreHomeFeeds(followingFeedsOnly: Boolean, skip: Int) = launch {

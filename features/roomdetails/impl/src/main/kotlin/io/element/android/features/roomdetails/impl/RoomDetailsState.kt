@@ -66,6 +66,14 @@ data class RoomDetailsState(
             add(RoomBadge.PUBLIC)
         }*/
     }.toPersistentList()
+
+    fun canLeaveRoom(): Boolean {
+        val user = heroes.firstOrNull { it.userId == loggedInUser }
+        return user?.let {
+            val isUserAdmin = (it.role == RoomMember.Role.Admin || it.role is RoomMember.Role.Owner)
+            !isUserAdmin
+        } ?: true
+    }
 }
 
 @Immutable

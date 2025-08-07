@@ -32,9 +32,9 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesEntryPoint
 import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesListType
 import io.element.android.features.home.api.HomeEntryPoint
-import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.invite.api.InviteData
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteView
 import io.element.android.features.invite.api.declineandblock.DeclineInviteAndBlockEntryPoint
@@ -219,13 +219,13 @@ class HomeFlowNode @AssistedInject constructor(
                         modifier = Modifier
                     )
                 },
-                leaveRoomView = {
-                    leaveRoomRenderer.Render(
-                        state = state.roomListState.leaveRoomState,
-                        onSelectNewOwners = this::onSelectNewOwnersWhenLeavingRoom,
-                        modifier = Modifier
-                    )
-                }
+//                leaveRoomView = {
+//                    leaveRoomRenderer.Render(
+//                        state = state.roomListState.leaveRoomState,
+//                        onSelectNewOwners = this::onSelectNewOwnersWhenLeavingRoom,
+//                        modifier = Modifier
+//                    )
+//                }
             )
             directLogoutView.Render(state.directLogoutState)
         }

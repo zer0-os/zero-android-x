@@ -182,7 +182,7 @@ private fun RoomListModalBottomSheetContent(
                 ),
                 style = ListItemStyle.Destructive,
             )
-        }*/
+        }
         ListItem(
             headlineContent = {
                 Text(text = stringResource(CommonStrings.action_leave_room))
@@ -195,7 +195,7 @@ private fun RoomListModalBottomSheetContent(
             ),
             style = ListItemStyle.Destructive,
         )
-        /*if (contextMenu.displayClearRoomCacheAction) {
+        if (contextMenu.displayClearRoomCacheAction) {
             ListItem(
                 headlineContent = {
                     Text(text = "Clear cache for this room")

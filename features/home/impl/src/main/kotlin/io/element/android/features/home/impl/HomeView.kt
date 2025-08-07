@@ -50,7 +50,6 @@ import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
 import io.element.android.features.home.impl.wallet.HomeWalletContent
-import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
 import io.element.android.libraries.architecture.AsyncAction
@@ -97,7 +96,10 @@ fun HomeView(
     val resolvedChannelRoomId by remember(homeState.resolvedChannelRoom) {
         derivedStateOf { homeState.resolvedChannelRoom }
     }
-    resolvedChannelRoomId?.let { onRoomClick(it) }
+    resolvedChannelRoomId?.let {
+        homeState.eventSink(HomeEvents.ChannelRoomOpened)
+        onRoomClick(it)
+    }
 
     ConnectivityIndicatorContainer(
         modifier = modifier,
@@ -122,7 +124,7 @@ fun HomeView(
                 )
             }
 
-            LeaveRoomView(state = roomListState.leaveRoomState)
+            //LeaveRoomView(state = roomListState.leaveRoomState)
 
             HomeScaffold(
                 state = homeState,

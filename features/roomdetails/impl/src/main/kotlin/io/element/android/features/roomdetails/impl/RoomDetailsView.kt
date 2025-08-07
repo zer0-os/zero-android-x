@@ -267,6 +267,7 @@ fun RoomDetailsView(
             if (!state.isRoomAChannel) {
                 OtherActionsSection(
                     canReportRoom = state.canReportRoom,
+                    canLeaveRoom = state.canLeaveRoom(),
                     onReportRoomClick = onReportRoomClick,
                     onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom(needsConfirmation = true)) }
                 )
@@ -747,6 +748,7 @@ private fun MediaGalleryItem(
 @Composable
 private fun OtherActionsSection(
     canReportRoom: Boolean,
+    canLeaveRoom: Boolean,
     onReportRoomClick: () -> Unit,
     onLeaveRoomClick: () -> Unit,
 ) {
@@ -761,14 +763,16 @@ private fun OtherActionsSection(
                 onClick = onReportRoomClick,
             )
         }
-        ListItem(
-            headlineContent = {
-                Text(stringResource(CommonStrings.action_leave_room))
-            },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Leave())),
-            style = ListItemStyle.Destructive,
-            onClick = onLeaveRoomClick,
-        )
+        if (canLeaveRoom) {
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(CommonStrings.action_leave_room))
+                },
+                leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Leave())),
+                style = ListItemStyle.Destructive,
+                onClick = onLeaveRoomClick,
+            )
+        }
     }
 }
 
