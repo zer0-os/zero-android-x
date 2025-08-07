@@ -61,7 +61,7 @@ fun RoomListContextMenu(
             },
             onLeaveRoomClick = {
                 eventSink(RoomListEvents.HideContextMenu)
-                eventSink(RoomListEvents.LeaveRoom(contextMenu.roomId))
+                eventSink(RoomListEvents.LeaveRoom(contextMenu.roomId, needsConfirmation = true))
             },
             onFavoriteChange = { isFavorite ->
                 eventSink(RoomListEvents.HideContextMenu)

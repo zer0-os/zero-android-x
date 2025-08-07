@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.libraries.androidutils.system.copyToClipboard
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -110,6 +109,7 @@ fun RoomDetailsView(
     onProfileClick: (UserId, String?) -> Unit,
     onReportRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
+    leaveRoomView: @Composable () -> Unit,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
     Scaffold(
@@ -129,7 +129,7 @@ fun RoomDetailsView(
                 .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(padding)
         ) {
-            LeaveRoomView(state = state.leaveRoomState)
+            leaveRoomView()
 
             when (state.roomType) {
                 RoomDetailsType.Room -> {
@@ -268,7 +268,7 @@ fun RoomDetailsView(
                 OtherActionsSection(
                     canReportRoom = state.canReportRoom,
                     onReportRoomClick = onReportRoomClick,
-                    onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
+                    onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom(needsConfirmation = true)) }
                 )
             }
 
@@ -830,5 +830,6 @@ private fun ContentToPreview(state: RoomDetailsState) {
         onSecurityAndPrivacyClick = {},
         onProfileClick = { _, _ -> },
         onReportRoomClick = {},
+        leaveRoomView = {},
     )
 }
