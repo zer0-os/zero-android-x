@@ -9,5 +9,6 @@ package io.element.android.libraries.matrix.api.zero.rewards
 
 data class ZeroMeowPrice(
     val price: Double?,
-    val ref: String?
+    val ref: String?,
+    val diff: Double?,
 )

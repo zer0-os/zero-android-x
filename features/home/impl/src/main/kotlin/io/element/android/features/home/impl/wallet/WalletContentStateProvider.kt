@@ -8,6 +8,7 @@
 package io.element.android.features.home.impl.wallet
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 open class WalletContentStateProvider : PreviewParameterProvider<WalletContentState> {
     override val values: Sequence<WalletContentState>
@@ -27,6 +28,7 @@ internal fun aWalletContentState(
     userName = "Jade David",
     showWalletBalance = showWalletBalance,
     walletBalance = 0.0,
+    claimableRewards = ZeroUserRewards.empty(),
     tokensListState = tokensListState,
     transactionsListState = transactionsListState,
     tokensPaginationParams = null,

@@ -58,6 +58,7 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
@@ -127,6 +128,7 @@ class HomePresenter @Inject constructor(
         var shouldShowRoomIntimation by rememberSaveable { mutableStateOf(true) }
         val shouldShowNewRewardsIntimation = client.shouldShowNewRewardsIntimation.collectAsState()
         val userRewards = client.userRewards.collectAsState()
+        val claimableUserRewards = remember { mutableStateOf(ZeroUserRewards.empty()) }
         val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
         val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
@@ -238,8 +240,10 @@ class HomePresenter @Inject constructor(
                     )
                 }
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
-                HomeEvents.ClaimRewards -> coroutineScope
-                    .claimUserRewards(matrixUser.value, claimRewardsActionState)
+                HomeEvents.ClaimRewards -> {
+                    claimableUserRewards.value = userRewards.value
+                    coroutineScope.claimUserRewards(matrixUser.value, claimRewardsActionState)
+                }
                 HomeEvents.RefreshWalletBalance -> {
                     matrixUser.value.walletAddress?.let { address ->
                         val currentList = (walletTokensListState.value as? WalletTokensListState.Tokens)
@@ -312,6 +316,7 @@ class HomePresenter @Inject constructor(
                 userName = matrixUser.value.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
                 walletBalance = userWalletBalance.doubleValue,
+                claimableRewards = claimableUserRewards.value,
                 tokensListState = walletTokensListState.value,
                 transactionsListState = walletTransactionsListState.value,
                 tokensPaginationParams = walletTokenPaginationParams.value,

@@ -65,17 +65,18 @@ fun ClaimRewardsSheet(
         onClaimRewards()
     }
 
-    val unclaimedRewards = RewardsUtil.getEarnedRewardsFormatted(userRewards.unclaimedRewards, userRewards.decimals)
+    val unClaimedRewards = RewardsUtil.getEarnedRewards(userRewards.unclaimedRewards, userRewards.decimals)
+    val unclaimedRewardsFormatted = ZeroWalletUtil.thousandSeparatedFormat(unClaimedRewards.toString())
     val unclaimedRewardsRefPrice = meowPrice?.let {
         ZeroWalletUtil.getMeowTokenPriceFormatted(
-            tokenAmount = userRewards.unclaimedRewards.toDoubleOrNull() ?: 0.0,
+            tokenAmount = unClaimedRewards.toDouble(),
             meowPrice = it
         )
     } ?: 0
     val headerText = when (actionState) {
         AsyncAction.Loading -> "Processing Claim..."
         is AsyncAction.Failure -> "Claim Failed"
-        else -> "$unclaimedRewards MEOW"
+        else -> "$unclaimedRewardsFormatted MEOW"
     }
     val headerTextColor = when (actionState) {
         AsyncAction.Loading -> ElementTheme.colors.textPrimary
@@ -110,6 +111,7 @@ fun ClaimRewardsSheet(
         modifier = modifier
             .height(400.dp)
             .padding(horizontal = 12.dp)
+            .padding(bottom = 48.dp)
             .shadow(
                 elevation = 20.dp,
                 shape = RoundedCornerShape(24.dp),

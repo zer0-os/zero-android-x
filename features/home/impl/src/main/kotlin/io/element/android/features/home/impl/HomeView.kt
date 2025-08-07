@@ -291,7 +291,7 @@ private fun HomeScaffold(
             dragHandle = null,
             content = {
                 ClaimRewardsSheet(
-                    userRewards = state.userRewards,
+                    userRewards = state.walletContentState.claimableRewards,
                     actionState = state.claimRewardActionState,
                     meowPrice = state.walletContentState.meowPrice,
                     onViewTransaction = { transaction ->

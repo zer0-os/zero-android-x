@@ -55,6 +55,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import kotlin.math.abs
 
 @Composable
 fun WalletTokensList(
@@ -204,32 +205,48 @@ private fun TokenRow(
             error = painterResource(R.drawable.ic_zero_avatar_default)
         )
 
-        Text(
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp),
-            text = token.name,
-            style = ElementTheme.typography.fontBodyLgRegular,
-            color = ElementTheme.colors.textPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Column(horizontalAlignment = Alignment.End) {
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = token.name,
+                style = ElementTheme.typography.fontBodyLgRegular,
+                color = ElementTheme.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
             val tokenAmount = "${ZeroWalletUtil.thousandSeparatedFormat(token.amount)} ${token.symbol.uppercase()}"
             Text(
                 tokenAmount,
                 style = ElementTheme.typography.fontBodyMdRegular,
-                color = ElementTheme.colors.textPrimary
+                color = ElementTheme.colors.textSecondary
             )
+        }
 
-            if (token.isClaimableToken && meowPrice != null) {
-                val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
+        if (token.isClaimableToken && meowPrice != null) {
+            Column(horizontalAlignment = Alignment.End) {
+                val refPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
                 Text(
-                    "$$meowPrice",
-                    style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.zeroBrandColor
+                    "$$refPrice",
+                    style = ElementTheme.typography.fontBodyLgRegular,
+                    color = ElementTheme.colors.textPrimary
                 )
+
+                if (meowPrice.diff != null) {
+                    val refPriceDiff = if (meowPrice.diff!! > 0) {
+                        "+${meowPrice.diff!!}%"
+                    } else {
+                        "-${abs(meowPrice.diff!!)}%"
+                    }
+                    Text(
+                        refPriceDiff,
+                        style = ElementTheme.typography.fontBodyMdRegular,
+                        color = ElementTheme.colors.zeroBrandColor
+                    )
+                }
             }
         }
     }

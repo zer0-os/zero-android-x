@@ -13,4 +13,4 @@ fun UserRewards.map() = ZeroUserRewards(
     hasUnclaimedRewards = this.hasUnclaimedRewards ?: false
 )
 
-fun ApiZeroTokens.toModel() = ZeroMeowPrice(price, reference)
+fun ApiZeroTokens.toModel() = ZeroMeowPrice(price, reference, diff)
