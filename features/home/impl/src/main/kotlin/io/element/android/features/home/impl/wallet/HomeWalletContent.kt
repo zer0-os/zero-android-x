@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +53,7 @@ fun HomeWalletContent(
     onSendWalletToken: () -> Unit = {},
     onReceiveWalletToken: () -> Unit = {},
 ) {
-    var selectedWalletTab by remember { mutableStateOf(WalletContentTab.TOKENS) }
+    var selectedWalletTab by rememberSaveable { mutableStateOf(WalletContentTab.TOKENS) }
     Column(
         modifier = modifier
             .background(color = ElementTheme.colors.bgCanvasDefault)

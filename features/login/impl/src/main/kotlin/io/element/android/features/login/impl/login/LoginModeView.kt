@@ -129,7 +129,8 @@ internal fun LoginModeViewPreview(@PreviewParameter(ChangeServerErrorProvider::c
             onLearnMoreClick = {},
             onOidcDetails = {},
             onNeedLoginPassword = {},
-            onCreateAccountContinue = {}
+            onCreateAccountContinue = {},
+            onCreateZeroAccount = {}
         )
     }
 }

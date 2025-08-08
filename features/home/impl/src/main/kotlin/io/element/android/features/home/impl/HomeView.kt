@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -65,6 +66,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 
@@ -91,14 +93,22 @@ fun HomeView(
 ) {
     val roomListState: RoomListState = homeState.roomListState
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     val firstThrottler = remember { FirstThrottler(300, coroutineScope) }
 
     val resolvedChannelRoomId by remember(homeState.resolvedChannelRoom) {
         derivedStateOf { homeState.resolvedChannelRoom }
     }
+    val walletTransactionUrl by remember(homeState.walletContentState.walletTransactionUrlState) {
+        derivedStateOf { homeState.walletContentState.walletTransactionUrlState }
+    }
     resolvedChannelRoomId?.let {
         homeState.eventSink(HomeEvents.ChannelRoomOpened)
         onRoomClick(it)
+    }
+    walletTransactionUrl.dataOrNull()?.let {
+        context.openExternalUri(it)
+        homeState.eventSink(HomeEvents.OnWalletTransactionViewed)
     }
 
     ConnectivityIndicatorContainer(

@@ -46,8 +46,7 @@ class AuthRepositoryImpl(
         }
 
     private suspend fun proceedLoginFlow(authCredentials: ZeroAuthCredentials): AuthSSOToken {
-//        preferences.setZeroToken(authCredentials.accessToken)
-        preferences.setZeroToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImpGTlhNbkZqR3JTb0RhZm5MUUJvaG9DTmFsV2NGY1RqbktFYmtSeldGQkh5WUpGaWtkTE1IUCJ9.eyJpYXQiOjE3NDA1NzIzMzYsImV4cCI6MTc3MjEyOTkzNiwiaXNzIjoiaHR0cHM6Ly96b3NhcGkuemVyby50ZWNoIiwic3ViIjoiemVyb3xlMTZhNzVhNy0zZjAyLTRiODctOGJhMS1jYzg1MDY1ODhhZjYiLCJhdWQiOlsiaHR0cHM6Ly96b3NhcGkuemVyby50ZWNoIl0sImlkIjoiZTE2YTc1YTctM2YwMi00Yjg3LThiYTEtY2M4NTA2NTg4YWY2IiwiaHR0cDovL2ZhY3QwcnkuY29tL2VtYWlsIjpudWxsLCJhenAiOiJodHRwczovL3pvc2FwaS56ZXJvLnRlY2gifQ.9ADd91HWbRlX35_Lq5tyy8ODy5tmS5hYP-n3nMyp_7c")
+        preferences.setZeroToken(authCredentials.accessToken)
         val ssoRequest = zeroAuthService.getSSOToken()
         return ssoRequest.toModel()
     }

@@ -8,6 +8,7 @@
 package io.element.android.features.home.impl.wallet
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 
 open class WalletContentStateProvider : PreviewParameterProvider<WalletContentState> {
@@ -28,6 +29,7 @@ internal fun aWalletContentState(
     userName = "Jade David",
     showWalletBalance = showWalletBalance,
     walletBalance = 0.0,
+    walletTransactionUrlState = AsyncAction.Uninitialized,
     claimableRewards = ZeroUserRewards.empty(),
     tokensListState = tokensListState,
     transactionsListState = transactionsListState,

@@ -7,7 +7,6 @@
 
 package io.element.android.features.home.impl
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.Composable
@@ -27,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.platform.LocalContext
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
@@ -68,7 +66,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
-import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
@@ -109,7 +106,6 @@ class HomePresenter @Inject constructor(
 
     @Composable
     override fun present(): HomeState {
-        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         val matrixUser = client.userProfile.collectAsState()
         val isOnline by syncService.isOnline.collectAsState()
@@ -131,6 +127,7 @@ class HomePresenter @Inject constructor(
         val claimableUserRewards = remember { mutableStateOf(ZeroUserRewards.empty()) }
         val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
         val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        val walletTransactionUrlState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
@@ -237,9 +234,11 @@ class HomePresenter @Inject constructor(
                 }
                 is HomeEvents.ViewWalletTransaction -> {
                     coroutineScope.loadWalletTransaction(
-                        event.transactionId, context, genericActionState
+                        event.transactionId, walletTransactionUrlState, genericActionState
                     )
                 }
+                HomeEvents.OnWalletTransactionViewed ->
+                    walletTransactionUrlState.value = AsyncAction.Uninitialized
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> {
                     claimableUserRewards.value = userRewards.value
@@ -317,6 +316,7 @@ class HomePresenter @Inject constructor(
                 userName = matrixUser.value.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
                 walletBalance = userWalletBalance.doubleValue,
+                walletTransactionUrlState = walletTransactionUrlState.value,
                 claimableRewards = claimableUserRewards.value,
                 tokensListState = walletTokensListState.value,
                 transactionsListState = walletTransactionsListState.value,
@@ -684,14 +684,14 @@ class HomePresenter @Inject constructor(
 
     private fun CoroutineScope.loadWalletTransaction(
         transactionId: String,
-        context: Context,
+        walletTransactionUrlState: MutableState<AsyncAction<String>>,
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
         genericActionState.value = AsyncAction.Loading
         client.getTransactionReceipt(transactionId)
             .onSuccess {
                 genericActionState.value = AsyncAction.Success(Unit)
-                context.openExternalUri(it.blockExplorerUrl)
+                walletTransactionUrlState.value = AsyncAction.Success(it.blockExplorerUrl)
             }
             .onFailure {
                 genericActionState.value = AsyncAction.Failure(it)
