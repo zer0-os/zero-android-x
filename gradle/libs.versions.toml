@@ -3,7 +3,7 @@
 
 [versions]
 # Project
-android_gradle_plugin = "8.11.1"
+android_gradle_plugin = "8.12.0"
 kotlin = "2.2.0"
 kotlinpoet = "2.2.0"
 ksp = "2.2.0-2.0.2"
@@ -191,7 +191,7 @@ matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose",
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
-sqlcipher = "net.zetetic:sqlcipher-android:4.9.0"
+sqlcipher = "net.zetetic:sqlcipher-android:4.10.0"
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
 sqlite = "androidx.sqlite:sqlite-ktx:2.5.2"
 unifiedpush = "org.unifiedpush.android:connector:3.0.10"
@@ -208,7 +208,7 @@ haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze_materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 
 # Analytics
-posthog = "com.posthog:posthog-android:3.20.1"
+posthog = "com.posthog:posthog-android:3.20.2"
 sentry = "io.sentry:sentry-android:8.18.0"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"
