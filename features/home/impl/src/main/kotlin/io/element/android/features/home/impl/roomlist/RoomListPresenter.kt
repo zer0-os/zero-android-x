@@ -162,6 +162,7 @@ class RoomListPresenter @Inject constructor(
 
         LaunchedEffect(contentState) {
             (contentState as? RoomListContentState.Rooms)?.let {
+                coroutineScope.autoAcceptInvitedRooms(it.summaries, acceptDeclineInviteState)
                 coroutineScope.extractRoomMembersAndMapBadge(it.summaries, roomMappedUserProStatusState)
             }
         }
@@ -341,6 +342,23 @@ class RoomListPresenter @Inject constructor(
                 currentRoomList.getOrNull(index)?.roomId
             }
             roomListDataSource.subscribeToVisibleRooms(roomIds)
+        }
+    }
+
+    private var autoAcceptInvitedRoomsJob: Job? = null
+    private fun CoroutineScope.autoAcceptInvitedRooms(
+        summaries: ImmutableList<RoomListRoomSummary>,
+        acceptDeclineInviteState: AcceptDeclineInviteState
+    ) {
+        autoAcceptInvitedRoomsJob?.cancel()
+        autoAcceptInvitedRoomsJob = launch {
+            val invitedRooms = summaries.filter { it.displayType == RoomSummaryDisplayType.INVITE }
+            if (invitedRooms.isEmpty()) return@launch
+            invitedRooms.map { room ->
+                async {
+                    acceptDeclineInviteState.eventSink(AcceptInvite(room.toInviteData()))
+                }
+            }.awaitAll()
         }
     }
 
