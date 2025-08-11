@@ -162,7 +162,13 @@ class JoinedRustRoom(
             // Skip initial one
             .drop(1)
             // The new events should already be in the SDK cache, no need to fetch them from the server
-            .onEach { baseRoom.roomMemberListFetcher.fetchRoomMembers(source = RoomMemberListFetcher.Source.CACHE) }
+            .onEach {
+                try {
+                baseRoom.roomMemberListFetcher.fetchRoomMembers(source = RoomMemberListFetcher.Source.CACHE)
+                } catch (e: Exception) {
+                    Timber.e("Failed to fetch room members for room $roomId, on `JoinedRustRoom` init block, with error: ${e.message}")
+                }
+            }
             .launchIn(roomCoroutineScope)
             .invokeOnCompletion {
                 Timber.d("Observing membership changes for room $roomId stopped, reason: $it")

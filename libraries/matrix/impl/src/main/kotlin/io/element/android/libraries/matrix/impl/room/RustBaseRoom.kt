@@ -94,13 +94,15 @@ class RustBaseRoom(
     override suspend fun subscribeToSync() = roomSyncSubscriber.subscribe(roomId)
 
     override suspend fun updateMembers() {
-        val useCache = membersStateFlow.value is RoomMembersState.Unknown
-        val source = if (useCache) {
-            RoomMemberListFetcher.Source.CACHE_AND_SERVER
-        } else {
-            RoomMemberListFetcher.Source.SERVER
+        runCatchingExceptions {
+            val useCache = membersStateFlow.value is RoomMembersState.Unknown
+            val source = if (useCache) {
+                RoomMemberListFetcher.Source.CACHE_AND_SERVER
+            } else {
+                RoomMemberListFetcher.Source.SERVER
+            }
+            roomMemberListFetcher.fetchRoomMembers(source = source)
         }
-        roomMemberListFetcher.fetchRoomMembers(source = source)
     }
 
     override suspend fun getMembers(limit: Int) = withContext(roomDispatcher) {

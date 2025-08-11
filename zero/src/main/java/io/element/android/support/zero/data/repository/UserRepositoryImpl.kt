@@ -50,6 +50,7 @@ class UserRepositoryImpl(
                 .getUsers(filter)
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { zeroUsers ->
+                    preferences.cacheUsers(zeroUsers)
                     trySend(zeroUsers.map { it.toModel() })
                 }
                 ?: trySend(emptyList())
@@ -59,9 +60,13 @@ class UserRepositoryImpl(
     override suspend fun getUser(userId: String): Flow<ZeroUser?> =
         channelFlowWithAwait {
             runSafeCall {
+                preferences.getCachedUser(userId)?.let {
+                    trySend(it.toModel())
+                }
                 val apiUser = zeroMatrixUserService.getMatrixUsers(
                     MatrixUsersFilter.newFilter(listOf(userId))
                 ).firstOrNull()
+                apiUser?.let { preferences.cacheUser(it) }
                 trySend(apiUser?.toModel())
             }
         }
@@ -71,9 +76,12 @@ class UserRepositoryImpl(
             val apiUsers = zeroMatrixUserService.getMatrixUsers(
                 MatrixUsersFilter.newFilter(userIds)
             )
+            preferences.cacheUsers(apiUsers)
             apiUsers.map { it.toModel() }
         }
-        return result.getOrDefault(emptyList())
+        val cachedUsers = preferences.getCachedUsers(userIds)
+            .map { it.toModel() }
+        return result.getOrDefault(cachedUsers)
     }
 
     override suspend fun updateUserProfile(userName: String?, avatarUrl: String?, profileZId: String?) {
