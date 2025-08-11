@@ -156,6 +156,7 @@ fun HomeView(
             RoomListSearchView(
                 state = roomListState.searchState,
                 eventSink = roomListState.eventSink,
+                roomMappedUserProStatus = roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 modifier = Modifier
@@ -345,6 +346,7 @@ internal fun HomeScreenContent(
                 modifier = modifier,
                 contentState = state.roomListState.contentState,
                 filtersState = state.roomListState.filtersState,
+                roomMappedUserProStatus = state.roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = state.roomListState.hideInvitesAvatars,
                 eventSink = state.roomListState.eventSink,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,

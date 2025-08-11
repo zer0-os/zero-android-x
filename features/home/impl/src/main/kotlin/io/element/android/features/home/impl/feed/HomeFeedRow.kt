@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
@@ -59,6 +61,7 @@ import io.element.android.libraries.matrix.api.zero.feed.isVideo
 import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.extension.openExternalUri
@@ -111,7 +114,7 @@ fun HomeFeedRow(
                 .fillMaxWidth()
                 .padding(start = 16.dp)
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     modifier = Modifier.clickable { onFeedUserClick() },
                     text = feed.user.profileSummary.name,
@@ -119,6 +122,16 @@ fun HomeFeedRow(
                     color = ElementTheme.colors.textPrimary,
                     maxLines = 1
                 )
+                if (feed.userProfileView?.isZeroProSubscriber == true) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(16.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
                 Text(
                     text = " • ",
                     style = ElementTheme.typography.fontBodyMdRegular,

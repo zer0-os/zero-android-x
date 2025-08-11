@@ -53,6 +53,7 @@ fun RoomListContentView(
     modifier: Modifier = Modifier,
     contentState: RoomListContentState,
     filtersState: RoomListFiltersState,
+    roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
@@ -83,6 +84,7 @@ fun RoomListContentView(
             RoomsView(
                 modifier = modifier,
                 state = contentState,
+                roomMappedUserProStatus = roomMappedUserProStatus,
                 hideInvitesAvatars = hideInvitesAvatars,
                 filtersState = filtersState,
                 eventSink = eventSink,
@@ -161,6 +163,7 @@ private fun EmptyView(
 @Composable
 private fun RoomsView(
     state: RoomListContentState.Rooms,
+    roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     filtersState: RoomListFiltersState,
     eventSink: (RoomListEvents) -> Unit,
@@ -178,6 +181,7 @@ private fun RoomsView(
     } else {
         RoomsViewList(
             state = state,
+            roomMappedUserProStatus = roomMappedUserProStatus,
             hideInvitesAvatars = hideInvitesAvatars,
             eventSink = eventSink,
             onSetUpRecoveryClick = onSetUpRecoveryClick,
@@ -192,6 +196,7 @@ private fun RoomsView(
 @Composable
 private fun RoomsViewList(
     state: RoomListContentState.Rooms,
+    roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
@@ -255,6 +260,7 @@ private fun RoomsViewList(
         ) { index, room ->
             RoomSummaryRow(
                 room = room,
+                showProBadgeWithRoom = roomMappedUserProStatus.getOrDefault(room.id, false),
                 hideInviteAvatars = hideInvitesAvatars,
                 isInviteSeen = room.displayType == RoomSummaryDisplayType.INVITE &&
                     state.seenRoomInvites.contains(room.roomId),
@@ -297,6 +303,7 @@ internal fun RoomListContentViewPreview(@PreviewParameter(RoomListContentStatePr
                 )
             }
         ),
+        roomMappedUserProStatus = emptyMap(),
         hideInvitesAvatars = false,
         eventSink = {},
         onSetUpRecoveryClick = {},

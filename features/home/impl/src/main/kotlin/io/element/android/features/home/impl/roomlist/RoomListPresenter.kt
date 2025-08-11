@@ -25,6 +25,8 @@ import androidx.compose.runtime.snapshotFlow
 import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.features.home.impl.datasource.RoomListDataSource
 import io.element.android.features.home.impl.filters.RoomListFiltersState
+import io.element.android.features.home.impl.model.RoomListRoomSummary
+import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.features.home.impl.search.RoomListSearchEvents
 import io.element.android.features.home.impl.search.RoomListSearchState
 import io.element.android.features.invite.api.SeenInvitesStore
@@ -51,11 +53,14 @@ import io.element.android.libraries.push.api.battery.BatteryOptimizationState
 import io.element.android.libraries.push.api.notifications.NotificationCleaner
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -111,7 +116,10 @@ class RoomListPresenter @Inject constructor(
         }.collectAsState()
 
         val contextMenu = remember { mutableStateOf<RoomListState.ContextMenu>(RoomListState.ContextMenu.Hidden) }
+
         val declineInviteMenu = remember { mutableStateOf<RoomListState.DeclineInviteMenu>(RoomListState.DeclineInviteMenu.Hidden) }
+
+        val roomMappedUserProStatusState = remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
         fun handleEvents(event: RoomListEvents) {
             when (event) {
@@ -150,6 +158,13 @@ class RoomListPresenter @Inject constructor(
         }
 
         val contentState = roomListContentState(securityBannerDismissed)
+        val mContentState = contentState.withoutInvitedRooms()
+
+        LaunchedEffect(contentState) {
+            (contentState as? RoomListContentState.Rooms)?.let {
+                coroutineScope.extractRoomMembersAndMapBadge(it.summaries, roomMappedUserProStatusState)
+            }
+        }
 
         val canReportRoom by produceState(false) { value = client.canReportRoom() }
 
@@ -159,7 +174,8 @@ class RoomListPresenter @Inject constructor(
             leaveRoomState = leaveRoomState,
             filtersState = filtersState,
             searchState = searchState,
-            contentState = contentState,
+            contentState = mContentState,
+            roomMappedUserProStatus = roomMappedUserProStatusState.value,
             acceptDeclineInviteState = acceptDeclineInviteState,
             hideInvitesAvatars = hideInvitesAvatar,
             canReportRoom = canReportRoom,
@@ -325,6 +341,49 @@ class RoomListPresenter @Inject constructor(
                 currentRoomList.getOrNull(index)?.roomId
             }
             roomListDataSource.subscribeToVisibleRooms(roomIds)
+        }
+    }
+
+    private var extractRoomMembersAndMapBadgeJob: Job? = null
+    private fun CoroutineScope.extractRoomMembersAndMapBadge(
+        summaries: ImmutableList<RoomListRoomSummary>,
+        roomMappedUserProStatusState: MutableState<Map<String, Boolean>>
+    ) {
+        extractRoomMembersAndMapBadgeJob = null
+        extractRoomMembersAndMapBadgeJob = launch {
+            if (summaries.isEmpty()) return@launch
+            val currentUserId = client.sessionId.value
+            val allUsers = summaries
+                .flatMap { it.heroes.map { hero -> hero.id } }
+                .toMutableList()
+                .apply {
+                    // Add the current loggedIn user id
+                    add(currentUserId)
+                    distinct()
+                }
+            if (allUsers.isEmpty()) return@launch
+            val profiles = client.getZeroUsers(allUsers)
+                .getOrNull().orEmpty()
+            val dmRooms = summaries.filter { it.isDm || it.isDirect }
+            if (dmRooms.isEmpty()) return@launch
+            val roomMappedUserProStatus = mutableMapOf<String, Boolean>()
+            dmRooms.forEach { roomSummary ->
+                val roomDirectUserId = roomSummary.heroes.firstOrNull { hero ->
+                    hero.id != currentUserId
+                }?.id
+                val roomDirectUser = roomDirectUserId?.let {
+                    profiles.firstOrNull { zeroProfile -> zeroProfile.matrixId == it }
+                } ?: run {
+                    profiles.firstOrNull { zeroProfile ->
+                        zeroProfile.name.equals(roomSummary.name, true) ||
+                            zeroProfile.id.equals(roomSummary.name, true)
+                    }
+                }
+                roomDirectUser?.let { user ->
+                    roomMappedUserProStatus[roomSummary.id] = user.isZeroProSubscriber
+                }
+            }
+            roomMappedUserProStatusState.value = roomMappedUserProStatus
         }
     }
 }

@@ -44,6 +44,7 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
@@ -180,6 +181,9 @@ class FakeMatrixClient(
         return getProfileResults[userId] ?: Result.failure(IllegalStateException("No profile found for $userId"))
     }
 
+    override suspend fun getZeroUsers(userIds: List<String>): Result<List<ZeroUser>> {
+        return Result.success(emptyList())
+    }
     override suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults> {
         return searchUserResults[searchTerm] ?: Result.failure(IllegalStateException("No response defined for $searchTerm"))
     }

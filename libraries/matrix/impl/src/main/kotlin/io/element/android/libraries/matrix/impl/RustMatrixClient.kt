@@ -432,6 +432,14 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun getZeroUsers(userIds: List<String>): Result<List<ZeroUser>> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
+            val zeroUserProfiles = zeroCoreRepository?.user?.getUsers(userIds)
+                ?: emptyList()
+            zeroUserProfiles
+        }
+    }
+
     override suspend fun getUserProfile(): Result<MatrixUser> {
         return runCatchingExceptions {
             getProfile(sessionId)
@@ -1128,7 +1136,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
-    = withContext(sessionDispatcher) {
+        = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
             walletRepo.getTransactionReceipt(transactionId).toModel()

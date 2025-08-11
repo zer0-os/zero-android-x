@@ -55,6 +55,7 @@ import io.element.android.libraries.designsystem.theme.components.SearchBarResul
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.matrix.api.room.RoomMember
@@ -307,27 +308,35 @@ private fun RoomMemberListItem(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                when (roomMemberWithIdentity.identityState) {
-                    IdentityState.Verified -> {
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            imageVector = CompoundIcons.Verified(),
-                            contentDescription = stringResource(CommonStrings.common_verified),
-                            tint = ElementTheme.colors.iconSuccessPrimary
-                        )
-                    }
-                    IdentityState.VerificationViolation -> {
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            imageVector = CompoundIcons.ErrorSolid(),
-                            contentDescription = stringResource(
-                                CommonStrings.crypto_identity_change_profile_pin_violation,
-                                roomMemberWithIdentity.roomMember.getBestName()
-                            ),
-                            tint = ElementTheme.colors.iconCriticalPrimary
-                        )
-                    }
-                    else -> Unit
+//                when (roomMemberWithIdentity.identityState) {
+//                    IdentityState.Verified -> {
+//                        Icon(
+//                            modifier = Modifier.size(20.dp),
+//                            imageVector = CompoundIcons.Verified(),
+//                            contentDescription = stringResource(CommonStrings.common_verified),
+//                            tint = ElementTheme.colors.iconSuccessPrimary
+//                        )
+//                    }
+//                    IdentityState.VerificationViolation -> {
+//                        Icon(
+//                            modifier = Modifier.size(20.dp),
+//                            imageVector = CompoundIcons.ErrorSolid(),
+//                            contentDescription = stringResource(
+//                                CommonStrings.crypto_identity_change_profile_pin_violation,
+//                                roomMemberWithIdentity.roomMember.getBestName()
+//                            ),
+//                            tint = ElementTheme.colors.iconCriticalPrimary
+//                        )
+//                    }
+//                    else -> Unit
+//                }
+                if (member.isZeroProSubscriber) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
                 }
 
                 roleText?.let {

@@ -31,9 +31,15 @@ class NotJoinedRustRoom(
         }
         RoomMembershipDetails(
             currentUserMember = RoomMemberMapper.map(ownMember)
-                .copy(primaryZId = apiOwnMember?.primaryZeroId),
+                .copy(
+                    primaryZId = apiOwnMember?.primaryZeroId,
+                    isZeroProSubscriber = apiOwnMember?.isZeroProSubscriber ?: false
+                ),
             senderMember = senderInfo?.let {
-                RoomMemberMapper.map(it).copy(primaryZId = apiSenderInfo?.primaryZeroId)
+                RoomMemberMapper.map(it).copy(
+                    primaryZId = apiSenderInfo?.primaryZeroId,
+                    isZeroProSubscriber = apiSenderInfo?.isZeroProSubscriber ?: false
+                )
             },
         )
     }

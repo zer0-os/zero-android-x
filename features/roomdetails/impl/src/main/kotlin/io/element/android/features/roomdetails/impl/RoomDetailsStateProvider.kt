@@ -81,7 +81,8 @@ fun aDmRoomMember(
     isIgnored = isIgnored,
     role = role,
     membershipChangeReason = membershipChangeReason,
-    primaryZId = null
+    primaryZId = null,
+    isZeroProSubscriber = false
 )
 
 fun aRoomDetailsState(

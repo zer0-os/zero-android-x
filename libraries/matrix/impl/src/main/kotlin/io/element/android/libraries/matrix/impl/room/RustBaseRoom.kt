@@ -108,7 +108,10 @@ class RustBaseRoom(
             innerRoom.members().use {
                 it.nextChunk(limit.toUInt()).orEmpty().map { roomMember ->
                     val apiMember = zeroUserRepository?.getUser(roomMember.userId)?.firstOrNull()
-                    RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
+                    RoomMemberMapper.map(roomMember).copy(
+                        primaryZId = apiMember?.primaryZeroId,
+                        isZeroProSubscriber = apiMember?.isZeroProSubscriber ?: false
+                    )
                 }
             }
         }
@@ -122,7 +125,10 @@ class RustBaseRoom(
             )
             val apiMember = results[0] as? ZeroUser
             val roomMember = results[1] as org.matrix.rustcomponents.sdk.RoomMember
-            RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
+            RoomMemberMapper.map(roomMember).copy(
+                primaryZId = apiMember?.primaryZeroId,
+                isZeroProSubscriber = apiMember?.isZeroProSubscriber ?: false
+            )
         }
     }
 

@@ -59,6 +59,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -505,7 +506,9 @@ class JoinedRustRoom(
         if (!roomMembers.isNullOrEmpty()) {
             val otherMember = roomMembers.firstOrNull { it.userId != sessionId }
             otherMember?.let { member ->
-                repository.getUser(member.userId.value).collect(_directZeroUser)
+                repository.getUser(member.userId.value).collectLatest {
+                    _directZeroUser.value = it
+                }
             }
         }
     }

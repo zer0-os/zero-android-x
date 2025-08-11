@@ -70,6 +70,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
@@ -463,6 +464,7 @@ private fun RoomHeaderSection(
         TitleAndSubtitle(
             title = roomName,
             subtitle = roomSubTitle,
+            showProSubscriberBadge = false,
             onSubtitleClick = {}
         )
     }
@@ -505,6 +507,7 @@ private fun DmHeaderSection(
             title = roomName,
             // subtitle = otherMember.userId.value,
             subtitle = roomSubTitle,
+            showProSubscriberBadge = otherMember.isZeroProSubscriber,
             onSubtitleClick = { },
         )
     }
@@ -514,15 +517,29 @@ private fun DmHeaderSection(
 private fun TitleAndSubtitle(
     title: String,
     subtitle: String?,
+    showProSubscriberBadge: Boolean,
     onSubtitleClick: (String) -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = title,
-            style = ElementTheme.zeroTypography.fontHeadingLgBold,
-            textAlign = TextAlign.Center,
-        )
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = ElementTheme.zeroTypography.fontHeadingLgBold,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            if (showProSubscriberBadge) {
+                Icon(
+                    modifier = Modifier.size(26.dp),
+                    imageVector = CompoundIcons.Verified(),
+                    contentDescription = stringResource(CommonStrings.common_verified),
+                    tint = ElementTheme.colors.zeroBrandColor
+                )
+            }
+        }
         if (subtitle != null) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(

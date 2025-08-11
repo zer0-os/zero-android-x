@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -92,6 +93,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.HideKeyboardWhenDisposed
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
@@ -197,6 +199,7 @@ fun MessagesView(
                         MessagesViewTopBar(
                             roomName = state.roomName,
                             roomAvatar = state.roomAvatar,
+                            showZeroProBadge = state.showZeroProBadge,
                             isTombstoned = state.isTombstoned,
                             roomSubTitle = state.roomSubTitle,
                             heroes = state.heroes,
@@ -482,6 +485,7 @@ private fun MessagesViewComposerBottomSheetContents(
 private fun MessagesViewTopBar(
     roomName: String?,
     roomAvatar: AvatarData,
+    showZeroProBadge: Boolean,
     isTombstoned: Boolean,
     roomSubTitle: String?,
     heroes: ImmutableList<AvatarData>,
@@ -508,6 +512,7 @@ private fun MessagesViewTopBar(
                 RoomAvatarAndNameRow(
                     roomName = roomName,
                     roomAvatar = roomAvatar,
+                    showZeroProBadge = showZeroProBadge,
                     isTombstoned = isTombstoned,
                     roomSubTitle = roomSubTitle,
                     heroes = heroes,
@@ -550,6 +555,7 @@ private fun RoomAvatarAndNameRow(
     roomAvatar: AvatarData,
     roomSubTitle: String? = null,
     heroes: ImmutableList<AvatarData>,
+    showZeroProBadge: Boolean,
     isTombstoned: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -565,18 +571,33 @@ private fun RoomAvatarAndNameRow(
             ),
         )
         Column {
-            Text(
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .semantics {
-                        heading()
-                    },
-                text = roomName ?: stringResource(CommonStrings.common_no_room_name),
-                style = ElementTheme.zeroTypography.fontBodyLgMedium,
-                fontStyle = FontStyle.Italic.takeIf { roomName == null },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .semantics {
+                            heading()
+                        },
+                    text = roomName ?: stringResource(CommonStrings.common_no_room_name),
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
+                    fontStyle = FontStyle.Italic.takeIf { roomName == null },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (showZeroProBadge) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(20.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
+            }
             if (!roomSubTitle.isNullOrBlank()) {
                 Text(
                     modifier = Modifier.padding(horizontal = 8.dp),

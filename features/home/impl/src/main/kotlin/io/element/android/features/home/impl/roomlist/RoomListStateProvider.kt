@@ -64,6 +64,7 @@ internal fun aRoomListState(
     filtersState = filtersState,
     searchState = searchState,
     contentState = contentState,
+    roomMappedUserProStatus = emptyMap(),
     acceptDeclineInviteState = acceptDeclineInviteState,
     hideInvitesAvatars = hideInvitesAvatars,
     canReportRoom = canReportRoom,

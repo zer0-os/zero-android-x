@@ -150,6 +150,7 @@ fun aMessagesState(
     dmUserVerificationState = dmUserVerificationState,
     roomMemberModerationState = roomMemberModerationState,
     successorRoom = successorRoom,
+    showZeroProBadge = false,
     eventSink = eventSink,
 )
 

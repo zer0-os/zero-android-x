@@ -9,11 +9,13 @@ package io.element.android.features.roommembermoderation.impl
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,11 +46,13 @@ import io.element.android.libraries.designsystem.components.dialogs.TextFieldDia
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconSource
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.ModalBottomSheet
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.ui.model.getAvatarData
@@ -230,29 +234,42 @@ private fun RoomMemberActionsBottomSheet(
                     .padding(bottom = 28.dp)
                     .align(Alignment.CenterHorizontally)
             )
-            user.displayName?.let {
+            Row(modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                user.displayName?.let {
+                    Text(
+                        text = it,
+                        style = ElementTheme.zeroTypography.fontHeadingLgBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                if (user.isZeroProSubscriber) {
+                    Icon(
+                        modifier = Modifier.size(26.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
+            }
+            user.primaryZeroId?.let {
                 Text(
                     text = it,
-                    style = ElementTheme.zeroTypography.fontHeadingLgBold,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                    color = ElementTheme.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                        .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                 )
             }
-            /*Text(
-                text = user.userId.toString(),
-                style = ElementTheme.zeroTypography.fontBodyLgRegular,
-                color = ElementTheme.colors.textSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-            )*/
             Spacer(modifier = Modifier.height(32.dp))
 
             for (actionState in actions) {

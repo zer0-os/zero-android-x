@@ -11,6 +11,7 @@ import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
+import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.features.home.impl.search.RoomListSearchState
 import io.element.android.features.invite.api.acceptdecline.AcceptDeclineInviteState
 import io.element.android.features.leaveroom.api.LeaveRoomState
@@ -19,6 +20,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.push.api.battery.BatteryOptimizationState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class RoomListState(
@@ -28,6 +30,7 @@ data class RoomListState(
     val filtersState: RoomListFiltersState,
     val searchState: RoomListSearchState,
     val contentState: RoomListContentState,
+    val roomMappedUserProStatus: Map<String, Boolean>,
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val hideInvitesAvatars: Boolean,
     val canReportRoom: Boolean,
@@ -78,4 +81,16 @@ sealed interface RoomListContentState {
         val summaries: ImmutableList<RoomListRoomSummary>,
         val seenRoomInvites: ImmutableSet<RoomId>,
     ) : RoomListContentState
+}
+
+fun RoomListContentState.withoutInvitedRooms(): RoomListContentState {
+    val contentState = when (this) {
+        is RoomListContentState.Skeleton,
+        is RoomListContentState.Empty -> this
+        is RoomListContentState.Rooms -> {
+            val filtered = this.summaries.filter { it.displayType != RoomSummaryDisplayType.INVITE }
+            this.copy(summaries = filtered.toImmutableList())
+        }
+    }
+    return contentState
 }

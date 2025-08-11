@@ -56,6 +56,7 @@ import io.element.android.libraries.ui.strings.CommonStrings
 @Composable
 internal fun RoomListSearchView(
     state: RoomListSearchState,
+    roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomId) -> Unit,
@@ -73,6 +74,7 @@ internal fun RoomListSearchView(
         Column(modifier = modifier) {
             RoomListSearchContent(
                 state = state,
+                roomMappedUserProStatus = roomMappedUserProStatus,
                 hideInvitesAvatars = hideInvitesAvatars,
                 onRoomClick = onRoomClick,
                 eventSink = eventSink,
@@ -85,6 +87,7 @@ internal fun RoomListSearchView(
 @Composable
 private fun RoomListSearchContent(
     state: RoomListSearchState,
+    roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomId) -> Unit,
@@ -169,6 +172,7 @@ private fun RoomListSearchContent(
                 ) { room ->
                     RoomSummaryRow(
                         room = room,
+                        showProBadgeWithRoom = roomMappedUserProStatus.getOrDefault(room.id, false),
                         hideInviteAvatars = hideInvitesAvatars,
                         // TODO
                         isInviteSeen = false,
@@ -186,6 +190,7 @@ private fun RoomListSearchContent(
 internal fun RoomListSearchContentPreview(@PreviewParameter(RoomListSearchStateProvider::class) state: RoomListSearchState) = ElementPreview {
     RoomListSearchContent(
         state = state,
+        roomMappedUserProStatus = emptyMap(),
         hideInvitesAvatars = false,
         onRoomClick = {},
         eventSink = {},

@@ -189,7 +189,8 @@ private fun RoomInviteMembersSearchBar(
                                 // Otherwise show the ID, unless that's already used for their name
                                 invitableUser.matrixUser.displayName.isNullOrEmpty().not() -> invitableUser.matrixUser.primaryZeroId
                                 else -> null
-                            }
+                            },
+                            showProSubscriberBadge = invitableUser.matrixUser.isZeroProSubscriber
                         )
                     }
                     CheckableUserRow(

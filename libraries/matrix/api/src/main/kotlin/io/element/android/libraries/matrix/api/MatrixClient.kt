@@ -46,6 +46,7 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
@@ -82,6 +83,7 @@ interface MatrixClient {
     suspend fun createRoom(createRoomParams: CreateRoomParameters): Result<RoomId>
     suspend fun createDM(userId: UserId): Result<RoomId>
     suspend fun getProfile(userId: UserId): Result<MatrixUser>
+    suspend fun getZeroUsers(userIds: List<String>): Result<List<ZeroUser>>
     suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults>
     suspend fun setDisplayName(displayName: String): Result<Unit>
     suspend fun setDisplayNameOrZid(displayName: String, primaryZId: String): Result<Unit>
