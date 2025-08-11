@@ -28,6 +28,7 @@ import io.element.android.libraries.core.mimetype.MimeTypes
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.ui.media.AvatarAction
 import io.element.android.libraries.mediapickers.api.PickerProvider
+import io.element.android.libraries.mediaupload.api.MediaOptimizationConfigProvider
 import io.element.android.libraries.mediaupload.api.MediaPreProcessor
 import io.element.android.libraries.permissions.api.PermissionsEvents
 import io.element.android.libraries.permissions.api.PermissionsPresenter
@@ -44,6 +45,7 @@ class CompleteProfilePresenter @AssistedInject constructor(
     private val mediaPreProcessor: MediaPreProcessor,
     private val temporaryUriDeleter: TemporaryUriDeleter,
     permissionsPresenterFactory: PermissionsPresenter.Factory,
+    private val mediaOptimizationConfigProvider: MediaOptimizationConfigProvider,
 ) : Presenter<CompleteProfileState> {
     private val cameraPermissionPresenter: PermissionsPresenter = permissionsPresenterFactory.create(android.Manifest.permission.CAMERA)
     private var pendingPermissionRequest = false
@@ -154,7 +156,7 @@ class CompleteProfilePresenter @AssistedInject constructor(
                 uri = avatarUri,
                 mimeType = MimeTypes.Jpeg,
                 deleteOriginal = false,
-                compressIfPossible = false,
+                mediaOptimizationConfig = mediaOptimizationConfigProvider.get()
             ).getOrThrow()
             avatarMimeType = MimeTypes.Jpeg
             avatarData = preprocessed.file.readBytes()

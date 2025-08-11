@@ -206,6 +206,11 @@ interface MatrixClient {
      */
     suspend fun isLivekitRtcSupported(): Boolean
 
+    /**
+     * Returns the maximum file upload size allowed by the Matrix server.
+     */
+    suspend fun getMaxFileUploadSize(): Result<Long>
+
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
 
