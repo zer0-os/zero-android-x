@@ -141,11 +141,12 @@ class PreferencesRootNode @AssistedInject constructor(
             onOpenUserProfile = this::onOpenUserProfile,
             onOpenBlockedUsers = this::onOpenBlockedUsers,
             onSignOutClick = {
-                if (state.directLogoutState.canDoDirectSignOut) {
-                    state.directLogoutState.eventSink(DirectLogoutEvents.Logout(ignoreSdkError = false))
-                } else {
-                    onSignOutClick()
-                }
+//                if (state.directLogoutState.canDoDirectSignOut) {
+//                    state.directLogoutState.eventSink(DirectLogoutEvents.Logout(ignoreSdkError = false))
+//                } else {
+//                    onSignOutClick()
+//                }
+                state.directLogoutState.eventSink(DirectLogoutEvents.Logout(ignoreSdkError = false))
             },
             onDeactivateClick = this::onOpenAccountDeactivation,
             onOpenRewards = this::onOpenRewards,

@@ -150,6 +150,14 @@ class HomePresenter @Inject constructor(
         val walletTransactionsPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?> =
             remember { mutableStateOf(null) }
 
+        val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
+            coroutineScope.fetchWalletData(
+                meowPrice, walletAddress, userWalletBalance,
+                walletTokensListState, walletTransactionsListState,
+                walletTokenPaginationParams, walletTransactionsPaginationParams
+            )
+        }
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
@@ -160,13 +168,7 @@ class HomePresenter @Inject constructor(
             client.userProfile
                 .mapNotNull { it.walletAddress }
                 .distinctUntilChanged()
-                .collectLatest {
-                    fetchWalletData(
-                        meowPrice, it, userWalletBalance,
-                        walletTokensListState, walletTransactionsListState,
-                        walletTokenPaginationParams, walletTransactionsPaginationParams
-                    )
-                }
+                .collectLatest { fetchWalletData(it) }
         }
         // Avatar indicator
         val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()
@@ -242,7 +244,15 @@ class HomePresenter @Inject constructor(
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> {
                     claimableUserRewards.value = userRewards.value
-                    coroutineScope.claimUserRewards(matrixUser.value, claimRewardsActionState)
+                    coroutineScope.claimUserRewards(
+                        matrixUser = matrixUser.value,
+                        claimRewardsActionState = claimRewardsActionState,
+                        refreshWallet = {
+                            client.userProfile.value.walletAddress?.let { walletAddress ->
+                                fetchWalletData(walletAddress)
+                            }
+                        }
+                    )
                 }
                 HomeEvents.RefreshWalletBalance -> {
                     matrixUser.value.walletAddress?.let { address ->
@@ -712,7 +722,8 @@ class HomePresenter @Inject constructor(
     }
 
     private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,
-                                                claimRewardsActionState: MutableState<AsyncAction<String>>
+                                                claimRewardsActionState: MutableState<AsyncAction<String>>,
+                                                refreshWallet: () -> Unit
     ) = launch {
         matrixUser.walletAddress?.let {
             claimRewardsActionState.value = AsyncAction.Loading
@@ -720,6 +731,7 @@ class HomePresenter @Inject constructor(
                 .onSuccess { transaction ->
                     claimRewardsActionState.value = AsyncAction.Success(transaction)
                     client.getUserRewards()
+                    refreshWallet()
                 }
                 .onFailure { error ->
                     claimRewardsActionState.value = AsyncAction.Failure(error)

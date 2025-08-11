@@ -109,7 +109,7 @@ fun ClaimRewardsSheet(
 
     Box(
         modifier = modifier
-            .height(400.dp)
+            .height(450.dp)
             .padding(horizontal = 12.dp)
             .padding(bottom = 48.dp)
             .shadow(
