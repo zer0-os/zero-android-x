@@ -50,6 +50,7 @@ data class MessagesState(
     val hasNetworkConnection: Boolean,
     val snackbarMessage: SnackbarMessage?,
     val inviteProgress: AsyncData<Unit>,
+    val showZeroProBadge: Boolean,
     val showReinvitePrompt: Boolean,
     val enableTextFormatting: Boolean,
     val enableVoiceMessages: Boolean,

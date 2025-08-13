@@ -113,11 +113,15 @@ fun ChooseSelfVerificationModeView(
             )
         }
     }*/
-    ZeroVerifySelfSessionView(
-        onSkipVerification = onSkipVerification,
-        onEnterRecoveryKey = onUseRecoveryKey,
-        onResetRecoveryKey = onResetKey
-    )
+    if (state.canEnterRecoveryKey) {
+        ZeroVerifySelfSessionView(
+            onSkipVerification = onSkipVerification,
+            onEnterRecoveryKey = onUseRecoveryKey,
+            onResetRecoveryKey = onResetKey
+        )
+    } else {
+        onSkipVerification()
+    }
 }
 
 @PreviewsDayNight

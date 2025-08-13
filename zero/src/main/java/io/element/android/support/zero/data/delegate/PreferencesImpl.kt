@@ -3,6 +3,7 @@ package io.element.android.support.zero.data.delegate
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.datastore.AppPreferences
+import io.element.android.support.zero.network.model.response.ApiUser
 
 class PreferencesImpl(private val appPreferences: AppPreferences) :
     Preferences {
@@ -35,4 +36,16 @@ class PreferencesImpl(private val appPreferences: AppPreferences) :
     }
 
     override fun loggedInUserInfo() = appPreferences.loggedInUserInfo()
+
+    override fun getCachedUser(id: String): ApiUser? = appPreferences.getCachedUser(id)
+
+    override fun getCachedUsers(ids: List<String>): List<ApiUser> = appPreferences.getCachedUsers(ids)
+
+    override suspend fun cacheUser(user: ApiUser) {
+        appPreferences.cacheUser(user)
+    }
+
+    override suspend fun cacheUsers(users: List<ApiUser>) {
+        appPreferences.cacheUsers(users)
+    }
 }

@@ -77,7 +77,8 @@
       "name" : ":libraries:textcomposer:impl",
       "includeRegex" : [
         "rich_text_editor.*",
-        ".*voice_message_tooltip"
+        ".*voice_message_tooltip",
+        "screen\\.media_upload_preview.caption_warning"
       ]
     },
     {
@@ -213,7 +214,8 @@
         "screen_room_retry.*",
         "screen_room_timeline.*",
         "screen\\.room_timeline.*",
-        "screen_room_typing.*"
+        "screen_room_typing.*",
+        "screen\\.media_upload.*"
       ]
     },
     {
@@ -334,6 +336,14 @@
       "name" : ":features:roommembermoderation:impl",
       "includeRegex" : [
         "screen\\.bottom_sheet\\.manage_room_member\\..*"
+      ]
+    },
+    {
+      "name" : ":features:changeroommemberroles:impl",
+      "includeRegex" : [
+        "screen_room_change_.*",
+        "screen_room_roles_.*",
+        "screen_room_member_list.*"
       ]
     }
   ]

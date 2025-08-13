@@ -12,24 +12,31 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 internal fun UserRow(
     avatarData: AvatarData,
     name: String,
     subtext: String?,
+    showProSubscriberBadge: Boolean,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -50,14 +57,26 @@ internal fun UserRow(
                 .weight(1f),
         ) {
             // Name
-            Text(
-                modifier = Modifier.clipToBounds(),
-                text = name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = ElementTheme.colors.textPrimary,
-                style = ElementTheme.zeroTypography.fontBodyLgRegular,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    modifier = Modifier.clipToBounds(),
+                    text = name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = ElementTheme.colors.textPrimary,
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                )
+                if (showProSubscriberBadge) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(16.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
+            }
             // Id
             subtext?.let {
                 Text(

@@ -11,6 +11,8 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.coroutineScope
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
@@ -25,6 +27,8 @@ import io.element.android.anvilannotations.ContributesNode
 import io.element.android.appconfig.LearnMoreConfig
 import io.element.android.features.call.api.CallType
 import io.element.android.features.call.api.ElementCallEntryPoint
+import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesEntryPoint
+import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesListType
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.features.knockrequests.api.list.KnockRequestsListEntryPoint
@@ -35,11 +39,9 @@ import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
 import io.element.android.features.roomdetails.impl.edit.RoomDetailsEditNode
 import io.element.android.features.roomdetails.impl.invite.RoomInviteMembersNode
 import io.element.android.features.roomdetails.impl.members.RoomMemberListNode
-import io.element.android.features.roomdetails.impl.members.details.RoomMemberDetailsNode
 import io.element.android.features.roomdetails.impl.notificationsettings.RoomNotificationSettingsNode
 import io.element.android.features.roomdetails.impl.rolesandpermissions.RolesAndPermissionsFlowNode
 import io.element.android.features.roomdetails.impl.securityandprivacy.SecurityAndPrivacyFlowNode
-import io.element.android.features.userprofile.shared.UserProfileNodeHelper
 import io.element.android.features.verifysession.api.OutgoingVerificationEntryPoint
 import io.element.android.libraries.architecture.BackstackWithOverlayBox
 import io.element.android.libraries.architecture.BaseFlowNode
@@ -53,7 +55,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
-import io.element.android.libraries.matrix.api.room.BaseRoom
+import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -61,6 +63,9 @@ import io.element.android.libraries.mediaviewer.api.MediaGalleryEntryPoint
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 
 @ContributesNode(RoomScope::class)
@@ -69,7 +74,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
     @Assisted plugins: List<Plugin>,
     private val pollHistoryEntryPoint: PollHistoryEntryPoint,
     private val elementCallEntryPoint: ElementCallEntryPoint,
-    private val room: BaseRoom,
+    private val room: JoinedRoom,
     private val analyticsService: AnalyticsService,
     private val messagesEntryPoint: MessagesEntryPoint,
     private val knockRequestsListEntryPoint: KnockRequestsListEntryPoint,
@@ -77,6 +82,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
     private val mediaGalleryEntryPoint: MediaGalleryEntryPoint,
     private val outgoingVerificationEntryPoint: OutgoingVerificationEntryPoint,
     private val reportRoomEntryPoint: ReportRoomEntryPoint,
+    private val changeRoomMemberRolesEntryPoint: ChangeRoomMemberRolesEntryPoint,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
 ) : BaseFlowNode<RoomDetailsFlowNode.NavTarget>(
@@ -141,6 +147,24 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
         @Parcelize
         data class FeedDetails(val feed: ZeroFeed) : NavTarget
+
+        @Parcelize
+        data object SelectNewOwnersWhenLeaving : NavTarget
+    }
+
+    override fun onBuilt() {
+        super.onBuilt()
+        whenChildrenAttached { commonLifecycle: Lifecycle,
+                               roomDetailsNode: RoomDetailsNode,
+                               changeRoomMemberRolesNode: ChangeRoomMemberRolesEntryPoint.NodeProxy ->
+            commonLifecycle.coroutineScope.launch {
+                changeRoomMemberRolesNode.waitForRoleChanged()
+                withContext(NonCancellable) {
+                    backstack.pop()
+                    roomDetailsNode.onNewOwnersSelected()
+                }
+            }
+        }
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -206,6 +230,10 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
                     override fun openReportRoom() {
                         backstack.push(NavTarget.ReportRoom)
+                    }
+
+                    override fun onSelectNewOwnersWhenLeaving() {
+                        backstack.push(NavTarget.SelectNewOwnersWhenLeaving)
                     }
                 }
                 createNode<RoomDetailsNode>(buildContext, listOf(roomDetailsCallback))
@@ -370,7 +398,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
             is NavTarget.VerifyUser -> {
                 val params = OutgoingVerificationEntryPoint.Params(
                     showDeviceVerifiedScreen = true,
-                    verificationRequest = VerificationRequest.Outgoing.User(userId = navTarget.userId,)
+                    verificationRequest = VerificationRequest.Outgoing.User(userId = navTarget.userId)
                 )
                 outgoingVerificationEntryPoint.nodeBuilder(this, buildContext)
                     .params(params)
@@ -391,6 +419,13 @@ class RoomDetailsFlowNode @AssistedInject constructor(
             }
             is NavTarget.ReportRoom -> {
                 reportRoomEntryPoint.createNode(this, buildContext, room.roomId)
+            }
+
+            is NavTarget.SelectNewOwnersWhenLeaving -> {
+                changeRoomMemberRolesEntryPoint.builder(this, buildContext)
+                    .room(room)
+                    .listType(ChangeRoomMemberRolesListType.SelectNewOwnersWhenLeaving)
+                    .build()
             }
         }
     }

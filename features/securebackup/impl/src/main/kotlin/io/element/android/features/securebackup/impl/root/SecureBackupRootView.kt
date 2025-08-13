@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.securebackup.impl.R
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
@@ -27,8 +28,10 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.text.buildAnnotatedStringWithStyledPart
 import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.ListItem
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
 import io.element.android.libraries.matrix.api.encryption.BackupState
@@ -55,87 +58,87 @@ fun SecureBackupRootView(
         title = stringResource(id = CommonStrings.common_encryption),
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        ListItem(
-            headlineContent = {
-                Text(
-                    text = stringResource(id = R.string.screen_chat_backup_key_backup_title),
-                )
-            },
-            supportingContent = {
-                /*Text(
-                    text = buildAnnotatedStringWithStyledPart(
-                        fullTextRes = R.string.screen_chat_backup_key_backup_description,
-                        coloredTextRes = CommonStrings.action_learn_more,
-                        color = ElementTheme.colors.textPrimary,
-                        underline = false,
-                        bold = true,
-                    ),
-                )*/
-                Text(
-                    text = stringResource(R.string.screen_chat_backup_key_backup_description, "")
-                    .replace(" .", "")
-                )
-            },
-            // onClick = onLearnMoreClick,
-        )
-
-        // Disable / Enable key storage
-        ListItem(
-            headlineContent = {
-                Text(
-                    text = stringResource(id = R.string.screen_chat_backup_key_storage_toggle_title),
-                )
-            },
-            trailingContent = when (state.backupState) {
-                BackupState.WAITING_FOR_SYNC,
-                BackupState.DISABLING -> ListItemContent.Custom { LoadingView() }
-                BackupState.UNKNOWN -> {
-                    when (state.doesBackupExistOnServer) {
-                        is AsyncData.Success -> {
-                            ListItemContent.Switch(checked = state.doesBackupExistOnServer.data)
-                        }
-                        is AsyncData.Loading,
-                        AsyncData.Uninitialized -> ListItemContent.Custom { LoadingView() }
-                        is AsyncData.Failure -> ListItemContent.Custom {
-                            Text(
-                                text = stringResource(id = CommonStrings.action_retry)
-                            )
-                        }
-                    }
-                }
-                BackupState.CREATING,
-                BackupState.ENABLING,
-                BackupState.RESUMING,
-                BackupState.ENABLED,
-                BackupState.DOWNLOADING -> ListItemContent.Switch(checked = true)
-            },
-            onClick = {
-                when (state.backupState) {
-                    BackupState.WAITING_FOR_SYNC,
-                    BackupState.DISABLING -> Unit
-                    BackupState.UNKNOWN -> {
-                        when (state.doesBackupExistOnServer) {
-                            is AsyncData.Success -> {
-                                if (state.doesBackupExistOnServer.data) {
-                                    onDisableClick()
-                                } else {
-                                    state.eventSink.invoke(SecureBackupRootEvents.EnableKeyStorage)
-                                }
-                            }
-                            is AsyncData.Loading,
-                            AsyncData.Uninitialized -> Unit
-                            is AsyncData.Failure -> state.eventSink.invoke(SecureBackupRootEvents.RetryKeyBackupState)
-                        }
-                    }
-                    BackupState.CREATING,
-                    BackupState.ENABLING,
-                    BackupState.RESUMING,
-                    BackupState.ENABLED,
-                    BackupState.DOWNLOADING -> onDisableClick()
-                }
-            },
-        )
-        HorizontalDivider()
+//        ListItem(
+//            headlineContent = {
+//                Text(
+//                    text = stringResource(id = R.string.screen_chat_backup_key_backup_title),
+//                )
+//            },
+//            supportingContent = {
+//                /*Text(
+//                    text = buildAnnotatedStringWithStyledPart(
+//                        fullTextRes = R.string.screen_chat_backup_key_backup_description,
+//                        coloredTextRes = CommonStrings.action_learn_more,
+//                        color = ElementTheme.colors.textPrimary,
+//                        underline = false,
+//                        bold = true,
+//                    ),
+//                )*/
+//                Text(
+//                    text = stringResource(R.string.screen_chat_backup_key_backup_description, "")
+//                    .replace(" .", "")
+//                )
+//            },
+//            // onClick = onLearnMoreClick,
+//        )
+//
+//        // Disable / Enable key storage
+//        ListItem(
+//            headlineContent = {
+//                Text(
+//                    text = stringResource(id = R.string.screen_chat_backup_key_storage_toggle_title),
+//                )
+//            },
+//            trailingContent = when (state.backupState) {
+//                BackupState.WAITING_FOR_SYNC,
+//                BackupState.DISABLING -> ListItemContent.Custom { LoadingView() }
+//                BackupState.UNKNOWN -> {
+//                    when (state.doesBackupExistOnServer) {
+//                        is AsyncData.Success -> {
+//                            ListItemContent.Switch(checked = state.doesBackupExistOnServer.data)
+//                        }
+//                        is AsyncData.Loading,
+//                        AsyncData.Uninitialized -> ListItemContent.Custom { LoadingView() }
+//                        is AsyncData.Failure -> ListItemContent.Custom {
+//                            Text(
+//                                text = stringResource(id = CommonStrings.action_retry)
+//                            )
+//                        }
+//                    }
+//                }
+//                BackupState.CREATING,
+//                BackupState.ENABLING,
+//                BackupState.RESUMING,
+//                BackupState.ENABLED,
+//                BackupState.DOWNLOADING -> ListItemContent.Switch(checked = true)
+//            },
+//            onClick = {
+//                when (state.backupState) {
+//                    BackupState.WAITING_FOR_SYNC,
+//                    BackupState.DISABLING -> Unit
+//                    BackupState.UNKNOWN -> {
+//                        when (state.doesBackupExistOnServer) {
+//                            is AsyncData.Success -> {
+//                                if (state.doesBackupExistOnServer.data) {
+//                                    onDisableClick()
+//                                } else {
+//                                    state.eventSink.invoke(SecureBackupRootEvents.EnableKeyStorage)
+//                                }
+//                            }
+//                            is AsyncData.Loading,
+//                            AsyncData.Uninitialized -> Unit
+//                            is AsyncData.Failure -> state.eventSink.invoke(SecureBackupRootEvents.RetryKeyBackupState)
+//                        }
+//                    }
+//                    BackupState.CREATING,
+//                    BackupState.ENABLING,
+//                    BackupState.RESUMING,
+//                    BackupState.ENABLED,
+//                    BackupState.DOWNLOADING -> onDisableClick()
+//                }
+//            },
+//        )
+//        HorizontalDivider()
         // Setup recovery
         when (state.recoveryState) {
             RecoveryState.UNKNOWN,
@@ -165,26 +168,38 @@ fun SecureBackupRootView(
                 )
             }
             RecoveryState.ENABLED -> {
+//                ListItem(
+//                    headlineContent = {
+//                        Text(
+//                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change),
+//                        )
+//                    },
+//                    supportingContent = {
+//                        Text(
+//                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change_description),
+//                        )
+//                    },
+//                    enabled = state.isKeyStorageEnabled,
+//                    alwaysClickable = true,
+//                    onClick = {
+//                        if (state.isKeyStorageEnabled) {
+//                            onChangeClick()
+//                        } else {
+//                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
+//                        }
+//                    },
+//                )
                 ListItem(
                     headlineContent = {
-                        Text(
-                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change),
+                        Text("Your backup key is verified")
+                    },
+                    leadingContent = ListItemContent.Custom({
+                        Icon(
+                            imageVector = CompoundIcons.CheckCircleSolid(),
+                            contentDescription = null,
+                            tint = ElementTheme.colors.zeroBrandColor
                         )
-                    },
-                    supportingContent = {
-                        Text(
-                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change_description),
-                        )
-                    },
-                    enabled = state.isKeyStorageEnabled,
-                    alwaysClickable = true,
-                    onClick = {
-                        if (state.isKeyStorageEnabled) {
-                            onChangeClick()
-                        } else {
-                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
-                        }
-                    },
+                    })
                 )
             }
             RecoveryState.INCOMPLETE ->

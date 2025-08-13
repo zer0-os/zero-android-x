@@ -55,6 +55,8 @@ import io.element.android.features.ftue.api.state.FtueService
 import io.element.android.features.ftue.api.state.FtueState
 import io.element.android.features.home.api.HomeEntryPoint
 import io.element.android.features.logout.api.LogoutEntryPoint
+import io.element.android.features.networkmonitor.api.NetworkMonitor
+import io.element.android.features.networkmonitor.api.NetworkStatus
 import io.element.android.features.preferences.api.PreferencesEntryPoint
 import io.element.android.features.roomdirectory.api.RoomDescription
 import io.element.android.features.roomdirectory.api.RoomDirectoryEntryPoint
@@ -128,6 +130,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val logoutEntryPoint: LogoutEntryPoint,
     private val incomingVerificationEntryPoint: IncomingVerificationEntryPoint,
     private val mediaPreviewConfigMigration: MediaPreviewConfigMigration,
+    private val networkMonitor: NetworkMonitor,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
@@ -198,6 +201,12 @@ class LoggedInFlowNode @AssistedInject constructor(
                 loggedInFlowProcessor.observeEvents(sessionCoroutineScope)
                 matrixClient.sessionVerificationService().setListener(verificationListener)
                 mediaPreviewConfigMigration()
+
+                sessionCoroutineScope.launch {
+                    // Wait for the network to be connected before pre-fetching the max file upload size
+                    networkMonitor.connectivity.first { networkStatus -> networkStatus == NetworkStatus.Connected }
+                    matrixClient.getMaxFileUploadSize()
+                }
 
                 ftueService.state
                     .onEach { ftueState ->

@@ -73,7 +73,10 @@ class RoomMemberModerationPresenter @Inject constructor(
                     selectedUser = event.user
                     val member = room.membersStateFlow.value.roomMembers()?.firstOrNull {
                         it.userId == event.user.userId
-                    }
+                    }?.copy(
+                        primaryZId = event.user.primaryZeroId,
+                        isZeroProSubscriber = event.user.isZeroProSubscriber
+                    )
                     moderationActions.value = computeModerationActions(
                         member = member,
                         canKick = canKick.value,

@@ -161,6 +161,7 @@ class MessagesPresenter @AssistedInject constructor(
             derivedStateOf { roomInfo.avatarData() }
         }
         val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.zIdOrWalletAddressDisplay } }
+        val showZeroProBadge: Boolean by remember { derivedStateOf { directZeroMember.value?.isZeroProSubscriber ?: false} }
         val heroes by remember {
             derivedStateOf { roomInfo.heroes().toPersistentList() }
         }
@@ -179,9 +180,9 @@ class MessagesPresenter @AssistedInject constructor(
                     room.getUpdatedIsEncrypted()
                 }
 
-                if (room.isOneToOne) {
-                    room.fetchDirectZeroUser()
-                }
+//                if (room.isOneToOne) {
+//                    room.fetchDirectZeroUser()
+//                }
             }
         }
 
@@ -213,6 +214,7 @@ class MessagesPresenter @AssistedInject constructor(
                 val dmRoomMemberId = dmRoomMember?.userId
                 localCoroutineScope.launch {
                     dmRoomMemberId?.let { userId ->
+                        room.fetchDirectZeroUser()
                         dmUserVerificationState = roomMemberIdentityStateChanges.find { it.identityRoomMember.userId == userId }?.identityState
                             ?: encryptionService.getUserIdentity(userId).getOrNull()
                     }
@@ -269,6 +271,7 @@ class MessagesPresenter @AssistedInject constructor(
             readReceiptBottomSheetState = readReceiptBottomSheetState,
             hasNetworkConnection = isOnline,
             snackbarMessage = snackbarMessage,
+            showZeroProBadge = showZeroProBadge,
             showReinvitePrompt = showReinvitePrompt,
             inviteProgress = inviteProgress.value,
             enableTextFormatting = MessageComposerConfig.ENABLE_RICH_TEXT_EDITING,

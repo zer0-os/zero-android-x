@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.haze)
     implementation(libs.haze.materials)
     implementation(projects.features.reportroom.api)
+    implementation(projects.features.changeroommemberroles.api)
     api(projects.features.home.api)
     implementation(libs.coil.compose)
 

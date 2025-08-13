@@ -45,7 +45,7 @@ fun BaseRoom.getDirectRoomMember(roomMembersState: RoomMembersState): State<Room
         derivedStateOf {
             roomMembers
                 ?.filter { it.membership.isActive() }
-                ?.takeIf { it.size == 2 && roomInfo.isDirect == true }
+                ?.takeIf { it.size == 2 && roomInfo.isDirect }
                 ?.find { it.userId != sessionId }
         }
     }

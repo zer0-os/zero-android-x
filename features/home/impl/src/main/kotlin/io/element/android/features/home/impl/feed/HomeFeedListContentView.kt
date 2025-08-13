@@ -28,6 +28,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +59,7 @@ fun HomeFeedListContentView(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedFeedTab = remember { mutableStateOf(FeedsScreenTab.FOLLOWING) }
+    val selectedFeedTab = rememberSaveable { mutableStateOf(FeedsScreenTab.FOLLOWING) }
     Column(modifier = modifier) {
         if (!isProfileFeedList) {
             FeedsScreenTabView(

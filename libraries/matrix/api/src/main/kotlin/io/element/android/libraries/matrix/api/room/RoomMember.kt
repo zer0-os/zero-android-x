@@ -22,6 +22,7 @@ data class RoomMember(
     val role: Role,
     val membershipChangeReason: String?,
     val primaryZId: String?,
+    val isZeroProSubscriber: Boolean
 ) {
     /**
      * Role of the RoomMember, based on its [powerLevel].
@@ -100,4 +101,6 @@ fun RoomMember.toMatrixUser() = MatrixUser(
     userId = userId,
     displayName = displayName,
     avatarUrl = avatarUrl,
+    primaryZeroId = primaryZId,
+    isZeroProSubscriber = isZeroProSubscriber
 )

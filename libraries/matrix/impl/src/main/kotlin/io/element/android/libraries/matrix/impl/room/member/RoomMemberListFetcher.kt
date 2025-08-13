@@ -129,7 +129,8 @@ internal class RoomMemberListFetcher(
                         val apiMember = apiMembers.firstOrNull { zeroUser -> zeroUser.matrixId == it.userId.value }
                         it.copy(
                             displayName = apiMember?.name ?: it.displayName,
-                            primaryZId = apiMember?.primaryZeroId
+                            primaryZId = apiMember?.primaryZeroId,
+                            isZeroProSubscriber = apiMember?.isZeroProSubscriber ?: false
                         )
                     }
                     addAll(updatedMembers)

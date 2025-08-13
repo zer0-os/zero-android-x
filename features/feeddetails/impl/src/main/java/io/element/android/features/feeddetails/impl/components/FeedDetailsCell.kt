@@ -20,18 +20,22 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.feed.FeedActionButton
 import io.element.android.features.home.impl.feed.FeedMeowActionButton
 import io.element.android.features.home.impl.feed.annotatedText
@@ -41,6 +45,7 @@ import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
@@ -51,6 +56,7 @@ import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.feed.userProfile
 import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.extension.openExternalUri
@@ -93,7 +99,7 @@ fun FeedDetailsCell(
                     .fillMaxWidth()
                     .padding(start = 16.dp)
             ) {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         modifier = Modifier.clickable {
                             onFeedUserClick(feed.userProfile)
@@ -103,6 +109,16 @@ fun FeedDetailsCell(
                         color = ElementTheme.colors.textPrimary,
                         maxLines = 1
                     )
+                    if (feed.userProfileView?.isZeroProSubscriber == true) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .size(16.dp),
+                            imageVector = CompoundIcons.Verified(),
+                            contentDescription = stringResource(CommonStrings.common_verified),
+                            tint = ElementTheme.colors.zeroBrandColor
+                        )
+                    }
                     Spacer(Modifier.width(8.dp))
                     if (!feed.worldZid.isNullOrBlank() && feed.worldZid != feed.zid) {
                         Text(

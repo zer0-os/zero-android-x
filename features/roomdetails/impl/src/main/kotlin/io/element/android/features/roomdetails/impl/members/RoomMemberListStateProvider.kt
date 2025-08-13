@@ -164,7 +164,8 @@ fun aRoomMember(
     isIgnored = isIgnored,
     role = role,
     membershipChangeReason = membershipChangeReason,
-    primaryZId = null
+    primaryZId = null,
+    isZeroProSubscriber = false
 )
 
 fun aRoomMemberList() = persistentListOf(

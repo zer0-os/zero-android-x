@@ -105,6 +105,7 @@ fun UserListView(
                                 name = recentDirectRoom.matrixUser.getBestName(),
                                 //subtext = recentDirectRoom.matrixUser.userId.value,
                                 subtext = recentDirectRoom.matrixUser.zIdOrWalletAddressDisplay,
+                                showProSubscriberBadge = recentDirectRoom.matrixUser.isZeroProSubscriber
                             ),
                         )
                         /*if (index < state.recentDirectRooms.lastIndex) {

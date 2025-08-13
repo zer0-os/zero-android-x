@@ -59,6 +59,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -161,7 +162,13 @@ class JoinedRustRoom(
             // Skip initial one
             .drop(1)
             // The new events should already be in the SDK cache, no need to fetch them from the server
-            .onEach { baseRoom.roomMemberListFetcher.fetchRoomMembers(source = RoomMemberListFetcher.Source.CACHE) }
+            .onEach {
+                try {
+                baseRoom.roomMemberListFetcher.fetchRoomMembers(source = RoomMemberListFetcher.Source.CACHE)
+                } catch (e: Exception) {
+                    Timber.e("Failed to fetch room members for room $roomId, on `JoinedRustRoom` init block, with error: ${e.message}")
+                }
+            }
             .launchIn(roomCoroutineScope)
             .invokeOnCompletion {
                 Timber.d("Observing membership changes for room $roomId stopped, reason: $it")
@@ -444,12 +451,6 @@ class JoinedRustRoom(
         }
     }
 
-    override suspend fun sendCallNotificationIfNeeded(): Result<Boolean> = withContext(roomDispatcher) {
-        runCatchingExceptions {
-            innerRoom.sendCallNotificationIfNeeded()
-        }
-    }
-
     override suspend fun setSendQueueEnabled(enabled: Boolean) {
         withContext(roomDispatcher) {
             Timber.d("setSendQueuesEnabled: $enabled")
@@ -511,7 +512,9 @@ class JoinedRustRoom(
         if (!roomMembers.isNullOrEmpty()) {
             val otherMember = roomMembers.firstOrNull { it.userId != sessionId }
             otherMember?.let { member ->
-                repository.getUser(member.userId.value).collect(_directZeroUser)
+                repository.getUser(member.userId.value).collectLatest {
+                    _directZeroUser.value = it
+                }
             }
         }
     }

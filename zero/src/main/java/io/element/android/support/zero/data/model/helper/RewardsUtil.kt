@@ -25,12 +25,16 @@ object RewardsUtil {
             val credits = parseCredits(zero, decimals)
             if (refPrice > 0) {
                 val price = credits.times(refPrice).toBigDecimal().setScale(2, RoundingMode.UP).toDouble()
-                ZeroWalletUtil.getFormattedNumber(price)
+                if (price > 0) {
+                    ZeroWalletUtil.getFormattedNumber(price)
+                } else {
+                    "0"
+                }
             } else {
-                ""
+                "0"
             }
         } catch (e: Exception) {
-            ""
+            "0"
         }
     }
 

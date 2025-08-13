@@ -50,6 +50,7 @@ fun CheckableUserRow(
                     avatarData = data.avatarData,
                     name = data.name,
                     subtext = data.subtext,
+                    showProSubscriberBadge = data.showProSubscriberBadge
                 )
             }
             is CheckableUserRowData.Unresolved -> {
@@ -76,6 +77,7 @@ sealed interface CheckableUserRowData {
         val avatarData: AvatarData,
         val name: String,
         val subtext: String?,
+        val showProSubscriberBadge: Boolean
     ) : CheckableUserRowData
 
     data class Unresolved(
@@ -92,6 +94,7 @@ internal fun CheckableResolvedUserRowPreview() = ElementThemedPreview {
         avatarData = matrixUser.getAvatarData(AvatarSize.UserListItem),
         name = matrixUser.displayName.orEmpty(),
         subtext = matrixUser.userId.value,
+        showProSubscriberBadge = matrixUser.isZeroProSubscriber
     )
     Column {
         CheckableUserRow(

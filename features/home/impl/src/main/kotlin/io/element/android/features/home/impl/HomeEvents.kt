@@ -21,6 +21,7 @@ sealed interface HomeEvents {
 
     sealed interface HomeChannelEvents : HomeEvents
     data class OpenChannel(val channel: HomeScreenChannel) : HomeChannelEvents
+    data object ChannelRoomOpened : HomeChannelEvents
 
     sealed interface HomeFeedEvents: HomeEvents
     data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean): HomeFeedEvents
@@ -37,6 +38,7 @@ sealed interface HomeEvents {
     data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>): HomeWalletEvents
     data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>): HomeWalletEvents
     data class ViewWalletTransaction(val transactionId: String): HomeWalletEvents
+    data object OnWalletTransactionViewed: HomeWalletEvents
     data object ToggleWalletBalance: HomeWalletEvents
     data object RefreshWalletBalance: HomeWalletEvents
 }

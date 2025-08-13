@@ -94,13 +94,15 @@ class RustBaseRoom(
     override suspend fun subscribeToSync() = roomSyncSubscriber.subscribe(roomId)
 
     override suspend fun updateMembers() {
-        val useCache = membersStateFlow.value is RoomMembersState.Unknown
-        val source = if (useCache) {
-            RoomMemberListFetcher.Source.CACHE_AND_SERVER
-        } else {
-            RoomMemberListFetcher.Source.SERVER
+        runCatchingExceptions {
+            val useCache = membersStateFlow.value is RoomMembersState.Unknown
+            val source = if (useCache) {
+                RoomMemberListFetcher.Source.CACHE_AND_SERVER
+            } else {
+                RoomMemberListFetcher.Source.SERVER
+            }
+            roomMemberListFetcher.fetchRoomMembers(source = source)
         }
-        roomMemberListFetcher.fetchRoomMembers(source = source)
     }
 
     override suspend fun getMembers(limit: Int) = withContext(roomDispatcher) {
@@ -108,7 +110,10 @@ class RustBaseRoom(
             innerRoom.members().use {
                 it.nextChunk(limit.toUInt()).orEmpty().map { roomMember ->
                     val apiMember = zeroUserRepository?.getUser(roomMember.userId)?.firstOrNull()
-                    RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
+                    RoomMemberMapper.map(roomMember).copy(
+                        primaryZId = apiMember?.primaryZeroId,
+                        isZeroProSubscriber = apiMember?.isZeroProSubscriber ?: false
+                    )
                 }
             }
         }
@@ -122,7 +127,10 @@ class RustBaseRoom(
             )
             val apiMember = results[0] as? ZeroUser
             val roomMember = results[1] as org.matrix.rustcomponents.sdk.RoomMember
-            RoomMemberMapper.map(roomMember).copy(primaryZId = apiMember?.primaryZeroId)
+            RoomMemberMapper.map(roomMember).copy(
+                primaryZId = apiMember?.primaryZeroId,
+                isZeroProSubscriber = apiMember?.isZeroProSubscriber ?: false
+            )
         }
     }
 

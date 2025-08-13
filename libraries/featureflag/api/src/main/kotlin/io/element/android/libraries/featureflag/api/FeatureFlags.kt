@@ -176,10 +176,18 @@ enum class FeatureFlags(
         isFinished = false,
     ),
     SharePos(
-        key = "feature.share_pos",
+        key = "feature.share_pos_v2",
         title = "Share pos in sliding sync",
         description = "Keep the sliding sync pos to make initial syncs faster. Requires an app restart to take effect." +
             "\n\nWARNING: this may cause issues with syncs.",
+        defaultValue = { true },
+        // False so it's displayed in the developer options screen
+        isFinished = false,
+    ),
+    SelectableMediaQuality(
+        key = "feature.selectable_media_quality",
+        title = "Select media quality per upload",
+        description = "You can select the media quality for each attachment you upload.",
         defaultValue = { false },
         // False so it's displayed in the developer options screen
         isFinished = false,

@@ -9,6 +9,7 @@ package io.element.android.features.home.impl.wallet
 
 import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.HomeEvents
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
@@ -22,6 +23,7 @@ data class WalletContentState(
     val userName: String,
     val showWalletBalance: Boolean,
     private val walletBalance: Double,
+    val walletTransactionUrlState: AsyncAction<String>,
 
     val claimableRewards: ZeroUserRewards,
 

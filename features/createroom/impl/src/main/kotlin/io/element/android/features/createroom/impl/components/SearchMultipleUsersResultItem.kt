@@ -40,6 +40,7 @@ fun SearchMultipleUsersResultItem(
             //subtext = if (searchResult.matrixUser.displayName.isNullOrEmpty()) null else searchResult.matrixUser.userId.value,
             subtext = searchResult.matrixUser.zIdOrWalletAddressDisplay,
             avatarData = searchResult.matrixUser.getAvatarData(AvatarSize.UserListItem),
+            showProSubscriberBadge = searchResult.matrixUser.isZeroProSubscriber
         )
     }
     CheckableUserRow(

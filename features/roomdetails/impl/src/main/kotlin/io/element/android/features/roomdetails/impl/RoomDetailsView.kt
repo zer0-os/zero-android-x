@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.leaveroom.api.LeaveRoomView
 import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.libraries.androidutils.system.copyToClipboard
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -71,6 +70,7 @@ import io.element.android.libraries.designsystem.theme.components.ListItemStyle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
 import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbarHostState
@@ -110,6 +110,7 @@ fun RoomDetailsView(
     onProfileClick: (UserId, String?) -> Unit,
     onReportRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
+    leaveRoomView: @Composable () -> Unit,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
     Scaffold(
@@ -129,7 +130,7 @@ fun RoomDetailsView(
                 .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(padding)
         ) {
-            LeaveRoomView(state = state.leaveRoomState)
+            leaveRoomView()
 
             when (state.roomType) {
                 RoomDetailsType.Room -> {
@@ -267,8 +268,9 @@ fun RoomDetailsView(
             if (!state.isRoomAChannel) {
                 OtherActionsSection(
                     canReportRoom = state.canReportRoom,
+                    canLeaveRoom = state.canLeaveRoom(),
                     onReportRoomClick = onReportRoomClick,
-                    onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom) }
+                    onLeaveRoomClick = { state.eventSink(RoomDetailsEvent.LeaveRoom(needsConfirmation = true)) }
                 )
             }
 
@@ -462,6 +464,7 @@ private fun RoomHeaderSection(
         TitleAndSubtitle(
             title = roomName,
             subtitle = roomSubTitle,
+            showProSubscriberBadge = false,
             onSubtitleClick = {}
         )
     }
@@ -504,6 +507,7 @@ private fun DmHeaderSection(
             title = roomName,
             // subtitle = otherMember.userId.value,
             subtitle = roomSubTitle,
+            showProSubscriberBadge = otherMember.isZeroProSubscriber,
             onSubtitleClick = { },
         )
     }
@@ -513,15 +517,29 @@ private fun DmHeaderSection(
 private fun TitleAndSubtitle(
     title: String,
     subtitle: String?,
+    showProSubscriberBadge: Boolean,
     onSubtitleClick: (String) -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = title,
-            style = ElementTheme.zeroTypography.fontHeadingLgBold,
-            textAlign = TextAlign.Center,
-        )
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = ElementTheme.zeroTypography.fontHeadingLgBold,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            if (showProSubscriberBadge) {
+                Icon(
+                    modifier = Modifier.size(26.dp),
+                    imageVector = CompoundIcons.Verified(),
+                    contentDescription = stringResource(CommonStrings.common_verified),
+                    tint = ElementTheme.colors.zeroBrandColor
+                )
+            }
+        }
         if (subtitle != null) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(
@@ -747,6 +765,7 @@ private fun MediaGalleryItem(
 @Composable
 private fun OtherActionsSection(
     canReportRoom: Boolean,
+    canLeaveRoom: Boolean,
     onReportRoomClick: () -> Unit,
     onLeaveRoomClick: () -> Unit,
 ) {
@@ -761,14 +780,16 @@ private fun OtherActionsSection(
                 onClick = onReportRoomClick,
             )
         }
-        ListItem(
-            headlineContent = {
-                Text(stringResource(CommonStrings.action_leave_room))
-            },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Leave())),
-            style = ListItemStyle.Destructive,
-            onClick = onLeaveRoomClick,
-        )
+        if (canLeaveRoom) {
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(CommonStrings.action_leave_room))
+                },
+                leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Leave())),
+                style = ListItemStyle.Destructive,
+                onClick = onLeaveRoomClick,
+            )
+        }
     }
 }
 
@@ -830,5 +851,6 @@ private fun ContentToPreview(state: RoomDetailsState) {
         onSecurityAndPrivacyClick = {},
         onProfileClick = { _, _ -> },
         onReportRoomClick = {},
+        leaveRoomView = {},
     )
 }

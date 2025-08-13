@@ -2,6 +2,7 @@ package io.element.android.support.zero.data.delegate
 
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.data.model.UserRewards
+import io.element.android.support.zero.network.model.response.ApiUser
 
 interface Preferences {
     fun zosToken(): String
@@ -23,4 +24,12 @@ interface Preferences {
     suspend fun saveLoggedInUserInfo(info: MatrixUser)
 
     fun loggedInUserInfo(): MatrixUser?
+
+    fun getCachedUser(id: String): ApiUser?
+
+    fun getCachedUsers(ids: List<String>): List<ApiUser>
+
+    suspend fun cacheUser(user: ApiUser)
+
+    suspend fun cacheUsers(users: List<ApiUser>)
 }

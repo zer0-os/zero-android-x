@@ -7,7 +7,6 @@
 
 package io.element.android.features.home.impl
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.Composable
@@ -27,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.platform.LocalContext
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
@@ -68,7 +66,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
-import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
@@ -109,7 +106,6 @@ class HomePresenter @Inject constructor(
 
     @Composable
     override fun present(): HomeState {
-        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         val matrixUser = client.userProfile.collectAsState()
         val isOnline by syncService.isOnline.collectAsState()
@@ -131,6 +127,7 @@ class HomePresenter @Inject constructor(
         val claimableUserRewards = remember { mutableStateOf(ZeroUserRewards.empty()) }
         val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
         val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        val walletTransactionUrlState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
@@ -153,6 +150,14 @@ class HomePresenter @Inject constructor(
         val walletTransactionsPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?> =
             remember { mutableStateOf(null) }
 
+        val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
+            coroutineScope.fetchWalletData(
+                meowPrice, walletAddress, userWalletBalance,
+                walletTokensListState, walletTransactionsListState,
+                walletTokenPaginationParams, walletTransactionsPaginationParams
+            )
+        }
+
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile()
@@ -163,13 +168,7 @@ class HomePresenter @Inject constructor(
             client.userProfile
                 .mapNotNull { it.walletAddress }
                 .distinctUntilChanged()
-                .collectLatest {
-                    fetchWalletData(
-                        meowPrice, it, userWalletBalance,
-                        walletTokensListState, walletTransactionsListState,
-                        walletTokenPaginationParams, walletTransactionsPaginationParams
-                    )
-                }
+                .collectLatest { fetchWalletData(it) }
         }
         // Avatar indicator
         val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()
@@ -191,6 +190,7 @@ class HomePresenter @Inject constructor(
                 }
                 HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
                 is HomeEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                HomeEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
                 is HomeEvents.LoadMoreFeeds -> {
                     _allFeeds.apply {
                         clear()
@@ -236,13 +236,23 @@ class HomePresenter @Inject constructor(
                 }
                 is HomeEvents.ViewWalletTransaction -> {
                     coroutineScope.loadWalletTransaction(
-                        event.transactionId, context, genericActionState
+                        event.transactionId, walletTransactionUrlState, genericActionState
                     )
                 }
+                HomeEvents.OnWalletTransactionViewed ->
+                    walletTransactionUrlState.value = AsyncAction.Uninitialized
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> {
                     claimableUserRewards.value = userRewards.value
-                    coroutineScope.claimUserRewards(matrixUser.value, claimRewardsActionState)
+                    coroutineScope.claimUserRewards(
+                        matrixUser = matrixUser.value,
+                        claimRewardsActionState = claimRewardsActionState,
+                        refreshWallet = {
+                            client.userProfile.value.walletAddress?.let { walletAddress ->
+                                fetchWalletData(walletAddress)
+                            }
+                        }
+                    )
                 }
                 HomeEvents.RefreshWalletBalance -> {
                     matrixUser.value.walletAddress?.let { address ->
@@ -316,6 +326,7 @@ class HomePresenter @Inject constructor(
                 userName = matrixUser.value.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
                 walletBalance = userWalletBalance.doubleValue,
+                walletTransactionUrlState = walletTransactionUrlState.value,
                 claimableRewards = claimableUserRewards.value,
                 tokensListState = walletTokensListState.value,
                 transactionsListState = walletTransactionsListState.value,
@@ -469,23 +480,25 @@ class HomePresenter @Inject constructor(
             return@launch
         }
         genericActionState.value = AsyncAction.Loading
-        client.resolveRoomAlias(RoomAlias(channelId)).getOrNull()?.getOrNull()?.roomId?.let { roomId ->
-            resolvedChannelRoomId.value = roomId
+        val channelRoomId = client.resolveRoomAlias(RoomAlias(channelId))
+            .getOrNull()?.getOrNull()?.roomId
+        if (channelRoomId != null) {
+            resolvedChannelRoomId.value = channelRoomId
             genericActionState.value = AsyncAction.Success(Unit)
-            return@launch
-        }
-        client.joinZeroChannel(channelId)
-            .onSuccess { roomId ->
-                roomId?.let {
-                    genericActionState.value = AsyncAction.Success(Unit)
-                    resolvedChannelRoomId.value = RoomId(roomId)
-                } ?: run {
-                    genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
+        } else {
+            client.joinZeroChannel(channelId)
+                .onSuccess { roomId ->
+                    roomId?.let {
+                        genericActionState.value = AsyncAction.Success(Unit)
+                        resolvedChannelRoomId.value = RoomId(roomId)
+                    } ?: run {
+                        genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
+                    }
                 }
-            }
-            .onFailure { failure ->
-                genericActionState.value = AsyncAction.Failure(failure)
-            }
+                .onFailure { failure ->
+                    genericActionState.value = AsyncAction.Failure(failure)
+                }
+        }
     }
 
     private fun CoroutineScope.loadMoreHomeFeeds(followingFeedsOnly: Boolean, skip: Int) = launch {
@@ -681,14 +694,14 @@ class HomePresenter @Inject constructor(
 
     private fun CoroutineScope.loadWalletTransaction(
         transactionId: String,
-        context: Context,
+        walletTransactionUrlState: MutableState<AsyncAction<String>>,
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
         genericActionState.value = AsyncAction.Loading
         client.getTransactionReceipt(transactionId)
             .onSuccess {
                 genericActionState.value = AsyncAction.Success(Unit)
-                context.openExternalUri(it.blockExplorerUrl)
+                walletTransactionUrlState.value = AsyncAction.Success(it.blockExplorerUrl)
             }
             .onFailure {
                 genericActionState.value = AsyncAction.Failure(it)
@@ -709,7 +722,8 @@ class HomePresenter @Inject constructor(
     }
 
     private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,
-                                                claimRewardsActionState: MutableState<AsyncAction<String>>
+                                                claimRewardsActionState: MutableState<AsyncAction<String>>,
+                                                refreshWallet: () -> Unit
     ) = launch {
         matrixUser.walletAddress?.let {
             claimRewardsActionState.value = AsyncAction.Loading
@@ -717,6 +731,7 @@ class HomePresenter @Inject constructor(
                 .onSuccess { transaction ->
                     claimRewardsActionState.value = AsyncAction.Success(transaction)
                     client.getUserRewards()
+                    refreshWallet()
                 }
                 .onFailure { error ->
                     claimRewardsActionState.value = AsyncAction.Failure(error)

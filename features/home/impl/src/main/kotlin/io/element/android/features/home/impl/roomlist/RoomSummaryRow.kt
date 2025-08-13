@@ -45,6 +45,7 @@ import io.element.android.libraries.core.extensions.orEmpty
 import io.element.android.libraries.designsystem.atomic.atoms.UnreadIndicatorAtom
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
+import io.element.android.libraries.designsystem.modifiers.onKeyboardContextMenuAction
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
@@ -69,6 +70,7 @@ internal val minHeight = 84.dp
 @Composable
 internal fun RoomSummaryRow(
     room: RoomListRoomSummary,
+    showProBadgeWithRoom: Boolean,
     hideInviteAvatars: Boolean,
     isInviteSeen: Boolean,
     onClick: (RoomListRoomSummary) -> Unit,
@@ -121,6 +123,7 @@ internal fun RoomSummaryRow(
                     NameAndTimestampRow(
                         name = room.name,
                         timestamp = room.timestamp,
+                        showProBadgeWithRoom = showProBadgeWithRoom,
                         isHighlighted = room.isHighlighted
                     )
                     MessagePreviewAndIndicatorRow(room = room)
@@ -137,6 +140,7 @@ internal fun RoomSummaryRow(
                     NameAndTimestampRow(
                         name = room.name,
                         timestamp = null,
+                        showProBadgeWithRoom = showProBadgeWithRoom,
                         isHighlighted = room.isHighlighted
                     )
                     if (room.canonicalAlias != null) {
@@ -171,14 +175,15 @@ private fun RoomSummaryScaffoldRow(
     hideAvatarImage: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val clickModifier = Modifier.combinedClickable(
-        onClick = { onClick(room) },
-        onLongClick = { onLongClick(room) },
-        onLongClickLabel = stringResource(CommonStrings.action_open_context_menu),
-        indication = ripple(),
-        interactionSource = remember { MutableInteractionSource() }
-    )
-
+    val clickModifier = Modifier
+        .combinedClickable(
+            onClick = { onClick(room) },
+            onLongClick = { onLongClick(room) },
+            onLongClickLabel = stringResource(CommonStrings.action_open_context_menu),
+            indication = ripple(),
+            interactionSource = remember { MutableInteractionSource() }
+        )
+        .onKeyboardContextMenuAction { onLongClick(room) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -207,6 +212,7 @@ private fun RoomSummaryScaffoldRow(
 private fun NameAndTimestampRow(
     name: String?,
     timestamp: String?,
+    showProBadgeWithRoom: Boolean,
     isHighlighted: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -214,17 +220,31 @@ private fun NameAndTimestampRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = spacedBy(16.dp)
     ) {
-        // Name
-        Text(
+        // Name & Badge
+        Row(
             modifier = Modifier.weight(1f),
-            style = ElementTheme.zeroTypography.fontBodyLgMedium,
-            text = name ?: stringResource(id = CommonStrings.common_no_room_name),
-            fontStyle = FontStyle.Italic.takeIf { name == null },
-            color = if (isHighlighted) ElementTheme.colors.textPrimary
-            else ElementTheme.colors.roomListRoomName,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                style = ElementTheme.zeroTypography.fontBodyLgMedium,
+                text = name ?: stringResource(id = CommonStrings.common_no_room_name),
+                fontStyle = FontStyle.Italic.takeIf { name == null },
+                color = if (isHighlighted) ElementTheme.colors.textPrimary
+                else ElementTheme.colors.roomListRoomName,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (showProBadgeWithRoom) {
+                Icon(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(20.dp),
+                    imageVector = CompoundIcons.Verified(),
+                    contentDescription = stringResource(CommonStrings.common_verified),
+                    tint = ElementTheme.colors.zeroBrandColor
+                )
+            }
+        }
         // Timestamp
         Text(
             text = timestamp ?: "",
@@ -401,6 +421,7 @@ private fun MentionIndicatorAtom() {
 internal fun RoomSummaryRowPreview(@PreviewParameter(RoomListRoomSummaryProvider::class) data: RoomListRoomSummary) = ElementPreview {
     RoomSummaryRow(
         room = data,
+        showProBadgeWithRoom = false,
         hideInviteAvatars = false,
         // Set isInviteSeen to true for the preview when the room has name "Bob"
         isInviteSeen = data.name == "Bob",

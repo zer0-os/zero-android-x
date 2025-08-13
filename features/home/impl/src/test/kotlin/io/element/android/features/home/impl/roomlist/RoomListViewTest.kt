@@ -292,7 +292,9 @@ private fun <R : TestRule> AndroidComposeTestRule<R, ComponentActivity>.setRoomL
             onCreateFeedClick = {},
             onFeedClick = {},
             onUserProfileClick = {},
-            onFeedUserClick = {}
+            onFeedUserClick = {},
+            onSendWalletToken = {},
+            onReceiveWalletToken = {}
         )
     }
 }
