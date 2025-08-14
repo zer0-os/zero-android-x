@@ -4,10 +4,10 @@ import io.element.android.support.zero.network.model.request.AuthoriseUserReques
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
-import io.element.android.support.zero.network.model.response.ApiInviter
-import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
-import io.element.android.support.zero.network.model.response.ZeroNonce
-import io.element.android.support.zero.network.model.response.ZeroSSOToken
+import io.element.android.support.zero.network.model.response.auth.ApiInviter
+import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
+import io.element.android.support.zero.network.model.response.auth.ZeroNonce
+import io.element.android.support.zero.network.model.response.auth.ZeroSSOToken
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header

@@ -46,8 +46,15 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
+import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletStakingApprovalResponse
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -289,7 +296,7 @@ interface MatrixClient {
     ): Result<ZeroWalletTokensResponse>
 
     suspend fun getWalletTransactions(walletAddress: String,
-                                paginationParams: ZeroWalletTransactionsPaginationParams?
+                                      paginationParams: ZeroWalletTransactionsPaginationParams?
     ): Result<ZeroWalletTransactionsResponse>
 
     suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
@@ -299,6 +306,30 @@ interface MatrixClient {
     suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>>
 
     suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt>
+
+    suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo>
+
+    suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance>
+
+    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String>
+
+    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): Result<ZeroWalletStakingApprovalResponse>
+
+    suspend fun getTotalStaked(poolAddress: String): Result<String>
+
+    suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig>
+
+    suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): Result<ZeroStakingStatus>
+
+    suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): Result<ZeroStakingUserRewardsInfo>
+
+    suspend fun getStakingToken(poolAddress: String): Result<ZeroTokenAddress>
+
+    suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress>
+
+    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
+
+    suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
 }
 
 /**

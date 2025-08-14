@@ -10,7 +10,7 @@ package io.element.android.support.zero.data.repository
 import io.element.android.libraries.core.extensions.replacePrefix
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import io.element.android.support.zero.common.ZERO_WALLET_ADDRESS_PREFIX
-import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
+import io.element.android.support.zero.network.model.response.feed.ApiFeedUserProfileView
 import io.element.android.support.zero.network.service.ZeroFeedUserService
 
 class FeedUserRepositoryImpl(

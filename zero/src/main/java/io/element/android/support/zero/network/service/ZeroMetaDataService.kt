@@ -9,10 +9,10 @@ package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.meta.NoAuth
 import io.element.android.support.zero.network.model.request.LinkPreviewMetaDataFilter
-import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
-import io.element.android.support.zero.network.model.response.ApiLinkPreview
-import io.element.android.support.zero.network.model.response.ApiUploadFeedMedia
-import io.element.android.support.zero.network.model.response.ApiYoutubeLinkPreview
+import io.element.android.support.zero.network.model.response.feed.ApiFeedMediaResponse
+import io.element.android.support.zero.network.model.response.metadata.ApiLinkPreview
+import io.element.android.support.zero.network.model.response.feed.ApiUploadFeedMedia
+import io.element.android.support.zero.network.model.response.metadata.ApiYoutubeLinkPreview
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Multipart

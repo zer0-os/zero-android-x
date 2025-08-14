@@ -16,6 +16,7 @@ import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroMetaDataService
 import io.element.android.support.zero.network.service.ZeroRewardService
+import io.element.android.support.zero.network.service.ZeroStakeService
 import io.element.android.support.zero.network.service.ZeroUserService
 import io.element.android.support.zero.network.service.ZeroWalletService
 
@@ -77,6 +78,11 @@ object ZeroServiceModule {
     @SingleIn(AppScope::class)
     fun provideZeroWalletService(retrofit: ZeroRetrofitFactory): ZeroWalletService =
         retrofit.baseClient.create(ZeroWalletService::class.java)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideZeroStakingService(retrofit: ZeroRetrofitFactory): ZeroStakeService =
+        retrofit.baseClient.create(ZeroStakeService::class.java)
 
     @Provides
     @SingleIn(AppScope::class)

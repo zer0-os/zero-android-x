@@ -25,6 +25,8 @@ import io.element.android.support.zero.data.repository.MetaDataRepository
 import io.element.android.support.zero.data.repository.MetaDataRepositoryImpl
 import io.element.android.support.zero.data.repository.RewardsRepository
 import io.element.android.support.zero.data.repository.RewardsRepositoryImpl
+import io.element.android.support.zero.data.repository.StakeRepository
+import io.element.android.support.zero.data.repository.StakeRepositoryImpl
 import io.element.android.support.zero.data.repository.UserRepository
 import io.element.android.support.zero.data.repository.UserRepositoryImpl
 import io.element.android.support.zero.data.repository.WalletRepository
@@ -40,6 +42,7 @@ import io.element.android.support.zero.network.service.ZeroInviteService
 import io.element.android.support.zero.network.service.ZeroMatrixUserService
 import io.element.android.support.zero.network.service.ZeroMetaDataService
 import io.element.android.support.zero.network.service.ZeroRewardService
+import io.element.android.support.zero.network.service.ZeroStakeService
 import io.element.android.support.zero.network.service.ZeroUserService
 import io.element.android.support.zero.network.service.ZeroWalletService
 
@@ -60,7 +63,8 @@ object RepositoryModule {
         rewardsRepository: RewardsRepository,
         userRepository: UserRepository,
         metaDataRepository: MetaDataRepository,
-        walletRepository: WalletRepository
+        walletRepository: WalletRepository,
+        stakeRepository: StakeRepository,
     ): ZeroCoreRepository = ZeroCoreRepository(
         auth = authRepository,
         account = accountRepository,
@@ -72,7 +76,8 @@ object RepositoryModule {
         rewards = rewardsRepository,
         user = userRepository,
         metaData = metaDataRepository,
-        wallet = walletRepository
+        wallet = walletRepository,
+        stake = stakeRepository,
     )
 
     @Provides
@@ -149,4 +154,10 @@ object RepositoryModule {
         zeroUserService: ZeroUserService,
         zeroWalletService: ZeroWalletService
     ): WalletRepository = WalletRepositoryImpl(zeroUserService, zeroWalletService)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun bindStakeRepository(
+        zeroStakeService: ZeroStakeService
+    ): StakeRepository = StakeRepositoryImpl(zeroStakeService)
 }

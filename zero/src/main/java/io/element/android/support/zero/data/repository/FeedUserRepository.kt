@@ -7,7 +7,7 @@
 
 package io.element.android.support.zero.data.repository
 
-import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
+import io.element.android.support.zero.network.model.response.feed.ApiFeedUserProfileView
 
 interface FeedUserRepository {
     suspend fun fetchUserProfile(key: String): ApiFeedUserProfileView?

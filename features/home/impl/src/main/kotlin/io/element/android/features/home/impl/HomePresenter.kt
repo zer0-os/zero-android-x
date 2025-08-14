@@ -65,6 +65,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
+import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
@@ -719,6 +720,18 @@ class HomePresenter @Inject constructor(
             meowPrice = meowPrice
         )
         userWalletBalance.doubleValue = userBalance
+    }
+
+    private fun fetchStakingData(
+        tokensList: List<ZeroWalletToken>,
+        meowPrice: ZeroMeowPrice?,
+    ) {
+        // NEED TO FIGURE OUT FROM WHERE TO GET THIS POOL ADDRESS
+        val poolAddress = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
+        val meowToken = tokensList.firstOrNull { it.isMeowToken } ?: return
+        withIOScope {
+
+        }
     }
 
     private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,

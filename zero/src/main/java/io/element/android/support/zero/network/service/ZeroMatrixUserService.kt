@@ -1,7 +1,7 @@
 package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.MatrixUsersFilter
-import io.element.android.support.zero.network.model.response.ApiUser
+import io.element.android.support.zero.network.model.response.user.ApiUser
 import retrofit2.http.Body
 import retrofit2.http.POST
 

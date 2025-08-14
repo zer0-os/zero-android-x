@@ -9,7 +9,7 @@ import io.element.android.support.zero.common.extension.runBlockingWithTimeOut
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
 import io.element.android.support.zero.datastore.converter.AppJson.toJson
-import io.element.android.support.zero.network.model.response.ApiUser
+import io.element.android.support.zero.network.model.response.user.ApiUser
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 

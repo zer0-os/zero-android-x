@@ -9,9 +9,9 @@ package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreviewThumbnail
-import io.element.android.support.zero.network.model.response.ApiLinkPreview
-import io.element.android.support.zero.network.model.response.ApiLinkPreviewThumbnail
-import io.element.android.support.zero.network.model.response.ApiYoutubeLinkPreview
+import io.element.android.support.zero.network.model.response.metadata.ApiLinkPreview
+import io.element.android.support.zero.network.model.response.metadata.ApiLinkPreviewThumbnail
+import io.element.android.support.zero.network.model.response.metadata.ApiYoutubeLinkPreview
 
 fun ApiLinkPreview.toModel() = ZeroLinkPreview(
     url = url,

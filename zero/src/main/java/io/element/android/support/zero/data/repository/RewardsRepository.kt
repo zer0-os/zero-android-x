@@ -1,7 +1,7 @@
 package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.data.model.UserRewards
-import io.element.android.support.zero.network.model.response.ApiZeroTokens
+import io.element.android.support.zero.network.model.response.reward.ApiZeroTokens
 import kotlinx.coroutines.flow.StateFlow
 
 interface RewardsRepository {
