@@ -29,6 +29,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.features.home.impl.model.channelId
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.wallet.WalletContentState
@@ -57,6 +58,9 @@ import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
@@ -150,10 +154,11 @@ class HomePresenter @Inject constructor(
         }
         val walletTransactionsPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?> =
             remember { mutableStateOf(null) }
+        val walletStakingContent: MutableState<List<HomeStakePool>> = remember { mutableStateOf(emptyList()) }
 
         val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
             coroutineScope.fetchWalletData(
-                meowPrice, walletAddress, userWalletBalance,
+                meowPrice, walletAddress, userWalletBalance, walletStakingContent,
                 walletTokensListState, walletTransactionsListState,
                 walletTokenPaginationParams, walletTransactionsPaginationParams
             )
@@ -269,6 +274,9 @@ class HomePresenter @Inject constructor(
                         )
                     }
                 }
+                is HomeEvents.StakePoolSelected -> {
+
+                }
             }
         }
 
@@ -334,6 +342,7 @@ class HomePresenter @Inject constructor(
                 tokensPaginationParams = walletTokenPaginationParams.value,
                 transactionsPaginationParams = walletTransactionsPaginationParams.value,
                 meowPrice = meowPrice.value,
+                stakePools = walletStakingContent.value,
                 eventSink = ::handleEvents
             ),
             showClaimRewardsSheet = showClaimRewardsSheet.value,
@@ -607,6 +616,7 @@ class HomePresenter @Inject constructor(
         meowPrice: MutableState<ZeroMeowPrice?>,
         walletAddress: String,
         userWalletBalance: MutableDoubleState,
+        stakePoolsContent: MutableState<List<HomeStakePool>>,
         walletTokensListState: MutableState<WalletTokensListState>,
         walletTransactionsListState: MutableState<WalletTransactionsListState>,
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
@@ -624,6 +634,7 @@ class HomePresenter @Inject constructor(
             it.onSuccess { result ->
                 val tokensList = result.tokens
                 setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
+                fetchStakingData(stakePoolsContent, tokensList, meowPrice.value, walletAddress)
                 walletTokensListState.value = WalletTokensListState.Tokens(
                     tokensList
                         .distinctBy { token -> token.tokenAddress }
@@ -715,7 +726,7 @@ class HomePresenter @Inject constructor(
     ) {
         val meowPrice = meowPrice ?: return
         val meowTokens = tokensList.filter { it.isClaimableToken }
-        val userBalance = ZeroWalletUtil.getWalletBalance(
+        val userBalance = ZeroWalletUtil.getBalance(
             meowTokenAmount = meowTokens.sumOf { it.tokenAmount },
             meowPrice = meowPrice
         )
@@ -723,14 +734,44 @@ class HomePresenter @Inject constructor(
     }
 
     private fun fetchStakingData(
+        stakePoolsContent: MutableState<List<HomeStakePool>>,
         tokensList: List<ZeroWalletToken>,
         meowPrice: ZeroMeowPrice?,
+        userAddress: String,
     ) {
         // NEED TO FIGURE OUT FROM WHERE TO GET THIS POOL ADDRESS
         val poolAddress = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
         val meowToken = tokensList.firstOrNull { it.isMeowToken } ?: return
+        val price = meowPrice ?: return
         withIOScope {
+            coroutineScope {
+                val (totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult) = awaitAll(
+                    async { client.getTotalStaked(poolAddress) },
+                    async { client.getStakingConfig(poolAddress) },
+                    async { client.getStakerStatusInfo(userAddress, poolAddress) },
+                    async { client.getStakeRewardsInfo(userAddress, poolAddress) }
+                )
 
+                if (listOf(totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult).all { it.isSuccess }) {
+                    val totalStaked = (totalStakedResult as Result<String>).getOrNull() ?: return@coroutineScope
+                    val stakingConfig = (stakingConfigResult as Result<ZeroStakingConfig>).getOrNull() ?: return@coroutineScope
+                    val stakeStatus = (stakeStatusResult as Result<ZeroStakingStatus>).getOrNull() ?: return@coroutineScope
+                    val rewardsInfo = (rewardsInfoResult as Result<ZeroStakingUserRewardsInfo>).getOrNull() ?: return@coroutineScope
+
+                    stakePoolsContent.value = listOf(
+                        HomeStakePool.from(
+                            userAddress = userAddress,
+                            poolAddress = poolAddress,
+                            meowPrice = price,
+                            token = meowToken,
+                            totalStakedAmount = totalStaked,
+                            stakingConfig = stakingConfig,
+                            stakingStatus = stakeStatus,
+                            rewardsInfo = rewardsInfo
+                        )
+                    )
+                }
+            }
         }
     }
 

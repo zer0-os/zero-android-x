@@ -8,6 +8,7 @@
 package io.element.android.features.home.impl
 
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
@@ -41,4 +42,5 @@ sealed interface HomeEvents {
     data object OnWalletTransactionViewed: HomeWalletEvents
     data object ToggleWalletBalance: HomeWalletEvents
     data object RefreshWalletBalance: HomeWalletEvents
+    data class StakePoolSelected(val pool: HomeStakePool) : HomeWalletEvents
 }

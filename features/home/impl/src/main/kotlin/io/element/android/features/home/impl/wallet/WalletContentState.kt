@@ -9,6 +9,7 @@ package io.element.android.features.home.impl.wallet
 
 import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.HomeEvents
+import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -32,6 +33,8 @@ data class WalletContentState(
     val tokensPaginationParams: ZeroWalletTokensPaginationParams?,
     val transactionsPaginationParams: ZeroWalletTransactionsPaginationParams?,
     val meowPrice: ZeroMeowPrice?,
+
+    val stakePools: List<HomeStakePool>,
 
     val eventSink: (HomeEvents.HomeWalletEvents) -> Unit,
 ) {

@@ -27,7 +27,7 @@ object ZeroWalletUtil {
         }
     }
 
-    fun getWalletBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
+    fun getBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
         return meowTokenAmount.times(meowPrice.price ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)

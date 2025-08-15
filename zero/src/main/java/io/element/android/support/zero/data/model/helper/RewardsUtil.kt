@@ -38,7 +38,7 @@ object RewardsUtil {
         }
     }
 
-    private fun parseCredits(credits: String, decimals: Int): Double {
+    fun parseCredits(credits: String, decimals: Int): Double {
         return try {
             val delimiter = credits.length - decimals
             credits.substring(0, delimiter).toDoubleOrNull() ?: 0.0

@@ -36,5 +36,6 @@ internal fun aWalletContentState(
     tokensPaginationParams = null,
     transactionsPaginationParams = null,
     meowPrice = null,
+    stakePools = emptyList(),
     eventSink = {}
 )
