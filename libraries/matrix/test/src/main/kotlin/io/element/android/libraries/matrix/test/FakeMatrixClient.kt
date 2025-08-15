@@ -50,7 +50,6 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletStakingApprovalResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
@@ -532,14 +531,6 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> {
-        return Result.failure(Throwable("fake"))
-    }
-
-    override suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): Result<ZeroWalletStakingApprovalResponse> {
-        return Result.failure(Throwable("fake"))
-    }
-
     override suspend fun getTotalStaked(poolAddress: String): Result<String> {
         return Result.failure(Throwable("fake"))
     }
@@ -564,7 +555,7 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String> {
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 

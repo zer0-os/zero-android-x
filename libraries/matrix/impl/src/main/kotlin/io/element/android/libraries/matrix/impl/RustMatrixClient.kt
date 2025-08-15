@@ -66,7 +66,6 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletStakingApprovalResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
@@ -1193,22 +1192,6 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> =
-        withContext(sessionDispatcher) {
-            runCatching {
-                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.approveERC20(userAddress, amount, poolAddress, tokenAddress).transactionHash
-            }
-        }
-
-    override suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): Result<ZeroWalletStakingApprovalResponse> =
-        withContext(sessionDispatcher) {
-            runCatching {
-                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress).toModel()
-            }
-        }
-
     override suspend fun getTotalStaked(poolAddress: String): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
@@ -1257,10 +1240,21 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String> =
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> =
         withContext(sessionDispatcher) {
-            runCatching {
-                val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
+            runCatchingExceptions {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                val stake = zeroCoreRepository.stake
+
+                //1. approve transaction
+                val approveTransactionRequest = walletRepo.approveERC20(
+                    userAddress, amount, poolAddress, tokenAddress
+                )
+                //2. verify approval transaction
+                walletRepo.getTransactionReceipt(approveTransactionRequest.transactionHash)
+                //3. verify approval request
+                walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress)
+                //4. stake amount
                 stake.stakeAmount(userAddress, amount, poolAddress).transactionHash
             }
         }

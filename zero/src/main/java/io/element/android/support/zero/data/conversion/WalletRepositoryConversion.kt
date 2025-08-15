@@ -8,7 +8,6 @@
 package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletStakingApprovalResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -21,7 +20,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
-import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokens
@@ -95,8 +93,6 @@ fun ApiWalletRecipient.toModel(): ZeroWalletRecipient {
 fun ApiWalletTokenInfo.toModel() = ZeroWalletTokenInfo(name, symbol, decimals, address)
 
 fun ApiWalletTokenBalance.toModel() = ZeroWalletTokenBalance(balance)
-
-fun ApiWalletStakingApprovalResponse.toModel() = ZeroWalletStakingApprovalResponse(allowance)
 
 fun ZeroWalletTokensPaginationParams.toApi() = NextPageParams(itemsCount, tokenName, tokenType, value)
 fun ZeroWalletTransactionsPaginationParams.toApi() = TransactionNextPageParams(blockNumber, index)

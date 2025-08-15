@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -59,7 +60,9 @@ fun WalletStakingList(
         items(state.stakePools, key = { pool -> pool.poolAddress }) {
             StakePoolCell(
                 pool = it,
-                onClick = {}
+                onClick = {
+                    state.eventSink(HomeEvents.StakePoolSelected(it))
+                }
             )
         }
     }

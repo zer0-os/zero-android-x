@@ -5,7 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.features.wallettransactions.impl.transfertoken.confirmation
+package io.element.android.support.zero.common.ui
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -37,11 +37,13 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 
 @Composable
 fun TransactionInProgressView(
+    modifier: Modifier = Modifier.fillMaxSize(),
     size: Dp = 100.dp,
     message: String = "Sending",
+    subMessage: String = "Just a moment...",
     color: Color = ElementTheme.colors.zeroBrandColor
 ) {
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier) {
         Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
@@ -72,7 +74,7 @@ fun TransactionInProgressView(
             Spacer(Modifier.size(6.dp))
 
             Text(
-                text = "Just a moment...",
+                text = subMessage,
                 style = ElementTheme.typography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary
             )

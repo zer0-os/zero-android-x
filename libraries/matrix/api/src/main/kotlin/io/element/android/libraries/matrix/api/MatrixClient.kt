@@ -52,7 +52,6 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletStakingApprovalResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
@@ -311,10 +310,6 @@ interface MatrixClient {
 
     suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance>
 
-    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String>
-
-    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): Result<ZeroWalletStakingApprovalResponse>
-
     suspend fun getTotalStaked(poolAddress: String): Result<String>
 
     suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig>
@@ -327,7 +322,7 @@ interface MatrixClient {
 
     suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress>
 
-    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
+    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String>
 
     suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
 }

@@ -42,5 +42,8 @@ sealed interface HomeEvents {
     data object OnWalletTransactionViewed: HomeWalletEvents
     data object ToggleWalletBalance: HomeWalletEvents
     data object RefreshWalletBalance: HomeWalletEvents
-    data class StakePoolSelected(val pool: HomeStakePool) : HomeWalletEvents
+    data class StakePoolSelected(val pool: HomeStakePool): HomeWalletEvents
+    data class StakeAmount(val amount: String): HomeWalletEvents
+    data class UnstakeAmount(val amount: String): HomeWalletEvents
+    data object DismissStakingSheet: HomeWalletEvents
 }

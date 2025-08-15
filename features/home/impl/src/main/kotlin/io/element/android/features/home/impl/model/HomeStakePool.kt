@@ -24,6 +24,7 @@ data class HomeStakePool(
     val poolDisplayName: String,
     val tokenAmount: String,
     val tokenIcon: String?,
+    val tokenAddress: String,
     val totalStakedAmount: Double,
     val myStakeAmount: Double
 ) {
@@ -50,6 +51,7 @@ data class HomeStakePool(
                 poolDisplayName = "${token.symbol.uppercase()} Pool",
                 tokenAmount = stakingStatus.amountStaked,
                 tokenIcon = token.logo,
+                tokenAddress = token.tokenAddress,
                 totalStakedAmount = totalStakedAmountRefPrice,
                 myStakeAmount = myStakedAmountRefPrice
             )
