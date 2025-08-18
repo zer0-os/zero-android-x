@@ -26,7 +26,8 @@ data class HomeStakePool(
     val tokenIcon: String?,
     val tokenAddress: String,
     val totalStakedAmount: Double,
-    val myStakeAmount: Double
+    val myStakeAmount: Double,
+    val pendingRewards: String,
 ) {
     val totalStakedAmountFormatted: String
         get() = ZeroWalletUtil.getFormattedNumber(totalStakedAmount)
@@ -53,7 +54,8 @@ data class HomeStakePool(
                 tokenIcon = token.logo,
                 tokenAddress = token.tokenAddress,
                 totalStakedAmount = totalStakedAmountRefPrice,
-                myStakeAmount = myStakedAmountRefPrice
+                myStakeAmount = myStakedAmountRefPrice,
+                pendingRewards = rewardsInfo.pendingRewards
             )
         }
     }

@@ -68,7 +68,7 @@ fun TransactionInProgressView(
             Text(
                 text = message,
                 style = ElementTheme.typography.fontHeadingSmMedium,
-                color = ElementTheme.colors.zeroBrandColor
+                color = ElementTheme.colors.zeroBrandColor,
             )
 
             Spacer(Modifier.size(6.dp))

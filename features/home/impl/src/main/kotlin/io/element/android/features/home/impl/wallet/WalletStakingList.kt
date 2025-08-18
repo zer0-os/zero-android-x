@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -114,7 +115,9 @@ fun StakePoolCell(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = pool.poolDisplayName,
                 style = ElementTheme.typography.fontBodyLgRegular,
-                color = ElementTheme.colors.textPrimary
+                color = ElementTheme.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -122,7 +125,9 @@ fun StakePoolCell(
             modifier = Modifier.weight(0.5f),
             text = "$${pool.totalStakedAmountFormatted}",
             style = ElementTheme.typography.fontBodyLgRegular,
-            color = ElementTheme.colors.textPrimary
+            color = ElementTheme.colors.textPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Text(
@@ -130,6 +135,8 @@ fun StakePoolCell(
             text = "$${pool.myStakeAmountFormatted}",
             style = ElementTheme.typography.fontBodyLgRegular,
             color = ElementTheme.colors.textPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

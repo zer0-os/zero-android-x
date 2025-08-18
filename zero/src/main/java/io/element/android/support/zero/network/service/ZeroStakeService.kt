@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.network.service
 
+import io.element.android.support.zero.network.model.request.ClaimStakingRewardsRequest
 import io.element.android.support.zero.network.model.request.StakeTransactionRequest
 import io.element.android.support.zero.network.model.request.UnstakeTransactionRequest
 import io.element.android.support.zero.network.model.response.staking.ApiStakingConfig
@@ -64,5 +65,11 @@ interface ZeroStakeService {
     suspend fun unstakeAmount(
         @Path("user_address") userAddress: String,
         @Body request: UnstakeTransactionRequest
+    ): ApiTransactionPerformed
+
+    @POST(value = "api/wallet/{user_address}/transactions/claim-staking-rewards")
+    suspend fun claimStakingRewards(
+        @Path("user_address") userAddress: String,
+        @Body request: ClaimStakingRewardsRequest
     ): ApiTransactionPerformed
 }

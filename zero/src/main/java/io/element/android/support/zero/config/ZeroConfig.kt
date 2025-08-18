@@ -6,6 +6,7 @@ object ZeroConfig {
     val environment: EnvironmentConfig = EnvironmentConfig.Production
 
     const val ARWEAVE_BASE_URL = "https://of2ub4a2ai55lgpqj5z7so7j7v6uwjcruh6cdm3ojgnhqngahkwa.arweave.net/"
+    const val MEOW_POOL_ADDRESS = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
 }
 
 sealed class EnvironmentConfig(

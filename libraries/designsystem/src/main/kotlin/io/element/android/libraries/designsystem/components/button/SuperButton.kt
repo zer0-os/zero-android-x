@@ -62,6 +62,7 @@ fun SuperButton(
             ButtonSize.Medium -> PaddingValues(horizontal = 20.dp, vertical = 9.dp)
             ButtonSize.MediumLowPadding -> PaddingValues(horizontal = lowHorizontalPaddingValue, vertical = 9.dp)
             ButtonSize.Small -> PaddingValues(horizontal = 16.dp, vertical = 5.dp)
+            ButtonSize.XSmall -> PaddingValues(horizontal = 8.dp, vertical = 2.5.dp)
         }
     }
     val colors = if (LocalBuildMeta.current.isEnterpriseBuild) {

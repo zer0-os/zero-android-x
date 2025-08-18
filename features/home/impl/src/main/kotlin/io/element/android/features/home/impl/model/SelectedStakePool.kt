@@ -24,7 +24,8 @@ data class SelectedStakePool(
     val claimableRewardValue: String
         get() = ZeroWalletUtil.getFormattedNumber(
             count = RewardsUtil.parseCredits(
-                rewardsTokenBalance.balance,
+//                rewardsTokenBalance.balance,
+                poolInfo.pendingRewards,
                 rewardsTokenInfo.decimals
             )
         )

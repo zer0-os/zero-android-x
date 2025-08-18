@@ -31,4 +31,6 @@ interface StakeRepository {
     suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): ApiTransactionPerformed
 
     suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): ApiTransactionPerformed
+
+    suspend fun claimStakingRewards(userAddress: String, poolAddress: String): ApiTransactionPerformed
 }

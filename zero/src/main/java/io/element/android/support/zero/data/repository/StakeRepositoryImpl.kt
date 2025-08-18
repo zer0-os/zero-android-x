@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.repository
 
+import io.element.android.support.zero.network.model.request.ClaimStakingRewardsRequest
 import io.element.android.support.zero.network.model.request.StakeTransactionRequest
 import io.element.android.support.zero.network.model.request.UnstakeTransactionRequest
 import io.element.android.support.zero.network.model.response.staking.ApiStakingConfig
@@ -52,5 +53,10 @@ class StakeRepositoryImpl(
     override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): ApiTransactionPerformed {
         val request = UnstakeTransactionRequest(amount, poolAddress)
         return zeroStakeService.unstakeAmount(userAddress, request)
+    }
+
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): ApiTransactionPerformed {
+        val request = ClaimStakingRewardsRequest(poolAddress)
+        return zeroStakeService.claimStakingRewards(userAddress, request)
     }
 }

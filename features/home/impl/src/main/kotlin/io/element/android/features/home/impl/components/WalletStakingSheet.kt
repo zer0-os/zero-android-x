@@ -46,16 +46,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.components.button.BackButton
+import io.element.android.libraries.designsystem.theme.components.ButtonSize
+import io.element.android.libraries.designsystem.theme.components.Icon
+import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
 import io.element.android.support.zero.common.ui.TransactionInProgressView
 import io.element.android.support.zero.common.ui.ZChainIcon
@@ -99,7 +105,10 @@ fun WalletStakingSheet(
                     pool = selectedPool,
                     isUserStaking = (isUserStaking.value == true),
                     transactionAmount = transactionAmount.value,
-                    isSuccess = true
+                    isSuccess = true,
+                    onDismiss = {
+                        eventSink(HomeEvents.DismissStakingSheet)
+                    }
                 )
             }
             is AsyncAction.Failure -> {
@@ -107,7 +116,10 @@ fun WalletStakingSheet(
                     pool = selectedPool,
                     isUserStaking = (isUserStaking.value == true),
                     transactionAmount = transactionAmount.value,
-                    isSuccess = false
+                    isSuccess = false,
+                    onDismiss = {
+                        eventSink(HomeEvents.DismissStakingSheet)
+                    }
                 )
             }
             else -> {
@@ -132,7 +144,10 @@ fun WalletStakingSheet(
                         PoolDetailsView(
                             pool = selectedPool,
                             onStake = { isUserStaking.value = true },
-                            onUnstake = { isUserStaking.value = false }
+                            onUnstake = { isUserStaking.value = false },
+                            onClaimRewards = {
+                                eventSink(HomeEvents.ClaimStakingRewards)
+                            }
                         )
                     }
                 }
@@ -146,11 +161,14 @@ fun PoolDetailsView(
     pool: SelectedStakePool,
     onStake: () -> Unit,
     onUnstake: () -> Unit,
+    onClaimRewards: () -> Unit,
 ) {
     val stakeTokenName = pool.stakeTokenInfo.name.uppercase()
     val rewardTokenName = pool.rewardsTokenInfo.name.uppercase()
     /// Need to check this value
-    val claimableRewardsToken = pool.claimableRewardValue
+    val claimableRewardsToken = "0"
+//    val claimableRewardsToken = pool.claimableRewardValue
+    val hasClaimableRewards = false
 
     Column(horizontalAlignment = Alignment.Start) {
         Text(
@@ -183,13 +201,17 @@ fun PoolDetailsView(
                 Text(
                     text = pool.poolInfo.poolDisplayName,
                     style = ElementTheme.typography.fontBodyLgRegular,
-                    color = ElementTheme.colors.textPrimary
+                    color = ElementTheme.colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     modifier = Modifier.padding(vertical = 2.dp),
                     text = "Reward: $rewardTokenName",
                     style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -204,12 +226,22 @@ fun PoolDetailsView(
 
         Spacer(Modifier.size(SPACING_4X.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            DetailBorderedCell(
-                title = "Claimable Rewards $rewardTokenName",
-                //subTitle = claimableRewardsToken
-                subTitle = "0"
-            )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row(Modifier.align(Alignment.Center)) {
+                DetailBorderedCell(
+                    title = "Claimable Rewards $rewardTokenName",
+                    subTitle = claimableRewardsToken
+                )
+            }
+            if (hasClaimableRewards) {
+                ClaimRewardsButton(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(horizontal = 12.dp),
+                    onClick = onClaimRewards,
+                    size = ButtonSize.XSmall
+                )
+            }
         }
 
         Spacer(Modifier.size(SPACING_2X.dp))
@@ -284,13 +316,17 @@ fun StakeUnstakeAmountView(
                 Text(
                     text = pool.poolInfo.poolDisplayName,
                     style = ElementTheme.typography.fontBodyLgRegular,
-                    color = ElementTheme.colors.textPrimary
+                    color = ElementTheme.colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     modifier = Modifier.padding(vertical = 2.dp),
                     text = "Reward: $rewardTokenName",
                     style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -381,14 +417,18 @@ fun StakeUnstakeAmountView(
                     modifier = Modifier.align(Alignment.End),
                     text = "Available: ${pool.totalAvailableTokenBalanceFormatted}",
                     style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             } else {
                 Text(
                     modifier = Modifier.align(Alignment.End),
                     text = "Staked: ${pool.myStakedTokensFormatted}",
                     style = ElementTheme.typography.fontBodyMdRegular,
-                    color = ElementTheme.colors.textSecondary
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -439,14 +479,25 @@ fun TransactionSuccessOrFailureView(
     pool: SelectedStakePool,
     isUserStaking: Boolean = true,
     transactionAmount: String,
-    isSuccess: Boolean
+    isSuccess: Boolean,
+    onDismiss: () -> Unit,
 ) {
     val stakeTokenName = pool.stakeTokenInfo.name.uppercase()
     val rewardTokenName = pool.rewardsTokenInfo.name.uppercase()
 
-    Box(Modifier.size(400.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(400.dp)) {
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd),
+            onClick = onDismiss
+        ) {
+            Icon(imageVector = CompoundIcons.Close(), contentDescription = null)
+        }
+
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -535,14 +586,16 @@ fun RowScope.DetailBorderedCell(
         Text(
             text = title,
             style = ElementTheme.typography.fontBodyMdRegular,
-            color = ElementTheme.colors.textSecondary
+            color = ElementTheme.colors.textSecondary,
         )
 
         Text(
             modifier = Modifier.padding(vertical = 8.dp),
             text = subTitle,
             style = ElementTheme.typography.fontHeadingMdBold,
-            color = ElementTheme.colors.textPrimary
+            color = ElementTheme.colors.textPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

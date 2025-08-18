@@ -1264,6 +1264,14 @@ class RustMatrixClient(
             }
         }
 
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
+                stake.claimStakingRewards(userAddress, poolAddress).transactionHash
+            }
+        }
+
     private suspend fun postCreateFeed(replyToPost: String?) {
         withContext(sessionDispatcher) {
             runCatching {

@@ -81,6 +81,7 @@ import io.element.android.support.zero.common.extension.withScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -306,6 +307,25 @@ class HomePresenter @Inject constructor(
                     showWalletStakingSheet.value = false
                     walletStakeActionState.value = AsyncAction.Uninitialized
                     selectedStakePool.value = null
+                    client.userProfile.value.walletAddress?.let { walletAddress ->
+                        fetchWalletData(walletAddress)
+                    }
+                }
+                HomeEvents.ClaimStakingRewards -> {
+                    selectedStakePool.value?.poolInfo?.let { pool ->
+                        coroutineScope.claimStakingRewards(
+                            pool = pool,
+                            genericActionState = genericActionState,
+                            onDone = {
+                                coroutineScope.fetchPoolData(
+                                    pool = pool,
+                                    selectedStakePoolState = selectedStakePool,
+                                    genericActionState = genericActionState,
+                                    showWalletStakingSheetState = showWalletStakingSheet
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -791,7 +811,7 @@ class HomePresenter @Inject constructor(
         userAddress: String,
     ) {
         // NEED TO FIGURE OUT FROM WHERE TO GET THIS POOL ADDRESS
-        val poolAddress = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
+        val poolAddress = ZeroConfig.MEOW_POOL_ADDRESS
         val meowToken = tokensList.firstOrNull { it.isMeowToken } ?: return
         val price = meowPrice ?: return
         withIOScope {
@@ -877,6 +897,23 @@ class HomePresenter @Inject constructor(
             showWalletStakingSheetState.value = true
         } else {
             genericActionState.value = AsyncAction.Failure(Throwable("Failed to fetch pool data. Required values are missing"))
+        }
+    }
+
+    private fun CoroutineScope.claimStakingRewards(
+        pool: HomeStakePool,
+        genericActionState: MutableState<AsyncAction<Unit>>,
+        onDone: () -> Unit,
+    ) = launch {
+        genericActionState.value = AsyncAction.Loading
+        client.claimStakingRewards(
+            userAddress = pool.userWalletAddress,
+            poolAddress = pool.poolAddress
+        ).onSuccess {
+            genericActionState.value = AsyncAction.Success(Unit)
+            onDone()
+        }.onFailure {
+            genericActionState.value = AsyncAction.Failure(it)
         }
     }
 

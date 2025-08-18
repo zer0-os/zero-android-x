@@ -67,6 +67,7 @@ enum class IconColorButtonStyle {
 }
 
 private fun ButtonSize.toContainerSize() = when (this) {
+    ButtonSize.XSmall -> 12.dp
     ButtonSize.Small -> 20.dp
     ButtonSize.Medium -> 24.dp
     ButtonSize.Large,
@@ -75,6 +76,7 @@ private fun ButtonSize.toContainerSize() = when (this) {
 }
 
 private fun ButtonSize.toContainerPadding() = when (this) {
+    ButtonSize.XSmall -> 1.dp
     ButtonSize.Small -> 2.dp
     ButtonSize.Medium -> 2.dp
     ButtonSize.Large,

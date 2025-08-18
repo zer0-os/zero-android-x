@@ -325,6 +325,8 @@ interface MatrixClient {
     suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String>
 
     suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
+
+    suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String>
 }
 
 /**

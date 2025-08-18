@@ -563,5 +563,9 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String> {
+        return Result.failure(Throwable("fake"))
+    }
+
     //endregion
 }
