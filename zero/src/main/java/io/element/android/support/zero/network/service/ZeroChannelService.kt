@@ -8,7 +8,7 @@
 package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.JoinChannelRequest
-import io.element.android.support.zero.network.model.response.ApiJoinChannel
+import io.element.android.support.zero.network.model.response.channel.ApiJoinChannel
 import retrofit2.http.Body
 import retrofit2.http.POST
 

@@ -90,6 +90,7 @@ fun HomeWalletContent(
         )
         when (selectedWalletTab) {
             WalletContentTab.TOKENS -> WalletTokensList(state)
+            WalletContentTab.STAKING -> WalletStakingList(state)
             WalletContentTab.TRANSACTIONS -> WalletTransactionsList(state)
         }
     }

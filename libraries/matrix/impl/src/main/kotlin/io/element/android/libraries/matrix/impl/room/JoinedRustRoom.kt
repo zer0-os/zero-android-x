@@ -11,7 +11,6 @@ import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.coroutine.childScope
 import io.element.android.libraries.core.extensions.mapFailure
 import io.element.android.libraries.core.extensions.runCatchingExceptions
-import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.RoomAlias
@@ -55,7 +54,6 @@ import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.repository.ConversationRepository
 import io.element.android.support.zero.data.repository.MetaDataRepository
 import io.element.android.support.zero.data.repository.UserRepository
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,7 +93,6 @@ class JoinedRustRoom(
     private val coroutineDispatchers: CoroutineDispatchers,
     private val systemClock: SystemClock,
     private val roomContentForwarder: RoomContentForwarder,
-    private val featureFlagService: FeatureFlagService,
     private val zeroConversationRepository: ConversationRepository?,
     private val zeroUserRepository: UserRepository?,
     private val zeroMetaDataRepository: MetaDataRepository?,
@@ -501,7 +498,6 @@ class JoinedRustRoom(
             dispatcher = roomDispatcher,
             roomContentForwarder = roomContentForwarder,
             onNewSyncedEvent = onNewSyncedEvent,
-            featureFlagsService = featureFlagService,
             zeroConversationRepository = zeroConversationRepository
         )
     }

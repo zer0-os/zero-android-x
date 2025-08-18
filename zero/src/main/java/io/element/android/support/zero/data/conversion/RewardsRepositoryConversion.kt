@@ -3,8 +3,8 @@ package io.element.android.support.zero.data.conversion
 import io.element.android.support.zero.common.extension.isPositive
 import io.element.android.support.zero.common.extension.toBigDecimalOrZero
 import io.element.android.support.zero.data.model.UserRewards
-import io.element.android.support.zero.network.model.response.ApiUserRewards
-import io.element.android.support.zero.network.model.response.ApiZeroTokens
+import io.element.android.support.zero.network.model.response.reward.ApiUserRewards
+import io.element.android.support.zero.network.model.response.reward.ApiZeroTokens
 
 internal fun ApiUserRewards.toModel(zeroTokens: ApiZeroTokens?): UserRewards {
     val legacyRewards = legacyRewards

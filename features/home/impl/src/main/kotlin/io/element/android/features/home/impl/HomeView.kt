@@ -39,6 +39,7 @@ import io.element.android.features.home.impl.components.ClaimRewardsSheet
 import io.element.android.features.home.impl.components.HomeFabButton
 import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
+import io.element.android.features.home.impl.components.WalletStakingSheet
 import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
@@ -214,6 +215,7 @@ private fun HomeScaffold(
     }
 
     val claimRewardsSheetState = rememberModalBottomSheetState()
+    val walletStakeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box {
         Scaffold(
@@ -316,6 +318,23 @@ private fun HomeScaffold(
                     onRewardsClaimed = {
                         state.eventSink(HomeEvents.RefreshWalletBalance)
                     }
+                )
+            }
+        )
+    }
+
+    if (
+        state.walletContentState.showStakingSheet &&
+        state.walletContentState.selectedPool != null
+    ) {
+        ModalBottomSheet(
+            onDismissRequest = { state.eventSink(HomeEvents.DismissStakingSheet) },
+            sheetState = walletStakeSheetState,
+            content = {
+                WalletStakingSheet(
+                    selectedPool = state.walletContentState.selectedPool,
+                    actionState = state.walletContentState.walletStakeActionState,
+                    eventSink = state.walletContentState.eventSink
                 )
             }
         )

@@ -9,7 +9,6 @@ package io.element.android.libraries.matrix.impl.room
 
 import io.element.android.appconfig.TimelineConfig
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
-import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.SessionId
@@ -50,7 +49,6 @@ class RustRoomFactory(
     private val innerRoomListService: InnerRoomListService,
     private val roomSyncSubscriber: RoomSyncSubscriber,
     private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
-    private val featureFlagService: FeatureFlagService,
     private val roomMembershipObserver: RoomMembershipObserver,
     private val roomInfoMapper: RoomInfoMapper,
     private val zeroCoreRepository: ZeroCoreRepository?
@@ -101,7 +99,7 @@ class RustRoomFactory(
         )
     }
 
-    suspend fun getJoinedRoomOrPreview(roomId: RoomId): GetRoomResult? = withContext(dispatcher) {
+    suspend fun getJoinedRoomOrPreview(roomId: RoomId, serverNames: List<String>): GetRoomResult? = withContext(dispatcher) {
         mutex.withLock {
             if (isDestroyed.get()) {
                 Timber.d("Room factory is destroyed, returning null for $roomId")
@@ -130,7 +128,6 @@ class RustRoomFactory(
                         liveInnerTimeline = timeline,
                         coroutineDispatchers = dispatchers,
                         systemClock = systemClock,
-                        featureFlagService = featureFlagService,
                         zeroConversationRepository = zeroCoreRepository?.conversation,
                         zeroUserRepository = zeroCoreRepository?.user,
                         zeroMetaDataRepository = zeroCoreRepository?.metaData
@@ -138,7 +135,7 @@ class RustRoomFactory(
                 )
             } else {
                 val preview = try {
-                    sdkRoom.previewRoom(via = emptyList())
+                    sdkRoom.previewRoom(via = serverNames)
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to get room preview for $roomId")
                     return@withContext null

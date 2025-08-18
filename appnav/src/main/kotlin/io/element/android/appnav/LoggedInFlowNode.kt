@@ -48,6 +48,7 @@ import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
 import io.element.android.features.createfeed.api.CreateFeedEntryPoint
 import io.element.android.features.createroom.api.CreateRoomEntryPoint
+import io.element.android.features.enterprise.api.SessionEnterpriseService
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.features.ftue.api.FtueEntryPoint
@@ -130,6 +131,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val logoutEntryPoint: LogoutEntryPoint,
     private val incomingVerificationEntryPoint: IncomingVerificationEntryPoint,
     private val mediaPreviewConfigMigration: MediaPreviewConfigMigration,
+    private val sessionEnterpriseService: SessionEnterpriseService,
     private val networkMonitor: NetworkMonitor,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
@@ -192,7 +194,9 @@ class LoggedInFlowNode @AssistedInject constructor(
 
     override fun onBuilt() {
         super.onBuilt()
-
+        lifecycleScope.launch {
+            sessionEnterpriseService.init()
+        }
         lifecycle.subscribe(
             onCreate = {
                 appNavigationStateService.onNavigateToSession(id, matrixClient.sessionId)
@@ -390,8 +394,8 @@ class LoggedInFlowNode @AssistedInject constructor(
             }
             is NavTarget.Room -> {
                 val callback = object : JoinedRoomLoadedFlowNode.Callback {
-                    override fun onOpenRoom(roomId: RoomId) {
-                        backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
+                    override fun onOpenRoom(roomId: RoomId, serverNames: List<String>) {
+                        backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), serverNames))
                     }
 
                     override fun onForwardedToSingleRoom(roomId: RoomId) {

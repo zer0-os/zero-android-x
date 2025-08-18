@@ -1,7 +1,7 @@
 package io.element.android.support.zero.network.service
 
-import io.element.android.support.zero.network.model.response.ApiUserRewards
-import io.element.android.support.zero.network.model.response.ApiZeroTokens
+import io.element.android.support.zero.network.model.response.reward.ApiUserRewards
+import io.element.android.support.zero.network.model.response.reward.ApiZeroTokens
 import retrofit2.http.GET
 
 interface ZeroRewardService {

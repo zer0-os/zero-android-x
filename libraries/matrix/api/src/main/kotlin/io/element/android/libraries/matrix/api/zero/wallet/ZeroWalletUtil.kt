@@ -27,7 +27,7 @@ object ZeroWalletUtil {
         }
     }
 
-    fun getWalletBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
+    fun getBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
         return meowTokenAmount.times(meowPrice.price ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)
@@ -44,12 +44,18 @@ object ZeroWalletUtil {
 
     @SuppressLint("DefaultLocale")
     fun getFormattedNumber(count: Double, withAbbreviations: Boolean = true): String {
+        if (count.isNaN() || count.isInfinite()) return "0" // handle weird inputs
         return if (withAbbreviations) {
-            val exp = (ln(count) / ln(1000.0)).toInt()
-            val value = count / 1000.0.pow(exp.toDouble())
-            val suffixes = "KMBTPE"
-            val suffix = if (exp - 1 in suffixes.indices) suffixes[exp - 1] else ' '
-            String.format("%.2f%c", value, suffix)
+            if (count < 1000.0) {
+                // Small numbers, just format without suffix
+                String.format("%.2f", count)
+            } else {
+                val exp = (ln(count) / ln(1000.0)).toInt().coerceAtLeast(1)
+                val value = count / 1000.0.pow(exp.toDouble())
+                val suffixes = "KMBTPE"
+                val suffix = if (exp - 1 in suffixes.indices) suffixes[exp - 1] else ' '
+                String.format("%.2f%c", value, suffix)
+            }
         } else {
             String.format("%.2f", count)
         }

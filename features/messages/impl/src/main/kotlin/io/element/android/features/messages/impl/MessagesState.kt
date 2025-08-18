@@ -53,7 +53,6 @@ data class MessagesState(
     val showZeroProBadge: Boolean,
     val showReinvitePrompt: Boolean,
     val enableTextFormatting: Boolean,
-    val enableVoiceMessages: Boolean,
     val roomCallState: RoomCallState,
     val appName: String,
     val pinnedMessagesBannerState: PinnedMessagesBannerState,

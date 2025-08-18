@@ -19,4 +19,5 @@ class ZeroCoreRepository(
     val user: UserRepository,
     val metaData: MetaDataRepository,
     val wallet: WalletRepository,
+    val stake: StakeRepository,
 )

@@ -10,7 +10,7 @@ import io.element.android.support.zero.network.model.request.AuthoriseUserReques
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
-import io.element.android.support.zero.network.model.response.ZeroAuthCredentials
+import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroUserService
 import kotlinx.coroutines.flow.Flow

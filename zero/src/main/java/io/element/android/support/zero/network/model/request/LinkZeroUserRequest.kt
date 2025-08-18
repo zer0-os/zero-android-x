@@ -1,6 +1,6 @@
 package io.element.android.support.zero.network.model.request
 
-import io.element.android.support.zero.network.model.response.ZeroMatrixAuthCredentials
+import io.element.android.support.zero.network.model.response.auth.ZeroMatrixAuthCredentials
 import kotlinx.serialization.Serializable
 
 @Serializable

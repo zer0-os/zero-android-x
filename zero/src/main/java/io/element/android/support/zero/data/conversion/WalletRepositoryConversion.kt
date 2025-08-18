@@ -9,6 +9,8 @@ package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
@@ -17,12 +19,14 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.support.zero.network.model.response.ApiWalletRecipient
-import io.element.android.support.zero.network.model.response.ApiWalletTokens
-import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
-import io.element.android.support.zero.network.model.response.ApiWalletTransactions
-import io.element.android.support.zero.network.model.response.NextPageParams
-import io.element.android.support.zero.network.model.response.TransactionNextPageParams
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokens
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactionReceipt
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactions
+import io.element.android.support.zero.network.model.response.wallet.NextPageParams
+import io.element.android.support.zero.network.model.response.wallet.TransactionNextPageParams
 
 fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
     return ZeroWalletTokensResponse(
@@ -85,6 +89,10 @@ fun ApiWalletTransactionReceipt.toModel(): ZeroWalletTransactionReceipt {
 fun ApiWalletRecipient.toModel(): ZeroWalletRecipient {
     return ZeroWalletRecipient(userId, matrixId, publicAddress, name, profileImage, primaryZid)
 }
+
+fun ApiWalletTokenInfo.toModel() = ZeroWalletTokenInfo(name, symbol, decimals, address)
+
+fun ApiWalletTokenBalance.toModel() = ZeroWalletTokenBalance(balance)
 
 fun ZeroWalletTokensPaginationParams.toApi() = NextPageParams(itemsCount, tokenName, tokenType, value)
 fun ZeroWalletTransactionsPaginationParams.toApi() = TransactionNextPageParams(blockNumber, index)

@@ -12,16 +12,16 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthor
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeedAuthorProfileSummary
-import io.element.android.support.zero.network.model.response.ApiFeed
-import io.element.android.support.zero.network.model.response.ApiFeedMedia
-import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
-import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
-import io.element.android.support.zero.network.model.response.FeedUser
-import io.element.android.support.zero.network.model.response.FeedUserProfileSummary
-import io.element.android.support.zero.network.model.response.Meow
-import io.element.android.support.zero.network.model.response.PostsMeowsSummary
-import io.element.android.support.zero.network.model.response.Reply
-import io.element.android.support.zero.network.model.response.ReplyToFeed
+import io.element.android.support.zero.network.model.response.feed.ApiFeed
+import io.element.android.support.zero.network.model.response.feed.ApiFeedMedia
+import io.element.android.support.zero.network.model.response.feed.ApiFeedMediaResponse
+import io.element.android.support.zero.network.model.response.feed.ApiFeedUserProfileView
+import io.element.android.support.zero.network.model.response.feed.FeedUser
+import io.element.android.support.zero.network.model.response.feed.FeedUserProfileSummary
+import io.element.android.support.zero.network.model.response.feed.Meow
+import io.element.android.support.zero.network.model.response.feed.PostsMeowsSummary
+import io.element.android.support.zero.network.model.response.feed.Reply
+import io.element.android.support.zero.network.model.response.feed.ReplyToFeed
 
 fun ApiFeed.toModel() = ZeroFeed(
     id = id,

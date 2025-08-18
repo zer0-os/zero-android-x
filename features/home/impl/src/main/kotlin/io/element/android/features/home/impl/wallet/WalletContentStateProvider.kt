@@ -36,5 +36,9 @@ internal fun aWalletContentState(
     tokensPaginationParams = null,
     transactionsPaginationParams = null,
     meowPrice = null,
+    stakePools = emptyList(),
+    selectedPool = null,
+    showStakingSheet = false,
+    walletStakeActionState = AsyncAction.Uninitialized,
     eventSink = {}
 )

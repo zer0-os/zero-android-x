@@ -11,5 +11,6 @@ enum class WalletContentTab(
     val title: String,
 ) {
     TOKENS("Tokens"),
+    STAKING("Staking"),
     TRANSACTIONS("Transactions")
 }

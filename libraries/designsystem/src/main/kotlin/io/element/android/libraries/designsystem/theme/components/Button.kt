@@ -145,6 +145,13 @@ private fun ButtonInternal(
     val hasStartDrawable = showProgress || leadingIcon != null
 
     val contentPadding = when (size) {
+        ButtonSize.XSmall -> {
+            if (hasStartDrawable) {
+                PaddingValues(start = 4.dp, top = 2.5.dp, end = 4.dp, bottom = 2.5.dp)
+            } else {
+                PaddingValues(start = 8.dp, top = 5.dp, end = 8.dp, bottom = 5.dp)
+            }
+        }
         ButtonSize.Small -> {
             if (hasStartDrawable) {
                 PaddingValues(start = 8.dp, top = 5.dp, end = 16.dp, bottom = 5.dp)
@@ -218,12 +225,20 @@ private fun ButtonInternal(
         contentPadding = contentPadding,
         interactionSource = remember { MutableInteractionSource() },
     ) {
+        val iconSize = when(size) {
+            ButtonSize.XSmall,
+            ButtonSize.Small -> 12.dp
+            ButtonSize.Medium,
+            ButtonSize.MediumLowPadding -> 16.dp
+            ButtonSize.Large,
+            ButtonSize.LargeLowPadding -> 20.dp
+        }
         when {
             showProgress -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .progressSemantics()
-                        .size(20.dp),
+                        .size(iconSize),
                     color = ElementTheme.colors.zeroBrandColor,
                     strokeWidth = 2.dp,
                 )
@@ -234,14 +249,22 @@ private fun ButtonInternal(
                     painter = leadingIcon.getPainter(),
                     contentDescription = null,
                     tint = LocalContentColor.current,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(iconSize),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
+        val fontStyle = when(size) {
+            ButtonSize.XSmall,
+            ButtonSize.Small -> ElementTheme.zeroTypography.fontBodySmMedium
+            ButtonSize.Medium,
+            ButtonSize.MediumLowPadding -> ElementTheme.zeroTypography.fontBodyMdMedium
+            ButtonSize.Large,
+            ButtonSize.LargeLowPadding -> ElementTheme.zeroTypography.fontBodyLgMedium
+        }
         Text(
             text = text,
-            style = ElementTheme.zeroTypography.fontBodyLgMedium,
+            style = fontStyle,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -249,6 +272,7 @@ private fun ButtonInternal(
 }
 
 private fun ButtonSize.toMinHeight() = when (this) {
+    ButtonSize.XSmall -> 24.dp
     ButtonSize.Small -> 32.dp
     ButtonSize.Medium,
     ButtonSize.MediumLowPadding -> 40.dp
@@ -271,6 +295,7 @@ sealed interface IconSource {
 }
 
 enum class ButtonSize {
+    XSmall,
     Small,
     Medium,
 

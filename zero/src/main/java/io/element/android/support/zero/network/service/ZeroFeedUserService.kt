@@ -7,8 +7,8 @@
 
 package io.element.android.support.zero.network.service
 
-import io.element.android.support.zero.network.model.response.ApiFeedUserFollowingStatus
-import io.element.android.support.zero.network.model.response.ApiFeedUserProfileView
+import io.element.android.support.zero.network.model.response.feed.ApiFeedUserFollowingStatus
+import io.element.android.support.zero.network.model.response.feed.ApiFeedUserProfileView
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.DELETE

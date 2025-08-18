@@ -8,10 +8,10 @@
 package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.network.model.request.LinkPreviewMetaDataFilter
-import io.element.android.support.zero.network.model.response.ApiFeedMediaResponse
-import io.element.android.support.zero.network.model.response.ApiLinkPreview
-import io.element.android.support.zero.network.model.response.ApiUploadFeedMedia
-import io.element.android.support.zero.network.model.response.ApiYoutubeLinkPreview
+import io.element.android.support.zero.network.model.response.feed.ApiFeedMediaResponse
+import io.element.android.support.zero.network.model.response.metadata.ApiLinkPreview
+import io.element.android.support.zero.network.model.response.feed.ApiUploadFeedMedia
+import io.element.android.support.zero.network.model.response.metadata.ApiYoutubeLinkPreview
 import io.element.android.support.zero.network.service.ZeroMetaDataService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody

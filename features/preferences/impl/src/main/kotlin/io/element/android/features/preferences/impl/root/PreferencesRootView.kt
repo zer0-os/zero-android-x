@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.preferences.impl.ClaimRewardsButton
+import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.features.preferences.impl.R
 import io.element.android.features.preferences.impl.user.UserPreferences
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -330,13 +330,12 @@ private fun ColumnScope.ManageAppSection(
         onClick = onInviteFriend,
     )
 
-    if (state.showNotificationSettings) {
-        ListItem(
-            headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Notifications())),
-            onClick = onOpenNotificationSettings,
-        )
-    }
+    ListItem(
+        headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Notifications())),
+        onClick = onOpenNotificationSettings,
+    )
+
     /*if (state.showLockScreenSettings) {
         ListItem(
             headlineContent = { Text(stringResource(id = CommonStrings.common_screen_lock)) },
@@ -358,9 +357,7 @@ private fun ColumnScope.ManageAppSection(
         trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
         onClick = onSecureBackupClick,
     )
-    if (state.showNotificationSettings || state.showLockScreenSettings || state.showSecureBackup) {
-        HorizontalDivider()
-    }
+    HorizontalDivider()
 }
 
 @Composable

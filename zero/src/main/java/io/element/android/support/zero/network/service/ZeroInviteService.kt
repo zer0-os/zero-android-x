@@ -1,6 +1,6 @@
 package io.element.android.support.zero.network.service
 
-import io.element.android.support.zero.network.model.response.ApiInvite
+import io.element.android.support.zero.network.model.response.auth.ApiInvite
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.POST

@@ -7,15 +7,19 @@
 
 package io.element.android.support.zero.data.repository
 
+import io.element.android.support.zero.network.model.request.ApproveERC20Request
 import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
-import io.element.android.support.zero.network.model.response.ApiTransactionPerformed
-import io.element.android.support.zero.network.model.response.ApiWalletRecipient
-import io.element.android.support.zero.network.model.response.ApiWalletTokens
-import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
-import io.element.android.support.zero.network.model.response.ApiWalletTransactions
-import io.element.android.support.zero.network.model.response.NextPageParams
-import io.element.android.support.zero.network.model.response.TransactionNextPageParams
-import io.element.android.support.zero.network.model.response.toQueryMap
+import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokens
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactionReceipt
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactions
+import io.element.android.support.zero.network.model.response.wallet.NextPageParams
+import io.element.android.support.zero.network.model.response.wallet.TransactionNextPageParams
+import io.element.android.support.zero.network.model.response.wallet.toQueryMap
 import io.element.android.support.zero.network.service.ZeroUserService
 import io.element.android.support.zero.network.service.ZeroWalletService
 
@@ -66,5 +70,22 @@ class WalletRepositoryImpl(
             request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token)
         )
         return getTransactionReceipt(transaction.transactionHash)
+    }
+
+    override suspend fun getTokenInfo(tokenAddress: String): ApiWalletTokenInfo {
+        return zeroWalletService.getTokenInfo(tokenAddress)
+    }
+
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String): ApiWalletTokenBalance {
+        return zeroWalletService.getTokenBalance(userAddress, tokenAddress)
+    }
+
+    override suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): ApiTransactionPerformed {
+        val request = ApproveERC20Request(amount = amount, spenderAddress = poolAddress, tokenAddress = tokenAddress)
+        return zeroWalletService.approveERC20(userAddress, request)
+    }
+
+    override suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): ApiWalletStakingApprovalResponse {
+        return zeroWalletService.verifyERC20Approval(userAddress, tokenAddress, poolAddress)
     }
 }

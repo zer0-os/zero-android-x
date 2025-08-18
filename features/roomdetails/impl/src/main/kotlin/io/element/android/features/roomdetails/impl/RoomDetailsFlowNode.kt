@@ -300,7 +300,7 @@ class RoomDetailsFlowNode @AssistedInject constructor(
                             }
 
                             override fun onOpenDm(roomId: RoomId) {
-                                plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
+                                plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId, emptyList()) }
                             }
 
                             override fun openAvatarPreview(name: String, url: String) {

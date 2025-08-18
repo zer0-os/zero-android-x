@@ -44,8 +44,14 @@ import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
+import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -490,23 +496,23 @@ class FakeMatrixClient(
     }
 
     override suspend fun getMeowPrice(): Result<ZeroMeowPrice> {
-        return Result.failure(Throwable("test"))
+        return Result.failure(Throwable("fake"))
     }
 
     override suspend fun getWalletTokens(walletAddress: String, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
-        return Result.failure(Throwable("test"))
+        return Result.failure(Throwable("fake"))
     }
 
     override suspend fun getWalletTransactions(walletAddress: String, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
-        return Result.failure(Throwable("test"))
+        return Result.failure(Throwable("fake"))
     }
 
     override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt> {
-        return Result.failure(Throwable("test"))
+        return Result.failure(Throwable("fake"))
     }
 
     override suspend fun claimRewards(walletAddress: String): Result<String> {
-        return Result.success("test_transaction_hash")
+        return Result.success("fake_transaction_hash")
     }
 
     override suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>> {
@@ -514,7 +520,51 @@ class FakeMatrixClient(
     }
 
     override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
-        return Result.failure(Throwable("test"))
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getTotalStaked(poolAddress: String): Result<String> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): Result<ZeroStakingStatus> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): Result<ZeroStakingUserRewardsInfo> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getStakingToken(poolAddress: String): Result<ZeroTokenAddress> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String> {
+        return Result.failure(Throwable("fake"))
     }
 
     //endregion

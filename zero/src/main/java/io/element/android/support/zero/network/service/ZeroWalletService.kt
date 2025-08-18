@@ -7,12 +7,16 @@
 
 package io.element.android.support.zero.network.service
 
+import io.element.android.support.zero.network.model.request.ApproveERC20Request
 import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
-import io.element.android.support.zero.network.model.response.ApiTransactionPerformed
-import io.element.android.support.zero.network.model.response.ApiWalletRecipientsResponse
-import io.element.android.support.zero.network.model.response.ApiWalletTokens
-import io.element.android.support.zero.network.model.response.ApiWalletTransactionReceipt
-import io.element.android.support.zero.network.model.response.ApiWalletTransactions
+import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipientsResponse
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokens
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactionReceipt
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletTransactions
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -57,4 +61,28 @@ interface ZeroWalletService {
         @Path("sender_address") senderWalletAddress: String,
         @Body request: TransferWalletTokenRequest
     ): ApiTransactionPerformed
+
+    @GET(value = "api/tokens/{token_address}/info")
+    suspend fun getTokenInfo(
+        @Path("token_address") tokenAddress: String
+    ): ApiWalletTokenInfo
+
+    @GET(value = "api/wallet/{user_address}/token/{token_address}/balance")
+    suspend fun getTokenBalance(
+        @Path("user_address") userAddress: String,
+        @Path("token_address") tokenAddress: String
+    ): ApiWalletTokenBalance
+
+    @POST(value = "api/wallet/{user_address}/transactions/approve-erc20")
+    suspend fun approveERC20(
+        @Path("user_address") userAddress: String,
+        @Body request: ApproveERC20Request
+    ): ApiTransactionPerformed
+
+    @GET(value = "api/wallet/{user_address}/token/{token_address}/approval/{pool_address}")
+    suspend fun verifyERC20Approval(
+        @Path("user_address") userAddress: String,
+        @Path("token_address") tokenAddress: String,
+        @Path("pool_address") poolAddress: String,
+    ): ApiWalletStakingApprovalResponse
 }

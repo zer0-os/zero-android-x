@@ -9,9 +9,9 @@ package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.MeowFeedRequest
 import io.element.android.support.zero.network.model.request.PostNewFeedRequest
-import io.element.android.support.zero.network.model.response.ApiFeedDetails
-import io.element.android.support.zero.network.model.response.ApiFeedReplies
-import io.element.android.support.zero.network.model.response.ApiFeeds
+import io.element.android.support.zero.network.model.response.feed.ApiFeedDetails
+import io.element.android.support.zero.network.model.response.feed.ApiFeedReplies
+import io.element.android.support.zero.network.model.response.feed.ApiFeeds
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body

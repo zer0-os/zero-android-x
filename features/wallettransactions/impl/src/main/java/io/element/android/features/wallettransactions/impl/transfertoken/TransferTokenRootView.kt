@@ -30,7 +30,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.CompletedTransferView
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.ConfirmTransferView
-import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.TransactionInProgressView
+import io.element.android.support.zero.common.ui.TransactionInProgressView
 import io.element.android.features.wallettransactions.impl.transfertoken.recipient.SelectRecipientView
 import io.element.android.features.wallettransactions.impl.transfertoken.token.SelectTokenView
 import io.element.android.libraries.designsystem.components.button.BackButton

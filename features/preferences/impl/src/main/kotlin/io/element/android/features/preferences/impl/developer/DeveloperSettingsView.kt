@@ -39,6 +39,7 @@ import io.element.android.support.zero.common.ui.component.ZeroAlertDialog
 fun DeveloperSettingsView(
     state: DeveloperSettingsState,
     onOpenShowkase: () -> Unit,
+    onPushHistoryClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,6 +56,7 @@ fun DeveloperSettingsView(
         ) {
             FeatureListContent(state)
         }
+        NotificationCategory(onPushHistoryClick)
         ElementCallCategory(state = state)
 
         PreferenceCategory(title = "Rust SDK") {
@@ -160,6 +162,18 @@ private fun ElementCallCategory(
 }
 
 @Composable
+private fun NotificationCategory(onPushHistoryClick: () -> Unit) {
+    PreferenceCategory(title = stringResource(id = R.string.screen_notification_settings_title)) {
+        ListItem(
+            headlineContent = {
+                Text(stringResource(R.string.troubleshoot_notifications_entry_point_push_history_title))
+            },
+            onClick = onPushHistoryClick,
+        )
+    }
+}
+
+@Composable
 private fun FeatureListContent(
     state: DeveloperSettingsState,
 ) {
@@ -237,6 +251,7 @@ internal fun DeveloperSettingsViewPreview(@PreviewParameter(DeveloperSettingsSta
     DeveloperSettingsView(
         state = state,
         onOpenShowkase = {},
+        onPushHistoryClick = {},
         onBackClick = {}
     )
 }
