@@ -330,13 +330,12 @@ private fun ColumnScope.ManageAppSection(
         onClick = onInviteFriend,
     )
 
-    if (state.showNotificationSettings) {
-        ListItem(
-            headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Notifications())),
-            onClick = onOpenNotificationSettings,
-        )
-    }
+    ListItem(
+        headlineContent = { Text(stringResource(id = R.string.screen_notification_settings_title)) },
+        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Notifications())),
+        onClick = onOpenNotificationSettings,
+    )
+
     /*if (state.showLockScreenSettings) {
         ListItem(
             headlineContent = { Text(stringResource(id = CommonStrings.common_screen_lock)) },
@@ -358,9 +357,7 @@ private fun ColumnScope.ManageAppSection(
         trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
         onClick = onSecureBackupClick,
     )
-    if (state.showNotificationSettings || state.showLockScreenSettings || state.showSecureBackup) {
-        HorizontalDivider()
-    }
+    HorizontalDivider()
 }
 
 @Composable

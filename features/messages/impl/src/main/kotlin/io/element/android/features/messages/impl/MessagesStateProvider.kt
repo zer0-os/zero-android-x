@@ -61,14 +61,12 @@ open class MessagesStateProvider : PreviewParameterProvider<MessagesState> {
             aMessagesState(roomName = null),
             aMessagesState(composerState = aMessageComposerState(showTextFormatting = true)),
             aMessagesState(
-                enableVoiceMessages = true,
                 voiceMessageComposerState = aVoiceMessageComposerState(showPermissionRationaleDialog = true),
             ),
             aMessagesState(
                 roomCallState = anOngoingCallState(),
             ),
             aMessagesState(
-                enableVoiceMessages = true,
                 voiceMessageComposerState = aVoiceMessageComposerState(
                     voiceMessageState = aVoiceMessagePreviewState(),
                     showSendFailureDialog = true
@@ -114,7 +112,6 @@ fun aMessagesState(
     reactionSummaryState: ReactionSummaryState = aReactionSummaryState(),
     hasNetworkConnection: Boolean = true,
     showReinvitePrompt: Boolean = false,
-    enableVoiceMessages: Boolean = true,
     roomCallState: RoomCallState = aStandByCallState(),
     pinnedMessagesBannerState: PinnedMessagesBannerState = aLoadedPinnedMessagesBannerState(),
     dmUserVerificationState: IdentityState? = null,
@@ -143,7 +140,6 @@ fun aMessagesState(
     inviteProgress = AsyncData.Uninitialized,
     showReinvitePrompt = showReinvitePrompt,
     enableTextFormatting = true,
-    enableVoiceMessages = enableVoiceMessages,
     roomCallState = roomCallState,
     appName = "Element",
     pinnedMessagesBannerState = pinnedMessagesBannerState,

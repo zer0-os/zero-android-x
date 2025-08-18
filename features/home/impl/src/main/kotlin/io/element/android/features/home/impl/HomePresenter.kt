@@ -121,7 +121,7 @@ class HomePresenter @Inject constructor(
         val coroutineScope = rememberCoroutineScope()
         val matrixUser = client.userProfile.collectAsState()
         val isOnline by syncService.isOnline.collectAsState()
-        val canReportBug = remember { rageshakeFeatureAvailability.isAvailable() }
+        val canReportBug by remember { rageshakeFeatureAvailability.isAvailable() }.collectAsState(false)
         val roomListState = roomListPresenter.present()
         val isSpaceFeatureEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)

@@ -23,8 +23,7 @@ camera = "1.4.2"
 firebase_bom = "33.15.0"
 
 # Compose
-compose_bom = "2025.06.01"
-composecompiler = "1.5.15"
+compose_bom = "2025.07.00"
 
 # Coroutines
 coroutines = "1.10.2"
@@ -42,12 +41,12 @@ serialization_json = "1.9.0"
 #other
 detekt = "1.23.8"
 coil = "3.3.0"
-showkase = "1.0.4"
+showkase = "1.0.5"
 appyx = "1.7.1"
 sqldelight = "2.1.0"
 wysiwyg = "2.39.0"
 telephoto = "0.16.0"
-haze = "1.6.9"
+haze = "1.6.10"
 
 # Dependency analysis
 dependencyAnalysis = "2.19.0"
@@ -209,7 +208,7 @@ haze_materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = 
 
 # Analytics
 posthog = "com.posthog:posthog-android:3.20.2"
-sentry = "io.sentry:sentry-android:8.18.0"
+sentry = "io.sentry:sentry-android:8.19.1"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"
 
@@ -232,10 +231,6 @@ google_autoservice = { module = "com.google.auto.service:auto-service", version.
 google_autoservice_annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice" }
 
 # Miscellaneous
-# Add unused dependency to androidx.compose.compiler:compiler to let Renovate create PR to change the
-# value of `composecompiler` (which is used to set composeOptions.kotlinCompilerExtensionVersion.
-# See https://github.com/renovatebot/renovate/issues/18354
-android_composeCompiler = { module = "androidx.compose.compiler:compiler", version.ref = "composecompiler" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 
 # Wallet Connect
@@ -260,7 +255,7 @@ ktlint = "org.jlleitschuh.gradle.ktlint:13.0.0"
 dependencygraph = "com.savvasdalkitsis.module-dependency-graph:0.12"
 dependencycheck = "org.owasp.dependencycheck:12.1.3"
 dependencyanalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysis" }
-paparazzi = "app.cash.paparazzi:1.3.5"
+paparazzi = "app.cash.paparazzi:2.0.0-alpha02"
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 firebaseAppDistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 knit = { id = "org.jetbrains.kotlinx.knit", version = "0.5.0" }
