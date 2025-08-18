@@ -23,7 +23,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.element.android.features.createroom.api.StartDMAction
+import io.element.android.features.startchat.api.StartDMAction
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient

@@ -18,9 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import io.element.android.features.createroom.api.ConfirmingStartDmWithMatrixUser
 import io.element.android.features.feeduserprofile.impl.components.UserFeedsListView
 import io.element.android.features.feeduserprofile.impl.components.UserProfileHeaderView
+import io.element.android.features.startchat.api.ConfirmingStartDmWithMatrixUser
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.async.AsyncActionView

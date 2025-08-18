@@ -17,7 +17,6 @@ import io.element.android.libraries.core.extensions.mapFailure
 import io.element.android.libraries.core.extensions.runCatchingExceptions
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
-import io.element.android.libraries.matrix.api.core.ProgressCallback
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
@@ -74,7 +73,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.impl.conversion.map
 import io.element.android.libraries.matrix.impl.conversion.toModel
-import io.element.android.libraries.matrix.impl.core.toProgressWatcher
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.exception.mapClientException
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
@@ -749,9 +747,9 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun uploadMedia(mimeType: String, data: ByteArray, progressCallback: ProgressCallback?): Result<String> = withContext(sessionDispatcher) {
+    override suspend fun uploadMedia(mimeType: String, data: ByteArray): Result<String> = withContext(sessionDispatcher) {
         runCatchingExceptions {
-            innerClient.uploadMedia(mimeType, data, progressCallback?.toProgressWatcher())
+            innerClient.uploadMedia(mimeType, data, progressWatcher = null)
         }
     }
 

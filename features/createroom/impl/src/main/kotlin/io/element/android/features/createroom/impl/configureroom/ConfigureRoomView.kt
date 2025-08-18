@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -57,7 +56,6 @@ import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
-import io.element.android.libraries.matrix.ui.components.SelectedUsersRowList
 import io.element.android.libraries.matrix.ui.components.UnsavedAvatar
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -105,21 +103,6 @@ fun ConfigureRoomView(
                 onAvatarClick = ::onAvatarClick,
                 onChangeRoomName = { state.eventSink(ConfigureRoomEvents.RoomNameChanged(it)) },
             )
-            /*RoomTopic(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                topic = state.config.topic.orEmpty(),
-                onTopicChange = { state.eventSink(ConfigureRoomEvents.TopicChanged(it)) },
-            )*/
-            if (state.config.invites.isNotEmpty()) {
-                SelectedUsersRowList(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    selectedUsers = state.config.invites,
-                    onUserRemove = {
-                        focusManager.clearFocus()
-                        state.eventSink(ConfigureRoomEvents.RemoveUserFromSelection(it))
-                    },
-                )
-            }
             RoomVisibilityOptions(
                 selected = when (state.config.roomVisibility) {
                     is RoomVisibilityState.Private -> RoomVisibilityItem.Private
@@ -130,7 +113,12 @@ fun ConfigureRoomView(
                     state.eventSink(ConfigureRoomEvents.RoomVisibilityChanged(it))
                 },
             )
-            /*if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
+            /*RoomTopic(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                topic = state.config.topic.orEmpty(),
+                onTopicChange = { state.eventSink(ConfigureRoomEvents.TopicChanged(it)) },
+            )
+            if (state.config.roomVisibility is RoomVisibilityState.Public && state.isKnockFeatureEnabled) {
                 RoomAccessOptions(
                     selected = when (state.config.roomVisibility.roomAccess) {
                         RoomAccess.Anyone -> RoomAccessItem.Anyone

@@ -22,6 +22,7 @@ dependencies {
     implementation(projects.zero)
     implementation(projects.features.home.impl)
     implementation(projects.features.createroom.api)
+    implementation(projects.features.startchat.api)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)
