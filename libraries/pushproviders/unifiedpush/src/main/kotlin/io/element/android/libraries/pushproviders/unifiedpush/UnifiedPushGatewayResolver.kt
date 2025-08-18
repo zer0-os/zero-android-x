@@ -12,6 +12,7 @@ import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.core.log.logger.LoggerTag
 import io.element.android.libraries.di.AppScope
+import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
@@ -49,7 +50,8 @@ class DefaultUnifiedPushGatewayResolver @Inject constructor(
         } else {
             val port = if (url.port != -1) ":${url.port}" else ""
             val customBase = "${url.protocol}://${url.host}$port"
-            val customUrl = "$customBase/_matrix/push/v1/notify"
+//            val customUrl = "$customBase/_matrix/push/v1/notify"
+            val customUrl = ZeroConfig.environment.matrixPushGateway
             Timber.tag(loggerTag.value).i("Testing $customUrl")
             return withContext(coroutineDispatchers.io) {
                 val api = unifiedPushApiFactory.create(customBase)

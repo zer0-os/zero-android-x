@@ -244,7 +244,10 @@ class RoomListPresenter @Inject constructor(
                     securityBannerState = securityBannerState,
                     fullScreenIntentPermissionsState = fullScreenIntentPermissionsPresenter.present(),
                     batteryOptimizationState = batteryOptimizationPresenter.present(),
-                    summaries = roomSummaries.dataOrNull().orEmpty().toPersistentList(),
+                    summaries = roomSummaries.dataOrNull()
+                        .orEmpty()
+                        .distinctBy { it.roomId }
+                        .toPersistentList(),
                     seenRoomInvites = seenRoomInvites.toPersistentSet(),
                 )
             }

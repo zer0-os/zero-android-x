@@ -409,11 +409,11 @@ private fun StandardLayout(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        if (isRoomEncrypted == false) {
-            Spacer(Modifier.height(16.dp))
-            NotEncryptedBadge()
-            Spacer(Modifier.height(4.dp))
-        }
+//        if (isRoomEncrypted == false) {
+//            Spacer(Modifier.height(16.dp))
+//            NotEncryptedBadge()
+//            Spacer(Modifier.height(4.dp))
+//        }
         Row(verticalAlignment = Alignment.Bottom) {
             if (voiceMessageState !is VoiceMessageState.Idle) {
                 if (voiceMessageState is VoiceMessageState.Preview || voiceMessageState is VoiceMessageState.Recording) {

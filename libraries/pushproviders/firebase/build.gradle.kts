@@ -58,6 +58,7 @@ dependencies {
     implementation(projects.libraries.uiStrings)
     implementation(projects.libraries.troubleshoot.api)
     implementation(projects.services.toolbox.api)
+    implementation(projects.zero)
 
     implementation(projects.libraries.pushstore.api)
     implementation(projects.libraries.pushproviders.api)

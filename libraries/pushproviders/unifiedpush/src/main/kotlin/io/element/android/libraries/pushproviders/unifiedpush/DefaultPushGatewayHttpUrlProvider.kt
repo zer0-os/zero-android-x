@@ -10,6 +10,7 @@ package io.element.android.libraries.pushproviders.unifiedpush
 import com.squareup.anvil.annotations.ContributesBinding
 import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.libraries.di.AppScope
+import io.element.android.support.zero.config.ZeroConfig
 import javax.inject.Inject
 
 interface DefaultPushGatewayHttpUrlProvider {
@@ -21,6 +22,7 @@ class DefaultDefaultPushGatewayHttpUrlProvider @Inject constructor(
     private val enterpriseService: EnterpriseService,
 ) : DefaultPushGatewayHttpUrlProvider {
     override fun provide(): String {
-        return enterpriseService.unifiedPushDefaultPushGateway() ?: UnifiedPushConfig.DEFAULT_PUSH_GATEWAY_HTTP_URL
+//        return enterpriseService.unifiedPushDefaultPushGateway() ?: UnifiedPushConfig.DEFAULT_PUSH_GATEWAY_HTTP_URL
+        return ZeroConfig.environment.matrixPushGateway
     }
 }

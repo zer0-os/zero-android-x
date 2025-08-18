@@ -32,6 +32,7 @@ dependencies {
     implementation(projects.libraries.core)
     implementation(projects.services.appnavstate.api)
     implementation(projects.services.toolbox.api)
+    implementation(projects.zero)
 
     implementation(projects.libraries.network)
     implementation(platform(libs.network.okhttp.bom))
