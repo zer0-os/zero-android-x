@@ -43,6 +43,15 @@
 
 -keep class io.element.android.x.di.** { *; }
 
+
+# Keep LogSessionId class and related classes (https://github.com/androidx/media/issues/2535)
+-keep class android.media.metrics.LogSessionId { *; }
+-keep class android.media.metrics.** { *; }
+
+# Keep Media3 classes that use reflection (https://github.com/androidx/media/issues/2535)
+-keep class androidx.media3.** { *; }
+-dontwarn android.media.metrics.**
+
 # Needed for Web3-WalletConnect
 -keepnames class com.fasterxml.jackson.** { *; }
 -dontwarn com.fasterxml.jackson.databind.**

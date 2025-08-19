@@ -52,8 +52,8 @@ private const val versionPatch = 9
 object Versions {
     const val VERSION_CODE = 84
     const val VERSION_NAME = "$versionMajor.$versionMinor.$versionPatch"
-    const val COMPILE_SDK = 35
-    const val TARGET_SDK = 35
+    const val COMPILE_SDK = 36
+    const val TARGET_SDK = 36
 
     // When updating the `minSdk`, make sure to update the value of `minSdkVersion` in the file `tools/release/release.sh`
     private const val MIN_SDK_FOSS = 24

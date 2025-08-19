@@ -31,7 +31,7 @@ fun MatrixUserRow(
     subtext = matrixUser.zIdOrWalletAddressDisplay,
     showProSubscriberBadge = matrixUser.isZeroProSubscriber,
     modifier = modifier,
-    trailingContent,
+    trailingContent = trailingContent,
 )
 
 @PreviewsDayNight

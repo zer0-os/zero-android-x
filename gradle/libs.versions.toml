@@ -3,7 +3,7 @@
 
 [versions]
 # Project
-android_gradle_plugin = "8.12.0"
+android_gradle_plugin = "8.12.1"
 # When updateing this, please also update the version in the file ./idea/kotlinc.xml
 kotlin = "2.2.10"
 kotlinpoet = "2.2.0"
@@ -11,7 +11,7 @@ ksp = "2.2.10-2.0.2"
 firebaseAppDistribution = "5.1.1"
 
 # AndroidX
-core = "1.16.0"
+core = "1.17.0"
 datastore = "1.1.7"
 constraintlayout = "2.2.1"
 constraintlayout_compose = "1.1.1"
@@ -96,7 +96,7 @@ androidx_camera_view = { module = "androidx.camera:camera-view", version.ref = "
 androidx_camera_camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
 
 androidx_recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
-androidx_browser = "androidx.browser:browser:1.8.0"
+androidx_browser = "androidx.browser:browser:1.9.0"
 androidx_lifecycle_runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx_lifecycle_process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
 androidx_splash = "androidx.core:core-splashscreen:1.0.1"
@@ -191,7 +191,6 @@ matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose",
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
-sqlcipher = "net.zetetic:sqlcipher-android:4.10.0"
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
 sqlite = "androidx.sqlite:sqlite-ktx:2.5.2"
 unifiedpush = "org.unifiedpush.android:connector:3.0.10"

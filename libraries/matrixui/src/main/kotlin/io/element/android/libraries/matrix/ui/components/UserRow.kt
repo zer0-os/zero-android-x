@@ -36,6 +36,7 @@ internal fun UserRow(
     avatarData: AvatarData,
     name: String,
     subtext: String?,
+    enabled: Boolean = true,
     showProSubscriberBadge: Boolean,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (() -> Unit)? = null,
@@ -63,7 +64,7 @@ internal fun UserRow(
                     text = name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = ElementTheme.colors.textPrimary,
+                    color = if (enabled) ElementTheme.colors.textPrimary else ElementTheme.colors.textDisabled,
                     style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 )
                 if (showProSubscriberBadge) {
@@ -81,7 +82,7 @@ internal fun UserRow(
             subtext?.let {
                 Text(
                     text = subtext,
-                    color = ElementTheme.colors.textSecondary,
+                    color = if (enabled) ElementTheme.colors.textSecondary else ElementTheme.colors.textDisabled,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = ElementTheme.zeroTypography.fontBodySmRegular,
