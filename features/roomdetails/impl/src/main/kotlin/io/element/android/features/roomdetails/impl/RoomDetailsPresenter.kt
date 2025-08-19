@@ -169,7 +169,8 @@ class RoomDetailsPresenter @Inject constructor(
         val securityAndPrivacyPermissions = room.securityAndPrivacyPermissionsAsState(syncUpdateFlow.value)
         val canShowSecurityAndPrivacy by remember {
             derivedStateOf {
-                isKnockRequestsEnabled && roomType is RoomDetailsType.Room && securityAndPrivacyPermissions.value.hasAny
+//                isKnockRequestsEnabled && roomType is RoomDetailsType.Room && securityAndPrivacyPermissions.value.hasAny
+                roomType is RoomDetailsType.Room && securityAndPrivacyPermissions.value.hasAny
             }
         }
 

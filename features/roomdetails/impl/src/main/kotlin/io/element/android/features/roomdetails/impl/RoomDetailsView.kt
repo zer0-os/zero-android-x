@@ -205,11 +205,11 @@ fun RoomDetailsView(
                     }
                 )
 
-//                if (state.canShowSecurityAndPrivacy) {
-//                    SecurityAndPrivacyItem(
-//                        onClick = onSecurityAndPrivacyClick
-//                    )
-//                }
+                if (state.canShowSecurityAndPrivacy) {
+                    SecurityAndPrivacyItem(
+                        onClick = onSecurityAndPrivacyClick
+                    )
+                }
 
                 state.roomMemberDetailsState?.let { dmMemberDetails ->
                     ProfileItem(
@@ -395,7 +395,7 @@ private fun MainActionsSection(
                 imageVector = CompoundIcons.VideoCall(),
                 onClick = onCall,
             )
-        }
+        }*/
         if (state.roomType is RoomDetailsType.Room) {
             if (state.canInvite) {
                 MainActionButton(
@@ -404,13 +404,13 @@ private fun MainActionsSection(
                     onClick = onInvitePeople,
                 )
             }
-            // Share CTA should be hidden for DMs
+            /*// Share CTA should be hidden for DMs
             MainActionButton(
                 title = stringResource(CommonStrings.action_share),
                 imageVector = CompoundIcons.ShareAndroid(),
                 onClick = onShareRoom
-            )
-        }*/
+            )*/
+        }
     }
 }
 
