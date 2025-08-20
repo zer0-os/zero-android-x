@@ -27,7 +27,7 @@ data class HomeStakePool(
     val tokenAddress: String,
     val totalStakedAmount: Double,
     val myStakeAmount: Double,
-    val pendingRewards: String,
+    val pendingRewards: Double,
 ) {
     val totalStakedAmountFormatted: String
         get() = ZeroWalletUtil.getFormattedNumber(totalStakedAmount)
@@ -44,7 +44,7 @@ data class HomeStakePool(
             val totalStakedAmountRefPrice = ZeroWalletUtil.getBalance(totalStakedAmount, meowPrice)
             val myStakedAmount = RewardsUtil.parseCredits(stakingStatus.amountStaked, 18)
             val myStakedAmountRefPrice = ZeroWalletUtil.getBalance(myStakedAmount, meowPrice)
-
+            val pendingRewards = RewardsUtil.parseCredits(rewardsInfo.pendingRewards, 18)
             return HomeStakePool(
                 userWalletAddress = userAddress,
                 poolAddress = poolAddress,
@@ -55,7 +55,7 @@ data class HomeStakePool(
                 tokenAddress = token.tokenAddress,
                 totalStakedAmount = totalStakedAmountRefPrice,
                 myStakeAmount = myStakedAmountRefPrice,
-                pendingRewards = rewardsInfo.pendingRewards
+                pendingRewards = pendingRewards
             )
         }
     }

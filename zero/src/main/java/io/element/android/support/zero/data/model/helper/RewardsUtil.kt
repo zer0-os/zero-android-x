@@ -41,8 +41,13 @@ object RewardsUtil {
     fun parseCredits(credits: String, decimals: Int): Double {
         return try {
             if (credits.isBlank()) return 0.0
-            val delimiter = (credits.length - decimals).coerceAtLeast(1) // prevent negative or 0
-            val intPart = credits.substring(0, delimiter)
+            val mCredits = if (credits.length < 18) {
+                "0".repeat(18 - credits.length) + credits  // prepend zeros
+            } else {
+                credits
+            }
+            val delimiter = (mCredits.length - decimals).coerceAtLeast(1) // prevent negative or 0
+            val intPart = mCredits.substring(0, delimiter)
             val result = intPart.toDoubleOrNull()
             result ?: 0.0
         } catch (e: Exception) {

@@ -61,6 +61,7 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
 import io.element.android.support.zero.common.ui.TransactionInProgressView
@@ -166,9 +167,8 @@ fun PoolDetailsView(
     val stakeTokenName = pool.stakeTokenInfo.name.uppercase()
     val rewardTokenName = pool.rewardsTokenInfo.name.uppercase()
     /// Need to check this value
-    val claimableRewardsToken = "0"
-//    val claimableRewardsToken = pool.claimableRewardValue
-    val hasClaimableRewards = false
+    val claimableRewardsToken = pool.poolInfo.pendingRewards
+    val hasClaimableRewards = claimableRewardsToken > 0
 
     Column(horizontalAlignment = Alignment.Start) {
         Text(
@@ -230,7 +230,7 @@ fun PoolDetailsView(
             Row(Modifier.align(Alignment.Center)) {
                 DetailBorderedCell(
                     title = "Claimable Rewards $rewardTokenName",
-                    subTitle = claimableRewardsToken
+                    subTitle = ZeroWalletUtil.getFormattedNumber(claimableRewardsToken)
                 )
             }
             if (hasClaimableRewards) {

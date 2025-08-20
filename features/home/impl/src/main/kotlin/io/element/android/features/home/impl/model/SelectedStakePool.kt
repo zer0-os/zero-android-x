@@ -21,15 +21,6 @@ data class SelectedStakePool(
     val rewardsTokenInfo: ZeroWalletTokenInfo,
     val rewardsTokenBalance: ZeroWalletTokenBalance
 ) {
-    val claimableRewardValue: String
-        get() = ZeroWalletUtil.getFormattedNumber(
-            count = RewardsUtil.parseCredits(
-//                rewardsTokenBalance.balance,
-                poolInfo.pendingRewards,
-                rewardsTokenInfo.decimals
-            )
-        )
-
     val myStakedTokens: Double
         get() = RewardsUtil.parseCredits(
             poolInfo.tokenAmount,
