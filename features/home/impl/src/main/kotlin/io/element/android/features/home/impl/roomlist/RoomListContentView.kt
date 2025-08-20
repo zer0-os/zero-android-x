@@ -223,7 +223,7 @@ private fun RoomsViewList(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
-        when (state.securityBannerState) {
+        /*when (state.securityBannerState) {
             SecurityBannerState.SetUpRecovery -> {
                 item {
                     SetUpRecoveryKeyBanner(
@@ -233,7 +233,7 @@ private fun RoomsViewList(
                 }
             }
             else -> {}
-            /*SecurityBannerState.RecoveryKeyConfirmation -> {
+            SecurityBannerState.RecoveryKeyConfirmation -> {
                 item {
                     ConfirmRecoveryKeyBanner(
                         onContinueClick = onConfirmRecoveryKeyClick,
@@ -249,8 +249,8 @@ private fun RoomsViewList(
                 item {
                     BatteryOptimizationBanner(state = state.batteryOptimizationState)
                 }
-            }*/
-        }
+            }
+        }*/
 
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.

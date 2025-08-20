@@ -14,6 +14,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.support.zero.config.ZeroConfig
 import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @Immutable
@@ -24,7 +25,6 @@ data class HomeStakePool(
     val poolDisplayName: String,
     val tokenAmount: String,
     val tokenIcon: String?,
-    val tokenAddress: String,
     val totalStakedAmount: Double,
     val myStakeAmount: Double,
     val pendingRewards: Double,
@@ -36,8 +36,8 @@ data class HomeStakePool(
 
     companion object {
         fun from(
-            userAddress: String, poolAddress: String, token: ZeroWalletToken,
-            meowPrice: ZeroMeowPrice, totalStakedAmount: String, stakingConfig: ZeroStakingConfig,
+            userAddress: String, poolAddress: String, meowPrice: ZeroMeowPrice,
+            totalStakedAmount: String, stakingConfig: ZeroStakingConfig,
             stakingStatus: ZeroStakingStatus, rewardsInfo: ZeroStakingUserRewardsInfo
         ): HomeStakePool {
             val totalStakedAmount = RewardsUtil.parseCredits(totalStakedAmount, 18)
@@ -48,11 +48,10 @@ data class HomeStakePool(
             return HomeStakePool(
                 userWalletAddress = userAddress,
                 poolAddress = poolAddress,
-                poolIcon = token.logo,
-                poolDisplayName = "${token.symbol.uppercase()} Pool",
+                poolIcon = ZeroConfig.MEOW_ICON_URL,
+                poolDisplayName = ZeroConfig.MEOW_POOL_NAME,
                 tokenAmount = stakingStatus.amountStaked,
-                tokenIcon = token.logo,
-                tokenAddress = token.tokenAddress,
+                tokenIcon = ZeroConfig.MEOW_ICON_URL,
                 totalStakedAmount = totalStakedAmountRefPrice,
                 myStakeAmount = myStakedAmountRefPrice,
                 pendingRewards = pendingRewards

@@ -73,7 +73,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
-import io.element.android.libraries.matrix.api.zero.wallet.isMeowToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
@@ -149,7 +148,6 @@ class HomePresenter @Inject constructor(
 
         val showWalletBalance = remember { mutableStateOf(true) }
         val userWalletBalance = remember { mutableDoubleStateOf(0.0) }
-        val meowToken: MutableState<ZeroWalletToken?> = remember { mutableStateOf(null) }
         val meowPrice: MutableState<ZeroMeowPrice?> = remember { mutableStateOf(null) }
         val walletTokensListState: MutableState<WalletTokensListState> = remember {
             mutableStateOf(WalletTokensListState.Skeleton(10))
@@ -169,9 +167,8 @@ class HomePresenter @Inject constructor(
 
         val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
             coroutineScope.fetchWalletData(
-                meowPrice, meowToken, walletAddress,
-                userWalletBalance, walletStakingContent,
-                walletTokensListState, walletTransactionsListState,
+                meowPrice, walletAddress, userWalletBalance,
+                walletStakingContent, walletTokensListState, walletTransactionsListState,
                 walletTokenPaginationParams, walletTransactionsPaginationParams
             )
         }
@@ -296,12 +293,12 @@ class HomePresenter @Inject constructor(
                 }
                 is HomeEvents.StakeAmount -> {
                     selectedStakePool.value?.let {
-                        coroutineScope.stakeAmount(it.poolInfo, event.amount, walletStakeActionState)
+                        coroutineScope.stakeAmount(it, event.amount, walletStakeActionState)
                     }
                 }
                 is HomeEvents.UnstakeAmount -> {
                     selectedStakePool.value?.let {
-                        coroutineScope.unstakeAmount(it.poolInfo, event.amount, walletStakeActionState)
+                        coroutineScope.unstakeAmount(it, event.amount, walletStakeActionState)
                     }
                 }
                 HomeEvents.DismissStakingSheet -> {
@@ -319,10 +316,8 @@ class HomePresenter @Inject constructor(
                             genericActionState = genericActionState,
                             onDone = {
                                 val walletAddress = client.userProfile.value.walletAddress ?: return@claimStakingRewards
-                                val meowToken = meowToken.value ?: return@claimStakingRewards
                                 fetchStakingData(
                                     stakePoolsContent = walletStakingContent,
-                                    meowToken = meowToken,
                                     meowPrice = meowPrice.value,
                                     userAddress = walletAddress,
                                     refreshAllData = true,
@@ -679,7 +674,6 @@ class HomePresenter @Inject constructor(
 
     private fun CoroutineScope.fetchWalletData(
         meowPrice: MutableState<ZeroMeowPrice?>,
-        meowTokenState: MutableState<ZeroWalletToken?>,
         walletAddress: String,
         userWalletBalance: MutableDoubleState,
         stakePoolsContent: MutableState<List<HomeStakePool>>,
@@ -700,10 +694,7 @@ class HomePresenter @Inject constructor(
             it.onSuccess { result ->
                 val tokensList = result.tokens
                 setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
-                tokensList.firstOrNull { token -> token.isMeowToken }?.let { meowToken ->
-                    meowTokenState.value = meowToken
-                    fetchStakingData(stakePoolsContent, meowToken, meowPrice.value, walletAddress)
-                }
+                fetchStakingData(stakePoolsContent, meowPrice.value, walletAddress)
                 walletTokensListState.value = WalletTokensListState.Tokens(
                     tokensList
                         .distinctBy { token -> token.tokenAddress }
@@ -822,7 +813,6 @@ class HomePresenter @Inject constructor(
 
     private fun fetchStakingData(
         stakePoolsContent: MutableState<List<HomeStakePool>>,
-        meowToken: ZeroWalletToken,
         meowPrice: ZeroMeowPrice?,
         userAddress: String,
         refreshAllData: Boolean = false,
@@ -850,7 +840,6 @@ class HomePresenter @Inject constructor(
                         userAddress = userAddress,
                         poolAddress = poolAddress,
                         meowPrice = price,
-                        token = meowToken,
                         totalStakedAmount = totalStaked,
                         stakingConfig = stakingConfig,
                         stakingStatus = stakeStatus,
@@ -935,17 +924,17 @@ class HomePresenter @Inject constructor(
     }
 
     private fun CoroutineScope.stakeAmount(
-        pool: HomeStakePool,
+        stakePool: SelectedStakePool,
         amount: String,
         walletStakeActionState: MutableState<AsyncAction<String>>
     ) = launch {
         walletStakeActionState.value = AsyncAction.Loading
         val transactionAmount = amount.toDoubleOrNull() ?: 0.0
         client.stakeAmount(
-            userAddress = pool.userWalletAddress,
+            userAddress = stakePool.poolInfo.userWalletAddress,
             amount = toSmallestUnit(transactionAmount, 18),
-            poolAddress = pool.poolAddress,
-            tokenAddress = pool.tokenAddress
+            poolAddress = stakePool.poolInfo.poolAddress,
+            tokenAddress = stakePool.stakeTokenInfo.address
         ).onSuccess {
             walletStakeActionState.value = AsyncAction.Success(it)
         }.onFailure {
@@ -954,16 +943,16 @@ class HomePresenter @Inject constructor(
     }
 
     private fun CoroutineScope.unstakeAmount(
-        pool: HomeStakePool,
+        stakePool: SelectedStakePool,
         amount: String,
         walletStakeActionState: MutableState<AsyncAction<String>>
     ) = launch {
         walletStakeActionState.value = AsyncAction.Loading
         val transactionAmount = amount.toDoubleOrNull() ?: 0.0
         client.unstakeAmount(
-            userAddress = pool.userWalletAddress,
+            userAddress = stakePool.poolInfo.userWalletAddress,
             amount = toSmallestUnit(transactionAmount, 18),
-            poolAddress = pool.poolAddress
+            poolAddress = stakePool.poolInfo.poolAddress,
         ).onSuccess {
             walletStakeActionState.value = AsyncAction.Success(it)
         }.onFailure {
