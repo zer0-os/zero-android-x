@@ -15,6 +15,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -115,7 +116,7 @@ class ThreadedMessagesNode @AssistedInject constructor(
     interface Callback : Plugin {
         fun onEventClick(timelineMode: Timeline.Mode, event: TimelineItem.Event): Boolean
         fun onPreviewAttachments(attachments: ImmutableList<Attachment>)
-        fun onUserDataClick(userId: UserId)
+        fun onUserDataClick(userId: UserId, primaryZId: String?)
         fun onPermalinkClick(data: PermalinkData)
         fun onShowEventDebugInfoClick(eventId: EventId?, debugInfo: TimelineItemDebugInfo)
         fun onForwardEventClick(eventId: EventId)
@@ -148,8 +149,8 @@ class ThreadedMessagesNode @AssistedInject constructor(
             .orFalse()
     }
 
-    private fun onUserDataClick(userId: UserId) {
-        callbacks.forEach { it.onUserDataClick(userId) }
+    private fun onUserDataClick(userId: UserId, primaryZId: String?) {
+        callbacks.forEach { it.onUserDataClick(userId, primaryZId) }
     }
 
     private fun onLinkClick(
@@ -163,7 +164,7 @@ class ThreadedMessagesNode @AssistedInject constructor(
             is PermalinkData.UserLink -> {
                 // Open the room member profile, it will fallback to
                 // the user profile if the user is not in the room
-                callbacks.forEach { it.onUserDataClick(permalink.userId) }
+                callbacks.forEach { it.onUserDataClick(permalink.userId, primaryZId = null) }
             }
             is PermalinkData.RoomLink -> {
                 handleRoomLinkClick(permalink, eventSink)
@@ -241,6 +242,7 @@ class ThreadedMessagesNode @AssistedInject constructor(
 
     @Composable
     override fun View(modifier: Modifier) {
+        val localCoroutineScope = rememberCoroutineScope()
         val activity = requireNotNull(LocalActivity.current)
         val isDark = ElementTheme.isLightTheme.not()
         CompositionLocalProvider(
@@ -269,7 +271,9 @@ class ThreadedMessagesNode @AssistedInject constructor(
                         }
                     }
                 },
-                onUserDataClick = this::onUserDataClick,
+                onUserDataClick = { userId ->
+                    localCoroutineScope.getUserInfo(userId)
+                },
                 onLinkClick = { url, customTab ->
                     onLinkClick(
                         activity,
@@ -298,5 +302,15 @@ class ThreadedMessagesNode @AssistedInject constructor(
                 focusedEventId = null
             }
         }
+    }
+
+    private fun CoroutineScope.getUserInfo(userId: UserId) = launch {
+        room.getUpdatedMember(userId)
+            .onSuccess { user ->
+                onUserDataClick(userId, user.primaryZId)
+            }
+            .onFailure {
+                onUserDataClick(userId, null)
+            }
     }
 }

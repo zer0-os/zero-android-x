@@ -42,14 +42,17 @@ object RewardsUtil {
         return try {
             if (credits.isBlank()) return 0.0
             val mCredits = if (credits.length < 18) {
-                "0".repeat(18 - credits.length) + credits  // prepend zeros
+                "0".repeat(18 - credits.length) + credits  // pad with leading zeros
             } else {
                 credits
             }
-            val delimiter = (mCredits.length - decimals).coerceAtLeast(1) // prevent negative or 0
-            val intPart = mCredits.substring(0, delimiter)
-            val result = intPart.toDoubleOrNull()
-            result ?: 0.0
+            val delimiter = mCredits.length - decimals
+            if (delimiter < 0) return 0.0
+
+            val prefixPart = mCredits.substring(0, delimiter)
+            val suffixPart = mCredits.drop(delimiter).take(2) // take 2 decimals like Swift
+            val value = "$prefixPart.$suffixPart"
+            value.toDoubleOrNull() ?: 0.0
         } catch (e: Exception) {
             0.0
         }

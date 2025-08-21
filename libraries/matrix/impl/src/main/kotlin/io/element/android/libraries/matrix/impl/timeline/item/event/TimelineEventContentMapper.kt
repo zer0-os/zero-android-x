@@ -120,73 +120,73 @@ class TimelineEventContentMapper(
             }
         }
     }
-}
 
-private fun getActualEventContent(
-    it: TimelineItemContent.MsgLike,
-    eventMessageMapper: EventMessageMapper
-): EventContent {
-    return when (val kind = it.content.kind) {
-        is MsgLikeKind.Message -> {
-            val inReplyTo = it.content.inReplyTo
-            val threadSummary = it.content.threadSummary?.use { summary ->
-                                val numberOfReplies = summary.numReplies().toLong()
-                                val latestEvent = summary.latestEvent()
-                                val details = when (latestEvent) {
-                                    is EmbeddedEventDetails.Unavailable -> AsyncData.Uninitialized
-                                    is EmbeddedEventDetails.Pending -> AsyncData.Loading()
-                                    is EmbeddedEventDetails.Error -> AsyncData.Failure(IllegalStateException(latestEvent.message))
-                                    is EmbeddedEventDetails.Ready -> {
-                                        AsyncData.Success(
-                                            EmbeddedEventInfo(
-                                                eventOrTransactionId = latestEvent.eventOrTransactionId.map(),
-                                                content = map(latestEvent.content),
-                                                senderId = UserId(latestEvent.sender),
-                                                senderProfile = latestEvent.senderProfile.map(),
-                                                timestamp = latestEvent.timestamp.toLong()
-                                            )
-                                        )
-                                    }
-                                }
-                                ThreadSummary(
-                                    latestEvent = details,
-                                    numberOfReplies = numberOfReplies,
+    private fun getActualEventContent(
+        it: TimelineItemContent.MsgLike,
+        eventMessageMapper: EventMessageMapper
+    ): EventContent {
+        return when (val kind = it.content.kind) {
+            is MsgLikeKind.Message -> {
+                val inReplyTo = it.content.inReplyTo
+                val threadSummary = it.content.threadSummary?.use { summary ->
+                    val numberOfReplies = summary.numReplies().toLong()
+                    val latestEvent = summary.latestEvent()
+                    val details = when (latestEvent) {
+                        is EmbeddedEventDetails.Unavailable -> AsyncData.Uninitialized
+                        is EmbeddedEventDetails.Pending -> AsyncData.Loading()
+                        is EmbeddedEventDetails.Error -> AsyncData.Failure(IllegalStateException(latestEvent.message))
+                        is EmbeddedEventDetails.Ready -> {
+                            AsyncData.Success(
+                                EmbeddedEventInfo(
+                                    eventOrTransactionId = latestEvent.eventOrTransactionId.map(),
+                                    content = map(latestEvent.content),
+                                    senderId = UserId(latestEvent.sender),
+                                    senderProfile = latestEvent.senderProfile.map(),
+                                    timestamp = latestEvent.timestamp.toLong()
                                 )
-                            }
-                            val threadInfo = EventThreadInfo(
-                                threadRootId = it.content.threadRoot?.let(::ThreadId),
-                                threadSummary = threadSummary,
                             )
-            eventMessageMapper.map(kind, inReplyTo, threadInfo)
-        }
-        is MsgLikeKind.Redacted -> {
-            RedactedContent
-        }
-        is MsgLikeKind.Poll -> {
-            PollContent(
-                question = kind.question,
-                kind = kind.kind.map(),
-                maxSelections = kind.maxSelections,
-                answers = kind.answers.map { answer -> answer.map() }.toImmutableList(),
-                votes = kind.votes.mapValues { vote ->
-                    vote.value.map { userId -> UserId(userId) }.toImmutableList()
-                }.toImmutableMap(),
-                endTime = kind.endTime,
-                isEdited = kind.hasBeenEdited,
-            )
-        }
-        is MsgLikeKind.UnableToDecrypt -> {
-            UnableToDecryptContent(
-                data = kind.msg.map()
-            )
-        }
-        is MsgLikeKind.Sticker -> {
-            StickerContent(
-                filename = kind.body,
-                body = null,
-                info = kind.info.map(),
-                source = kind.source.map(),
-            )
+                        }
+                    }
+                    ThreadSummary(
+                        latestEvent = details,
+                        numberOfReplies = numberOfReplies,
+                    )
+                }
+                val threadInfo = EventThreadInfo(
+                    threadRootId = it.content.threadRoot?.let(::ThreadId),
+                    threadSummary = threadSummary,
+                )
+                eventMessageMapper.map(kind, inReplyTo, threadInfo)
+            }
+            is MsgLikeKind.Redacted -> {
+                RedactedContent
+            }
+            is MsgLikeKind.Poll -> {
+                PollContent(
+                    question = kind.question,
+                    kind = kind.kind.map(),
+                    maxSelections = kind.maxSelections,
+                    answers = kind.answers.map { answer -> answer.map() }.toImmutableList(),
+                    votes = kind.votes.mapValues { vote ->
+                        vote.value.map { userId -> UserId(userId) }.toImmutableList()
+                    }.toImmutableMap(),
+                    endTime = kind.endTime,
+                    isEdited = kind.hasBeenEdited,
+                )
+            }
+            is MsgLikeKind.UnableToDecrypt -> {
+                UnableToDecryptContent(
+                    data = kind.msg.map()
+                )
+            }
+            is MsgLikeKind.Sticker -> {
+                StickerContent(
+                    filename = kind.body,
+                    body = null,
+                    info = kind.info.map(),
+                    source = kind.source.map(),
+                )
+            }
         }
     }
 }

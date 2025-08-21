@@ -422,8 +422,8 @@ class MessagesFlowNode @AssistedInject constructor(
                         ))
                     }
 
-                    override fun onUserDataClick(userId: UserId) {
-                        callbacks.forEach { it.onUserDataClick(userId) }
+                    override fun onUserDataClick(userId: UserId, primaryZId: String?) {
+                        callbacks.forEach { it.onUserDataClick(userId, primaryZId) }
                     }
 
                     override fun onPermalinkClick(data: PermalinkData) {

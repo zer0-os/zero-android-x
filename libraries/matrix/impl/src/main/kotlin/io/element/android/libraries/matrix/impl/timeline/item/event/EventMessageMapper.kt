@@ -78,7 +78,7 @@ class EventMessageMapper {
                 body = content.body.orEmpty(),
                 inReplyTo = null,
                 isEdited = false,
-                threadInfo = null,
+                threadInfo = EventThreadInfo(threadRootId = null, threadSummary = null),
                 type = type
             )
         } else {
