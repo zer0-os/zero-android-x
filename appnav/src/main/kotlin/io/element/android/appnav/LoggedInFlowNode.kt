@@ -90,6 +90,7 @@ import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
+import io.element.android.libraries.push.api.notifications.conversations.NotificationConversationService
 import io.element.android.services.appnavstate.api.AppNavigationStateService
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -133,6 +134,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val mediaPreviewConfigMigration: MediaPreviewConfigMigration,
     private val sessionEnterpriseService: SessionEnterpriseService,
     private val networkMonitor: NetworkMonitor,
+    private val notificationConversationService: NotificationConversationService,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
@@ -231,6 +233,12 @@ class LoggedInFlowNode @AssistedInject constructor(
                         }
                     }
                     .launchIn(lifecycleScope)
+            },
+            onResume = {
+                lifecycleScope.launch {
+                    val availableRoomIds = matrixClient.getJoinedRoomIds().getOrNull() ?: return@launch
+                    notificationConversationService.onAvailableRoomsChanged(sessionId = matrixClient.sessionId, roomIds = availableRoomIds)
+                }
             },
             onDestroy = {
                 appNavigationStateService.onLeavingSpace(id)

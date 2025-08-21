@@ -26,7 +26,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 
 @Composable
-fun RoomPreviewMembersCountMolecule(
+fun MembersCountMolecule(
     memberCount: Long,
     modifier: Modifier = Modifier,
 ) {
@@ -52,13 +52,13 @@ fun RoomPreviewMembersCountMolecule(
 
 @PreviewsDayNight
 @Composable
-internal fun RoomPreviewMembersCountMoleculePreview() = ElementPreview {
+internal fun MembersCountMoleculePreview() = ElementPreview {
     Column(
         modifier = Modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        RoomPreviewMembersCountMolecule(memberCount = 1)
-        RoomPreviewMembersCountMolecule(memberCount = 888)
-        RoomPreviewMembersCountMolecule(memberCount = 123_456)
+        MembersCountMolecule(memberCount = 1)
+        MembersCountMolecule(memberCount = 888)
+        MembersCountMolecule(memberCount = 123_456)
     }
 }

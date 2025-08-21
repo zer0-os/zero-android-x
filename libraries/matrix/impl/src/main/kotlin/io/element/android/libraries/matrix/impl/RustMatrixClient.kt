@@ -15,6 +15,7 @@ import io.element.android.libraries.core.coroutine.mapState
 import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.core.extensions.mapFailure
 import io.element.android.libraries.core.extensions.runCatchingExceptions
+import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.DeviceId
 import io.element.android.libraries.matrix.api.core.RoomAlias
@@ -145,6 +146,7 @@ import org.matrix.rustcomponents.sdk.AuthDataPasswordDetails
 import org.matrix.rustcomponents.sdk.Client
 import org.matrix.rustcomponents.sdk.ClientException
 import org.matrix.rustcomponents.sdk.IgnoredUsersListener
+import org.matrix.rustcomponents.sdk.Membership
 import org.matrix.rustcomponents.sdk.NotificationProcessSetup
 import org.matrix.rustcomponents.sdk.PowerLevels
 import org.matrix.rustcomponents.sdk.RoomInfoListener
@@ -173,6 +175,7 @@ class RustMatrixClient(
     baseCacheDirectory: File,
     clock: SystemClock,
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
+    private val featureFlagService: FeatureFlagService,
     val zeroCoreRepository: ZeroCoreRepository?
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
@@ -245,6 +248,7 @@ class RustMatrixClient(
         timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
         roomMembershipObserver = roomMembershipObserver,
         roomInfoMapper = roomInfoMapper,
+        featureFlagService = featureFlagService,
         zeroCoreRepository = zeroCoreRepository
     )
 
@@ -325,6 +329,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getRoom(roomId: RoomId): BaseRoom? = withContext(sessionDispatcher) {
+        innerClient.rooms()
         roomFactory.getBaseRoom(roomId)
     }
 
@@ -356,6 +361,15 @@ class RustMatrixClient(
     override suspend fun findDM(userId: UserId): Result<RoomId?> = withContext(sessionDispatcher) {
         runCatchingExceptions {
             innerClient.getDmRoom(userId.value)?.use { RoomId(it.id()) }
+        }
+    }
+
+    override suspend fun getJoinedRoomIds(): Result<Set<RoomId>> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
+            innerClient.rooms()
+                .filter { it.membership() == Membership.JOINED }
+                .map { RoomId(it.id()) }
+                .toSet()
         }
     }
 

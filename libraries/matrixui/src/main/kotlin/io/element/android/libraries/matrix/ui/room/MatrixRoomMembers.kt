@@ -41,6 +41,11 @@ fun getRoomMemberAsState(roomMembersState: RoomMembersState, userId: UserId): St
 fun BaseRoom.getDirectRoomMember(roomMembersState: RoomMembersState): State<RoomMember?> {
     val roomMembers = roomMembersState.roomMembers()
     val roomInfo by roomInfoFlow.collectAsState()
+//    return remember {
+//        derivedStateOf {
+//            roomMembersState.getDirectRoomMember(roomInfo, sessionId)
+//        }
+//    }
     return remember(roomMembersState, roomInfo.isDirect) {
         derivedStateOf {
             roomMembers

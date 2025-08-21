@@ -17,6 +17,7 @@ import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UniqueId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.tombstone.PredecessorRoom
+import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.collections.immutable.ImmutableList
@@ -26,6 +27,7 @@ import kotlin.time.Duration
 data class TimelineState(
     val timelineItems: ImmutableList<TimelineItem>,
     val timelineRoomInfo: TimelineRoomInfo,
+    val timelineMode: Timeline.Mode,
     val renderReadReceipts: Boolean,
     val newEventState: NewEventState,
     val isLive: Boolean,
@@ -33,6 +35,7 @@ data class TimelineState(
     // If not null, info will be rendered in a dialog
     val messageShield: MessageShield?,
     val resolveVerifiedUserSendFailureState: ResolveVerifiedUserSendFailureState,
+    val displayThreadSummaries: Boolean,
     val linkPreviewMap: Map<UniqueId, ZeroLinkPreview>,
     val eventSink: (TimelineEvents) -> Unit,
 ) {

@@ -41,6 +41,7 @@ import io.element.android.libraries.dateformatter.api.DateFormatterMode
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.room.BaseRoom
+import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.data.model.helper.isRemoteGif
@@ -54,13 +55,18 @@ import kotlinx.coroutines.launch
 
 interface ActionListPresenter : Presenter<ActionListState> {
     interface Factory {
-        fun create(postProcessor: TimelineItemActionPostProcessor): ActionListPresenter
+        fun create(
+            postProcessor: TimelineItemActionPostProcessor,
+            timelineMode: Timeline.Mode,
+        ): ActionListPresenter
     }
 }
 
 class DefaultActionListPresenter @AssistedInject constructor(
     @Assisted
     private val postProcessor: TimelineItemActionPostProcessor,
+    @Assisted
+    private val timelineMode: Timeline.Mode,
     private val appPreferencesStore: AppPreferencesStore,
     private val room: BaseRoom,
     private val userSendFailureFactory: VerifiedUserSendFailureFactory,
@@ -69,7 +75,10 @@ class DefaultActionListPresenter @AssistedInject constructor(
     @AssistedFactory
     @ContributesBinding(RoomScope::class)
     interface Factory : ActionListPresenter.Factory {
-        override fun create(postProcessor: TimelineItemActionPostProcessor): DefaultActionListPresenter
+        override fun create(
+            postProcessor: TimelineItemActionPostProcessor,
+            timelineMode: Timeline.Mode,
+        ): DefaultActionListPresenter
     }
 
     private val comparator = TimelineItemActionComparator()
@@ -162,7 +171,7 @@ class DefaultActionListPresenter @AssistedInject constructor(
         }
         return buildSet {
             if (timelineItem.canBeRepliedTo && usersEventPermissions.canSendMessage && !isAGiphy) {
-                /*if (timelineItem.isThreaded) {
+                /*if (timelineMode !is Timeline.Mode.Thread && timelineItem.threadInfo.threadRootId != null) {
                     add(TimelineItemAction.ReplyInThread)
                 } else {
                     add(TimelineItemAction.Reply)

@@ -7,8 +7,10 @@
 
 package io.element.android.libraries.matrix.impl.timeline.item.event
 
+import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.api.media.ImageInfo
 import io.element.android.libraries.matrix.api.media.MediaSource
+import io.element.android.libraries.matrix.api.timeline.item.EventThreadInfo
 import io.element.android.libraries.matrix.api.timeline.item.event.AudioMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.EmoteMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.FileMessageType
@@ -23,14 +25,13 @@ import io.element.android.libraries.matrix.api.timeline.item.event.OtherMessageT
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VideoMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.VoiceMessageType
-import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.timeline.reply.InReplyToMapper
-import org.matrix.rustcomponents.sdk.InReplyToDetails
 import io.element.android.support.zero.common.util.ZeroPatterns
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.data.model.helper.isRemoteGif
 import io.element.android.support.zero.datastore.converter.AppJson.toJson
+import org.matrix.rustcomponents.sdk.InReplyToDetails
 import org.matrix.rustcomponents.sdk.MessageType
 import org.matrix.rustcomponents.sdk.MsgLikeKind
 import org.matrix.rustcomponents.sdk.use
@@ -44,14 +45,14 @@ private const val MSG_TYPE_GALLERY_UNSTABLE = "dm.filament.gallery"
 class EventMessageMapper {
     private val inReplyToMapper by lazy { InReplyToMapper(TimelineEventContentMapper()) }
 
-    fun map(message: MsgLikeKind.Message, inReplyTo: InReplyToDetails?, isThreaded: Boolean): MessageContent = message.use {
+    fun map(message: MsgLikeKind.Message, inReplyTo: InReplyToDetails?, threadInfo: EventThreadInfo): MessageContent = message.use {
         val type = it.content.msgType.use(this::mapMessageType)
         val inReplyToEvent: InReplyTo? = inReplyTo?.use(inReplyToMapper::map)
         MessageContent(
             body = it.content.body,
             inReplyTo = inReplyToEvent,
             isEdited = it.content.isEdited,
-            isThreaded = isThreaded,
+            threadInfo = threadInfo,
             type = type
         )
     }
@@ -77,7 +78,7 @@ class EventMessageMapper {
                 body = content.body.orEmpty(),
                 inReplyTo = null,
                 isEdited = false,
-                isThreaded = false,
+                threadInfo = null,
                 type = type
             )
         } else {

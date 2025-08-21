@@ -17,6 +17,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -43,6 +44,8 @@ import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
+import io.element.android.libraries.featureflag.api.FeatureFlagService
+import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UniqueId
 import io.element.android.libraries.matrix.api.room.JoinedRoom
@@ -50,6 +53,7 @@ import io.element.android.libraries.matrix.api.room.MessageEventType
 import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
+import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
 import io.element.android.libraries.matrix.api.timeline.item.event.TimelineItemEventOrigin
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
@@ -79,16 +83,20 @@ class TimelinePresenter @AssistedInject constructor(
     private val sendPollResponseAction: SendPollResponseAction,
     private val endPollAction: EndPollAction,
     private val sessionPreferencesStore: SessionPreferencesStore,
-    private val timelineController: TimelineController,
+    @Assisted private val timelineController: TimelineController,
     private val timelineItemIndexer: TimelineItemIndexer = TimelineItemIndexer(),
     private val resolveVerifiedUserSendFailurePresenter: Presenter<ResolveVerifiedUserSendFailureState>,
     private val typingNotificationPresenter: Presenter<TypingNotificationState>,
     private val roomCallStatePresenter: Presenter<RoomCallState>,
     private val markAsFullyRead: MarkAsFullyRead,
+    private val featureFlagService: FeatureFlagService,
 ) : Presenter<TimelineState> {
     @AssistedFactory
     interface Factory {
-        fun create(navigator: MessagesNavigator): TimelinePresenter
+        fun create(
+            timelineController: TimelineController,
+            navigator: MessagesNavigator
+        ): TimelinePresenter
     }
 
     private val timelineItemsFactory: TimelineItemsFactory = timelineItemsFactoryCreator.create(
@@ -102,6 +110,9 @@ class TimelinePresenter @AssistedInject constructor(
     @Composable
     override fun present(): TimelineState {
         val localScope = rememberCoroutineScope()
+
+        val timelineMode = remember { timelineController.mainTimelineMode() }
+
         var focusRequestState: FocusRequestState by remember { mutableStateOf(FocusRequestState.None) }
 
         val lastReadReceiptId = rememberSaveable { mutableStateOf<EventId?>(null) }
@@ -132,9 +143,17 @@ class TimelinePresenter @AssistedInject constructor(
 
         val eventLinkPreviewMap = remember { mutableStateMapOf<UniqueId, ZeroLinkPreview>() }
 
+        val displayThreadSummaries by produceState(false) {
+            value = featureFlagService.isFeatureEnabled(FeatureFlags.HideThreadedEvents)
+        }
+
         fun handleEvents(event: TimelineEvents) {
             when (event) {
                 is TimelineEvents.LoadMore -> {
+                    if (event.direction == Timeline.PaginationDirection.FORWARDS && timelineMode is Timeline.Mode.Thread) {
+                        // Do not paginate forwards in thread mode, as it's not supported
+                        return
+                    }
                     localScope.launch {
                         timelineController.paginate(direction = event.direction)
                     }
@@ -156,15 +175,21 @@ class TimelinePresenter @AssistedInject constructor(
                     }
                 }
                 is TimelineEvents.SelectPollAnswer -> sessionCoroutineScope.launch {
-                    sendPollResponseAction.execute(
-                        pollStartId = event.pollStartId,
-                        answerId = event.answerId
-                    )
+                    timelineController.invokeOnCurrentTimeline {
+                        sendPollResponseAction.execute(
+                            timeline = this,
+                            pollStartId = event.pollStartId,
+                            answerId = event.answerId
+                        )
+                    }
                 }
                 is TimelineEvents.EndPoll -> sessionCoroutineScope.launch {
-                    endPollAction.execute(
-                        pollStartId = event.pollStartId,
-                    )
+                    timelineController.invokeOnCurrentTimeline {
+                        endPollAction.execute(
+                            timeline = this,
+                            pollStartId = event.pollStartId,
+                        )
+                    }
                 }
                 is TimelineEvents.EditPoll -> {
                     navigator.onEditPollClick(event.pollStartId)
@@ -190,6 +215,12 @@ class TimelinePresenter @AssistedInject constructor(
                     // Navigate to the predecessor or successor room
                     val serverNames = calculateServerNamesForRoom(room)
                     navigator.onNavigateToRoom(event.roomId, serverNames)
+                }
+                is TimelineEvents.OpenThread -> {
+                    navigator.onOpenThread(
+                        threadRootId = event.threadRootEventId,
+                        focusedEventId = event.focusedEvent,
+                    )
                 }
                 is TimelineEvents.GetLinkPreviewIfApplicable -> {
                     localScope.getLinkPreviewIfRequired(event.event, eventLinkPreviewMap)
@@ -282,6 +313,7 @@ class TimelinePresenter @AssistedInject constructor(
         }
         return TimelineState(
             timelineItems = timelineItems,
+            timelineMode = timelineMode,
             timelineRoomInfo = timelineRoomInfo,
             renderReadReceipts = renderReadReceipts,
             newEventState = newEventState.value,
@@ -289,6 +321,7 @@ class TimelinePresenter @AssistedInject constructor(
             focusRequestState = focusRequestState,
             messageShield = messageShield.value,
             resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
+            displayThreadSummaries = displayThreadSummaries,
             linkPreviewMap = eventLinkPreviewMap,
             eventSink = { handleEvents(it) }
         )
