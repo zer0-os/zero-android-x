@@ -50,7 +50,7 @@ object RewardsUtil {
             if (delimiter < 0) return 0.0
 
             val prefixPart = mCredits.substring(0, delimiter)
-            val suffixPart = mCredits.drop(delimiter).take(2) // take 2 decimals like Swift
+            val suffixPart = mCredits.drop(delimiter).take(3) // take 3 decimals
             val value = "$prefixPart.$suffixPart"
             value.toDoubleOrNull() ?: 0.0
         } catch (e: Exception) {

@@ -144,7 +144,7 @@ class TimelinePresenter @AssistedInject constructor(
         val eventLinkPreviewMap = remember { mutableStateMapOf<UniqueId, ZeroLinkPreview>() }
 
         val displayThreadSummaries by produceState(false) {
-            value = featureFlagService.isFeatureEnabled(FeatureFlags.HideThreadedEvents)
+            value = featureFlagService.isFeatureEnabled(FeatureFlags.Threads)
         }
 
         fun handleEvents(event: TimelineEvents) {
