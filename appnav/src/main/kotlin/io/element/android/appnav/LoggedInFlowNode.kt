@@ -63,6 +63,7 @@ import io.element.android.features.roomdirectory.api.RoomDirectoryEntryPoint
 import io.element.android.features.securebackup.api.SecureBackupEntryPoint
 import io.element.android.features.share.api.ShareEntryPoint
 import io.element.android.features.startchat.api.StartChatEntryPoint
+import io.element.android.features.userprofile.api.SearchUserEntryPoint
 import io.element.android.features.userprofile.api.UserProfileEntryPoint
 import io.element.android.features.verifysession.api.IncomingVerificationEntryPoint
 import io.element.android.features.wallettransactions.api.WalletTransactionsEntryPoint
@@ -139,6 +140,7 @@ class LoggedInFlowNode @AssistedInject constructor(
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
     private val walletTransactionsEntryPoint: WalletTransactionsEntryPoint,
+    private val searchUserEntryPoint: SearchUserEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
@@ -322,6 +324,9 @@ class LoggedInFlowNode @AssistedInject constructor(
         @Parcelize
         data object SendWalletToken : NavTarget
 
+        @Parcelize
+        data object SearchUser : NavTarget
+
 //        @Parcelize
 //        data object ReceiveWalletToken : NavTarget
     }
@@ -349,6 +354,10 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onStartChatClick() {
                         backstack.push(NavTarget.CreateRoom)
+                    }
+
+                    override fun onSearchUserClick() {
+                        backstack.push(NavTarget.SearchUser)
                     }
 
                     override fun onSetUpRecoveryClick() {
@@ -654,6 +663,16 @@ class LoggedInFlowNode @AssistedInject constructor(
 //            NavTarget.ReceiveWalletToken -> {
 //
 //            }
+            NavTarget.SearchUser -> {
+                val callback = object: SearchUserEntryPoint.Callback {
+                    override fun onUserSelected(userId: UserId) {
+                        backstack.push(NavTarget.UserProfile(userId))
+                    }
+                }
+                searchUserEntryPoint.nodeBuilder(this, buildContext)
+                    .callback(callback)
+                    .build()
+            }
         }
     }
 

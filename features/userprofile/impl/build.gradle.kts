@@ -35,6 +35,8 @@ dependencies {
     implementation(projects.features.call.api)
     implementation(projects.features.enterprise.api)
     implementation(projects.features.verifysession.api)
+    implementation(projects.features.startchat.impl)
+    implementation(projects.libraries.usersearch.api)
     api(projects.features.userprofile.api)
     api(projects.features.userprofile.shared)
     implementation(libs.coil.compose)

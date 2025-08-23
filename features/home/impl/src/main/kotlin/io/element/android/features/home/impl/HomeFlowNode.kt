@@ -126,6 +126,10 @@ class HomeFlowNode @AssistedInject constructor(
         plugins<HomeEntryPoint.Callback>().forEach { it.onStartChatClick() }
     }
 
+    private fun onSearchUserClick() {
+        plugins<HomeEntryPoint.Callback>().forEach { it.onSearchUserClick() }
+    }
+
     private fun onSetUpRecoveryClick() {
         plugins<HomeEntryPoint.Callback>().forEach { it.onSetUpRecoveryClick() }
     }
@@ -198,6 +202,7 @@ class HomeFlowNode @AssistedInject constructor(
                 onRoomClick = this::onRoomClick,
                 onSettingsClick = this::onOpenSettings,
                 onCreateRoomClick = this::onStartChatClick,
+                onSearchUserClick = this::onSearchUserClick,
                 onSetUpRecoveryClick = this::onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = this::onSessionConfirmRecoveryKeyClick,
                 onRoomSettingsClick = this::onRoomSettingsClick,

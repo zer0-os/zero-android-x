@@ -79,6 +79,7 @@ fun HomeView(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onCreateRoomClick: () -> Unit,
+    onSearchUserClick: () -> Unit,
     onRoomSettingsClick: (roomId: RoomId) -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onReportRoomClick: (roomId: RoomId) -> Unit,
@@ -144,6 +145,7 @@ fun HomeView(
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 onOpenSettings = { if (firstThrottler.canHandle()) onSettingsClick() },
                 onCreateRoomClick = { if (firstThrottler.canHandle()) onCreateRoomClick() },
+                onSearchUserClick = { if (firstThrottler.canHandle()) onSearchUserClick() },
                 onMenuActionClick = onMenuActionClick,
                 onFeedClick = onFeedClick,
                 onFeedUserClick = onFeedUserClick,
@@ -191,6 +193,7 @@ private fun HomeScaffold(
     onRoomClick: (RoomId) -> Unit,
     onOpenSettings: () -> Unit,
     onCreateRoomClick: () -> Unit,
+    onSearchUserClick: () -> Unit,
     onMenuActionClick: (RoomListMenuAction) -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
@@ -225,7 +228,16 @@ private fun HomeScaffold(
                     matrixUser = state.matrixUser,
                     showAvatarIndicator = state.showAvatarIndicator,
                     areSearchResultsDisplayed = roomListState.searchState.isSearchActive,
-                    onToggleSearch = { roomListState.eventSink(RoomListEvents.ToggleSearchResults) },
+                    onToggleSearch = {
+                        when (selectedNavigationTab.value) {
+                            HomeScreenTab.FEED -> {
+                                onSearchUserClick()
+                            }
+                            else ->  {
+                                roomListState.eventSink(RoomListEvents.ToggleSearchResults)
+                            }
+                        }
+                    },
                     onMenuActionClick = onMenuActionClick,
                     onOpenSettings = onOpenSettings,
                     onOpenProfile = onUserProfileClick,
@@ -439,6 +451,7 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onSetUpRecoveryClick = {},
         onConfirmRecoveryKeyClick = {},
         onCreateRoomClick = {},
+        onSearchUserClick = {},
         onRoomSettingsClick = {},
         onReportRoomClick = {},
         onMenuActionClick = {},

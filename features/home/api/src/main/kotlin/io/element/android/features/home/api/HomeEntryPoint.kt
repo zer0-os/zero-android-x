@@ -25,6 +25,7 @@ interface HomeEntryPoint : FeatureEntryPoint {
     interface Callback : Plugin {
         fun onRoomClick(roomId: RoomId)
         fun onStartChatClick()
+        fun onSearchUserClick()
         fun onSettingsClick()
         fun onSetUpRecoveryClick()
         fun onSessionConfirmRecoveryKeyClick()
