@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -233,7 +234,7 @@ private fun HomeScaffold(
                             HomeScreenTab.FEED -> {
                                 onSearchUserClick()
                             }
-                            else ->  {
+                            else -> {
                                 roomListState.eventSink(RoomListEvents.ToggleSearchResults)
                             }
                         }
@@ -461,6 +462,31 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onCreateFeedClick = {},
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},
+        onSendWalletToken = {},
+        onReceiveWalletToken = {}
+    )
+}
+
+@Preview
+@Composable
+internal fun HomeViewA11yPreview() = ElementPreview {
+    HomeView(
+        homeState = aHomeState(),
+        onRoomClick = {},
+        onSettingsClick = {},
+        onSetUpRecoveryClick = {},
+        onConfirmRecoveryKeyClick = {},
+        onRoomSettingsClick = {},
+        onReportRoomClick = {},
+        onMenuActionClick = {},
+        onDeclineInviteAndBlockUser = {},
+        acceptDeclineInviteView = {},
+        onCreateRoomClick = {},
+        onSearchUserClick = {},
+        onFeedClick = {},
+        onFeedUserClick = {},
+        onUserProfileClick = {},
+        onCreateFeedClick = {},
         onSendWalletToken = {},
         onReceiveWalletToken = {}
     )
