@@ -27,7 +27,6 @@ import com.reown.appkit.ui.components.button.rememberAppKitState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.element.android.features.login.impl.DefaultLoginUserStory
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
 import io.element.android.features.login.impl.login.LoginMode
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
@@ -46,7 +45,6 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
     @Assisted private val params: Params,
     private val accountProviderDataSource: AccountProviderDataSource,
     private val authenticationService: MatrixAuthenticationService,
-    private val defaultLoginUserStory: DefaultLoginUserStory,
 ) : Presenter<ZeroCreateAccountState> {
     data class Params(
         val inviteCode: String
@@ -169,7 +167,6 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
                 )
                     .onSuccess { sessionId ->
                         ZeroCreateAccountInviteHolder.inviteCode = params.inviteCode
-                        defaultLoginUserStory.setLoginFlowIsDone(true)
                         createAccountActionState.value = AsyncData.Success(sessionId)
                     }
                     .onFailure { failure ->
@@ -217,7 +214,6 @@ class ZeroCreateAccountPresenter @AssistedInject constructor(
                 authenticationService.createZeroAccountWithWeb3(web3Token, params.inviteCode)
                     .onSuccess { sessionId ->
                         ZeroCreateAccountInviteHolder.inviteCode = params.inviteCode
-                        defaultLoginUserStory.setLoginFlowIsDone(true)
                         createAccountActionState.value = AsyncData.Success(sessionId)
                     }
                     .onFailure { failure ->

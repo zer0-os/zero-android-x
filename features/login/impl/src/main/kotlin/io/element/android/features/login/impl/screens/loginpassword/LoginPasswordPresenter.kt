@@ -24,7 +24,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
 import com.reown.appkit.ui.components.button.rememberAppKitState
-import io.element.android.features.login.impl.DefaultLoginUserStory
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
 import io.element.android.features.login.impl.walletconnect.WalletConnectService
@@ -41,7 +40,6 @@ import javax.inject.Inject
 class LoginPasswordPresenter @Inject constructor(
     private val authenticationService: MatrixAuthenticationService,
     private val accountProviderDataSource: AccountProviderDataSource,
-    private val defaultLoginUserStory: DefaultLoginUserStory,
 ) : Presenter<LoginPasswordState> {
     @Composable
     override fun present(): LoginPasswordState {
@@ -134,8 +132,6 @@ class LoginPasswordPresenter @Inject constructor(
         loggedInState.value = AsyncData.Loading()
         authenticationService.loginWithZero(formState.login.trim(), formState.password)
             .onSuccess { sessionId ->
-                // We will not navigate to the WaitList screen, so the login user story is done
-                defaultLoginUserStory.setLoginFlowIsDone(true)
                 loggedInState.value = AsyncData.Success(sessionId)
             }
             .onFailure { failure ->
@@ -155,8 +151,6 @@ class LoginPasswordPresenter @Inject constructor(
         val web3Token = "Web3 ${successResult.result}"
         authenticationService.loginWithWeb3(web3Token)
             .onSuccess { sessionId ->
-                // We will not navigate to the WaitList screen, so the login user story is done
-                defaultLoginUserStory.setLoginFlowIsDone(true)
                 loggedInState.value = AsyncData.Success(sessionId)
             }
             .onFailure { failure ->
