@@ -185,7 +185,7 @@ jsoup = "org.jsoup:jsoup:1.21.2"
 appyx_core = { module = "com.bumble.appyx:core", version.ref = "appyx" }
 molecule-runtime = "app.cash.molecule:molecule-runtime:2.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.8.18"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.8.26"
 matrix_richtexteditor = { module = "io.element.android:wysiwyg", version.ref = "wysiwyg" }
 matrix_richtexteditor_compose = { module = "io.element.android:wysiwyg-compose", version.ref = "wysiwyg" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
@@ -208,7 +208,7 @@ haze_materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = 
 
 # Analytics
 posthog = "com.posthog:posthog-android:3.20.4"
-sentry = "io.sentry:sentry-android:8.19.1"
+sentry = "io.sentry:sentry-android:8.20.0"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.28.0"
 
@@ -224,7 +224,7 @@ anvil_compiler_api = { module = "dev.zacsweers.anvil:compiler-api", version.ref 
 anvil_compiler_utils = { module = "dev.zacsweers.anvil:compiler-utils", version.ref = "anvil" }
 
 # Element Call
-element_call_embedded = "io.element.android:element-call-embedded:0.14.1"
+element_call_embedded = "io.element.android:element-call-embedded:0.15.0"
 
 # Auto services
 google_autoservice = { module = "com.google.auto.service:auto-service", version.ref = "autoservice" }
