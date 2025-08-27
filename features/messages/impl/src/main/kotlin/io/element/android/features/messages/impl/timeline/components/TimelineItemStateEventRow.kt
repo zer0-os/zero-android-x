@@ -100,8 +100,10 @@ private fun TimelineItemEventContent.updatedContent(roomMembers: List<RoomMember
         val regex = Regex("@[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}:[\\w.-]+")
         val text = regex.replace(event.body) {
             val matchedUserId = it.value
-            val user = roomMembers.first { member -> member.userId.value == matchedUserId }
-            (user.displayName ?: "").trim()
+            val user = roomMembers.firstOrNull { member ->
+                member.userId.value == matchedUserId
+            }
+            (user?.displayName ?: matchedUserId).trim()
         }
         event.copy(body = text)
     } ?: this

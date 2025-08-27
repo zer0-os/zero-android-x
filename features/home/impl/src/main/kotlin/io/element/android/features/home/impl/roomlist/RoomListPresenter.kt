@@ -159,7 +159,7 @@ class RoomListPresenter @Inject constructor(
 
         LaunchedEffect(contentState) {
             (contentState as? RoomListContentState.Rooms)?.let {
-                coroutineScope.autoAcceptInvitedRooms(it.summaries, acceptDeclineInviteState)
+//                coroutineScope.autoAcceptInvitedRooms(it.summaries, acceptDeclineInviteState)
                 coroutineScope.extractRoomMembersAndMapBadge(it.summaries, roomMappedUserProStatusState)
             }
         }
