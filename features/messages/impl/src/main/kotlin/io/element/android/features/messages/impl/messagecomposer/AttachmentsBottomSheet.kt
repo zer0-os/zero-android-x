@@ -131,7 +131,7 @@ private fun AttachmentSourcePickerMenu(
                 headlineContent = { Text(stringResource(R.string.screen_room_attachment_source_location)) },
                 style = ListItemStyle.Primary,
             )
-        }
+        }*/
         ListItem(
             modifier = Modifier.clickable {
                 state.eventSink(MessageComposerEvents.PickAttachmentSource.Poll)
@@ -141,7 +141,7 @@ private fun AttachmentSourcePickerMenu(
             headlineContent = { Text(stringResource(R.string.screen_room_attachment_source_poll)) },
             style = ListItemStyle.Primary,
         )
-        if (enableTextFormatting) {
+        /*if (enableTextFormatting) {
             ListItem(
                 modifier = Modifier.clickable { state.eventSink(MessageComposerEvents.ToggleTextFormatting(enabled = true)) },
                 leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.TextFormatting())),

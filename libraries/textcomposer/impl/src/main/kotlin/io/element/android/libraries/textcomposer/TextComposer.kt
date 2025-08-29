@@ -571,7 +571,7 @@ private fun TextInputBox(
             contentAlignment = Alignment.CenterStart,
         ) {
             textInput()
-            if (isTextEmpty && composerMode.showCaptionCompatibilityWarning()) {
+            /*if (isTextEmpty && composerMode.showCaptionCompatibilityWarning()) {
                 var showBottomSheet by remember { mutableStateOf(false) }
                 Icon(
                     modifier = Modifier
@@ -587,7 +587,7 @@ private fun TextInputBox(
                         onDismiss = { showBottomSheet = false },
                     )
                 }
-            }
+            }*/
         }
     }
 }

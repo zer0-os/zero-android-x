@@ -211,14 +211,14 @@ class DefaultActionListPresenter @AssistedInject constructor(
                         add(TimelineItemAction.RemoveCaption)
                     }
                 } else if (timelineItem.content is TimelineItemPollContent) {
-                    //add(TimelineItemAction.EditPoll)
+                    add(TimelineItemAction.EditPoll)
                 } else {
                     add(TimelineItemAction.Edit)
                 }
             }
-            /*if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
+            if (canRedact && timelineItem.content is TimelineItemPollContent && !timelineItem.content.isEnded) {
                 add(TimelineItemAction.EndPoll)
-            }*/
+            }
             val canPinUnpin = usersEventPermissions.canPinUnpin && timelineItem.isRemote
             if (canPinUnpin) {
                 if (isEventPinned) {
