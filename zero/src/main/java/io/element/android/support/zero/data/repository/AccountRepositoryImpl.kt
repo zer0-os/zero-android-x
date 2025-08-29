@@ -4,6 +4,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
+import io.element.android.support.zero.network.model.response.wallet.ApiWallet
 import io.element.android.support.zero.network.service.ZeroAccountService
 import io.element.android.support.zero.network.service.ZeroUserService
 
@@ -38,6 +39,12 @@ class AccountRepositoryImpl(
     override suspend fun fetchUserZIds(): List<String> {
         return runCatching {
             zeroAccountService.fetchUserZIds()
+        }.getOrDefault(emptyList())
+    }
+
+    override suspend fun fetchUserWallets(): List<ApiWallet> {
+        return runCatching {
+            zeroAccountService.fetchUserWallets().wallets
         }.getOrDefault(emptyList())
     }
 

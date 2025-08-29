@@ -50,6 +50,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -235,6 +236,8 @@ interface MatrixClient {
     suspend fun verifyUserPassword(password: String): Result<Unit>
 
     suspend fun getUserZIds()
+
+    suspend fun fetchUserWallets(): Result<List<ZeroWallet>>
 
     suspend fun joinZeroChannel(channelId: String): Result<String?>
 

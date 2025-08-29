@@ -64,6 +64,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -952,6 +953,14 @@ class RustMatrixClient(
             zeroCoreRepository?.account?.fetchUserZIds() ?: emptyList()
         }.getOrElse { emptyList() }
         _userZIds.emit(userZIds)
+    }
+
+    override suspend fun fetchUserWallets(): Result<List<ZeroWallet>> = withContext(sessionDispatcher) {
+        runCatching {
+            val accountRepository = zeroCoreRepository?.account
+                ?: return@withContext Result.failure(Throwable("Account repository is not initialized yet."))
+            accountRepository.fetchUserWallets().map { it.toModel() }
+        }
     }
 
     override suspend fun joinZeroChannel(channelId: String): Result<String?> = withContext(sessionDispatcher) {

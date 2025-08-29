@@ -2,6 +2,7 @@ package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
+import io.element.android.support.zero.network.model.response.wallet.ApiUserWallets
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -20,4 +21,7 @@ interface ZeroAccountService {
 
     @GET("api/v2/users/zids")
     suspend fun fetchUserZIds(): List<String>
+
+    @GET(value = "api/v2/accounts/wallets")
+    suspend fun fetchUserWallets(): ApiUserWallets
 }

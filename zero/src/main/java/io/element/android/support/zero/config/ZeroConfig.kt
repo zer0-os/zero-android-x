@@ -11,6 +11,8 @@ object ZeroConfig {
     const val MEOW_POOL_ADDRESS = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
     const val MEOW_ICON_URL = "https://zos.zero.tech/tokens/meow.png"
     const val MEOW_POOL_NAME = "MEOW Pool"
+
+    const val ZSCAN_LIVE_URL = "https://zscan.live/"
 }
 
 sealed class EnvironmentConfig(

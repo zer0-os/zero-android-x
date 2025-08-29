@@ -7,5 +7,9 @@
 
 package io.element.android.features.wallet.impl.manage
 
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
+
 sealed interface ManageWalletsEvents {
+    data class ShowWallet(val wallet: ZeroWallet) : ManageWalletsEvents
+    data object HideError : ManageWalletsEvents
 }

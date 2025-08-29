@@ -8,6 +8,7 @@
 package io.element.android.features.wallet.impl.manage
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.core.UserId
 
 open class ManageWalletsStateProvider : PreviewParameterProvider<ManageWalletsState> {
@@ -20,5 +21,7 @@ open class ManageWalletsStateProvider : PreviewParameterProvider<ManageWalletsSt
 fun aManageWalletsState(
 ) = ManageWalletsState(
     userId = UserId(""),
+    wallets = emptyList(),
+    actionState = AsyncAction.Uninitialized,
     eventSink = {}
 )

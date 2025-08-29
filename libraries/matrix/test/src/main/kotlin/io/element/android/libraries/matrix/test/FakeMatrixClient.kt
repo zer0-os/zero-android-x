@@ -48,6 +48,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -432,6 +433,9 @@ class FakeMatrixClient(
 
     override suspend fun getUserZIds() {}
 
+    override suspend fun fetchUserWallets(): Result<List<ZeroWallet>> {
+        return Result.success(emptyList())
+    }
     override suspend fun joinZeroChannel(channelId: String): Result<String?> {
         return Result.success("")
     }
