@@ -84,6 +84,7 @@ fun PreferencesRootView(
     onOpenRewards: () -> Unit,
     onClaimRewards: () -> Unit,
     onInviteFriend: () -> Unit,
+    onManageWallets: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
@@ -124,6 +125,7 @@ fun PreferencesRootView(
             onOpenNotificationSettings = onOpenNotificationSettings,
             onSecureBackupClick = onSecureBackupClick,
             onInviteFriend = onInviteFriend,
+            onManageWallets = onManageWallets,
             onOpenDeveloperSettings = onOpenDeveloperSettings,
             onSignOutClick = onSignOutClick,
         )
@@ -284,6 +286,7 @@ private fun ColumnScope.ZeroSettingsSection(
     onOpenNotificationSettings: () -> Unit,
     onSecureBackupClick: () -> Unit,
     onInviteFriend: () -> Unit,
+    onManageWallets: () -> Unit,
     onOpenDeveloperSettings: () -> Unit,
     onSignOutClick: () -> Unit,
 ) {
@@ -303,6 +306,11 @@ private fun ColumnScope.ZeroSettingsSection(
         headlineContent = { Text(stringResource(id = CommonStrings.common_encryption)) },
         trailingContent = ListItemContent.Badge.takeIf { state.showSecureBackupBadge },
         onClick = onSecureBackupClick,
+    )
+
+    ListItem(
+        headlineContent = { Text("Manage Wallets") },
+        onClick = onManageWallets,
     )
 
     DeveloperPreferencesView(onOpenDeveloperSettings)
@@ -525,6 +533,7 @@ private fun ContentToPreview(matrixUser: MatrixUser) {
         onDeactivateClick = {},
         onOpenRewards = {},
         onClaimRewards = {},
-        onInviteFriend = {}
+        onInviteFriend = {},
+        onManageWallets = {}
     )
 }

@@ -79,6 +79,7 @@ dependencies {
     implementation(projects.features.invite.api)
     implementation(projects.features.zerorewards.api)
     implementation(projects.features.zeroinvite.api)
+    implementation(projects.features.wallet.api)
     implementation(projects.services.analytics.api)
     implementation(projects.services.analytics.compose)
     implementation(projects.services.appnavstate.api)

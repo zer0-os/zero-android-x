@@ -34,6 +34,7 @@ import io.element.android.features.preferences.impl.notifications.NotificationSe
 import io.element.android.features.preferences.impl.notifications.edit.EditDefaultNotificationSettingNode
 import io.element.android.features.preferences.impl.root.PreferencesRootNode
 import io.element.android.features.preferences.impl.user.editprofile.EditUserProfileNode
+import io.element.android.features.wallet.api.ManageWalletsEntryPoint
 import io.element.android.features.zeroinvite.api.InviteEntryPoint
 import io.element.android.features.zerorewards.api.RewardsModalEntryPoint
 import io.element.android.libraries.architecture.BackstackView
@@ -61,6 +62,7 @@ class PreferencesFlowNode @AssistedInject constructor(
     private val accountDeactivationEntryPoint: AccountDeactivationEntryPoint,
     private val userRewardsEntryPoint: RewardsModalEntryPoint,
     private val messengerInviteEntryPoint: InviteEntryPoint,
+    private val manageWalletsEntryPoint: ManageWalletsEntryPoint,
 ) : BaseFlowNode<PreferencesFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = plugins.filterIsInstance<PreferencesEntryPoint.Params>().first().initialElement.toNavTarget(),
@@ -120,6 +122,9 @@ class PreferencesFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object InviteFriend : NavTarget
+
+        @Parcelize
+        data object ManageWallets : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -180,6 +185,10 @@ class PreferencesFlowNode @AssistedInject constructor(
 
                     override fun onInviteFriend() {
                         backstack.push(NavTarget.InviteFriend)
+                    }
+
+                    override fun onManageWallets() {
+                        backstack.push(NavTarget.ManageWallets)
                     }
                 }
                 createNode<PreferencesRootNode>(buildContext, plugins = listOf(callback))
@@ -290,6 +299,11 @@ class PreferencesFlowNode @AssistedInject constructor(
             }
             NavTarget.InviteFriend -> {
                 messengerInviteEntryPoint
+                    .nodeBuilder(this, buildContext)
+                    .build()
+            }
+            NavTarget.ManageWallets -> {
+                manageWalletsEntryPoint
                     .nodeBuilder(this, buildContext)
                     .build()
             }

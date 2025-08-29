@@ -48,6 +48,7 @@ class PreferencesRootNode @AssistedInject constructor(
         fun onOpenAccountDeactivation()
         fun onOpenRewards()
         fun onInviteFriend()
+        fun onManageWallets()
     }
 
     private fun onOpenBugReport() {
@@ -120,6 +121,10 @@ class PreferencesRootNode @AssistedInject constructor(
         plugins<Callback>().forEach { it.onInviteFriend() }
     }
 
+    private fun onManageWallets() {
+        plugins<Callback>().forEach { it.onManageWallets() }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -154,7 +159,8 @@ class PreferencesRootNode @AssistedInject constructor(
                 StateBus.onClaimUserRewards()
                 navigateUp()
             },
-            onInviteFriend = this::onInviteFriend
+            onInviteFriend = this::onInviteFriend,
+            onManageWallets = this::onManageWallets
         )
 
         directLogoutView.Render(state = state.directLogoutState)
