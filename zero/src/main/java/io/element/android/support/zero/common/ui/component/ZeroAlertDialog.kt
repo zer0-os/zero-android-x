@@ -32,3 +32,24 @@ fun ZeroAlertDialog(
         containerColor = Color(0xFF28282C)
     )
 }
+
+@Composable
+fun ZeroAlertDialog(
+    title: @Composable (() -> Unit) ? = null,
+    message: @Composable (() -> Unit),
+    onDismiss: () -> Unit = {},
+    confirmButton: @Composable (() -> Unit),
+    dismissButton: @Composable (() -> Unit)? = null
+) {
+    AlertDialog(
+        modifier =
+            Modifier.innerShadow(color = Color(0x50F6F4F6), blur = 4.dp, cornersRadius = 28.dp),
+        onDismissRequest = { onDismiss() },
+        confirmButton = confirmButton,
+        dismissButton = dismissButton,
+        title = title,
+        text = message,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = Color(0xFF28282C)
+    )
+}

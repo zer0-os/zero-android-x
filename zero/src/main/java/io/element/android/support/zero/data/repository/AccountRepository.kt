@@ -17,4 +17,8 @@ interface AccountRepository {
     suspend fun saveLoggedInUserInfo(user: MatrixUser)
 
     fun getLoggedInUser(): MatrixUser?
+
+    suspend fun addWallet(canAuthenticate: Boolean, token: String): Boolean
+
+    suspend fun deleteWallet(walletId: String): Boolean
 }

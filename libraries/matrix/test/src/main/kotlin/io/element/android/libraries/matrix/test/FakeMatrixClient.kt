@@ -436,6 +436,15 @@ class FakeMatrixClient(
     override suspend fun fetchUserWallets(): Result<List<ZeroWallet>> {
         return Result.success(emptyList())
     }
+
+    override suspend fun addWallet(canAuthenticate: Boolean, token: String): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override suspend fun deleteWallet(walledId: String): Result<Unit> {
+        return Result.success(Unit)
+    }
+
     override suspend fun joinZeroChannel(channelId: String): Result<String?> {
         return Result.success("")
     }

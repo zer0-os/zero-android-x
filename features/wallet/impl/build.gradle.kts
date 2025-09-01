@@ -19,9 +19,16 @@ dependencies {
     implementation(projects.libraries.matrixui)
     implementation(projects.libraries.designsystem)
     implementation(projects.libraries.uiStrings)
+    implementation(projects.features.login.impl)
     implementation(projects.zero)
 
     implementation(libs.coil.compose)
+
+    implementation(platform(libs.walletconnect.bom))
+    implementation(libs.walletconnect.androidcore)
+    implementation(libs.walletconnect.appkit)
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.accompanist.navigation)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.coroutines.test)

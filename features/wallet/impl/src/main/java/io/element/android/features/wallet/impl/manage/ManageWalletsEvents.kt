@@ -11,5 +11,11 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 
 sealed interface ManageWalletsEvents {
     data class ShowWallet(val wallet: ZeroWallet) : ManageWalletsEvents
+    data class ConfirmLinkWallet(val address: String, val enableLoggingIn: Boolean): ManageWalletsEvents
+    data class RemoveWallet(val wallet: ZeroWallet): ManageWalletsEvents
+    data class ConfirmDeleteWallet(val walletId: String): ManageWalletsEvents
+    data object CheckAndLinkWallet : ManageWalletsEvents
+    data object WalletLinkingCancelled: ManageWalletsEvents
+    data object WalletRemovingCancelled: ManageWalletsEvents
     data object HideError : ManageWalletsEvents
 }

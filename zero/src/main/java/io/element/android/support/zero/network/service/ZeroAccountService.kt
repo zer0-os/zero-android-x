@@ -1,13 +1,16 @@
 package io.element.android.support.zero.network.service
 
+import io.element.android.support.zero.network.model.request.AddWalletRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetUserPasswordRequest
 import io.element.android.support.zero.network.model.response.wallet.ApiUserWallets
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ZeroAccountService {
     @POST("api/v2/accounts/delete")
@@ -24,4 +27,14 @@ interface ZeroAccountService {
 
     @GET(value = "api/v2/accounts/wallets")
     suspend fun fetchUserWallets(): ApiUserWallets
+
+    @POST(value = "api/v2/accounts/add-wallet")
+    suspend fun addWallet(
+        @Body request: AddWalletRequest
+    ): Response<ResponseBody>
+
+    @DELETE(value = "api/v2/accounts/wallets/{wallet_id}")
+    suspend fun deleteWallet(
+        @Path("wallet_id") walletId: String
+    ): Response<ResponseBody>
 }

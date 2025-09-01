@@ -12,11 +12,19 @@ import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 
+sealed interface ManageWalletUserAction {
+    data object None : ManageWalletUserAction
+    data object SelectWallet : ManageWalletUserAction
+    data class LinkWallet(val address: String) : ManageWalletUserAction
+    data class RemoveWallet(val id: String) : ManageWalletUserAction
+}
+
 @Immutable
 data class ManageWalletsState(
     val userId: UserId,
     val wallets: List<ZeroWallet>,
 
+    val userActionState: ManageWalletUserAction,
     val actionState: AsyncAction<Unit>,
     val eventSink: (ManageWalletsEvents) -> Unit
 ) {
@@ -25,6 +33,10 @@ data class ManageWalletsState(
 
     val selfCustodyWalletsCount: Int
         get() = selfCustodyWallets.count()
+
+
+    val firstSelfCustodyWallet: ZeroWallet?
+        get() = selfCustodyWallets.firstOrNull()
 
     val zeroWallets: List<ZeroWallet>
         get() = wallets.filter { it.isThirdWeb }

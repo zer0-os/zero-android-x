@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,8 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.wallet.impl.manage.ManageWalletUserAction
 import io.element.android.features.wallet.impl.manage.ManageWalletsEvents
 import io.element.android.features.wallet.impl.manage.ManageWalletsState
 import io.element.android.features.wallet.impl.manage.ManageWalletsStateProvider
@@ -45,7 +49,11 @@ fun ManageWalletsView(
     state: ManageWalletsState,
     onBackClick: () -> Unit = {}
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .imePadding()
+        .navigationBarsPadding()
+    ) {
         if (state.actionState is AsyncAction.Success) {
             PreferencePage(
                 modifier = modifier,
@@ -66,18 +74,17 @@ fun ManageWalletsView(
                             .height(100.dp)
                             .padding(PADDING_4X.dp),
                         wallets = state.selfCustodyWallets,
-//                        canRemoveWallet = true,
-                        canRemoveWallet = false,
+                        canRemoveWallet = true,
                         onWalletTap = {},
                         onRemoveWallet = { wallet ->
-
+                            state.eventSink(ManageWalletsEvents.RemoveWallet(wallet))
                         }
                     )
                 }
 
                 AddWalletButton(
                     modifier = Modifier.padding(16.dp),
-                    onClick = {}
+                    onClick = { state.eventSink(ManageWalletsEvents.CheckAndLinkWallet) }
                 )
 
                 PreferenceCategory(
@@ -109,6 +116,50 @@ fun ManageWalletsView(
                 onSubmit = { state.eventSink(ManageWalletsEvents.HideError) }
             )
         }
+
+        when (state.userActionState) {
+            ManageWalletUserAction.None -> {}
+            ManageWalletUserAction.SelectWallet -> {
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    AppKitComponent(
+                        shouldOpenChooseNetwork = false,
+                        closeModal = {
+                            state.eventSink(ManageWalletsEvents.WalletLinkingCancelled)
+                        }
+                    )
+                }
+            }
+            is ManageWalletUserAction.LinkWallet -> {
+                if (state.firstSelfCustodyWallet != null) {
+                    AlreadyConnectedWalletAlert(
+                        walletAddress = state.firstSelfCustodyWallet!!.publicAddress,
+                        onCancel = {
+                            state.eventSink(ManageWalletsEvents.WalletLinkingCancelled)
+                        }
+                    )
+                } else {
+                    ConnectWalletAlert(
+                        walletAddress = state.userActionState.address,
+                        onConfirmLinking = { address, enableLoggingIn ->
+                            state.eventSink(ManageWalletsEvents.ConfirmLinkWallet(address, enableLoggingIn))
+                        },
+                        onCancel = {
+                            state.eventSink(ManageWalletsEvents.WalletLinkingCancelled)
+                        }
+                    )
+                }
+            }
+            is ManageWalletUserAction.RemoveWallet -> {
+                RemoveWalletAlert(
+                    onConfirm = {
+                        state.eventSink(ManageWalletsEvents.ConfirmDeleteWallet(state.userActionState.id))
+                    },
+                    onCancel = {
+                        state.eventSink(ManageWalletsEvents.WalletLinkingCancelled)
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -128,7 +179,8 @@ fun AddWalletButton(
             contentDescription = null
         )
         Text(
-            "Add Wallet",
+            modifier = Modifier.padding(horizontal = 6.dp),
+            text = "Add Wallet",
             style = ElementTheme.typography.fontBodyLgMedium,
             color = ElementTheme.colors.zeroBrandColor
         )

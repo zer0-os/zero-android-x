@@ -239,6 +239,10 @@ interface MatrixClient {
 
     suspend fun fetchUserWallets(): Result<List<ZeroWallet>>
 
+    suspend fun addWallet(canAuthenticate: Boolean, token: String) : Result<Unit>
+
+    suspend fun deleteWallet(walledId: String): Result<Unit>
+
     suspend fun joinZeroChannel(channelId: String): Result<String?>
 
     suspend fun fetchAllFeeds(followingFeeds: Boolean,

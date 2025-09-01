@@ -963,6 +963,22 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun addWallet(canAuthenticate: Boolean, token: String): Result<Unit> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val accountRepository = zeroCoreRepository?.account ?: return@runCatching
+                accountRepository.addWallet(canAuthenticate, token)
+            }
+        }
+
+    override suspend fun deleteWallet(walledId: String): Result<Unit> =
+        withContext(sessionDispatcher) {
+            runCatching {
+                val accountRepository = zeroCoreRepository?.account ?: return@runCatching
+                accountRepository.deleteWallet(walledId)
+            }
+        }
+
     override suspend fun joinZeroChannel(channelId: String): Result<String?> = withContext(sessionDispatcher) {
         runCatching {
             zeroCoreRepository?.channel?.joinChannel(channelId)

@@ -22,6 +22,7 @@ fun aManageWalletsState(
 ) = ManageWalletsState(
     userId = UserId(""),
     wallets = emptyList(),
+    userActionState = ManageWalletUserAction.None,
     actionState = AsyncAction.Uninitialized,
     eventSink = {}
 )

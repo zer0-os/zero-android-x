@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-internal object WalletConnectDelegate: AppKit.ModalDelegate {
+object WalletConnectDelegate: AppKit.ModalDelegate {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _wcEventModels: MutableSharedFlow<Modal.Model?> = MutableSharedFlow()
