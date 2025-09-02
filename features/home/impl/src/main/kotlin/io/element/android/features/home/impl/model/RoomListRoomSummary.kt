@@ -49,6 +49,10 @@ data class RoomListRoomSummary(
         numberOfUnreadNotifications > 0 ||
         isMarkedUnread
 
+    val hasUnreadMentions = numberOfUnreadMentions > 0
+
+    val isMuted = userDefinedNotificationMode == RoomNotificationMode.MUTE
+
     fun toInviteData() = InviteData(
         roomId = roomId,
         roomName = name ?: roomId.value,

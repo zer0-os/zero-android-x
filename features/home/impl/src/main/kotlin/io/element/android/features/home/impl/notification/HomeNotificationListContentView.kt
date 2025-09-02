@@ -70,12 +70,14 @@ fun HomeNotificationListContentView(
                         .filter { it.hasNewContent && it.displayType !in (RoomSummaryDisplayType.KNOCKED..RoomSummaryDisplayType.PLACEHOLDER) }
                         .let { roomListRoomSummaries ->
                             when (selectedNotificationTab.value) {
-                                NotificationsScreenTab.ALL -> roomListRoomSummaries
+                                NotificationsScreenTab.ALL -> roomListRoomSummaries.filter {
+                                    !it.hasUnreadMentions && !it.isMuted
+                                }
                                 NotificationsScreenTab.HIGHLIGHTS -> roomListRoomSummaries.filter {
-                                    it.numberOfUnreadMentions > 0
+                                    it.hasUnreadMentions
                                 }
                                 NotificationsScreenTab.MUTED -> roomListRoomSummaries.filter {
-                                    it.userDefinedNotificationMode == RoomNotificationMode.MUTE
+                                    it.isMuted
                                 }
                             }
                         }
