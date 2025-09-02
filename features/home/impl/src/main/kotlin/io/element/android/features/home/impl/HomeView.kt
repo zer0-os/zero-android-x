@@ -402,7 +402,7 @@ internal fun HomeScreenContent(
                 feedLinkMetaDataMap = state.feedLinkMetaDataMap,
                 eventSink = state.eventSink,
                 zeroUserRewards = state.userRewards,
-                isProfileFeedList = false,
+                loggedInUserId = state.matrixUser.userId,
                 onFeedClick = onFeedClick,
                 onFeedUserClick = onFeedUserClick,
                 modifier = modifier

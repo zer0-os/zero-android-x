@@ -54,6 +54,7 @@ import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachme
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.withLocalMeowCount
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
@@ -1041,6 +1042,8 @@ class RustMatrixClient(
         withContext(sessionDispatcher) {
             runCatching {
                 val feedRepo = zeroCoreRepository?.feed ?: return@runCatching null
+                //update locally
+                updateFeedInHome(feed.withLocalMeowCount(meowAmount))
                 val updatedFeed = feedRepo
                     .addMeowToFeed(feedId = feed.id, meowAmount)
                     ?.toModel()

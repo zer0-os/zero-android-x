@@ -36,10 +36,12 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.primaryZIdOrWalletAddress
 import io.element.android.libraries.matrix.api.zero.feed.toZeroProfile
+import io.element.android.libraries.matrix.api.zero.feed.withLocalMeowCount
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -98,7 +100,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
         fun handleEvents(event: FeedUserProfileEvents) {
             when (event) {
                 is FeedUserProfileEvents.AddMeowToFeed ->
-                    coroutineScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
+                    GlobalScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
                 FeedUserProfileEvents.LoadMoreUserFeeds -> {
                     val primaryZId = userProfileFlow.value?.primaryZid ?: return
                     coroutineScope.loadMoreUserFeeds(primaryZId, userFeedsFlow)
@@ -201,8 +203,7 @@ class FeedUserProfilePresenter @AssistedInject constructor(
     }
 
     private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, userFeedsFlow: MutableState<List<ZeroFeed>>) = launch {
-        val result = client.addMeowToFeed(feed, meowCount)
-        result.getOrNull()?.let { updatedFeed ->
+        val updateList: (ZeroFeed) -> Unit = { updatedFeed ->
             val allFeeds = userFeedsFlow.value.toMutableList()
             allFeeds.indexOfFirst { it.id == updatedFeed.id }
                 .takeIf { it >= 0 }
@@ -212,6 +213,12 @@ class FeedUserProfilePresenter @AssistedInject constructor(
                     _userFeeds.addAll(allFeeds)
                     userFeedsFlow.value = allFeeds
                 }
+        }
+        //update locally
+        updateList(feed.withLocalMeowCount(meowCount))
+        val result = client.addMeowToFeed(feed, meowCount)
+        result.getOrNull()?.let { updatedFeed ->
+            updateList(updatedFeed)
         }
     }
 

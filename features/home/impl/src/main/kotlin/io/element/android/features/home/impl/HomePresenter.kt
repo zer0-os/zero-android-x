@@ -84,6 +84,7 @@ import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -222,7 +223,7 @@ class HomePresenter @Inject constructor(
                     coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
                 }
                 HomeEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
-                is HomeEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount)
+                is HomeEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount)
                 is HomeEvents.LoadFeedMedia -> {
                     coroutineScope.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
                 }

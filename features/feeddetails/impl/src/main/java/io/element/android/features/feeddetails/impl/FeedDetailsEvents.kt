@@ -12,7 +12,7 @@ import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 sealed interface FeedDetailsEvents {
     data object RefreshFeed : FeedDetailsEvents
-    data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int) : FeedDetailsEvents
+    data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int, val isReplyFeed: Boolean) : FeedDetailsEvents
     data object LoadMoreReplies : FeedDetailsEvents
     data class PostReplyTextChanged(val text: String) : FeedDetailsEvents
     data object PostReply : FeedDetailsEvents

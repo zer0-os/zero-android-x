@@ -63,8 +63,8 @@ fun FeedDetailsView(
                 state = state,
                 onReplyClick = onFeedReplyClick,
                 onFeedUserClick = onFeedUserClick,
-                onAddMeowToFeed = { feed, meowCount ->
-                    state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount))
+                onAddMeowToFeed = { feed, meowCount, isReplyFeed ->
+                    state.eventSink(FeedDetailsEvents.AddMeowToFeed(feed, meowCount, isReplyFeed))
                 },
                 onLoadFeedMedia = { mediaId ->
                     state.eventSink(FeedDetailsEvents.LoadFeedMedia(mediaId))

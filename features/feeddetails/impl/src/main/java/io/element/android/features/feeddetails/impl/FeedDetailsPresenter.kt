@@ -28,12 +28,14 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.feed.withLocalMeowCount
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.support.zero.common.extension.localFile
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -80,7 +82,7 @@ class FeedDetailsPresenter @AssistedInject constructor(
         fun handleEvents(event: FeedDetailsEvents) {
             when (event) {
                 FeedDetailsEvents.RefreshFeed -> coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
-                is FeedDetailsEvents.AddMeowToFeed -> coroutineScope.addMeowToFeed(event.feed, event.meowCount, feedDetailsFlow)
+                is FeedDetailsEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, event.isReplyFeed, feedDetailsFlow, feedRepliesFlow)
                 FeedDetailsEvents.LoadMoreReplies -> coroutineScope.loadMoreReplies(feed.id, feedRepliesFlow)
                 is FeedDetailsEvents.PostReplyTextChanged -> postReplyText.value = event.text
                 FeedDetailsEvents.PostReply -> coroutineScope.postMyReply(
@@ -139,16 +141,44 @@ class FeedDetailsPresenter @AssistedInject constructor(
             feedDetailsFlow.value = it.copy(media = feed.media, linkMetaData = feed.linkMetaData)
         }
         (results[1] as? Result<List<ZeroFeed>>)?.getOrNull()?.let {
+            _feedReplies.clear()
             _feedReplies.addAll(it)
             feedRepliesFlow.value = it
         }
     }
 
-    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, feedDetailsFlow: MutableState<ZeroFeed>) = launch {
-        val result = client.addMeowToFeed(feed, meowCount)
-        result.getOrNull()?.let {
-            feedDetailsFlow.value = it
+    private fun CoroutineScope.addMeowToFeed(
+        feed: ZeroFeed,
+        meowCount: Int,
+        isReplyFeed: Boolean,
+        feedDetailsFlow: MutableState<ZeroFeed>,
+        feedRepliesFlow: MutableState<List<ZeroFeed>>
+    ) = launch {
+        if (!isReplyFeed) {
+            //update locally
+            feedDetailsFlow.value = feed.withLocalMeowCount(meowCount)
+            val result = client.addMeowToFeed(feed, meowCount)
+            result.getOrNull()?.let {
+                feedDetailsFlow.value = it
+            }
+        } else {
+            //update locally
+            updateReplyFeed(feed.withLocalMeowCount(meowCount), feedRepliesFlow)
+            val result = client.addMeowToFeed(feed, meowCount)
+            result.getOrNull()?.let {
+                updateReplyFeed(it, feedRepliesFlow)
+            }
         }
+    }
+
+    private fun updateReplyFeed(feed: ZeroFeed, feedRepliesFlow: MutableState<List<ZeroFeed>>) {
+        val existingList = feedRepliesFlow.value.toMutableList()
+        existingList.indexOfFirst { it.id == feed.id }
+            .takeIf { it >= 0 }
+            ?.let { index ->
+                existingList[index] = feed
+                feedRepliesFlow.value = existingList
+            }
     }
 
     private fun CoroutineScope.loadMoreReplies(feedId: String, feedRepliesFlow: MutableState<List<ZeroFeed>>) = launch {

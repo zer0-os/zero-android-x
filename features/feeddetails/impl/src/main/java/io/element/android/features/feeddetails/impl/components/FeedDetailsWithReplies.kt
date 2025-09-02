@@ -45,7 +45,7 @@ fun FeedDetailsWithReplies(
     state: FeedDetailsState,
     onReplyClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
-    onAddMeowToFeed: (ZeroFeed, Int) -> Unit,
+    onAddMeowToFeed: (ZeroFeed, Int, Boolean) -> Unit,
     onLoadFeedMedia: (String) -> Unit
 ) {
     var refreshing by remember(state) { mutableStateOf(false) }
@@ -92,7 +92,7 @@ fun FeedDetailsWithReplies(
                         zeroUserRewards = state.userRewards,
                         isMyOwnFeed = state.zeroFeed.userId == state.loggedInUserId,
                         onAddMeowToFeed = { meowCount ->
-                            onAddMeowToFeed(state.zeroFeed, meowCount)
+                            onAddMeowToFeed(state.zeroFeed, meowCount, false)
                         },
                         onFeedUserClick = onFeedUserClick,
                         onMediaTapped = onLoadFeedMedia
@@ -121,7 +121,7 @@ fun FeedDetailsWithReplies(
                         onFeedUserClick(comment.userProfile)
                     },
                     onAddMeowToFeed = { meowCount ->
-                        onAddMeowToFeed(comment, meowCount)
+                        onAddMeowToFeed(comment, meowCount, true)
                     },
                     onMediaTapped = onLoadFeedMedia
                 )

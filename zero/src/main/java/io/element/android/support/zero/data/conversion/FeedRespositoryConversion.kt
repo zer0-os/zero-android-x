@@ -22,6 +22,7 @@ import io.element.android.support.zero.network.model.response.feed.Meow
 import io.element.android.support.zero.network.model.response.feed.PostsMeowsSummary
 import io.element.android.support.zero.network.model.response.feed.Reply
 import io.element.android.support.zero.network.model.response.feed.ReplyToFeed
+import java.math.BigInteger
 
 fun ApiFeed.toModel() = ZeroFeed(
     id = id,
@@ -40,12 +41,25 @@ fun ApiFeed.toModel() = ZeroFeed(
     conversationId = conversationId,
     user = user.toModel(),
     postsMeowsSummary = postsMeowsSummary?.toModel(),
-    meows = meows?.map { it.toModel() },
+    isMeowedByMe = !meows.isNullOrEmpty(),
+    totalMeowCount = getTotalMeowCount(postsMeowsSummary),
     replies = replies?.map { it.toModel() },
     replyToPost = replyToPost?.toModel(),
     media = media?.toModel(),
     userProfileView = userProfileView?.toModel()
 )
+
+private fun getTotalMeowCount(postsMeowsSummary: PostsMeowsSummary?): Int {
+    val value = postsMeowsSummary?.totalMeowAmount ?: "0"
+    return try {
+        val bigIntValue = BigInteger(value)
+        val divisor = BigInteger.TEN.pow(18)
+
+        (bigIntValue / divisor).toInt()
+    } catch (e: NumberFormatException) {
+        0
+    }
+}
 
 fun FeedUser.toModel() = ZeroFeedAuthor(
     id = id,

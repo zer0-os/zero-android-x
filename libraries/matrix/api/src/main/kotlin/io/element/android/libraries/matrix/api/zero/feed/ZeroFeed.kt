@@ -10,10 +10,9 @@ package io.element.android.libraries.matrix.api.zero.feed
 import android.os.Parcelable
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import kotlinx.parcelize.Parcelize
-import java.math.BigInteger
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -40,7 +39,8 @@ data class ZeroFeed(
     val conversationId: String? = null,
     val user: ZeroFeedAuthor,
     val postsMeowsSummary: PostsMeowsSummary? = null,
-    val meows: List<Meow>? = null,
+    val isMeowedByMe: Boolean = false,
+    val totalMeowCount: Int = 0,
     val replies: List<Reply>? = null,
     val replyToPost: ReplyToFeed? = null,
     val media: FeedMedia? = null,
@@ -102,19 +102,6 @@ data class ZeroFeed(
             ),
             media = FeedMedia.placeholder
         )
-    }
-}
-
-fun ZeroFeed.totalMeowCount(decimal: Int): String {
-    val value = postsMeowsSummary?.totalMeowAmount ?: "0"
-    return try {
-        val maxDecimals = maxOf(decimal, 18)
-        val bigIntValue = BigInteger(value)
-        val divisor = BigInteger.TEN.pow(maxDecimals)
-
-        (bigIntValue / divisor).toString()
-    } catch (e: NumberFormatException) {
-        value
     }
 }
 
@@ -243,3 +230,9 @@ fun MatrixUser.toZeroProfile() = FeedUserProfileView(
 
 val ZeroFeed.userProfile
     get() = userProfileView ?: user.toZeroProfile(zid)
+
+fun ZeroFeed.withLocalMeowCount(meowCount: Int): ZeroFeed {
+    val totalMeowCount = this.totalMeowCount
+    val newCount = totalMeowCount.plus(meowCount)
+    return this.copy(totalMeowCount = newCount, isMeowedByMe = true)
+}

@@ -9,6 +9,7 @@ package io.element.android.features.home.impl.feed
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,6 +41,7 @@ import io.element.android.features.home.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
+import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
@@ -54,23 +56,21 @@ fun HomeFeedListContentView(
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     eventSink: (HomeEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
-    isProfileFeedList: Boolean,
+    loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val selectedFeedTab = rememberSaveable { mutableStateOf(FeedsScreenTab.FOLLOWING) }
     Column(modifier = modifier) {
-        if (!isProfileFeedList) {
-            FeedsScreenTabView(
-                onTabSelected = { tab ->
-                    selectedFeedTab.value = tab
-                    eventSink(HomeEvents.RefreshFeeds(
-                        followingFeeds = tab == FeedsScreenTab.FOLLOWING
-                    ))
-                }
-            )
-        }
+        FeedsScreenTabView(
+            onTabSelected = { tab ->
+                selectedFeedTab.value = tab
+                eventSink(HomeEvents.RefreshFeeds(
+                    followingFeeds = tab == FeedsScreenTab.FOLLOWING
+                ))
+            }
+        )
         Box {
             when (contentState) {
                 is FeedListContentState.Skeleton -> {
@@ -88,7 +88,7 @@ fun HomeFeedListContentView(
                         feedLinkMetaDataMap = feedLinkMetaDataMap,
                         eventSink = eventSink,
                         zeroUserRewards = zeroUserRewards,
-                        isProfileFeedList = isProfileFeedList,
+                        loggedInUserId = loggedInUserId,
                         onFeedClick = onFeedClick,
                         onFeedUserClick = onFeedUserClick,
                         isFollowingFeedsTabSelected = {
@@ -123,7 +123,7 @@ private fun FeedsViewList(
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     eventSink: (HomeEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
-    isProfileFeedList: Boolean,
+    loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     isFollowingFeedsTabSelected: () -> Boolean,
@@ -135,11 +135,7 @@ private fun FeedsViewList(
     val lazyListState = rememberLazyListState()
     val pullRefreshState = rememberPullRefreshState(refreshing, {
         refreshing = true
-        if (isProfileFeedList) {
-            eventSink(HomeEvents.RefreshMyFeeds)
-        } else {
-            eventSink(HomeEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
-        }
+        eventSink(HomeEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
         }, 1_500)
@@ -156,11 +152,7 @@ private fun FeedsViewList(
     LaunchedEffect(shouldLoadMoreFeed) {
         if (shouldLoadMoreFeed && !isLoadingMoreItems) {
             isLoadingMoreItems = true
-            if (isProfileFeedList) {
-                eventSink(HomeEvents.LoadMoreMyFeeds(state.feeds))
-            } else {
-                eventSink(HomeEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
-            }
+            eventSink(HomeEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
         }
     }
 
@@ -183,7 +175,7 @@ private fun FeedsViewList(
                 HomeFeedRow(
                     feed = feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData),
                     zeroUserRewards = zeroUserRewards,
-                    isMyOwnFeed = isProfileFeedList,
+                    isMyOwnFeed = feed.userId == loggedInUserId.extractedDisplayName,
                     onFeedClick = { onFeedClick(
                         feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData)
                     ) },
@@ -222,7 +214,7 @@ internal fun HomeFeedListContentViewPreview(@PreviewParameter(FeedListContentSta
         feedMediaMap = emptyMap(),
         feedLinkMetaDataMap = emptyMap(),
         zeroUserRewards = ZeroUserRewards.empty(),
-        isProfileFeedList = false,
+        loggedInUserId = UserId(""),
         eventSink = {},
         onFeedClick = {},
         onFeedUserClick = {}

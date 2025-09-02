@@ -52,7 +52,6 @@ import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.matrix.api.zero.feed.aspectRatio
 import io.element.android.libraries.matrix.api.zero.feed.isVideo
-import io.element.android.libraries.matrix.api.zero.feed.totalMeowCount
 import io.element.android.libraries.matrix.api.zero.feed.userProfile
 import io.element.android.libraries.matrix.api.zero.metadata.aspectRatio
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -217,8 +216,8 @@ fun FeedDetailsCell(
                 enabled = false
             )
             FeedMeowActionButton(
-                meowCount = feed.totalMeowCount(zeroUserRewards.decimals),
-                highlighted = !feed.meows.isNullOrEmpty(),
+                meowCount = feed.totalMeowCount.toString(),
+                highlighted = feed.isMeowedByMe,
                 enabled = !isMyOwnFeed,
                 onAddMeowToFeed = onAddMeowToFeed
             )
