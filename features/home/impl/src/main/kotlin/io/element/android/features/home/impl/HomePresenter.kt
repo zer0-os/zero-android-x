@@ -335,6 +335,9 @@ class HomePresenter @Inject constructor(
                         )
                     }
                 }
+                HomeEvents.RefreshWallet -> client.userProfile.value.walletAddress?.let { walletAddress ->
+                    fetchWalletData(walletAddress)
+                }
             }
         }
 

@@ -7,6 +7,8 @@
 
 package io.element.android.features.home.impl.wallet
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,10 +18,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
@@ -46,6 +54,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeWalletContent(
     modifier: Modifier = Modifier,
@@ -88,10 +97,28 @@ fun HomeWalletContent(
                 selectedWalletTab = walletTab
             }
         )
-        when (selectedWalletTab) {
-            WalletContentTab.TOKENS -> WalletTokensList(state)
-            WalletContentTab.STAKING -> WalletStakingList(state)
-            WalletContentTab.TRANSACTIONS -> WalletTransactionsList(state)
+
+        var refreshing by remember(state) { mutableStateOf(false) }
+        val pullRefreshState = rememberPullRefreshState(refreshing, {
+            refreshing = true
+            state.eventSink(HomeEvents.RefreshWallet)
+            Handler(Looper.getMainLooper()).postDelayed({
+                refreshing = false
+            }, 1_500)
+        })
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullRefreshState)
+        ) {
+            when (selectedWalletTab) {
+                WalletContentTab.TOKENS -> WalletTokensList(state)
+                WalletContentTab.STAKING -> WalletStakingList(state)
+                WalletContentTab.TRANSACTIONS -> WalletTransactionsList(state)
+            }
+
+            PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
         }
     }
 }
