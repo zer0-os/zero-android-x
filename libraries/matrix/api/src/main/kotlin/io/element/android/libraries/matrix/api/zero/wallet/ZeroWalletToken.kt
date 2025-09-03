@@ -23,7 +23,8 @@ data class ZeroWalletToken(
     val name: String,
     val amount: String,
     val logo: String?,
-    val decimals: Int
+    val decimals: Int,
+    val chainId: Int
 ): Parcelable
 
 val ZeroWalletToken.isMeowToken: Boolean

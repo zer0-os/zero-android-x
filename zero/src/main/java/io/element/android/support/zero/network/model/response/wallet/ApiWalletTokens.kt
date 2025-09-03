@@ -23,7 +23,8 @@ data class ApiWalletToken(
     val name: String,
     val amount: String,
     val logo: String? = null,
-    val decimals: Int
+    val decimals: Int,
+    val chainId: Int
 )
 
 @Serializable

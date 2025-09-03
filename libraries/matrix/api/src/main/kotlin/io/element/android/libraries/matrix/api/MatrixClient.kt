@@ -298,20 +298,22 @@ interface MatrixClient {
     suspend fun getMeowPrice(): Result<ZeroMeowPrice>
 
     suspend fun getWalletTokens(walletAddress: String,
+                                chainId: Int,
                                 paginationParams: ZeroWalletTokensPaginationParams?
     ): Result<ZeroWalletTokensResponse>
 
     suspend fun getWalletTransactions(walletAddress: String,
+                                      chainId: Int,
                                       paginationParams: ZeroWalletTransactionsPaginationParams?
     ): Result<ZeroWalletTransactionsResponse>
 
-    suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
+    suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt>
 
     suspend fun claimRewards(walletAddress: String): Result<String>
 
     suspend fun searchWalletRecipient(query: String): Result<List<ZeroWalletRecipient>>
 
-    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt>
+    suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt>
 
     suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo>
 

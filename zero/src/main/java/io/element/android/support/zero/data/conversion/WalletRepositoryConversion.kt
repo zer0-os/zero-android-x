@@ -38,7 +38,8 @@ fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
                 token.name,
                 ZeroWalletUtil.getFormattedNumber(tokenAmount, false),
                 token.logo,
-                token.decimals
+                token.decimals,
+                token.chainId
             )
         },
         paginationParams = nextPageParams?.let { nextPageParams ->

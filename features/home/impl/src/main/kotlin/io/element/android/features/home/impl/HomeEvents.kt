@@ -47,4 +47,5 @@ sealed interface HomeEvents {
     data class UnstakeAmount(val amount: String): HomeWalletEvents
     data object DismissStakingSheet: HomeWalletEvents
     data object ClaimStakingRewards: HomeWalletEvents
+    data object RefreshWallet: HomeWalletEvents
 }

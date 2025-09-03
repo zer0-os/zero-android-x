@@ -13,6 +13,14 @@ object ZeroConfig {
     const val MEOW_POOL_NAME = "MEOW Pool"
 
     const val ZSCAN_LIVE_URL = "https://zscan.live/"
+
+    private const val ZCHAIN_ID_MAINNET = 9369
+    private const val ZCHAIN_ID_ZEPHYR = 1417429182
+    val ZERO_WALLET_ZCHAIN_ID = if (environment == EnvironmentConfig.Production) {
+        ZCHAIN_ID_MAINNET
+    } else {
+        ZCHAIN_ID_ZEPHYR
+    }
 }
 
 sealed class EnvironmentConfig(

@@ -515,15 +515,15 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getWalletTokens(walletAddress: String, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
+    override suspend fun getWalletTokens(walletAddress: String, chainId: Int, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getWalletTransactions(walletAddress: String, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
+    override suspend fun getWalletTransactions(walletAddress: String, chainId: Int, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt> {
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt> {
         return Result.failure(Throwable("fake"))
     }
 
@@ -535,7 +535,7 @@ class FakeMatrixClient(
         return Result.success(emptyList())
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
         return Result.failure(Throwable("fake"))
     }
 

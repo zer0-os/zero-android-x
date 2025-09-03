@@ -55,6 +55,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.support.zero.common.ui.ZChainIcon
 import kotlin.math.abs
 
 @Composable
@@ -193,17 +194,20 @@ private fun TokenRow(
             .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(40.dp)
-                .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
-                .clip(CircleShape),
-            model = token.logo,
-            contentScale = ContentScale.Fit,
-            alignment = Alignment.Center,
-            contentDescription = null,
-            error = painterResource(R.drawable.ic_zero_avatar_default)
-        )
+        Box(contentAlignment = Alignment.BottomEnd) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
+                    .clip(CircleShape),
+                model = token.logo,
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+                contentDescription = null,
+                error = painterResource(R.drawable.ic_zero_avatar_default)
+            )
+            ZChainIcon()
+        }
 
         Column(
             modifier = Modifier

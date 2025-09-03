@@ -335,6 +335,9 @@ class HomePresenter @Inject constructor(
                         )
                     }
                 }
+                HomeEvents.RefreshWallet -> client.userProfile.value.walletAddress?.let { walletAddress ->
+                    fetchWalletData(walletAddress)
+                }
             }
         }
 
@@ -685,8 +688,16 @@ class HomePresenter @Inject constructor(
     ) = launch(context = Dispatchers.IO) {
         val results = awaitAll(
             async { client.getMeowPrice() },
-            async { client.getWalletTokens(walletAddress, tokenPaginationParams.value) },
-            async { client.getWalletTransactions(walletAddress, transactionPaginationParams.value) },
+            async { client.getWalletTokens(
+                walletAddress = walletAddress,
+                chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
+                paginationParams = tokenPaginationParams.value
+            ) },
+            async { client.getWalletTransactions(
+                walletAddress = walletAddress,
+                chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
+                paginationParams = transactionPaginationParams.value
+            ) },
         )
         (results[0] as? Result<ZeroMeowPrice>)?.let {
             meowPrice.value = it.getOrNull()
@@ -728,20 +739,22 @@ class HomePresenter @Inject constructor(
         meowPrice: MutableState<ZeroMeowPrice?>,
         userWalletBalance: MutableDoubleState,
     ) = launch {
-        client.getWalletTokens(walletAddress, tokenPaginationParams.value)
-            .onSuccess {
-                val newList = mutableListOf<ZeroWalletToken>().apply {
-                    addAll(currentList)
-                    addAll(it.tokens)
-                }.distinctBy { token -> token.tokenAddress }
-                setWalletBalance(newList, meowPrice.value, userWalletBalance)
-                walletTokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
-                tokenPaginationParams.value = it.paginationParams
-            }
-            .onFailure {
-                //Failed to load tokens next page
-                walletTokensListState.value = WalletTokensListState.Tokens(currentList.toPersistentList())
-            }
+        client.getWalletTokens(
+            walletAddress = walletAddress,
+            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
+            paginationParams = tokenPaginationParams.value
+        ).onSuccess {
+            val newList = mutableListOf<ZeroWalletToken>().apply {
+                addAll(currentList)
+                addAll(it.tokens)
+            }.distinctBy { token -> token.tokenAddress }
+            setWalletBalance(newList, meowPrice.value, userWalletBalance)
+            walletTokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
+            tokenPaginationParams.value = it.paginationParams
+        }.onFailure {
+            //Failed to load tokens next page
+            walletTokensListState.value = WalletTokensListState.Tokens(currentList.toPersistentList())
+        }
     }
 
     private fun CoroutineScope.loadMoreWalletTransactions(
@@ -750,19 +763,21 @@ class HomePresenter @Inject constructor(
         walletTransactionsListState: MutableState<WalletTransactionsListState>,
         transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
     ) = launch {
-        client.getWalletTransactions(walletAddress, transactionPaginationParams.value)
-            .onSuccess {
-                val newList = mutableListOf<ZeroWalletTransaction>().apply {
-                    addAll(currentList)
-                    addAll(it.transactions)
-                }.distinctBy { trans -> trans.hash }
-                walletTransactionsListState.value = WalletTransactionsListState.Transactions(newList.toPersistentList())
-                transactionPaginationParams.value = it.paginationParams
-            }
-            .onFailure {
-                //Failed to load transactions next page
-                walletTransactionsListState.value = WalletTransactionsListState.Transactions(currentList.toPersistentList())
-            }
+        client.getWalletTransactions(
+            walletAddress = walletAddress,
+            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
+            paginationParams = transactionPaginationParams.value
+        ).onSuccess {
+            val newList = mutableListOf<ZeroWalletTransaction>().apply {
+                addAll(currentList)
+                addAll(it.transactions)
+            }.distinctBy { trans -> trans.hash }
+            walletTransactionsListState.value = WalletTransactionsListState.Transactions(newList.toPersistentList())
+            transactionPaginationParams.value = it.paginationParams
+        }.onFailure {
+            //Failed to load transactions next page
+            walletTransactionsListState.value = WalletTransactionsListState.Transactions(currentList.toPersistentList())
+        }
     }
 
     private fun CoroutineScope.loadWalletTransaction(
@@ -771,7 +786,7 @@ class HomePresenter @Inject constructor(
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
         genericActionState.value = AsyncAction.Loading
-        client.getTransactionReceipt(transactionId)
+        client.getTransactionReceipt(transactionId, ZeroConfig.ZERO_WALLET_ZCHAIN_ID)
             .onSuccess {
                 genericActionState.value = AsyncAction.Success(Unit)
                 walletTransactionUrlState.value = AsyncAction.Success(it.blockExplorerUrl)

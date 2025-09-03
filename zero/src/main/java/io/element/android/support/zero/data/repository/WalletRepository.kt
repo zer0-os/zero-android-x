@@ -21,17 +21,17 @@ import io.element.android.support.zero.network.model.response.wallet.Transaction
 interface WalletRepository {
     suspend fun checkAndInitializeThirdWeb()
 
-    suspend fun getTokens(walletAddress: String, nextPageParams: NextPageParams?): ApiWalletTokens
+    suspend fun getTokens(walletAddress: String, chainId: Int, nextPageParams: NextPageParams?): ApiWalletTokens
 
-    suspend fun getTransactions(walletAddress: String, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions
+    suspend fun getTransactions(walletAddress: String, chainId: Int, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions
 
-    suspend fun getTransactionReceipt(transactionHash: String): ApiWalletTransactionReceipt
+    suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt
 
     suspend fun claimRewards(walletAddress: String): ApiTransactionPerformed
 
     suspend fun searchRecipients(query: String): List<ApiWalletRecipient>
 
-    suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiWalletTransactionReceipt
+    suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): ApiWalletTransactionReceipt
 
     suspend fun getTokenInfo(tokenAddress: String): ApiWalletTokenInfo
 
