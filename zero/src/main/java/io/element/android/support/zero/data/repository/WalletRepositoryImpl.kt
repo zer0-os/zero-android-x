@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.repository
 
+import io.element.android.support.zero.config.ZeroConfig
 import io.element.android.support.zero.network.model.request.ApproveERC20Request
 import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
 import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
@@ -38,22 +39,42 @@ class WalletRepositoryImpl(
         }
     }
 
-    override suspend fun getTokens(walletAddress: String, nextPageParams: NextPageParams?): ApiWalletTokens {
+    override suspend fun getTokens(walletAddress: String, chainId: Int, nextPageParams: NextPageParams?): ApiWalletTokens {
+        val chainIds = listOf(
+            chainId.toString(),
+            // Appending ZEPHYR explicitly
+            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
+        )
         return zeroWalletService.getTokens(
             walletAddress = walletAddress,
+            chainIds = chainIds,
             nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
         )
     }
 
-    override suspend fun getTransactions(walletAddress: String, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions {
+    override suspend fun getTransactions(walletAddress: String, chainId: Int, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions {
+        val chainIds = listOf(
+            chainId.toString(),
+            // Appending ZEPHYR explicitly
+            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
+        )
         return zeroWalletService.getTransactions(
             walletAddress = walletAddress,
+            chainIds = chainIds,
             nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
         )
     }
 
-    override suspend fun getTransactionReceipt(transactionHash: String): ApiWalletTransactionReceipt {
-        return zeroWalletService.getTransactionReceipt(transactionHash)
+    override suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt {
+        val chainIds = listOf(
+            chainId.toString(),
+            // Appending ZEPHYR explicitly
+            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
+        )
+        val receipt = zeroWalletService.getTransactionReceipt(transactionHash, chainIds)
+        return receipt.copy(
+            blockExplorerUrl = receipt.blockExplorerUrl.replace("zscan.io", "zscan.live")
+        )
     }
 
     override suspend fun claimRewards(walletAddress: String): ApiTransactionPerformed {
@@ -64,12 +85,12 @@ class WalletRepositoryImpl(
         return zeroWalletService.searchRecipient(query).recipients
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): ApiWalletTransactionReceipt {
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): ApiWalletTransactionReceipt {
         val transaction = zeroWalletService.transferToken(
             senderWalletAddress = sender,
-            request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token)
+            request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token, chainId = chainId)
         )
-        return getTransactionReceipt(transaction.transactionHash)
+        return getTransactionReceipt(transaction.transactionHash, chainId)
     }
 
     override suspend fun getTokenInfo(tokenAddress: String): ApiWalletTokenInfo {

@@ -29,6 +29,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import io.element.android.support.zero.common.extension.openExternalUri
+import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -169,17 +170,20 @@ class TransferTokenPresenter @Inject constructor(
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>
     ) = launch {
         tokensListState.value = WalletTokensListState.Skeleton(10)
-        client.getWalletTokens(walletAddress, tokenPaginationParams.value)
-            .onSuccess { result ->
-                val newList = mutableListOf<ZeroWalletToken>().apply {
-                    addAll(currentList)
-                    addAll(result.tokens)
-                }.distinctBy { token -> token.tokenAddress }
-                tokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
-                tokenPaginationParams.value = result.paginationParams
-            }.onFailure {
-                tokensListState.value = WalletTokensListState.Empty
-            }
+        client.getWalletTokens(
+            walletAddress = walletAddress,
+            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
+            paginationParams = tokenPaginationParams.value
+        ).onSuccess { result ->
+            val newList = mutableListOf<ZeroWalletToken>().apply {
+                addAll(currentList)
+                addAll(result.tokens)
+            }.distinctBy { token -> token.tokenAddress }
+            tokensListState.value = WalletTokensListState.Tokens(newList.toPersistentList())
+            tokenPaginationParams.value = result.paginationParams
+        }.onFailure {
+            tokensListState.value = WalletTokensListState.Empty
+        }
     }
 
     private fun CoroutineScope.transferToken(
@@ -197,8 +201,9 @@ class TransferTokenPresenter @Inject constructor(
         client.transferToken(
             sender = senderWalletAddress,
             recipient = recipient.publicAddress,
+            chainId = token.chainId,
             amount = amount,
-            token = token.tokenAddress
+            token = token.tokenAddress,
         ).onSuccess {
             transferReceiptFlow.value = it
             flowStep.value = TransferTokenFlowStep.COMPLETED

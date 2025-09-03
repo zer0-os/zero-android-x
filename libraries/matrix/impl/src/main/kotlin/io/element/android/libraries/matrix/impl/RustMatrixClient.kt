@@ -113,6 +113,7 @@ import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import io.element.android.support.zero.config.ZeroConfig
 import io.element.android.support.zero.data.conversion.toApi
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
@@ -1165,28 +1166,30 @@ class RustMatrixClient(
         }
 
     override suspend fun getWalletTokens(walletAddress: String,
+                                         chainId: Int,
                                          paginationParams: ZeroWalletTokensPaginationParams?
     ): Result<ZeroWalletTokensResponse> = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTokens(walletAddress, paginationParams?.toApi()).toModel()
+            walletRepo.getTokens(walletAddress, chainId, paginationParams?.toApi()).toModel()
         }
     }
 
     override suspend fun getWalletTransactions(walletAddress: String,
+                                               chainId: Int,
                                                paginationParams: ZeroWalletTransactionsPaginationParams?
     ): Result<ZeroWalletTransactionsResponse> = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTransactions(walletAddress, paginationParams?.toApi()).toModel()
+            walletRepo.getTransactions(walletAddress, chainId, paginationParams?.toApi()).toModel()
         }
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String): Result<ZeroWalletTransactionReceipt>
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt>
         = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTransactionReceipt(transactionId).toModel()
+            walletRepo.getTransactionReceipt(transactionId, chainId).toModel()
         }
     }
 
@@ -1205,11 +1208,11 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun transferToken(sender: String, recipient: String, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.transferToken(sender, recipient, amount, token).toModel()
+                walletRepo.transferToken(sender, recipient, chainId, amount, token).toModel()
             }
         }
 
@@ -1288,7 +1291,10 @@ class RustMatrixClient(
                     userAddress, amount, poolAddress, tokenAddress
                 )
                 //2. verify approval transaction
-                walletRepo.getTransactionReceipt(approveTransactionRequest.transactionHash)
+                walletRepo.getTransactionReceipt(
+                    transactionHash = approveTransactionRequest.transactionHash,
+                    chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID
+                )
                 //3. verify approval request
                 walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress)
                 //4. stake amount

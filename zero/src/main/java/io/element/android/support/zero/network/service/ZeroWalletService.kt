@@ -32,18 +32,21 @@ interface ZeroWalletService {
     @GET(value = "api/wallet/{wallet_address}/tokens")
     suspend fun getTokens(
         @Path("wallet_address") walletAddress: String,
+        @Query("chainId") chainIds: List<String>,
         @QueryMap nextPageParams: Map<String, @JvmSuppressWildcards Any> = emptyMap()
     ): ApiWalletTokens
 
     @GET(value = "api/wallet/{wallet_address}/transactions")
     suspend fun getTransactions(
         @Path("wallet_address") walletAddress: String,
+        @Query("chainId") chainIds: List<String>,
         @QueryMap nextPageParams: Map<String, @JvmSuppressWildcards Any> = emptyMap()
     ): ApiWalletTransactions
 
     @GET(value = "api/wallet/transaction/{transaction_hash}/receipt")
     suspend fun getTransactionReceipt(
-        @Path("transaction_hash") transactionHash: String
+        @Path("transaction_hash") transactionHash: String,
+        @Query("chainId") chainIds: List<String>,
     ): ApiWalletTransactionReceipt
 
     @POST(value = "api/wallet/{wallet_address}/claim-rewards")
