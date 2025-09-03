@@ -204,17 +204,20 @@ private fun TransactionRow(
             .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(40.dp)
-                .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
-                .clip(CircleShape),
-            model = transaction.token.logo,
-            contentScale = ContentScale.Fit,
-            alignment = Alignment.Center,
-            contentDescription = null,
-            error = painterResource(R.drawable.ic_zero_avatar_default),
-        )
+        Box(contentAlignment = Alignment.BottomEnd) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(ElementTheme.colors.bgCanvasDefault, shape = CircleShape)
+                    .clip(CircleShape),
+                model = transaction.token.logo,
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+                contentDescription = null,
+                error = painterResource(R.drawable.ic_zero_avatar_default),
+            )
+            ZChainIcon()
+        }
 
         Column(
             Modifier
@@ -227,14 +230,14 @@ private fun TransactionRow(
                     style = ElementTheme.typography.fontBodySmRegular,
                     color = ElementTheme.colors.textSecondary
                 )
-                ZChainIcon(Modifier.padding(horizontal = 4.dp))
+//                ZChainIcon(Modifier.padding(horizontal = 4.dp))
                 val walletAddress = if (transaction.isTransactionReceived) {
                     ZeroWalletUtil.walletAddressDisplayText(transaction.from)
                 } else {
                     ZeroWalletUtil.walletAddressDisplayText(transaction.to)
                 }
                 Text(
-                    text = walletAddress ?: "",
+                    text = " $walletAddress",
                     style = ElementTheme.typography.fontBodySmRegular,
                     color = ElementTheme.colors.textSecondary,
                     maxLines = 1,

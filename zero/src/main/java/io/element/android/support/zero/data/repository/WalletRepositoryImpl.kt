@@ -40,38 +40,23 @@ class WalletRepositoryImpl(
     }
 
     override suspend fun getTokens(walletAddress: String, chainId: Int, nextPageParams: NextPageParams?): ApiWalletTokens {
-        val chainIds = listOf(
-            chainId.toString(),
-            // Appending ZEPHYR explicitly
-            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
-        )
         return zeroWalletService.getTokens(
             walletAddress = walletAddress,
-            chainIds = chainIds,
+            chainId = chainId.toString(),
             nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
         )
     }
 
     override suspend fun getTransactions(walletAddress: String, chainId: Int, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions {
-        val chainIds = listOf(
-            chainId.toString(),
-            // Appending ZEPHYR explicitly
-            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
-        )
         return zeroWalletService.getTransactions(
             walletAddress = walletAddress,
-            chainIds = chainIds,
+            chainId = chainId.toString(),
             nextPageParams = nextPageParams?.toQueryMap() ?: emptyMap()
         )
     }
 
     override suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt {
-        val chainIds = listOf(
-            chainId.toString(),
-            // Appending ZEPHYR explicitly
-            ZeroConfig.ZERO_WALLET_ZCHAIN_ID_ALTERNATE.toString()
-        )
-        val receipt = zeroWalletService.getTransactionReceipt(transactionHash, chainIds)
+        val receipt = zeroWalletService.getTransactionReceipt(transactionHash, chainId.toString())
         return receipt.copy(
             blockExplorerUrl = receipt.blockExplorerUrl.replace("zscan.io", "zscan.live")
         )
