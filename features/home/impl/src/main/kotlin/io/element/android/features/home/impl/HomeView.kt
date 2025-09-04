@@ -40,6 +40,7 @@ import io.element.android.features.home.impl.components.ClaimRewardsSheet
 import io.element.android.features.home.impl.components.HomeFabButton
 import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
+import io.element.android.features.home.impl.components.WalletReceiveTokenSheet
 import io.element.android.features.home.impl.components.WalletStakingSheet
 import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.HomeScreenTab
@@ -90,7 +91,6 @@ fun HomeView(
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     onSendWalletToken: () -> Unit,
-    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -153,7 +153,6 @@ fun HomeView(
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
                 onSendWalletToken = onSendWalletToken,
-                onReceiveWalletToken = onReceiveWalletToken,
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
@@ -201,7 +200,6 @@ private fun HomeScaffold(
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     onSendWalletToken: () -> Unit,
-    onReceiveWalletToken: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -220,6 +218,9 @@ private fun HomeScaffold(
 
     val claimRewardsSheetState = rememberModalBottomSheetState()
     val walletStakeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val showWalletReceiveTokenSheet = remember { mutableStateOf(false) }
+    val walletReceiveTokenSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box {
         Scaffold(
@@ -265,7 +266,9 @@ private fun HomeScaffold(
                     onFeedClick = onFeedClick,
                     onFeedUserClick = onFeedUserClick,
                     onSendWalletToken = onSendWalletToken,
-                    onReceiveWalletToken = onReceiveWalletToken,
+                    onReceiveWalletToken = {
+                        showWalletReceiveTokenSheet.value = true
+                    },
                     modifier = Modifier
                         .padding(padding)
                         .consumeWindowInsets(padding)
@@ -348,6 +351,19 @@ private fun HomeScaffold(
                     selectedPool = state.walletContentState.selectedPool,
                     actionState = state.walletContentState.walletStakeActionState,
                     eventSink = state.walletContentState.eventSink
+                )
+            }
+        )
+    }
+
+    if (showWalletReceiveTokenSheet.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showWalletReceiveTokenSheet.value = false },
+            sheetState = walletReceiveTokenSheetState,
+            content = {
+                WalletReceiveTokenSheet(
+                    state = state,
+                    onDismissSheet = { showWalletReceiveTokenSheet.value = false }
                 )
             }
         )
@@ -463,7 +479,6 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
         onDeclineInviteAndBlockUser = {},
         acceptDeclineInviteView = {},
         onSendWalletToken = {},
-        onReceiveWalletToken = {}
     )
 }
 
@@ -488,6 +503,5 @@ internal fun HomeViewA11yPreview() = ElementPreview {
         onUserProfileClick = {},
         onCreateFeedClick = {},
         onSendWalletToken = {},
-        onReceiveWalletToken = {}
     )
 }

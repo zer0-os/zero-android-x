@@ -326,9 +326,6 @@ class LoggedInFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object SearchUser : NavTarget
-
-//        @Parcelize
-//        data object ReceiveWalletToken : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -398,10 +395,6 @@ class LoggedInFlowNode @AssistedInject constructor(
 
                     override fun onSendWalletToken() {
                         backstack.push(NavTarget.SendWalletToken)
-                    }
-
-                    override fun onReceiveWalletToken() {
-                        //TODO: backstack.push(NavTarget.ReceiveWalletToken)
                     }
                 }
                 homeEntryPoint
