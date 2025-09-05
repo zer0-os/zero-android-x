@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -38,6 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -53,6 +53,7 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
+import io.element.android.support.zero.common.ui.theme.SPACING_3X
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -80,11 +81,13 @@ fun HomeWalletContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            /*WalletActionButton(
+            WalletActionButton(
                 icon = CompoundIcons.ArrowUpRight(),
                 text = "Receive",
+                iconRotation = 180f,
                 onClick = onReceiveWalletToken
-            )*/
+            )
+            Spacer(Modifier.size(SPACING_3X.dp))
             WalletActionButton(
                 icon = CompoundIcons.ArrowUpRight(),
                 text = "Send",
@@ -188,6 +191,7 @@ fun RowScope.WalletActionButton(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     text: String,
+    iconRotation: Float = 0f,
     onClick: () -> Unit = {}
 ) {
     Button(
@@ -196,7 +200,7 @@ fun RowScope.WalletActionButton(
             .border(
                 width = 0.5.dp,
                 color = ElementTheme.colors.zeroBrandColor,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             ),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors().copy(
@@ -206,6 +210,7 @@ fun RowScope.WalletActionButton(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
+                modifier = Modifier.rotate(iconRotation),
                 imageVector = icon,
                 contentDescription = null,
                 tint = ElementTheme.colors.zeroBrandColor

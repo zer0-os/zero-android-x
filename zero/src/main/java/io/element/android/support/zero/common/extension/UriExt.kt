@@ -10,6 +10,7 @@ package io.element.android.support.zero.common.extension
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 
@@ -39,4 +40,20 @@ fun Uri.localFileName(context: Context): String? {
         }
     }
     return null
+}
+
+fun ByteArray.toUri(context: Context, fileName: String): Uri {
+    // Save the bytes as a temp file
+    val file = File(context.cacheDir, fileName)
+    FileOutputStream(file).use {
+        it.write(this)
+        it.flush()
+    }
+    // Get content URI
+    val uri: Uri = FileProvider.getUriForFile(
+        context,
+        "com.zero.android.messenger.fileprovider",
+        file
+    )
+    return uri
 }
