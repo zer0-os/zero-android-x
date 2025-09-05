@@ -29,7 +29,7 @@ data class ManageWalletsState(
     val eventSink: (ManageWalletsEvents) -> Unit
 ) {
     val selfCustodyWallets: List<ZeroWallet>
-        get() = wallets.filter { it.isDefault }
+        get() = wallets.filter { !it.isThirdWeb }
 
     val selfCustodyWalletsCount: Int
         get() = selfCustodyWallets.count()

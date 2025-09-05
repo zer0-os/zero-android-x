@@ -71,7 +71,7 @@ fun ManageWalletsView(
                 ) {
                     WalletsListView(
                         modifier = Modifier
-                            .height(100.dp)
+                            .height((state.selfCustodyWallets.count().times(80)).dp)
                             .padding(PADDING_4X.dp),
                         wallets = state.selfCustodyWallets,
                         canRemoveWallet = true,
@@ -93,7 +93,7 @@ fun ManageWalletsView(
                 ) {
                     WalletsListView(
                         modifier = Modifier
-                            .height(100.dp)
+                            .height((state.zeroWallets.count().times(80)).dp)
                             .padding(PADDING_4X.dp),
                         wallets = state.zeroWallets,
                         canRemoveWallet = false,
