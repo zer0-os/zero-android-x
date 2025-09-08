@@ -32,6 +32,7 @@ import io.element.android.libraries.matrix.api.room.alias.ResolvedRoomAlias
 import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
+import io.element.android.libraries.matrix.api.spaces.SpaceService
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
@@ -70,6 +71,7 @@ interface MatrixClient {
     val deviceId: DeviceId
     val userProfile: StateFlow<MatrixUser>
     val roomListService: RoomListService
+    val spaceService: SpaceService
     val mediaLoader: MatrixMediaLoader
     val sessionCoroutineScope: CoroutineScope
     val ignoredUsersFlow: StateFlow<ImmutableList<UserId>>

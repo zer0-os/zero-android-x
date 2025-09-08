@@ -24,6 +24,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
 import com.reown.appkit.ui.components.button.rememberAppKitState
+import dev.zacsweers.metro.Inject
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
 import io.element.android.features.login.impl.walletconnect.WalletConnectService
@@ -34,10 +35,10 @@ import io.element.android.libraries.matrix.api.core.SessionId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
-class LoginPasswordPresenter @Inject constructor(
+@Inject
+class LoginPasswordPresenter(
     private val authenticationService: MatrixAuthenticationService,
     private val accountProviderDataSource: AccountProviderDataSource,
 ) : Presenter<LoginPasswordState> {

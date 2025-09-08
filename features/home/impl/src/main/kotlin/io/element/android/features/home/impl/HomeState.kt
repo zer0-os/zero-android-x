@@ -12,6 +12,7 @@ import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.roomlist.RoomListState
+import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.libraries.architecture.AsyncAction
@@ -36,6 +37,7 @@ data class HomeState(
     val feedMediaMap: Map<String, FeedMedia>,
     val feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
     val resolvedChannelRoom: RoomId?,
+    val homeSpacesState: HomeSpacesState,
     val snackbarMessage: SnackbarMessage?,
     val canReportBug: Boolean,
     val directLogoutState: DirectLogoutState,

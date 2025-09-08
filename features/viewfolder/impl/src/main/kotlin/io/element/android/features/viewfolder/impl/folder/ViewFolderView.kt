@@ -54,7 +54,7 @@ fun ViewFolderView(
                 navigationIcon = {
                     BackButton(onClick = onBackClick)
                 },
-                titleStr = state.path,
+                titleStr = state.title,
             )
         },
         content = { padding ->

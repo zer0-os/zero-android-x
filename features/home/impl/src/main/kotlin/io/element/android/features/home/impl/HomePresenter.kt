@@ -33,6 +33,7 @@ import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.features.home.impl.model.channelId
 import io.element.android.features.home.impl.roomlist.RoomListState
+import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.home.impl.wallet.WalletTokensListState
 import io.element.android.features.home.impl.wallet.WalletTransactionsListState
@@ -100,12 +101,14 @@ import kotlin.jvm.optionals.getOrNull
 
 private const val HOME_FEED_PAGE_SIZE = 15
 
-class HomePresenter @Inject constructor(
+@Inject
+class HomePresenter(
     private val client: MatrixClient,
     private val syncService: SyncService,
     private val snackbarDispatcher: SnackbarDispatcher,
     private val indicatorService: IndicatorService,
     private val roomListPresenter: Presenter<RoomListState>,
+    private val homeSpacesPresenter: Presenter<HomeSpacesState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val featureFlagService: FeatureFlagService,
@@ -123,6 +126,7 @@ class HomePresenter @Inject constructor(
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug by remember { rageshakeFeatureAvailability.isAvailable() }.collectAsState(false)
         val roomListState = roomListPresenter.present()
+        val homeSpacesState = homeSpacesPresenter.present()
         val isSpaceFeatureEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
         }.collectAsState(initial = false)
@@ -385,6 +389,7 @@ class HomePresenter @Inject constructor(
             feedMediaMap = feedMediaMap,
             feedLinkMetaDataMap = feedLinkMetaDataMap,
             resolvedChannelRoom = resolvedChannelRoomId.value,
+            homeSpacesState = homeSpacesState,
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,

@@ -25,9 +25,9 @@ import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.core.plugin.plugins
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import io.element.android.anvilannotations.ContributesNode
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.Inject
+import io.element.android.annotations.ContributesNode
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.messages.impl.MessagesNavigator
 import io.element.android.features.messages.impl.MessagesPresenter
@@ -50,8 +50,8 @@ import io.element.android.libraries.architecture.NodeInputs
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
-import io.element.android.libraries.di.ApplicationContext
 import io.element.android.libraries.di.RoomScope
+import io.element.android.libraries.di.annotations.ApplicationContext
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
 import io.element.android.libraries.matrix.api.analytics.toAnalyticsViewRoom
 import io.element.android.libraries.matrix.api.core.EventId
@@ -74,7 +74,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @ContributesNode(RoomScope::class)
-class ThreadedMessagesNode @AssistedInject constructor(
+@Inject
+class ThreadedMessagesNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
     @ApplicationContext private val context: Context,
@@ -115,7 +116,7 @@ class ThreadedMessagesNode @AssistedInject constructor(
 
     interface Callback : Plugin {
         fun onEventClick(timelineMode: Timeline.Mode, event: TimelineItem.Event): Boolean
-        fun onPreviewAttachments(attachments: ImmutableList<Attachment>)
+        fun onPreviewAttachments(attachments: ImmutableList<Attachment>, inReplyToEventId: EventId?)
         fun onUserDataClick(userId: UserId, primaryZId: String?)
         fun onPermalinkClick(data: PermalinkData)
         fun onShowEventDebugInfoClick(eventId: EventId?, debugInfo: TimelineItemDebugInfo)
@@ -215,8 +216,8 @@ class ThreadedMessagesNode @AssistedInject constructor(
         callbacks.forEach { it.onEditPollClick(eventId) }
     }
 
-    override fun onPreviewAttachment(attachments: ImmutableList<Attachment>) {
-        callbacks.forEach { it.onPreviewAttachments(attachments) }
+    override fun onPreviewAttachment(attachments: ImmutableList<Attachment>, inReplyToEventId: EventId?) {
+        callbacks.forEach { it.onPreviewAttachments(attachments, inReplyToEventId) }
     }
 
     override fun onNavigateToRoom(roomId: RoomId, serverNames: List<String>) = Unit

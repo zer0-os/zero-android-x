@@ -27,7 +27,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 
 @Composable
 fun MembersCountMolecule(
-    memberCount: Long,
+    memberCount: Int,
     modifier: Modifier = Modifier,
 ) {
     Row(

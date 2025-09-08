@@ -17,6 +17,8 @@ import io.element.android.features.home.impl.roomlist.RoomListStateProvider
 import io.element.android.features.home.impl.roomlist.aRoomListState
 import io.element.android.features.home.impl.roomlist.aRoomsContentState
 import io.element.android.features.home.impl.roomlist.generateRoomListRoomSummaryList
+import io.element.android.features.home.impl.spaces.HomeSpacesState
+import io.element.android.features.home.impl.spaces.aHomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.home.impl.wallet.aWalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
@@ -68,6 +70,7 @@ internal fun aHomeState(
     feedMediaMap: Map<String, FeedMedia> = emptyMap(),
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
     resolvedChannelRoom: RoomId? = null,
+    homeSpacesState: HomeSpacesState = aHomeSpacesState(),
     canReportBug: Boolean = true,
     isSpaceFeatureEnabled: Boolean = false,
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
@@ -89,6 +92,7 @@ internal fun aHomeState(
     snackbarMessage = snackbarMessage,
     canReportBug = canReportBug,
     directLogoutState = directLogoutState,
+    homeSpacesState = homeSpacesState,
     isSpaceFeatureEnabled = isSpaceFeatureEnabled,
     walletContentState = walletContentState,
     showClaimRewardsSheet = false,
