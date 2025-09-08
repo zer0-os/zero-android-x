@@ -51,10 +51,12 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 import kotlin.math.abs
 
@@ -206,7 +208,11 @@ private fun TokenRow(
                 contentDescription = null,
                 error = painterResource(R.drawable.ic_zero_avatar_default)
             )
-            ZChainIcon()
+            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
+                AvaxChainIcon()
+            } else {
+                ZChainIcon()
+            }
         }
 
         Column(

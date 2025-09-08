@@ -65,6 +65,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -113,7 +114,6 @@ import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
-import io.element.android.support.zero.config.ZeroConfig
 import io.element.android.support.zero.data.conversion.toApi
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
@@ -1166,30 +1166,31 @@ class RustMatrixClient(
         }
 
     override suspend fun getWalletTokens(walletAddress: String,
-                                         chainId: Int,
                                          paginationParams: ZeroWalletTokensPaginationParams?
     ): Result<ZeroWalletTokensResponse> = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTokens(walletAddress, chainId, paginationParams?.toApi()).toModel()
+            walletRepo.getTokens(walletAddress, paginationParams?.toApi()).toModel()
         }
     }
 
     override suspend fun getWalletTransactions(walletAddress: String,
-                                               chainId: Int,
                                                paginationParams: ZeroWalletTransactionsPaginationParams?
     ): Result<ZeroWalletTransactionsResponse> = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTransactions(walletAddress, chainId, paginationParams?.toApi()).toModel()
+            walletRepo.getTransactions(walletAddress, paginationParams?.toApi()).toModel()
         }
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt>
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int?): Result<ZeroWalletTransactionReceipt>
         = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-            walletRepo.getTransactionReceipt(transactionId, chainId).toModel()
+            walletRepo.getTransactionReceipt(
+                transactionHash = transactionId,
+                chainId = chainId ?: WalletChainsUtil.Z_CHAIN_ID
+            ).toModel()
         }
     }
 
@@ -1216,71 +1217,71 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo> =
+    override suspend fun getTokenInfo(tokenAddress: String, chainId: Int): Result<ZeroWalletTokenInfo> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.getTokenInfo(tokenAddress).toModel()
+                walletRepo.getTokenInfo(tokenAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance> =
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): Result<ZeroWalletTokenBalance> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
-                walletRepo.getTokenBalance(userAddress, tokenAddress).toModel()
+                walletRepo.getTokenBalance(userAddress, tokenAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getTotalStaked(poolAddress: String): Result<String> =
+    override suspend fun getTotalStaked(poolAddress: String, chainId: Int): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getTotalStaked(poolAddress)
+                stake.getTotalStaked(poolAddress, chainId)
             }
         }
 
-    override suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig> =
+    override suspend fun getStakingConfig(poolAddress: String, chainId: Int): Result<ZeroStakingConfig> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getStakingConfig(poolAddress).toModel()
+                stake.getStakingConfig(poolAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): Result<ZeroStakingStatus> =
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingStatus> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getStakerStatusInfo(userAddress, poolAddress).toModel()
+                stake.getStakerStatusInfo(userAddress, poolAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): Result<ZeroStakingUserRewardsInfo> =
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingUserRewardsInfo> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getStakeRewardsInfo(userAddress, poolAddress).toModel()
+                stake.getStakeRewardsInfo(userAddress, poolAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getStakingToken(poolAddress: String): Result<ZeroTokenAddress> =
+    override suspend fun getStakingToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getStakingToken(poolAddress).toModel()
+                stake.getStakingToken(poolAddress, chainId).toModel()
             }
         }
 
-    override suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress> =
+    override suspend fun getRewardToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.getRewardToken(poolAddress).toModel()
+                stake.getRewardToken(poolAddress, chainId).toModel()
             }
         }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> =
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): Result<String> =
         withContext(sessionDispatcher) {
             runCatchingExceptions {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
@@ -1288,33 +1289,33 @@ class RustMatrixClient(
 
                 //1. approve transaction
                 val approveTransactionRequest = walletRepo.approveERC20(
-                    userAddress, amount, poolAddress, tokenAddress
+                    userAddress, amount, poolAddress, tokenAddress, chainId
                 )
                 //2. verify approval transaction
                 walletRepo.getTransactionReceipt(
                     transactionHash = approveTransactionRequest.transactionHash,
-                    chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID
+                    chainId = chainId
                 )
                 //3. verify approval request
-                walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress)
+                walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress, chainId)
                 //4. stake amount
-                stake.stakeAmount(userAddress, amount, poolAddress).transactionHash
+                stake.stakeAmount(userAddress, amount, poolAddress, chainId).transactionHash
             }
         }
 
-    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String> =
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.unstakeAmount(userAddress, amount, poolAddress).transactionHash
+                stake.unstakeAmount(userAddress, amount, poolAddress, chainId).transactionHash
             }
         }
 
-    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String> =
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
-                stake.claimStakingRewards(userAddress, poolAddress).transactionHash
+                stake.claimStakingRewards(userAddress, poolAddress, chainId).transactionHash
             }
         }
 

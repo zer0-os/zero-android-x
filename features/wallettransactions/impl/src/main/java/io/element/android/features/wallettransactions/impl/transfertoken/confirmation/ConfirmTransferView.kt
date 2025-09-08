@@ -57,9 +57,11 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
 import io.element.android.support.zero.common.ui.ZChainIcon
 
@@ -313,8 +315,11 @@ fun TokenView(
                 contentDescription = null,
                 error = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
-
-            ZChainIcon(Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
+                AvaxChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            } else {
+                ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            }
         }
 
         Spacer(Modifier.size(12.dp))
@@ -327,7 +332,7 @@ fun TokenView(
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "Z Chain",
+                text = token.symbol,
                 style = ElementTheme.typography.fontBodyMdRegular,
                 color = ElementTheme.colors.textSecondary
             )

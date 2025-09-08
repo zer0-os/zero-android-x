@@ -62,6 +62,7 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
+import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUtil
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -80,7 +81,6 @@ import io.element.android.support.zero.common.extension.withScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
-import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -252,7 +252,7 @@ class HomePresenter @Inject constructor(
                 }
                 is HomeEvents.ViewWalletTransaction -> {
                     coroutineScope.loadWalletTransaction(
-                        event.transactionId, walletTransactionUrlState, genericActionState
+                        event.transactionId, event.chainId, walletTransactionUrlState, genericActionState
                     )
                 }
                 HomeEvents.OnWalletTransactionViewed ->
@@ -690,12 +690,10 @@ class HomePresenter @Inject constructor(
             async { client.getMeowPrice() },
             async { client.getWalletTokens(
                 walletAddress = walletAddress,
-                chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
                 paginationParams = tokenPaginationParams.value
             ) },
             async { client.getWalletTransactions(
                 walletAddress = walletAddress,
-                chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
                 paginationParams = transactionPaginationParams.value
             ) },
         )
@@ -741,7 +739,6 @@ class HomePresenter @Inject constructor(
     ) = launch {
         client.getWalletTokens(
             walletAddress = walletAddress,
-            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
             paginationParams = tokenPaginationParams.value
         ).onSuccess {
             val newList = mutableListOf<ZeroWalletToken>().apply {
@@ -765,7 +762,6 @@ class HomePresenter @Inject constructor(
     ) = launch {
         client.getWalletTransactions(
             walletAddress = walletAddress,
-            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
             paginationParams = transactionPaginationParams.value
         ).onSuccess {
             val newList = mutableListOf<ZeroWalletTransaction>().apply {
@@ -782,11 +778,12 @@ class HomePresenter @Inject constructor(
 
     private fun CoroutineScope.loadWalletTransaction(
         transactionId: String,
+        chainId: Int?,
         walletTransactionUrlState: MutableState<AsyncAction<String>>,
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
         genericActionState.value = AsyncAction.Loading
-        client.getTransactionReceipt(transactionId, ZeroConfig.ZERO_WALLET_ZCHAIN_ID)
+        client.getTransactionReceipt(transactionId, chainId)
             .onSuccess {
                 genericActionState.value = AsyncAction.Success(Unit)
                 walletTransactionUrlState.value = AsyncAction.Success(it.blockExplorerUrl)
@@ -834,35 +831,42 @@ class HomePresenter @Inject constructor(
         refreshAllData: Boolean = false,
         onRefreshAllData: (HomeStakePool) -> Unit = {},
     ) {
-        // NEED TO FIGURE OUT FROM WHERE TO GET THIS POOL ADDRESS
-        val poolAddress = ZeroConfig.MEOW_POOL_ADDRESS
         val price = meowPrice ?: return
-        withIOScope {
-            coroutineScope {
-                val (totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult) = awaitAll(
-                    async { client.getTotalStaked(poolAddress) },
-                    async { client.getStakingConfig(poolAddress) },
-                    async { client.getStakerStatusInfo(userAddress, poolAddress) },
-                    async { client.getStakeRewardsInfo(userAddress, poolAddress) }
-                )
-
-                if (listOf(totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult).all { it.isSuccess }) {
-                    val totalStaked = (totalStakedResult as Result<String>).getOrNull() ?: return@coroutineScope
-                    val stakingConfig = (stakingConfigResult as Result<ZeroStakingConfig>).getOrNull() ?: return@coroutineScope
-                    val stakeStatus = (stakeStatusResult as Result<ZeroStakingStatus>).getOrNull() ?: return@coroutineScope
-                    val rewardsInfo = (rewardsInfoResult as Result<ZeroStakingUserRewardsInfo>).getOrNull() ?: return@coroutineScope
-
-                    val pool = HomeStakePool.from(
-                        userAddress = userAddress,
-                        poolAddress = poolAddress,
-                        meowPrice = price,
-                        totalStakedAmount = totalStaked,
-                        stakingConfig = stakingConfig,
-                        stakingStatus = stakeStatus,
-                        rewardsInfo = rewardsInfo
+        val stakePools = ZeroStakingUtil.stakePools
+        stakePools.forEach { stakePool ->
+            val poolAddress = stakePool.address
+            val chainId = stakePool.chainId
+            withIOScope {
+                coroutineScope {
+                    val (totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult) = awaitAll(
+                        async { client.getTotalStaked(poolAddress, chainId) },
+                        async { client.getStakingConfig(poolAddress, chainId) },
+                        async { client.getStakerStatusInfo(userAddress, poolAddress, chainId) },
+                        async { client.getStakeRewardsInfo(userAddress, poolAddress, chainId) }
                     )
-                    stakePoolsContent.value = listOf(pool)
-                    if (refreshAllData) { onRefreshAllData(pool) }
+
+                    if (listOf(totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult).all { it.isSuccess }) {
+                        val totalStaked = (totalStakedResult as Result<String>).getOrNull() ?: return@coroutineScope
+                        val stakingConfig = (stakingConfigResult as Result<ZeroStakingConfig>).getOrNull() ?: return@coroutineScope
+                        val stakeStatus = (stakeStatusResult as Result<ZeroStakingStatus>).getOrNull() ?: return@coroutineScope
+                        val rewardsInfo = (rewardsInfoResult as Result<ZeroStakingUserRewardsInfo>).getOrNull() ?: return@coroutineScope
+
+                        val pool = HomeStakePool.from(
+                            userAddress = userAddress,
+                            pool = stakePool,
+                            meowPrice = price,
+                            totalStakedAmount = totalStaked,
+                            stakingConfig = stakingConfig,
+                            stakingStatus = stakeStatus,
+                            rewardsInfo = rewardsInfo
+                        )
+
+                        val existingPoolsList = stakePoolsContent.value.toMutableList()
+                        existingPoolsList.add(pool)
+                        stakePoolsContent.value = existingPoolsList.distinctBy { it.poolAddress }
+
+                        if (refreshAllData) { onRefreshAllData(pool) }
+                    }
                 }
             }
         }
@@ -880,18 +884,19 @@ class HomePresenter @Inject constructor(
             genericActionState.value = AsyncAction.Loading
         }
 
+        val chainId = pool.chainId
         val fetchTokenData: suspend (String) -> Pair<ZeroWalletTokenInfo?, ZeroWalletTokenBalance?> = { tokenAddress ->
             val results = awaitAll(
-                async { client.getTokenInfo(tokenAddress) },
-                async { client.getTokenBalance(pool.userWalletAddress, tokenAddress) },
+                async { client.getTokenInfo(tokenAddress, chainId) },
+                async { client.getTokenBalance(pool.userWalletAddress, tokenAddress, chainId) },
             )
             val tokenInfoResult = (results[0] as? Result<ZeroWalletTokenInfo>)?.getOrNull()
             val tokenBalanceResult = (results[1] as? Result<ZeroWalletTokenBalance>)?.getOrNull()
             (tokenInfoResult to tokenBalanceResult)
         }
         val tokensResult = awaitAll(
-            async { client.getStakingToken(pool.poolAddress) },
-            async { client.getRewardToken(pool.poolAddress) },
+            async { client.getStakingToken(pool.poolAddress, chainId) },
+            async { client.getRewardToken(pool.poolAddress, chainId) },
         )
         var stakeTokenInfo: ZeroWalletTokenInfo? = null
         var stakeTokenBalance: ZeroWalletTokenBalance? = null
@@ -930,7 +935,8 @@ class HomePresenter @Inject constructor(
         genericActionState.value = AsyncAction.Loading
         client.claimStakingRewards(
             userAddress = pool.userWalletAddress,
-            poolAddress = pool.poolAddress
+            poolAddress = pool.poolAddress,
+            chainId = pool.chainId
         ).onSuccess {
             genericActionState.value = AsyncAction.Success(Unit)
             onDone()
@@ -950,7 +956,8 @@ class HomePresenter @Inject constructor(
             userAddress = stakePool.poolInfo.userWalletAddress,
             amount = toSmallestUnit(transactionAmount, 18),
             poolAddress = stakePool.poolInfo.poolAddress,
-            tokenAddress = stakePool.stakeTokenInfo.address
+            tokenAddress = stakePool.stakeTokenInfo.address,
+            chainId = stakePool.poolInfo.chainId
         ).onSuccess {
             walletStakeActionState.value = AsyncAction.Success(it)
         }.onFailure {
@@ -969,6 +976,7 @@ class HomePresenter @Inject constructor(
             userAddress = stakePool.poolInfo.userWalletAddress,
             amount = toSmallestUnit(transactionAmount, 18),
             poolAddress = stakePool.poolInfo.poolAddress,
+            chainId = stakePool.poolInfo.chainId
         ).onSuccess {
             walletStakeActionState.value = AsyncAction.Success(it)
         }.onFailure {

@@ -298,16 +298,14 @@ interface MatrixClient {
     suspend fun getMeowPrice(): Result<ZeroMeowPrice>
 
     suspend fun getWalletTokens(walletAddress: String,
-                                chainId: Int,
                                 paginationParams: ZeroWalletTokensPaginationParams?
     ): Result<ZeroWalletTokensResponse>
 
     suspend fun getWalletTransactions(walletAddress: String,
-                                      chainId: Int,
                                       paginationParams: ZeroWalletTransactionsPaginationParams?
     ): Result<ZeroWalletTransactionsResponse>
 
-    suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt>
+    suspend fun getTransactionReceipt(transactionId: String, chainId: Int?): Result<ZeroWalletTransactionReceipt>
 
     suspend fun claimRewards(walletAddress: String): Result<String>
 
@@ -315,27 +313,27 @@ interface MatrixClient {
 
     suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt>
 
-    suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo>
+    suspend fun getTokenInfo(tokenAddress: String, chainId: Int): Result<ZeroWalletTokenInfo>
 
-    suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance>
+    suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): Result<ZeroWalletTokenBalance>
 
-    suspend fun getTotalStaked(poolAddress: String): Result<String>
+    suspend fun getTotalStaked(poolAddress: String, chainId: Int): Result<String>
 
-    suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig>
+    suspend fun getStakingConfig(poolAddress: String, chainId: Int): Result<ZeroStakingConfig>
 
-    suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): Result<ZeroStakingStatus>
+    suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingStatus>
 
-    suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): Result<ZeroStakingUserRewardsInfo>
+    suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingUserRewardsInfo>
 
-    suspend fun getStakingToken(poolAddress: String): Result<ZeroTokenAddress>
+    suspend fun getStakingToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress>
 
-    suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress>
+    suspend fun getRewardToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress>
 
-    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String>
+    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): Result<String>
 
-    suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String>
+    suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String>
 
-    suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String>
+    suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String>
 }
 
 /**

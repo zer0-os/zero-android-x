@@ -66,7 +66,8 @@ fun ApiWalletTransactions.toModel(): ZeroWalletTransactionsResponse {
                     transaction.token.symbol,
                     transaction.token.name,
                     transaction.token.logo,
-                    transaction.token.decimals
+                    transaction.token.decimals,
+                    transaction.token.chainId
                 ),
                 ZeroWalletUtil.getFormattedNumber(transactionAmount, false),
                 transaction.timestamp,

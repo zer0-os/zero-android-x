@@ -21,9 +21,9 @@ import io.element.android.support.zero.network.model.response.wallet.Transaction
 interface WalletRepository {
     suspend fun checkAndInitializeThirdWeb()
 
-    suspend fun getTokens(walletAddress: String, chainId: Int, nextPageParams: NextPageParams?): ApiWalletTokens
+    suspend fun getTokens(walletAddress: String, nextPageParams: NextPageParams?): ApiWalletTokens
 
-    suspend fun getTransactions(walletAddress: String, chainId: Int, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions
+    suspend fun getTransactions(walletAddress: String, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions
 
     suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt
 
@@ -33,11 +33,11 @@ interface WalletRepository {
 
     suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): ApiWalletTransactionReceipt
 
-    suspend fun getTokenInfo(tokenAddress: String): ApiWalletTokenInfo
+    suspend fun getTokenInfo(tokenAddress: String, chainId: Int): ApiWalletTokenInfo
 
-    suspend fun getTokenBalance(userAddress: String, tokenAddress: String): ApiWalletTokenBalance
+    suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): ApiWalletTokenBalance
 
-    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): ApiTransactionPerformed
+    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiTransactionPerformed
 
-    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String): ApiWalletStakingApprovalResponse
+    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiWalletStakingApprovalResponse
 }

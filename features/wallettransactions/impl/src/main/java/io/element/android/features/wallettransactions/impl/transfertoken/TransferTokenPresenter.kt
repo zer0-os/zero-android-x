@@ -29,7 +29,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import io.element.android.support.zero.common.extension.openExternalUri
-import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -172,7 +171,6 @@ class TransferTokenPresenter @Inject constructor(
         tokensListState.value = WalletTokensListState.Skeleton(10)
         client.getWalletTokens(
             walletAddress = walletAddress,
-            chainId = ZeroConfig.ZERO_WALLET_ZCHAIN_ID,
             paginationParams = tokenPaginationParams.value
         ).onSuccess { result ->
             val newList = mutableListOf<ZeroWalletToken>().apply {

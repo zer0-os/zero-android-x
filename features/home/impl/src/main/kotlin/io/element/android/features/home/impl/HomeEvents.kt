@@ -38,7 +38,7 @@ sealed interface HomeEvents {
     sealed interface HomeWalletEvents: HomeEvents
     data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>): HomeWalletEvents
     data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>): HomeWalletEvents
-    data class ViewWalletTransaction(val transactionId: String): HomeWalletEvents
+    data class ViewWalletTransaction(val transactionId: String, val chainId: Int? = null): HomeWalletEvents
     data object OnWalletTransactionViewed: HomeWalletEvents
     data object ToggleWalletBalance: HomeWalletEvents
     data object RefreshWalletBalance: HomeWalletEvents

@@ -51,11 +51,13 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
 import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 
 @Composable
@@ -85,7 +87,7 @@ fun WalletTransactionsList(
                         )
                     },
                     onTransactionTapped = { transaction ->
-                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction.hash))
+                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction.hash, transaction.token.chainId))
                     })
             }
         }
@@ -216,7 +218,13 @@ private fun TransactionRow(
                 contentDescription = null,
                 error = painterResource(R.drawable.ic_zero_avatar_default),
             )
-            ZChainIcon()
+            transaction.token.chainId?.let {
+                if (WalletChainsUtil.isAvaxChain(it)) {
+                    AvaxChainIcon()
+                } else {
+                    ZChainIcon()
+                }
+            } ?: ZChainIcon()
         }
 
         Column(

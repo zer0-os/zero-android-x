@@ -7,20 +7,7 @@ object ZeroConfig {
 
     const val ARWEAVE_BASE_URL = "https://of2ub4a2ai55lgpqj5z7so7j7v6uwjcruh6cdm3ojgnhqngahkwa.arweave.net/"
 
-    // STAKING Constants
-    const val MEOW_POOL_ADDRESS = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a"
-    const val MEOW_ICON_URL = "https://zos.zero.tech/tokens/meow.png"
-    const val MEOW_POOL_NAME = "MEOW Pool"
-
     const val ZSCAN_LIVE_URL = "https://zscan.live/"
-
-    private const val ZCHAIN_ID_MAINNET = 9369
-    private const val ZCHAIN_ID_ZEPHYR = 1417429182
-    val ZERO_WALLET_ZCHAIN_ID = if (environment == EnvironmentConfig.Production) {
-        ZCHAIN_ID_MAINNET
-    } else {
-        ZCHAIN_ID_ZEPHYR
-    }
 }
 
 sealed class EnvironmentConfig(

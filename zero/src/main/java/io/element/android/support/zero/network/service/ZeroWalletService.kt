@@ -32,14 +32,12 @@ interface ZeroWalletService {
     @GET(value = "api/wallet/{wallet_address}/tokens")
     suspend fun getTokens(
         @Path("wallet_address") walletAddress: String,
-        @Query("chainId") chainId: String,
         @QueryMap nextPageParams: Map<String, @JvmSuppressWildcards Any> = emptyMap()
     ): ApiWalletTokens
 
     @GET(value = "api/wallet/{wallet_address}/transactions")
     suspend fun getTransactions(
         @Path("wallet_address") walletAddress: String,
-        @Query("chainId") chainId: String,
         @QueryMap nextPageParams: Map<String, @JvmSuppressWildcards Any> = emptyMap()
     ): ApiWalletTransactions
 
@@ -67,13 +65,15 @@ interface ZeroWalletService {
 
     @GET(value = "api/tokens/{token_address}/info")
     suspend fun getTokenInfo(
-        @Path("token_address") tokenAddress: String
+        @Path("token_address") tokenAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiWalletTokenInfo
 
     @GET(value = "api/wallet/{user_address}/token/{token_address}/balance")
     suspend fun getTokenBalance(
         @Path("user_address") userAddress: String,
-        @Path("token_address") tokenAddress: String
+        @Path("token_address") tokenAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiWalletTokenBalance
 
     @POST(value = "api/wallet/{user_address}/transactions/approve-erc20")
@@ -87,5 +87,6 @@ interface ZeroWalletService {
         @Path("user_address") userAddress: String,
         @Path("token_address") tokenAddress: String,
         @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiWalletStakingApprovalResponse
 }

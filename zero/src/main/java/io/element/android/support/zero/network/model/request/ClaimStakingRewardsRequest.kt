@@ -12,4 +12,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClaimStakingRewardsRequest(
     val poolAddress: String,
+    val chainId: Int
 )

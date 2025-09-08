@@ -33,6 +33,8 @@ import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 
 @Composable
@@ -109,7 +111,11 @@ fun StakePoolCell(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                ZChainIcon()
+                if (WalletChainsUtil.isAvaxChain(pool.chainId)) {
+                    AvaxChainIcon()
+                } else {
+                    ZChainIcon()
+                }
             }
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),

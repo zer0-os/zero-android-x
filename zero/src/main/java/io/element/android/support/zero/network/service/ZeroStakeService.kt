@@ -20,39 +20,46 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ZeroStakeService {
 
     @GET(value = "api/staking/{pool_address}/total-staked")
     suspend fun getTotalStaked(
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): String
 
     @GET(value = "api/staking/{pool_address}/config")
     suspend fun getStakingConfig(
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiStakingConfig
 
     @GET(value = "api/staking/{user_address}/stakers/{pool_address}")
     suspend fun getStakerStatusInfo(
         @Path("user_address") userAddress: String,
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiStakingStatus
 
     @GET(value = "api/staking/{user_address}/rewards/{pool_address}")
     suspend fun getStakeRewardsInfo(
         @Path("user_address") userAddress: String,
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiStakingUserRewardsInfo
 
     @GET(value = "api/staking/{pool_address}/staking-token")
     suspend fun getStakingToken(
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiWalletStakingToken
 
     @GET(value = "api/staking/{pool_address}/rewards-token")
     suspend fun getRewardToken(
-        @Path("pool_address") poolAddress: String
+        @Path("pool_address") poolAddress: String,
+        @Query("chainId") chainId: String,
     ): ApiWalletStakingRewardsToken
 
     @POST(value = "api/wallet/{user_address}/transactions/stake")

@@ -515,15 +515,15 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getWalletTokens(walletAddress: String, chainId: Int, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
+    override suspend fun getWalletTokens(walletAddress: String, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletTokensResponse> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getWalletTransactions(walletAddress: String, chainId: Int, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
+    override suspend fun getWalletTransactions(walletAddress: String, paginationParams: ZeroWalletTransactionsPaginationParams?): Result<ZeroWalletTransactionsResponse> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int): Result<ZeroWalletTransactionReceipt> {
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int?): Result<ZeroWalletTransactionReceipt> {
         return Result.failure(Throwable("fake"))
     }
 
@@ -539,47 +539,47 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTokenInfo(tokenAddress: String): Result<ZeroWalletTokenInfo> {
+    override suspend fun getTokenInfo(tokenAddress: String, chainId: Int): Result<ZeroWalletTokenInfo> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String): Result<ZeroWalletTokenBalance> {
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): Result<ZeroWalletTokenBalance> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTotalStaked(poolAddress: String): Result<String> {
+    override suspend fun getTotalStaked(poolAddress: String, chainId: Int): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakingConfig(poolAddress: String): Result<ZeroStakingConfig> {
+    override suspend fun getStakingConfig(poolAddress: String, chainId: Int): Result<ZeroStakingConfig> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): Result<ZeroStakingStatus> {
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingStatus> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): Result<ZeroStakingUserRewardsInfo> {
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingUserRewardsInfo> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakingToken(poolAddress: String): Result<ZeroTokenAddress> {
+    override suspend fun getStakingToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getRewardToken(poolAddress: String): Result<ZeroTokenAddress> {
+    override suspend fun getRewardToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String): Result<String> {
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): Result<String> {
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String): Result<String> {
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 

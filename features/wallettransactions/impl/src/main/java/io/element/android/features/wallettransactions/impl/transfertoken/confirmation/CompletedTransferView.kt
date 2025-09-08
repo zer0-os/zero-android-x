@@ -54,6 +54,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
@@ -61,6 +62,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.displayName
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.ui.model.getAvatarData
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -132,7 +134,11 @@ fun TokenInfoView(
                 contentDescription = null,
                 error = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
-            ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
+                AvaxChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            } else {
+                ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            }
         }
 
         Spacer(Modifier.size(16.dp))
@@ -296,7 +302,7 @@ fun RowScope.ViewTransactionButton(
         onClick = onClick
     ) {
         Text(
-            text = "View on ZScan",
+            text = "View",
             style = ElementTheme.typography.fontBodyLgMedium,
             modifier = Modifier.padding(vertical = 8.dp),
             color = ElementTheme.colors.zeroBrandColor

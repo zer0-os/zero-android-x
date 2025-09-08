@@ -16,21 +16,21 @@ import io.element.android.support.zero.network.model.response.wallet.ApiTransact
 
 interface StakeRepository {
 
-    suspend fun getTotalStaked(poolAddress: String): String
+    suspend fun getTotalStaked(poolAddress: String, chainId: Int): String
 
-    suspend fun getStakingConfig(poolAddress: String): ApiStakingConfig
+    suspend fun getStakingConfig(poolAddress: String, chainId: Int): ApiStakingConfig
 
-    suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String): ApiStakingStatus
+    suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): ApiStakingStatus
 
-    suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String): ApiStakingUserRewardsInfo
+    suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): ApiStakingUserRewardsInfo
 
-    suspend fun getStakingToken(poolAddress: String): ApiWalletStakingToken
+    suspend fun getStakingToken(poolAddress: String, chainId: Int): ApiWalletStakingToken
 
-    suspend fun getRewardToken(poolAddress: String): ApiWalletStakingRewardsToken
+    suspend fun getRewardToken(poolAddress: String, chainId: Int): ApiWalletStakingRewardsToken
 
-    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String): ApiTransactionPerformed
+    suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): ApiTransactionPerformed
 
-    suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String): ApiTransactionPerformed
+    suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): ApiTransactionPerformed
 
-    suspend fun claimStakingRewards(userAddress: String, poolAddress: String): ApiTransactionPerformed
+    suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): ApiTransactionPerformed
 }

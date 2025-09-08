@@ -61,7 +61,9 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
 import io.element.android.support.zero.common.ui.TransactionInProgressView
@@ -192,7 +194,11 @@ fun PoolDetailsView(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                ZChainIcon()
+                if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
+                    AvaxChainIcon()
+                } else {
+                    ZChainIcon()
+                }
             }
             Column(
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -307,7 +313,11 @@ fun StakeUnstakeAmountView(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                ZChainIcon()
+                if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
+                    AvaxChainIcon()
+                } else {
+                    ZChainIcon()
+                }
             }
             Column(
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -513,7 +523,11 @@ fun TransactionSuccessOrFailureView(
                         contentDescription = null,
                         error = painterResource(R.drawable.ic_zero_avatar_default)
                     )
-                    ZChainIcon()
+                    if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
+                        AvaxChainIcon()
+                    } else {
+                        ZChainIcon()
+                    }
                 }
                 Column(
                     modifier = Modifier.padding(horizontal = 8.dp),
