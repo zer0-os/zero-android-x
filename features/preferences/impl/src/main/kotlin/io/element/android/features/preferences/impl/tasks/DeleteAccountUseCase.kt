@@ -7,19 +7,20 @@
 
 package io.element.android.features.preferences.impl.tasks
 
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.MatrixClient
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface DeleteAccountUseCase {
     suspend operator fun invoke(): Boolean
 }
 
 @ContributesBinding(SessionScope::class)
-class DefaultDeleteAccountUseCase @Inject constructor(
+@Inject
+class DefaultDeleteAccountUseCase(
     private val matrixClient: MatrixClient,
     private val coroutineDispatchers: CoroutineDispatchers,
 ) : DeleteAccountUseCase {

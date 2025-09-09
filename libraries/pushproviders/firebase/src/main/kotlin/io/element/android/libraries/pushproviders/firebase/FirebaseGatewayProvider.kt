@@ -9,9 +9,9 @@ package io.element.android.libraries.pushproviders.firebase
 
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.support.zero.config.ZeroConfig
-import javax.inject.Inject
 
 interface FirebaseGatewayProvider {
     fun getFirebaseGateway(): String

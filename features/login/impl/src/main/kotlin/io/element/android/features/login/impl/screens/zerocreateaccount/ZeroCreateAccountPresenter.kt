@@ -24,9 +24,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
 import com.reown.appkit.ui.components.button.rememberAppKitState
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.Inject
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
 import io.element.android.features.login.impl.login.LoginMode
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
@@ -41,7 +41,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
-class ZeroCreateAccountPresenter @AssistedInject constructor(
+@Inject
+class ZeroCreateAccountPresenter(
     @Assisted private val params: Params,
     private val accountProviderDataSource: AccountProviderDataSource,
     private val authenticationService: MatrixAuthenticationService,

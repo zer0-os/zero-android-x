@@ -18,6 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import dev.zacsweers.metro.Inject
 import io.element.android.features.home.impl.wallet.WalletTokensListState
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -33,9 +34,9 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class TransferTokenPresenter @Inject constructor(
+@Inject
+class TransferTokenPresenter(
     private val client: MatrixClient,
 ) : Presenter<TransferTokenState> {
     @Composable

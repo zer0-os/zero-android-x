@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -25,9 +26,9 @@ import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.support.zero.common.extension.localFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class CreateFeedPresenter @Inject constructor(
+@Inject
+class CreateFeedPresenter(
     private val client: MatrixClient,
     private val mediaPickerProvider: PickerProvider,
 ) : Presenter<CreateFeedState> {

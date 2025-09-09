@@ -1,4 +1,4 @@
-import extension.setupAnvil
+import extension.setupDependencyInjection
 import java.util.Properties
 
 val getEnv: (String) -> Properties = { env ->
@@ -37,12 +37,11 @@ android {
     }
 }
 
-setupAnvil()
+setupDependencyInjection()
 
 dependencies {
     implementation(projects.libraries.core)
     implementation(projects.libraries.designsystem)
-    implementation(libs.dagger)
     implementation(projects.libraries.di)
     implementation(projects.libraries.matrix.api)
 

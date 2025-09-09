@@ -8,15 +8,16 @@
 package io.element.android.features.userprofile.impl.searchuser
 
 import androidx.compose.runtime.Composable
+import dev.zacsweers.metro.Inject
 import io.element.android.features.startchat.impl.userlist.SelectionMode
 import io.element.android.features.startchat.impl.userlist.UserListDataStore
 import io.element.android.features.startchat.impl.userlist.UserListPresenter
 import io.element.android.features.startchat.impl.userlist.UserListPresenterArgs
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.usersearch.api.UserRepository
-import javax.inject.Inject
 
-class SearchUserPresenter @Inject constructor(
+@Inject
+class SearchUserPresenter constructor(
     presenterFactory: UserListPresenter.Factory,
     userRepository: UserRepository,
     userListDataStore: UserListDataStore,

@@ -1,10 +1,10 @@
 package io.element.android.support.zero.data.di
 
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import io.element.android.libraries.di.AppScope
-import io.element.android.libraries.di.SingleIn
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import io.element.android.support.zero.data.delegate.DataCleaner
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.repository.AccountRepository
@@ -46,7 +46,7 @@ import io.element.android.support.zero.network.service.ZeroStakeService
 import io.element.android.support.zero.network.service.ZeroUserService
 import io.element.android.support.zero.network.service.ZeroWalletService
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RepositoryModule {
 

@@ -10,14 +10,15 @@ package io.element.android.features.wallet.impl.manage
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import io.element.android.features.wallet.api.ManageWalletsEntryPoint
 import io.element.android.libraries.architecture.createNode
-import io.element.android.libraries.di.AppScope
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class DefaultManageWalletsEntryPoint @Inject constructor() : ManageWalletsEntryPoint {
+@Inject
+class DefaultManageWalletsEntryPoint: ManageWalletsEntryPoint {
     override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): ManageWalletsEntryPoint.NodeBuilder {
         val plugins = ArrayList<Plugin>()
 

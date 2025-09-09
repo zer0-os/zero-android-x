@@ -19,9 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.platform.LocalContext
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -42,7 +42,8 @@ import kotlinx.coroutines.launch
 
 private const val FEED_DETAILS_COMMENTS_PAGE_SIZE = 15
 
-class FeedDetailsPresenter @AssistedInject constructor(
+@Inject
+class FeedDetailsPresenter(
     private val client: MatrixClient,
     @Assisted private val feed: ZeroFeed,
     private val mediaPickerProvider: PickerProvider,

@@ -5,6 +5,13 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
+buildscript {
+    dependencies {
+        classpath(libs.kotlin.gradle.plugin)
+        classpath(libs.gms.google.services)
+    }
+}
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("io.element.android-root")

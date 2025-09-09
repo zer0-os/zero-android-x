@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import dev.zacsweers.metro.Inject
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
@@ -96,7 +97,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
-import javax.inject.Inject
 import kotlin.jvm.optionals.getOrNull
 
 private const val HOME_FEED_PAGE_SIZE = 15

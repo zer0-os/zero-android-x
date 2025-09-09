@@ -6,14 +6,15 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.zero.invite.ZeroMessengerInvite
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class InvitePresenter @Inject constructor(
+@Inject
+class InvitePresenter(
     private val client: MatrixClient,
 ) : Presenter<InviteState> {
     @Composable

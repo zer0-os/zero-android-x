@@ -13,7 +13,6 @@ import dev.zacsweers.metro.Inject
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.data.tryOrNull
 import io.element.android.libraries.core.log.logger.LoggerTag
-import io.element.android.libraries.di.AppScope
 import io.element.android.support.zero.config.ZeroConfig
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException

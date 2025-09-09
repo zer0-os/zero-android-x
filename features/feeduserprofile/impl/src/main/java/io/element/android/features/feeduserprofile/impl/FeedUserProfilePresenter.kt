@@ -20,9 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.Inject
 import io.element.android.features.startchat.api.StartDMAction
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
@@ -48,7 +48,8 @@ import kotlinx.coroutines.launch
 
 private const val USER_FEED_PAGE_SIZE = 15
 
-class FeedUserProfilePresenter @AssistedInject constructor(
+@Inject
+class FeedUserProfilePresenter(
     private val client: MatrixClient,
     private val startDMAction: StartDMAction,
     @Assisted private val userId: UserId,

@@ -7,19 +7,19 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import io.element.android.libraries.di.AppScope
-import io.element.android.libraries.di.ApplicationContext
-import io.element.android.libraries.di.SingleIn
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
+import io.element.android.libraries.di.annotations.ApplicationContext
 import io.element.android.support.zero.datastore.AppPreferences
 import io.element.android.support.zero.datastore.DatastoreCleaner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DatastoreModule {
 
@@ -35,9 +35,9 @@ object DatastoreModule {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideDatastoreCleaner(dataStore: DataStore<Preferences>) = DatastoreCleaner(dataStore)
+    fun provideDatastoreCleaner(dataStore: DataStore<Preferences>): DatastoreCleaner = DatastoreCleaner(dataStore)
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideAppPreferences(dataStore: DataStore<Preferences>) = AppPreferences(dataStore)
+    fun provideAppPreferences(dataStore: DataStore<Preferences>): AppPreferences = AppPreferences(dataStore)
 }

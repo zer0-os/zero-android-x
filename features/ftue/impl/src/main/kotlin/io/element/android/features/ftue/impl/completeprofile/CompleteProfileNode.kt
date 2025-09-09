@@ -12,15 +12,16 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import io.element.android.anvilannotations.ContributesNode
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.Inject
+import io.element.android.annotations.ContributesNode
 import io.element.android.libraries.architecture.NodeInputs
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.di.SessionScope
 
 @ContributesNode(SessionScope::class)
-class CompleteProfileNode @AssistedInject constructor(
+@Inject
+class CompleteProfileNode constructor(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
     presenterFactory: CompleteProfilePresenter.Factory,

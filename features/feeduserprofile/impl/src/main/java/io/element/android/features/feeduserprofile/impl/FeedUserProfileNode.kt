@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import io.element.android.anvilannotations.ContributesNode
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.Inject
+import io.element.android.annotations.ContributesNode
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.libraries.architecture.inputs
 import io.element.android.libraries.di.SessionScope
@@ -24,7 +24,8 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 
 @ContributesNode(SessionScope::class)
-class FeedUserProfileNode @AssistedInject constructor(
+@Inject
+class FeedUserProfileNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
     presenterFactory: FeedUserProfilePresenter.Factory,

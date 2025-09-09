@@ -9,10 +9,9 @@ package io.element.android.libraries.pushproviders.unifiedpush
 
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import io.element.android.features.enterprise.api.EnterpriseService
-import io.element.android.libraries.di.AppScope
 import io.element.android.support.zero.config.ZeroConfig
-import javax.inject.Inject
 
 interface DefaultPushGatewayHttpUrlProvider {
     fun provide(): String

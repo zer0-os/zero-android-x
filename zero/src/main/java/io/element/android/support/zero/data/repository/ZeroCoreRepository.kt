@@ -7,6 +7,9 @@
 
 package io.element.android.support.zero.data.repository
 
+import dev.zacsweers.metro.Inject
+
+@Inject
 class ZeroCoreRepository(
     val account: AccountRepository,
     val auth: AuthRepository,
