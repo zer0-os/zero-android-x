@@ -192,7 +192,12 @@ class EditUserProfilePresenter(
                     Timber.e(it, "Failed to update user's avatar")
                 })
             }
-            if (results.all { it.isSuccess }) Unit else results.first { it.isFailure }.getOrThrow()
+            if (results.all { it.isSuccess }) {
+                matrixClient.getUserProfile(forceRefresh = true)
+                Unit
+            } else {
+                results.first { it.isFailure }.getOrThrow()
+            }
         }.runCatchingUpdatingState(action)
     }
 

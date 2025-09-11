@@ -168,27 +168,6 @@ fun SecureBackupRootView(
                 )
             }
             RecoveryState.ENABLED -> {
-//                ListItem(
-//                    headlineContent = {
-//                        Text(
-//                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change),
-//                        )
-//                    },
-//                    supportingContent = {
-//                        Text(
-//                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change_description),
-//                        )
-//                    },
-//                    enabled = state.isKeyStorageEnabled,
-//                    alwaysClickable = true,
-//                    onClick = {
-//                        if (state.isKeyStorageEnabled) {
-//                            onChangeClick()
-//                        } else {
-//                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
-//                        }
-//                    },
-//                )
                 ListItem(
                     headlineContent = {
                         Text("Your backup key is verified")
@@ -200,6 +179,27 @@ fun SecureBackupRootView(
                             tint = ElementTheme.colors.zeroBrandColor
                         )
                     })
+                )
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change),
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(id = R.string.screen_chat_backup_recovery_action_change_description),
+                        )
+                    },
+                    enabled = state.isKeyStorageEnabled,
+                    alwaysClickable = true,
+                    onClick = {
+                        if (state.isKeyStorageEnabled) {
+                            onChangeClick()
+                        } else {
+                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
+                        }
+                    },
                 )
             }
             RecoveryState.INCOMPLETE ->

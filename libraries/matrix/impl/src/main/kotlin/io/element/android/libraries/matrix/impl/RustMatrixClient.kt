@@ -319,7 +319,7 @@ class RustMatrixClient(
             notificationSettingsService.start()
 
             // Force a refresh of the profile
-            getUserProfile()
+            getUserProfile(forceRefresh = true)
         }
     }
 
@@ -447,11 +447,11 @@ class RustMatrixClient(
         return createRoom(createRoomParams)
     }
 
-    override suspend fun getProfile(userId: UserId): Result<MatrixUser> = withContext(sessionDispatcher) {
+    override suspend fun getProfile(userId: UserId, forceRefresh: Boolean): Result<MatrixUser> = withContext(sessionDispatcher) {
         runCatchingExceptions {
             val profiles = awaitAll(
                 async { innerClient.getProfile(userId.value) },
-                async { zeroCoreRepository?.user?.getUser(userId.value)?.firstOrNull() }
+                async { zeroCoreRepository?.user?.getUser(userId.value, forceRefresh)?.firstOrNull() }
             )
             val matrixProfile = profiles.first() as UserProfile
             val zeroUser = profiles.getOrNull(1) as? ZeroUser
@@ -467,9 +467,9 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun getUserProfile(): Result<MatrixUser> {
+    override suspend fun getUserProfile(forceRefresh: Boolean): Result<MatrixUser> {
         return runCatchingExceptions {
-            getProfile(sessionId)
+            getProfile(sessionId, forceRefresh)
                 .onSuccess {
                     _userProfile.tryEmit(it)
                     zeroCoreRepository?.account?.saveLoggedInUserInfo(it)
@@ -1078,7 +1078,7 @@ class RustMatrixClient(
     override suspend fun checkZeroThirdWebWallet() {
         val zeroWalletRepo = zeroCoreRepository?.wallet ?: return
         zeroWalletRepo.checkAndInitializeThirdWeb()
-        getUserProfile()
+        getUserProfile(forceRefresh = true)
     }
 
     override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> =

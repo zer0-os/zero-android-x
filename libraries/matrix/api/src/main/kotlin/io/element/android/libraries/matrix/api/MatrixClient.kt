@@ -91,7 +91,7 @@ interface MatrixClient {
     suspend fun unignoreUser(userId: UserId): Result<Unit>
     suspend fun createRoom(createRoomParams: CreateRoomParameters): Result<RoomId>
     suspend fun createDM(userId: UserId): Result<RoomId>
-    suspend fun getProfile(userId: UserId): Result<MatrixUser>
+    suspend fun getProfile(userId: UserId, forceRefresh: Boolean = false): Result<MatrixUser>
     suspend fun getZeroUsers(userIds: List<String>): Result<List<ZeroUser>>
     suspend fun searchUsers(searchTerm: String, limit: Long): Result<MatrixSearchUserResults>
     suspend fun setDisplayName(displayName: String): Result<Unit>
@@ -128,7 +128,7 @@ interface MatrixClient {
     /**
      * Retrieve the user profile, will also eventually emit a new value to [userProfile].
      */
-    suspend fun getUserProfile(): Result<MatrixUser>
+    suspend fun getUserProfile(forceRefresh: Boolean = false): Result<MatrixUser>
     suspend fun getAccountManagementUrl(action: AccountManagementAction?): Result<String?>
     suspend fun uploadMedia(mimeType: String, data: ByteArray): Result<String>
     fun roomMembershipObserver(): RoomMembershipObserver

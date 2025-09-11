@@ -192,7 +192,7 @@ class FakeMatrixClient(
         return createDmResult
     }
 
-    override suspend fun getProfile(userId: UserId): Result<MatrixUser> {
+    override suspend fun getProfile(userId: UserId, forceRefresh: Boolean): Result<MatrixUser> {
         return getProfileResults[userId] ?: Result.failure(IllegalStateException("No profile found for $userId"))
     }
 
@@ -225,7 +225,7 @@ class FakeMatrixClient(
         deactivateAccountResult(password, eraseData)
     }
 
-    override suspend fun getUserProfile(): Result<MatrixUser> = simulateLongTask {
+    override suspend fun getUserProfile(forceRefresh: Boolean): Result<MatrixUser> = simulateLongTask {
         val result = getProfileResults[sessionId]?.getOrNull() ?: MatrixUser(sessionId, userDisplayName, userAvatarUrl)
         _userProfile.tryEmit(result)
         return Result.success(result)

@@ -83,7 +83,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun cacheUsers(users: List<ApiUser>) {
         val updatedList = (getAllCachedUsers() + users)
-            .distinctBy { it.matrixId } // Ensure uniqueness
+            .associateBy { it.matrixId }
+            .values
+            .toList()
         dataStore.edit { preferences ->
             preferences[CACHED_ZERO_USERS] = updatedList.toJson()
         }

@@ -57,11 +57,13 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun getUser(userId: String): Flow<ZeroUser?> =
+    override suspend fun getUser(userId: String, forceRefresh: Boolean): Flow<ZeroUser?> =
         channelFlowWithAwait {
             runSafeCall {
-                preferences.getCachedUser(userId)?.let {
-                    trySend(it.toModel())
+                if (!forceRefresh) {
+                    preferences.getCachedUser(userId)?.let {
+                        trySend(it.toModel())
+                    }
                 }
                 val apiUser = zeroMatrixUserService.getMatrixUsers(
                     MatrixUsersFilter.newFilter(listOf(userId))
