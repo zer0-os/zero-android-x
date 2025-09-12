@@ -66,6 +66,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUtil
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
+import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -849,32 +850,39 @@ class HomePresenter(
             val chainId = stakePool.chainId
             withIOScope {
                 coroutineScope {
-                    val (totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult) = awaitAll(
+                    val (totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult, stakeTokenResult) = awaitAll(
                         async { client.getTotalStaked(poolAddress, chainId) },
                         async { client.getStakingConfig(poolAddress, chainId) },
                         async { client.getStakerStatusInfo(userAddress, poolAddress, chainId) },
-                        async { client.getStakeRewardsInfo(userAddress, poolAddress, chainId) }
+                        async { client.getStakeRewardsInfo(userAddress, poolAddress, chainId) },
+                        async { client.getStakingToken(poolAddress, chainId) }
                     )
 
-                    if (listOf(totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult).all { it.isSuccess }) {
+                    if (listOf(totalStakedResult, stakingConfigResult, stakeStatusResult, rewardsInfoResult, stakeTokenResult).all { it.isSuccess }) {
                         val totalStaked = (totalStakedResult as Result<String>).getOrNull() ?: return@coroutineScope
                         val stakingConfig = (stakingConfigResult as Result<ZeroStakingConfig>).getOrNull() ?: return@coroutineScope
                         val stakeStatus = (stakeStatusResult as Result<ZeroStakingStatus>).getOrNull() ?: return@coroutineScope
                         val rewardsInfo = (rewardsInfoResult as Result<ZeroStakingUserRewardsInfo>).getOrNull() ?: return@coroutineScope
+                        val stakeToken = (stakeTokenResult as Result<ZeroTokenAddress>).getOrNull() ?: return@coroutineScope
+
+                        val tokenPrice = if (WalletChainsUtil.isAvaxChain(chainId)) {
+                            client.getAvaxTokenPrice(stakeToken.address).getOrNull()?.usd
+                        } else {  meowPrice.price }
 
                         val pool = HomeStakePool.from(
                             userAddress = userAddress,
                             pool = stakePool,
-                            meowPrice = price,
+                            tokenPrice = tokenPrice,
                             totalStakedAmount = totalStaked,
-                            stakingConfig = stakingConfig,
                             stakingStatus = stakeStatus,
                             rewardsInfo = rewardsInfo
                         )
 
                         val existingPoolsList = stakePoolsContent.value.toMutableList()
                         existingPoolsList.add(pool)
-                        stakePoolsContent.value = existingPoolsList.distinctBy { it.poolAddress }
+                        stakePoolsContent.value = existingPoolsList
+                            .distinctBy { it.poolAddress }
+                            .sortedBy { it.chainId }
 
                         if (refreshAllData) { onRefreshAllData(pool) }
                     }

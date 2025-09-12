@@ -9,6 +9,7 @@ package io.element.android.support.zero.network.service
 
 import io.element.android.support.zero.network.model.request.ApproveERC20Request
 import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
+import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
 import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipientsResponse
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
@@ -89,4 +90,9 @@ interface ZeroWalletService {
         @Path("pool_address") poolAddress: String,
         @Query("chainId") chainId: String,
     ): ApiWalletStakingApprovalResponse
+
+    @GET(value = "api/tokens/avalanche/{token_address}/price")
+    suspend fun getAvaxTokenPrice(
+        @Path("token_address") tokenAddress: String,
+    ): ApiAvaxTokenPrice
 }

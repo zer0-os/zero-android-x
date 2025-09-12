@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.conversion
 
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -19,6 +20,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
+import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
@@ -39,7 +41,9 @@ fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
                 ZeroWalletUtil.getFormattedNumber(tokenAmount, false),
                 token.logo,
                 token.decimals,
-                token.chainId
+                token.chainId,
+                token.percentChange,
+                token.price
             )
         },
         paginationParams = nextPageParams?.let { nextPageParams ->
@@ -98,3 +102,11 @@ fun ApiWalletTokenBalance.toModel() = ZeroWalletTokenBalance(balance)
 
 fun ZeroWalletTokensPaginationParams.toApi() = NextPageParams(itemsCount, tokenName, tokenType, value)
 fun ZeroWalletTransactionsPaginationParams.toApi() = TransactionNextPageParams(blockNumber, index)
+
+fun ApiAvaxTokenPrice.toModel() = ZeroAvaxTokenPrice(
+    usd = usd,
+    marketCap = marketCap,
+    volume24h = volume24h,
+    change24h = change24h,
+    lastUpdatedAt = lastUpdatedAt
+)

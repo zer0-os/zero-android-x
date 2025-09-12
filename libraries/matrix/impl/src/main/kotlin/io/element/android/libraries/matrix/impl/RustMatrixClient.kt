@@ -67,6 +67,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
 import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -1326,6 +1327,14 @@ class RustMatrixClient(
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
                 stake.claimStakingRewards(userAddress, poolAddress, chainId).transactionHash
+            }
+        }
+
+    override suspend fun getAvaxTokenPrice(tokenAddress: String): Result<ZeroAvaxTokenPrice> =
+        withContext(sessionDispatcher) {
+            runCatchingExceptions {
+                val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+                walletRepo.getAvaxTokenPrice(tokenAddress).toModel()
             }
         }
 

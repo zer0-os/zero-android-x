@@ -7,6 +7,7 @@
 
 package io.element.android.support.zero.data.repository
 
+import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
 import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
@@ -40,4 +41,6 @@ interface WalletRepository {
     suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiTransactionPerformed
 
     suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiWalletStakingApprovalResponse
+
+    suspend fun getAvaxTokenPrice(tokenAddress: String): ApiAvaxTokenPrice
 }

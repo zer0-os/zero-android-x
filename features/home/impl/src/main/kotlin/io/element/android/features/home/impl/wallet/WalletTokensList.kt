@@ -236,23 +236,47 @@ private fun TokenRow(
             )
         }
 
-        if (token.isClaimableToken && meowPrice != null) {
-            Column(horizontalAlignment = Alignment.End) {
-                val refPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
-                Text(
-                    "$$refPrice",
-                    style = ElementTheme.typography.fontBodyLgRegular,
-                    color = ElementTheme.colors.textPrimary
-                )
+        if (token.isClaimableToken) {
+            val refPrice = when {
+                WalletChainsUtil.isAvaxChain(token.chainId) -> {
+                    ZeroWalletUtil.getTokenPriceFormatted(token.tokenAmount, token.price)
+                }
+                else -> {
+                    if (meowPrice != null) {
+                        ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
+                    } else ""
+                }
+            }
 
-                if (meowPrice.diff != null) {
-                    val refPriceDiff = if (meowPrice.diff!! > 0) {
-                        "+${meowPrice.diff!!}%"
-                    } else {
-                        "-${abs(meowPrice.diff!!)}%"
-                    }
+            val priceChange = when {
+                WalletChainsUtil.isAvaxChain(token.chainId) -> {
+                    token.percentChange?.let {
+                        "$it%"
+                    } ?: ""
+                }
+                else -> {
+                    if (meowPrice?.diff != null) {
+                        if (meowPrice.diff!! > 0) {
+                            "+${meowPrice.diff!!}%"
+                        } else {
+                            "-${abs(meowPrice.diff!!)}%"
+                        }
+                    } else ""
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                if (refPrice.isNotBlank()) {
                     Text(
-                        refPriceDiff,
+                        "$$refPrice",
+                        style = ElementTheme.typography.fontBodyLgRegular,
+                        color = ElementTheme.colors.textPrimary
+                    )
+                }
+
+                if (priceChange.isNotBlank()) {
+                    Text(
+                        priceChange,
                         style = ElementTheme.typography.fontBodyMdRegular,
                         color = ElementTheme.colors.zeroBrandColor
                     )

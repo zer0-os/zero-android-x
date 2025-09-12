@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,8 @@ fun WalletStakingList(
                 )
                 StakingContentHeading(
                     modifier = Modifier.weight(0.5f),
-                    text = "Your Stake"
+                    text = "Your Stake",
+                    textAlign = TextAlign.End
                 )
             }
         }
@@ -75,12 +77,14 @@ fun WalletStakingList(
 fun StakingContentHeading(
     modifier: Modifier = Modifier,
     text: String,
+    textAlign: TextAlign = TextAlign.Start
 ) {
     Text(
         modifier = modifier,
         text = text,
         style = ElementTheme.typography.fontBodyMdMedium,
-        color = ElementTheme.colors.textSecondary
+        color = ElementTheme.colors.textSecondary,
+        textAlign = textAlign
     )
 }
 
@@ -136,13 +140,16 @@ fun StakePoolCell(
             overflow = TextOverflow.Ellipsis
         )
 
+        val textColor = if (pool.myStakeAmount > 0) ElementTheme.colors.textPrimary
+        else ElementTheme.colors.textSecondary
         Text(
             modifier = Modifier.weight(0.5f),
             text = "$${pool.myStakeAmountFormatted}",
             style = ElementTheme.typography.fontBodyLgRegular,
-            color = ElementTheme.colors.textPrimary,
+            color = textColor,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.End
         )
     }
 }
