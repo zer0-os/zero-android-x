@@ -63,6 +63,7 @@ import io.element.android.features.roomdirectory.api.RoomDescription
 import io.element.android.features.roomdirectory.api.RoomDirectoryEntryPoint
 import io.element.android.features.securebackup.api.SecureBackupEntryPoint
 import io.element.android.features.share.api.ShareEntryPoint
+import io.element.android.features.space.api.SpaceEntryPoint
 import io.element.android.features.startchat.api.StartChatEntryPoint
 import io.element.android.features.userprofile.api.SearchUserEntryPoint
 import io.element.android.features.userprofile.api.UserProfileEntryPoint
@@ -404,7 +405,7 @@ class LoggedInFlowNode(
                     .build()
             }
             is NavTarget.Room -> {
-                val callback = object : JoinedRoomLoadedFlowNode.Callback {
+                val joinedRoomCallback = object : JoinedRoomLoadedFlowNode.Callback {
                     override fun onOpenRoom(roomId: RoomId, serverNames: List<String>) {
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), serverNames))
                     }
@@ -443,6 +444,11 @@ class LoggedInFlowNode(
                         backstack.push(NavTarget.Settings(PreferencesEntryPoint.InitialTarget.NotificationSettings))
                     }
                 }
+                val spaceCallback = object : SpaceEntryPoint.Callback {
+                    override fun onOpenRoom(roomId: RoomId) {
+                        backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
+                    }
+                }
                 val inputs = RoomFlowNode.Inputs(
                     roomIdOrAlias = navTarget.roomIdOrAlias,
                     roomDescription = Optional.ofNullable(navTarget.roomDescription),
@@ -450,7 +456,7 @@ class LoggedInFlowNode(
                     trigger = Optional.ofNullable(navTarget.trigger),
                     initialElement = navTarget.initialElement
                 )
-                createNode<RoomFlowNode>(buildContext, plugins = listOf(inputs, callback))
+                createNode<RoomFlowNode>(buildContext, plugins = listOf(inputs, joinedRoomCallback, spaceCallback))
             }
             is NavTarget.UserProfile -> {
                 /*val callback = object : UserProfileEntryPoint.Callback {
