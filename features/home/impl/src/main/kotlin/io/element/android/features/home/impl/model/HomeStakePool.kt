@@ -8,7 +8,6 @@
 package io.element.android.features.home.impl.model
 
 import androidx.compose.runtime.Immutable
-import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.staking.WalletStakePool
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
@@ -36,14 +35,14 @@ data class HomeStakePool(
 
     companion object {
         fun from(
-            userAddress: String, pool: WalletStakePool, meowPrice: ZeroMeowPrice,
-            totalStakedAmount: String, stakingConfig: ZeroStakingConfig,
+            userAddress: String, pool: WalletStakePool,
+            tokenPrice: Double?, totalStakedAmount: String,
             stakingStatus: ZeroStakingStatus, rewardsInfo: ZeroStakingUserRewardsInfo
         ): HomeStakePool {
             val totalStakedAmount = RewardsUtil.parseCredits(totalStakedAmount, 18)
-            val totalStakedAmountRefPrice = ZeroWalletUtil.getBalance(totalStakedAmount, meowPrice)
+            val totalStakedAmountRefPrice = ZeroWalletUtil.getBalance(totalStakedAmount, tokenPrice)
             val myStakedAmount = RewardsUtil.parseCredits(stakingStatus.amountStaked, 18)
-            val myStakedAmountRefPrice = ZeroWalletUtil.getBalance(myStakedAmount, meowPrice)
+            val myStakedAmountRefPrice = ZeroWalletUtil.getBalance(myStakedAmount, tokenPrice)
             val pendingRewards = RewardsUtil.parseCredits(rewardsInfo.pendingRewards, 18)
             return HomeStakePool(
                 userWalletAddress = userAddress,

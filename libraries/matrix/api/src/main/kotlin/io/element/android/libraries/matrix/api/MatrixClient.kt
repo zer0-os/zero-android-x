@@ -51,6 +51,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -336,6 +337,8 @@ interface MatrixClient {
     suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String>
 
     suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String>
+
+    suspend fun getAvaxTokenPrice(tokenAddress: String): Result<ZeroAvaxTokenPrice>
 }
 
 /**

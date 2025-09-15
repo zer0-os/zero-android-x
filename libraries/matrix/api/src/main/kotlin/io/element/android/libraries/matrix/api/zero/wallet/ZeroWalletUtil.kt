@@ -28,7 +28,11 @@ object ZeroWalletUtil {
     }
 
     fun getBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
-        return meowTokenAmount.times(meowPrice.price ?: 0.0)
+        return getBalance(meowTokenAmount, meowPrice.price)
+    }
+
+    fun getBalance(meowTokenAmount: Double, price: Double?): Double {
+        return meowTokenAmount.times(price ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)
             .toDouble()
@@ -36,6 +40,14 @@ object ZeroWalletUtil {
 
     fun getMeowTokenPriceFormatted(tokenAmount: Double, meowPrice: ZeroMeowPrice): String {
         val amount = tokenAmount.times(meowPrice.price ?: 0.0)
+            .toBigDecimal()
+            .setScale(2, RoundingMode.UP)
+            .toDouble()
+        return getFormattedNumber(amount, withAbbreviations = false)
+    }
+
+    fun getTokenPriceFormatted(tokenAmount: Double, tokenPrice: Double?): String {
+        val amount = tokenAmount.times(tokenPrice ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)
             .toDouble()
