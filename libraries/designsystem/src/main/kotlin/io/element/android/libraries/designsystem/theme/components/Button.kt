@@ -108,17 +108,23 @@ fun TextButton(
     showProgress: Boolean = false,
     destructive: Boolean = false,
     leadingIcon: IconSource? = null,
-) = ButtonInternal(
-    text = text,
-    onClick = onClick,
-    style = ButtonStyle.Text,
-    modifier = modifier,
-    enabled = enabled,
-    size = size,
-    showProgress = showProgress,
-    destructive = destructive,
-    leadingIcon = leadingIcon
-)
+    contentColor: Color? = null,
+) {
+    val style = ButtonStyle.Text
+    val colors = style.getColors(destructive)
+    ButtonInternal(
+        text = text,
+        onClick = onClick,
+        style = style,
+        colors = colors.copy(contentColor = contentColor ?: colors.contentColor),
+        modifier = modifier,
+        enabled = enabled,
+        size = size,
+        showProgress = showProgress,
+        destructive = destructive,
+        leadingIcon = leadingIcon
+    )
+}
 
 @Composable
 fun InvisibleButton(

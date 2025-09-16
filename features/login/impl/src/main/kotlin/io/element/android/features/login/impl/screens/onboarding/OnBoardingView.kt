@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.login.impl.R
+import io.element.android.features.login.impl.login.LoginModeView
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtom
 import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtomSize
@@ -101,7 +102,26 @@ fun OnBoardingView(
         }
     )*/
 
-    ZeroOnboardingView(onSignIn = { onSignIn(false) })
+    Box {
+        ZeroOnboardingView(onSignIn = {
+            val defaultAccountProvider = state.defaultAccountProvider
+            if (defaultAccountProvider != null) {
+                state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
+            }
+        })
+
+        LoginModeView(
+            loginMode = state.loginMode,
+            onClearError = {
+                state.eventSink(OnBoardingEvents.ClearError)
+            },
+            onLearnMoreClick = onLearnMoreClick,
+            onOidcDetails = onOidcDetails,
+            onNeedLoginPassword = onNeedLoginPassword,
+            onCreateAccountContinue = onCreateAccountContinue,
+            onCreateZeroAccount = {}
+        )
+    }
 }
 
 @Composable

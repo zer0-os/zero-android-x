@@ -18,6 +18,7 @@ import io.element.android.features.login.impl.error.ChangeServerErrorProvider
 import io.element.android.features.login.impl.screens.createaccount.AccountCreationNotSupported
 import io.element.android.libraries.androidutils.system.openGooglePlay
 import io.element.android.libraries.architecture.AsyncData
+import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ConfirmationDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -104,7 +105,8 @@ fun LoginModeView(
                 }
             }
         }
-        is AsyncData.Loading -> Unit // The Continue button shows the loading state
+//        is AsyncData.Loading -> Unit // The Continue button shows the loading state
+        is AsyncData.Loading -> ProgressDialog()
         is AsyncData.Success -> {
             when (val loginModeData = loginMode.data) {
                 is LoginMode.Oidc -> onOidcDetails(loginModeData.oidcDetails)

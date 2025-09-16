@@ -26,9 +26,9 @@ import io.element.android.libraries.designsystem.theme.components.Text
 fun StrikedLabel(
     modifier: Modifier = Modifier,
     text: String,
-    textColor: Color,
-    textStyle: TextStyle,
-    strikeColor: Color
+    textColor: Color = ElementTheme.colors.textSecondary,
+    textStyle: TextStyle = ElementTheme.typography.fontBodySmRegular,
+    strikeColor: Color = ElementTheme.colors.textSecondary
 ) {
     Box(modifier) {
         HorizontalDivider(

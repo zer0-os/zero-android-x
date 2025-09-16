@@ -201,10 +201,7 @@ fun ColumnScope.InviteCodeContent(
     if (remainingInvites > 0) {
         StrikedLabel(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
-            text = "Your referral code",
-            textColor = ElementTheme.colors.textSecondary,
-            textStyle = ElementTheme.typography.fontBodySmRegular,
-            strikeColor = ElementTheme.colors.textSecondary
+            text = "Your referral code"
         )
 
         Row(

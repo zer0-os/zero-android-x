@@ -28,6 +28,7 @@ import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.ui.utils.MultipleTapToUnlock
+import io.element.android.support.zero.config.ZeroConfig
 
 @Inject
 class OnBoardingPresenter(
@@ -52,9 +53,10 @@ class OnBoardingPresenter(
     override fun present(): OnBoardingState {
         val localCoroutineScope = rememberCoroutineScope()
         val forcedAccountProvider = remember {
-            // If defaultHomeserverList() returns a singleton list, this is the default account provider.
-            // In this case, the user can sign in using this homeserver, or use QrCode login
-            enterpriseService.defaultHomeserverList().singleOrNull()
+//            // If defaultHomeserverList() returns a singleton list, this is the default account provider.
+//            // In this case, the user can sign in using this homeserver, or use QrCode login
+//            enterpriseService.defaultHomeserverList().singleOrNull()
+            ZeroConfig.environment.matrixHomeServerUrl
         }
         val canConnectToAnyHomeserver = remember {
             enterpriseService.canConnectToAnyHomeserver()

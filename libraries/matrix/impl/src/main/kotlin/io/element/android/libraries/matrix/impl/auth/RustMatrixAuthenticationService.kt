@@ -136,20 +136,25 @@ class RustMatrixAuthenticationService(
 
     override suspend fun setHomeserver(homeserver: String): Result<Unit> =
         withContext(coroutineDispatchers.io) {
-            val emptySessionPath = rotateSessionPath()
-            runCatchingExceptions {
-                val client = makeClient(sessionPaths = emptySessionPath) {
-                    serverNameOrHomeserverUrl(homeserver)
-                }
+            if (currentClient != null) {
+                // homeserver is already set
+                Result.success(Unit)
+            } else {
+                val emptySessionPath = rotateSessionPath()
+                runCatchingExceptions {
+                    val client = makeClient(sessionPaths = emptySessionPath) {
+                        serverNameOrHomeserverUrl(homeserver)
+                    }
 
-                currentClient = client
-                val homeServerDetails = client.homeserverLoginDetails().map()
-                currentHomeserver.value = homeServerDetails.copy(url = homeserver)
-            }.onFailure {
-                clear()
-            }.mapFailure { failure ->
-                Timber.e(failure, "Failed to set homeserver to $homeserver")
-                failure.mapAuthenticationException()
+                    currentClient = client
+                    val homeServerDetails = client.homeserverLoginDetails().map()
+                    currentHomeserver.value = homeServerDetails.copy(url = homeserver)
+                }.onFailure {
+                    clear()
+                }.mapFailure { failure ->
+                    Timber.e(failure, "Failed to set homeserver to $homeserver")
+                    failure.mapAuthenticationException()
+                }
             }
         }
 
