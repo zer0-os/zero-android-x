@@ -7,6 +7,8 @@
 
 package io.element.android.features.login.impl.screens.onboarding
 
+import android.app.Activity
+
 sealed interface OnBoardingEvents {
     data class OnSignIn(
         val defaultAccountProvider: String
@@ -14,4 +16,7 @@ sealed interface OnBoardingEvents {
 
     data object OnVersionClick : OnBoardingEvents
     data object ClearError : OnBoardingEvents
+
+    data class OnLoginWithX(val activity: Activity) : OnBoardingEvents
+    data class OnLoginWithEpic(val activity: Activity) : OnBoardingEvents
 }

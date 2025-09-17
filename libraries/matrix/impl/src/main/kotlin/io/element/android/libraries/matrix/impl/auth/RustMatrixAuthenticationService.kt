@@ -203,6 +203,15 @@ class RustMatrixAuthenticationService(
         )
     }
 
+    override suspend fun loginWithZeroOAuth(token: String): Result<SessionId> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
+        return executeZeroAuthFlow(
+            executeCall = {
+                authRepository.loginWithOAuth(token)
+            }
+        )
+    }
+
     override suspend fun importCreatedSession(externalSession: ExternalSession): Result<SessionId> =
         withContext(coroutineDispatchers.io) {
             runCatchingExceptions {

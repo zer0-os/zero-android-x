@@ -81,6 +81,12 @@ class AuthRepositoryImpl(
         trySend(ssoToken)
     }
 
+    override suspend fun loginWithOAuth(oAuthToken: String) = channelFlowWithAwait {
+        val credentials = zeroAuthService.establishZeroOAuthSession("Bearer $oAuthToken")
+        val ssoToken = proceedLoginFlow(credentials)
+        trySend(ssoToken)
+    }
+
     override suspend fun signUpWithWallet(walletToken: String, inviteSlug: String) =
         channelFlowWithAwait {
             val payload = CreateAndAuthoriseUserRequest(inviteSlug = inviteSlug)

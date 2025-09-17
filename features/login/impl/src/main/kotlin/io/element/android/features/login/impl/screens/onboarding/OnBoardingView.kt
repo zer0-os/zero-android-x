@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +50,7 @@ import io.element.android.libraries.matrix.api.auth.OidcDetails
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.screens.onboarding.ZeroOnboardingView
 
 // Refs:
@@ -69,6 +71,7 @@ fun OnBoardingView(
     onReportProblem: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     /*OnBoardingPage(
         modifier = modifier,
         renderBackground = state.onBoardingLogoResId == null,
@@ -103,12 +106,27 @@ fun OnBoardingView(
     )*/
 
     Box {
-        ZeroOnboardingView(onSignIn = {
-            val defaultAccountProvider = state.defaultAccountProvider
-            if (defaultAccountProvider != null) {
-                state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
+        ZeroOnboardingView(
+            onSignIn = {
+                val defaultAccountProvider = state.defaultAccountProvider
+                if (defaultAccountProvider != null) {
+                    state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
+                }
+            },
+            onLoginWithX = {
+                context.getActivity()?.let {
+                    state.eventSink(OnBoardingEvents.OnLoginWithX(it))
+                }
+            },
+            onLoginWithEpic = {
+                context.getActivity()?.let {
+                    state.eventSink(OnBoardingEvents.OnLoginWithEpic(it))
+                }
+            },
+            onLoginWithWalletConnect = {
+
             }
-        })
+        )
 
         LoginModeView(
             loginMode = state.loginMode,

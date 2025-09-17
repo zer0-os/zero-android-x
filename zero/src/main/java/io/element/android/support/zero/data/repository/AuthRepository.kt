@@ -26,6 +26,8 @@ interface AuthRepository {
 
     suspend fun loginWithWallet(walletToken: String): Flow<AuthSSOToken>
 
+    suspend fun loginWithOAuth(oAuthToken: String): Flow<AuthSSOToken>
+
     suspend fun signUpWithWallet(walletToken: String, inviteSlug: String): Flow<AuthSSOToken>
 
     suspend fun logout()

@@ -8,6 +8,7 @@
 package io.element.android.features.login.impl.screens.onboarding
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,11 +20,12 @@ import androidx.compose.runtime.setValue
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.Inject
-import io.element.android.appconfig.OnBoardingConfig
 import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.features.enterprise.api.canConnectToAnyHomeserver
 import io.element.android.features.login.impl.accesscontrol.DefaultAccountProviderAccessControl
 import io.element.android.features.login.impl.login.LoginHelper
+import io.element.android.features.login.impl.login.SocialAuthHelper
+import io.element.android.features.login.impl.login.SocialAuthResultHandler
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.meta.BuildMeta
@@ -39,6 +41,7 @@ class OnBoardingPresenter(
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val loginHelper: LoginHelper,
     private val onBoardingLogoResIdProvider: OnBoardingLogoResIdProvider,
+    private val socialAuthHelper: SocialAuthHelper,
 ) : Presenter<OnBoardingState> {
     @AssistedFactory
     interface Factory {
@@ -91,13 +94,25 @@ class OnBoardingPresenter(
 
         val loginMode by loginHelper.collectLoginMode()
 
+        LaunchedEffect(Unit) {
+            SocialAuthResultHandler.setListener { result ->
+                defaultAccountProvider?.let { accountProvider ->
+                    loginHelper.submitSocialAuthResult(
+                        coroutineScope = localCoroutineScope,
+                        homeserverUrl = accountProvider,
+                        result = result
+                    )
+                }
+            }
+        }
+
         fun handleEvent(event: OnBoardingEvents) {
             when (event) {
                 is OnBoardingEvents.OnSignIn -> loginHelper.submit(
                     coroutineScope = localCoroutineScope,
                     isAccountCreation = false,
                     homeserverUrl = event.defaultAccountProvider,
-                    loginHint = params.loginHint?.takeIf { forcedAccountProvider == null },
+                    loginHint = null,
                 )
                 OnBoardingEvents.ClearError -> loginHelper.clearError()
                 OnBoardingEvents.OnVersionClick -> {
@@ -107,6 +122,8 @@ class OnBoardingPresenter(
                         }
                     }
                 }
+                is OnBoardingEvents.OnLoginWithX -> socialAuthHelper.loginWithX(event.activity)
+                is OnBoardingEvents.OnLoginWithEpic -> socialAuthHelper.loginWithEpicGames(event.activity)
             }
         }
 
@@ -115,7 +132,7 @@ class OnBoardingPresenter(
             defaultAccountProvider = defaultAccountProvider,
             mustChooseAccountProvider = mustChooseAccountProvider,
             canLoginWithQrCode = canLoginWithQrCode,
-            canCreateAccount = defaultAccountProvider == null && canConnectToAnyHomeserver && OnBoardingConfig.CAN_CREATE_ACCOUNT,
+            canCreateAccount = defaultAccountProvider == null && canConnectToAnyHomeserver,
             canReportBug = canReportBug && showReportBug,
             loginMode = loginMode,
             version = buildMeta.versionName,

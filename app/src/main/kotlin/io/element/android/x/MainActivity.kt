@@ -34,6 +34,7 @@ import io.element.android.features.lockscreen.api.LockScreenEntryPoint
 import io.element.android.features.lockscreen.api.LockScreenLockState
 import io.element.android.features.lockscreen.api.LockScreenService
 import io.element.android.features.lockscreen.api.handleSecureFlag
+import io.element.android.features.login.impl.login.SocialAuthResultHandler
 import io.element.android.libraries.architecture.bindings
 import io.element.android.libraries.core.log.logger.LoggerTag
 import io.element.android.libraries.designsystem.theme.ElementThemeApp
@@ -177,6 +178,10 @@ class MainActivity : NodeActivity() {
                 Timber.tag("WalletConnect").e("Error dispatching envelope: ${it.throwable.message}")
             }
         }
+
+        // Zero social auth result
+        SocialAuthResultHandler.onMainActivityNewIntent(intent)
+
         // If the mainNode is not init yet, keep the intent for later.
         // It can happen when the activity is killed by the system. The methods are called in this order :
         // onCreate(savedInstanceState=true) -> onNewIntent -> onResume -> onMainNodeInit

@@ -35,6 +35,8 @@ interface MatrixAuthenticationService {
 
     suspend fun loginWithWeb3(web3Token: String): Result<SessionId>
 
+    suspend fun loginWithZeroOAuth(token: String): Result<SessionId>
+
     /**
      * Import a session that was created using another client, for instance Element Web.
      */

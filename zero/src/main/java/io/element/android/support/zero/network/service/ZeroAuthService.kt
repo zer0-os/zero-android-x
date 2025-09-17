@@ -37,4 +37,9 @@ interface ZeroAuthService {
 
 	@POST(value = "authentication/nonceOrAuthorize")
 	suspend fun nonceOrAuthorise(@Header("Authorization") web3Token: String): ZeroAuthCredentials
+
+    @POST(value = "api/oauth/establish-session")
+    suspend fun establishZeroOAuthSession(
+        @Header("Authorization") oAuthToken: String
+    ): ZeroAuthCredentials
 }

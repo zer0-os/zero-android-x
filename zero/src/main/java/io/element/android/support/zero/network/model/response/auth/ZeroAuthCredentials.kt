@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ZeroAuthCredentials(
 	val accessToken: String = "",
-	val chatAccessToken: String = "",
 	val expiresIn: Long,
 	val identityToken: String = ""
 )

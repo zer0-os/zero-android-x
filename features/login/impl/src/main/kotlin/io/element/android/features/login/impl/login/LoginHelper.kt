@@ -126,6 +126,31 @@ class LoginHelper(
         }
         oidcActionFlow.reset()
     }
+
+    fun submitSocialAuthResult(
+        coroutineScope: CoroutineScope,
+        homeserverUrl: String,
+        result: Result<String>
+    ) = coroutineScope.launch {
+        result.onSuccess { token ->
+            loginModeState.value = AsyncData.Loading(null)
+            authenticationService.setHomeserver(homeserverUrl)
+                .onSuccess {
+                    authenticationService.loginWithZeroOAuth(token)
+                        .onSuccess {
+                            loginModeState.value = AsyncData.Uninitialized
+                        }
+                        .onFailure { error ->
+                            loginModeState.value = AsyncData.Failure(error)
+                        }
+                }
+                .onFailure { error ->
+                    loginModeState.value = AsyncData.Failure(error)
+                }
+        }.onFailure { error ->
+            loginModeState.value = AsyncData.Failure(error)
+        }
+    }
 }
 
 internal class InvalidZeroInviteCode: Exception()

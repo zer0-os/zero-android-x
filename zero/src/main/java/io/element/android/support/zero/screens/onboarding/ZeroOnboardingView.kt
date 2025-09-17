@@ -28,6 +28,9 @@ import io.element.android.support.zero.common.ui.ZeroSecondaryButton
 @Composable
 fun ZeroOnboardingView(
     onSignIn: () -> Unit = {},
+    onLoginWithX: () -> Unit = {},
+    onLoginWithEpic: () -> Unit = {},
+    onLoginWithWalletConnect: () -> Unit = {},
 ) {
 //    LaunchedEffect(Unit) {
 //        onSignIn.invoke()
@@ -58,7 +61,7 @@ fun ZeroOnboardingView(
                     modifier = Modifier.fillMaxWidth(),
                     text = "Continue with",
                     icon = ImageVector.vectorResource(R.drawable.ic_logo_x),
-                    onClick = {}
+                    onClick = onLoginWithX
                 )
                 StrikedLabel(
                     modifier = Modifier.padding(vertical = 12.dp),
@@ -79,12 +82,14 @@ fun ZeroOnboardingView(
                         modifier = Modifier.weight(1f),
                         text = "",
                         icon = ImageVector.vectorResource(R.drawable.ic_logo_walletconnect),
+                        onClick = onLoginWithWalletConnect
                     )
                     Spacer(Modifier.size(8.dp))
                     ZeroSecondaryButton(
                         modifier = Modifier.weight(1f),
                         text = "",
                         icon = ImageVector.vectorResource(R.drawable.ic_logo_epic),
+                        onClick = onLoginWithEpic
                     )
                 }
             }
