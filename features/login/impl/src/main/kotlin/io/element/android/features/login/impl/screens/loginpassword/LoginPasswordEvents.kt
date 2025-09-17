@@ -11,6 +11,6 @@ sealed interface LoginPasswordEvents {
     data class SetLogin(val login: String) : LoginPasswordEvents
     data class SetPassword(val password: String) : LoginPasswordEvents
     data object Submit : LoginPasswordEvents
+    data object SubmitSSO : LoginPasswordEvents
     data object ClearError : LoginPasswordEvents
-    data class ToggleWeb3Modal(val show: Boolean) : LoginPasswordEvents
 }

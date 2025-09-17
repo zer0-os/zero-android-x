@@ -17,13 +17,16 @@ data class LoginPasswordState(
     val accountProvider: AccountProvider,
     val formState: LoginFormState,
     val loginAction: AsyncData<SessionId>,
-    val showWeb3Modal: Boolean,
     val eventSink: (LoginPasswordEvents) -> Unit
 ) {
     val submitEnabled: Boolean
         get() = loginAction !is AsyncData.Failure &&
             formState.login.isNotEmpty() &&
             formState.password.isNotEmpty()
+
+    val submitOtpEnabled: Boolean
+        get() = loginAction !is AsyncData.Failure &&
+            formState.login.isNotEmpty()
 }
 
 @Parcelize

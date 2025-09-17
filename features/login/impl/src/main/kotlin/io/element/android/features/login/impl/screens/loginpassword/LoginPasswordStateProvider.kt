@@ -17,8 +17,6 @@ open class LoginPasswordStateProvider : PreviewParameterProvider<LoginPasswordSt
     override val values: Sequence<LoginPasswordState>
         get() = sequenceOf(
             aLoginPasswordState(),
-            // With web3
-            aLoginPasswordState().copy(showWeb3Modal = true),
             // Loading
             aLoginPasswordState(loginAction = AsyncData.Loading()),
             // Error
@@ -35,7 +33,6 @@ fun aLoginPasswordState(
     accountProvider = accountProvider,
     formState = formState,
     loginAction = loginAction,
-    showWeb3Modal = false,
     eventSink = eventSink,
 )
 

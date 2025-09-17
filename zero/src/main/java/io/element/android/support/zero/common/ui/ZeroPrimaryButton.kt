@@ -32,6 +32,7 @@ fun ZeroPrimaryButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: ImageVector? = null,
+    enabled: Boolean = true,
     onClick: () -> Unit = {},
 ) {
     Button(
@@ -40,6 +41,7 @@ fun ZeroPrimaryButton(
         colors = ButtonDefaults.buttonColors().copy(
             containerColor = ElementTheme.colors.zeroBrandColor
         ),
+        enabled = enabled,
         onClick = onClick
     ) {
         val textBuilderString = buildString {

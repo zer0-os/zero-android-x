@@ -13,7 +13,9 @@
     <string name="email">Email</string>
     <string name="connect_a_wallet">Connect a Wallet</string>
     <string name="email_address">Email address</string>
+    <string name="enter_email_address">Enter email address</string>
     <string name="password">Password</string>
+    <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm Password</string>
 
     <string name="email_required">Email is required</string>

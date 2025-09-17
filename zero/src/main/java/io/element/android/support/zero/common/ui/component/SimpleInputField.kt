@@ -58,7 +58,7 @@ fun SimpleInputField(
 	Box(
 		modifier =
 		modifier
-			.height(42.dp)
+			.height(50.dp)
 			.background(textFieldColor, shape)
 			.innerShadow(
 				color = Color(0x50F6F4F6),
