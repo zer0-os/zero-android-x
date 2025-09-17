@@ -19,4 +19,5 @@ sealed interface OnBoardingEvents {
 
     data class OnLoginWithX(val activity: Activity) : OnBoardingEvents
     data class OnLoginWithEpic(val activity: Activity) : OnBoardingEvents
+    data class ToggleWeb3Modal(val show: Boolean) : OnBoardingEvents
 }

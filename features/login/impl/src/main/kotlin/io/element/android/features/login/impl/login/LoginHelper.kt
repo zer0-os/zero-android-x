@@ -12,12 +12,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import com.reown.appkit.client.Modal
 import dev.zacsweers.metro.Inject
 import io.element.android.features.login.impl.error.ChangeServerError
 import io.element.android.features.login.impl.screens.chooseaccountprovider.ChooseAccountProviderPresenter
 import io.element.android.features.login.impl.screens.confirmaccountprovider.ConfirmAccountProviderPresenter
 import io.element.android.features.login.impl.screens.createaccount.AccountCreationNotSupported
 import io.element.android.features.login.impl.screens.onboarding.OnBoardingPresenter
+import io.element.android.features.login.impl.walletconnect.WalletConnectService
 import io.element.android.features.login.impl.web.WebClientUrlForAuthenticationRetriever
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.runCatchingUpdatingState
@@ -136,7 +138,8 @@ class LoginHelper(
             loginModeState.value = AsyncData.Loading(null)
             authenticationService.setHomeserver(homeserverUrl)
                 .onSuccess {
-                    authenticationService.loginWithZeroOAuth(token)
+                    val authToken = "Bearer $token"
+                    authenticationService.loginWithZeroOAuth(authToken)
                         .onSuccess {
                             loginModeState.value = AsyncData.Uninitialized
                         }
@@ -151,6 +154,60 @@ class LoginHelper(
             loginModeState.value = AsyncData.Failure(error)
         }
     }
+
+    fun onWalletConnectEvent(
+        coroutineScope: CoroutineScope,
+        homeserverUrl: String,
+        model: Modal.Model?
+    ) {
+        when (model) {
+            is Modal.Model.ApprovedSession -> {
+                WalletConnectService.requestPersonalSign()
+            }
+            is Modal.Model.SessionRequestResponse -> {
+                when (model.result) {
+                    is Modal.Model.JsonRpcResponse.JsonRpcResult -> {
+                        val successResult = (model.result as Modal.Model.JsonRpcResponse.JsonRpcResult)
+                        coroutineScope.onWalletConnectionSuccess(successResult, homeserverUrl)
+                    }
+                    is Modal.Model.JsonRpcResponse.JsonRpcError -> {
+                        val errorResult = (model.result as Modal.Model.JsonRpcResponse.JsonRpcError)
+                        onWalletConnectError()
+                    }
+                }
+            }
+            is Modal.Model.RejectedSession -> onWalletConnectError()
+            is Modal.Model.Error -> onWalletConnectError()
+            else -> {
+                // do nothing for now
+            }
+        }
+    }
+
+    private fun CoroutineScope.onWalletConnectionSuccess(
+        successResult: Modal.Model.JsonRpcResponse.JsonRpcResult,
+        homeserverUrl: String
+    ) = launch {
+        loginModeState.value = AsyncData.Loading(null)
+        val web3Token = "Web3 ${successResult.result}"
+        authenticationService.setHomeserver(homeserverUrl)
+            .onSuccess {
+                authenticationService.loginWithWeb3(web3Token)
+                    .onSuccess { sessionId ->
+                        loginModeState.value = AsyncData.Uninitialized
+                    }
+                    .onFailure { failure ->
+                        loginModeState.value = AsyncData.Failure(failure)
+                    }
+            }
+            .onFailure { failure ->
+                loginModeState.value = AsyncData.Failure(failure)
+            }
+    }
+
+    fun onWalletConnectError() {
+        loginModeState.value = AsyncData.Failure(Throwable("Wallet connection failed. Please try again."))
+    }
 }
 
-internal class InvalidZeroInviteCode: Exception()
+internal class InvalidZeroInviteCode : Exception()

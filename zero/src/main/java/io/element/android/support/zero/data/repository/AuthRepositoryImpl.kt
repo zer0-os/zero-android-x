@@ -82,7 +82,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun loginWithOAuth(oAuthToken: String) = channelFlowWithAwait {
-        val credentials = zeroAuthService.establishZeroOAuthSession("Bearer $oAuthToken")
+        val credentials = zeroAuthService.establishZeroOAuthSession(oAuthToken)
         val ssoToken = proceedLoginFlow(credentials)
         trySend(ssoToken)
     }

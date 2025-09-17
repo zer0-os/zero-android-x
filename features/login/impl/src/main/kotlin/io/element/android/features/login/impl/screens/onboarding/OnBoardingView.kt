@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.login.impl.R
@@ -43,6 +45,7 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.IconSource
+import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TextButton
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
@@ -105,40 +108,55 @@ fun OnBoardingView(
         }
     )*/
 
-    Box {
-        ZeroOnboardingView(
-            onSignIn = {
-                val defaultAccountProvider = state.defaultAccountProvider
-                if (defaultAccountProvider != null) {
-                    state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
-                }
-            },
-            onLoginWithX = {
-                context.getActivity()?.let {
-                    state.eventSink(OnBoardingEvents.OnLoginWithX(it))
-                }
-            },
-            onLoginWithEpic = {
-                context.getActivity()?.let {
-                    state.eventSink(OnBoardingEvents.OnLoginWithEpic(it))
-                }
-            },
-            onLoginWithWalletConnect = {
-
+    Scaffold(
+        modifier = modifier,
+        bottomBar = {
+            if (state.showWeb3Modal) {
+                AppKitComponent(
+                    shouldOpenChooseNetwork = false,
+                    closeModal = {
+                        state.eventSink(OnBoardingEvents.ToggleWeb3Modal(false))
+                    }
+                )
             }
-        )
+        },
+        containerColor = Color.Transparent
+    ) { paddingValues ->
+        Box {
+            ZeroOnboardingView(
+                onSignIn = {
+                    val defaultAccountProvider = state.defaultAccountProvider
+                    if (defaultAccountProvider != null) {
+                        state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
+                    }
+                },
+                onLoginWithX = {
+                    context.getActivity()?.let {
+                        state.eventSink(OnBoardingEvents.OnLoginWithX(it))
+                    }
+                },
+                onLoginWithEpic = {
+                    context.getActivity()?.let {
+                        state.eventSink(OnBoardingEvents.OnLoginWithEpic(it))
+                    }
+                },
+                onLoginWithWalletConnect = {
+                    state.eventSink(OnBoardingEvents.ToggleWeb3Modal(true))
+                }
+            )
 
-        LoginModeView(
-            loginMode = state.loginMode,
-            onClearError = {
-                state.eventSink(OnBoardingEvents.ClearError)
-            },
-            onLearnMoreClick = onLearnMoreClick,
-            onOidcDetails = onOidcDetails,
-            onNeedLoginPassword = onNeedLoginPassword,
-            onCreateAccountContinue = onCreateAccountContinue,
-            onCreateZeroAccount = {}
-        )
+            LoginModeView(
+                loginMode = state.loginMode,
+                onClearError = {
+                    state.eventSink(OnBoardingEvents.ClearError)
+                },
+                onLearnMoreClick = onLearnMoreClick,
+                onOidcDetails = onOidcDetails,
+                onNeedLoginPassword = onNeedLoginPassword,
+                onCreateAccountContinue = onCreateAccountContinue,
+                onCreateZeroAccount = {}
+            )
+        }
     }
 }
 

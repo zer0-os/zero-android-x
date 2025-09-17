@@ -22,6 +22,7 @@ data class OnBoardingState(
     @DrawableRes
     val onBoardingLogoResId: Int?,
     val loginMode: AsyncData<LoginMode>,
+    val showWeb3Modal: Boolean,
     val eventSink: (OnBoardingEvents) -> Unit,
 ) {
     val submitEnabled: Boolean

@@ -48,5 +48,6 @@ fun anOnBoardingState(
     version = version,
     loginMode = loginMode,
     onBoardingLogoResId = customLogoResId,
+    showWeb3Modal = false,
     eventSink = eventSink,
 )

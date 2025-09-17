@@ -7,6 +7,8 @@
 
 package io.element.android.features.login.impl.screens.onboarding
 
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.reown.appkit.client.AppKit
+import com.reown.appkit.ui.components.button.rememberAppKitState
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.Inject
@@ -26,11 +33,13 @@ import io.element.android.features.login.impl.accesscontrol.DefaultAccountProvid
 import io.element.android.features.login.impl.login.LoginHelper
 import io.element.android.features.login.impl.login.SocialAuthHelper
 import io.element.android.features.login.impl.login.SocialAuthResultHandler
+import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.ui.utils.MultipleTapToUnlock
 import io.element.android.support.zero.config.ZeroConfig
+import kotlinx.coroutines.flow.collectLatest
 
 @Inject
 class OnBoardingPresenter(
@@ -52,6 +61,7 @@ class OnBoardingPresenter(
 
     private val multipleTapToUnlock = MultipleTapToUnlock()
 
+    @OptIn(ExperimentalMaterialNavigationApi::class)
     @Composable
     override fun present(): OnBoardingState {
         val localCoroutineScope = rememberCoroutineScope()
@@ -94,6 +104,16 @@ class OnBoardingPresenter(
 
         val loginMode by loginHelper.collectLoginMode()
 
+        val sheetState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            skipHalfExpanded = true
+        )
+        val bottomSheetNavigator = BottomSheetNavigator(sheetState)
+        val navController = rememberNavController(bottomSheetNavigator)
+        val web3ModalState = rememberAppKitState(navController = navController)
+        val isWeb3Connected: Boolean by web3ModalState.isConnected.collectAsState(initial = false)
+        val showWeb3Modal = rememberSaveable { mutableStateOf(false) }
+
         LaunchedEffect(Unit) {
             SocialAuthResultHandler.setListener { result ->
                 defaultAccountProvider?.let { accountProvider ->
@@ -101,6 +121,15 @@ class OnBoardingPresenter(
                         coroutineScope = localCoroutineScope,
                         homeserverUrl = accountProvider,
                         result = result
+                    )
+                }
+            }
+            WalletConnectDelegate.wcEventModels.collectLatest { model ->
+                defaultAccountProvider?.let { accountProvider ->
+                    loginHelper.onWalletConnectEvent(
+                        coroutineScope = localCoroutineScope,
+                        homeserverUrl = accountProvider,
+                        model = model
                     )
                 }
             }
@@ -124,6 +153,20 @@ class OnBoardingPresenter(
                 }
                 is OnBoardingEvents.OnLoginWithX -> socialAuthHelper.loginWithX(event.activity)
                 is OnBoardingEvents.OnLoginWithEpic -> socialAuthHelper.loginWithEpicGames(event.activity)
+                is OnBoardingEvents.ToggleWeb3Modal -> {
+                    if (event.show) {
+                        if (isWeb3Connected) {
+                            AppKit.disconnect(
+                                onSuccess = { showWeb3Modal.value = true },
+                                onError = { loginHelper.onWalletConnectError() }
+                            )
+                        } else {
+                            showWeb3Modal.value = true
+                        }
+                    } else {
+                        showWeb3Modal.value = false
+                    }
+                }
             }
         }
 
@@ -137,6 +180,7 @@ class OnBoardingPresenter(
             loginMode = loginMode,
             version = buildMeta.versionName,
             onBoardingLogoResId = onBoardingLogoResId,
+            showWeb3Modal = showWeb3Modal.value,
             eventSink = ::handleEvent,
         )
     }
