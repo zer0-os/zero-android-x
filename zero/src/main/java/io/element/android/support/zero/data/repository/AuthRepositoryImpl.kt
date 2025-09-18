@@ -10,6 +10,7 @@ import io.element.android.support.zero.network.model.request.AuthoriseUserReques
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
+import io.element.android.support.zero.network.model.request.ResetPasswordRequest
 import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroUserService
@@ -99,6 +100,11 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         dataCleaner.clean()
+    }
+
+    override suspend fun resetPasswordRequest(email: String) = channelFlowWithAwait {
+        zeroAuthService.resetPasswordRequest(request = ResetPasswordRequest(email))
+        trySend(Unit)
     }
 
     private suspend fun <T> runSafeCall(run: suspend () -> T) =

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -25,20 +26,22 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 fun OnboardingScreenHeader(
     title: String,
     subTitle: String?,
+    titleColor: Color = ElementTheme.colors.zeroBrandColor,
+    subtitleColor: Color = ElementTheme.colors.textSecondary,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.Start) {
         Text(
             text = title,
             style = ElementTheme.zeroTypography.fontHeadingLgRegular,
-            color = ElementTheme.colors.zeroBrandColor
+            color = titleColor
         )
         Spacer(modifier = Modifier.size(8.dp))
         if (subTitle != null) {
             Text(
                 text = subTitle,
                 style = ElementTheme.zeroTypography.fontBodyLgRegular,
-                color = ElementTheme.colors.textSecondary
+                color = subtitleColor
             )
         }
     }

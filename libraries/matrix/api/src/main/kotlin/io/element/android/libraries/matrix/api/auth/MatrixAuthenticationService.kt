@@ -74,4 +74,6 @@ interface MatrixAuthenticationService {
     suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId>
 
     suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId>
+
+    suspend fun requestResetPassword(email: String): Result<Unit>
 }

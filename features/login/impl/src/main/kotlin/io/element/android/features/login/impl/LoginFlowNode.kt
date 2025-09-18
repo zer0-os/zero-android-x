@@ -35,6 +35,7 @@ import io.element.android.features.login.impl.screens.changeaccountprovider.Chan
 import io.element.android.features.login.impl.screens.chooseaccountprovider.ChooseAccountProviderNode
 import io.element.android.features.login.impl.screens.confirmaccountprovider.ConfirmAccountProviderNode
 import io.element.android.features.login.impl.screens.createaccount.CreateAccountNode
+import io.element.android.features.login.impl.screens.extendedOnboarding.ExtendedOnboardingNode
 import io.element.android.features.login.impl.screens.loginpassword.LoginPasswordNode
 import io.element.android.features.login.impl.screens.onboarding.OnBoardingNode
 import io.element.android.features.login.impl.screens.searchaccountprovider.SearchAccountProviderNode
@@ -125,6 +126,12 @@ class LoginFlowNode(
 
         @Parcelize
         data class ZeroCreateAccount(val inviteCode: String) : NavTarget
+
+        @Parcelize
+        data object ForgotPassword : NavTarget
+
+        @Parcelize
+        data object VerifyOTP : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -251,7 +258,16 @@ class LoginFlowNode(
                 createNode<SearchAccountProviderNode>(buildContext, plugins = listOf(callback))
             }
             NavTarget.LoginPassword -> {
-                createNode<LoginPasswordNode>(buildContext)
+                val callback = object : LoginPasswordNode.Callback {
+                    override fun onVerifyOtp() {
+                        backstack.push(NavTarget.VerifyOTP)
+                    }
+
+                    override fun onForgotPassword() {
+                        backstack.push(NavTarget.ForgotPassword)
+                    }
+                }
+                createNode<LoginPasswordNode>(buildContext, plugins = listOf(callback))
             }
             is NavTarget.CreateAccount -> {
                 val inputs = CreateAccountNode.Inputs(
@@ -271,6 +287,16 @@ class LoginFlowNode(
                     }
                 }
                 createNode<ZeroCreateAccountNode>(buildContext, listOf(inputs, callback))
+            }
+            NavTarget.VerifyOTP -> {
+                val params = ExtendedOnboardingNode
+                    .Inputs(flow = ExtendedOnboardingNode.ExtendedOnboardingFlow.VERIFY_OTP)
+                createNode<ExtendedOnboardingNode>(buildContext, listOf(params))
+            }
+            NavTarget.ForgotPassword -> {
+                val params = ExtendedOnboardingNode
+                    .Inputs(flow = ExtendedOnboardingNode.ExtendedOnboardingFlow.FORGOT_PASSWORD)
+                createNode<ExtendedOnboardingNode>(buildContext, listOf(params))
             }
         }
     }

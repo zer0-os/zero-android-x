@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
-import com.reown.appkit.client.AppKit
+import com.bumble.appyx.core.plugin.plugins
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.Inject
@@ -25,6 +25,20 @@ class LoginPasswordNode(
     @Assisted plugins: List<Plugin>,
     private val presenter: LoginPasswordPresenter,
 ) : Node(buildContext, plugins = plugins) {
+
+    interface Callback : Plugin {
+        fun onVerifyOtp()
+        fun onForgotPassword()
+    }
+
+    private fun onVerifyOtp() {
+        plugins<Callback>().forEach { it.onVerifyOtp() }
+    }
+
+    private fun onForgotPassword() {
+        plugins<Callback>().forEach { it.onForgotPassword() }
+    }
+
     @Composable
     override fun View(modifier: Modifier) {
         val state = presenter.present()
@@ -36,17 +50,9 @@ class LoginPasswordNode(
         ZeroLoginPasswordView(
             state = state,
             modifier = modifier,
-            onBackClick = {
-                disconnectWallet()
-                navigateUp()
-            },
-        )
-    }
-
-    private fun disconnectWallet() {
-        AppKit.disconnect(
-            onSuccess = {},
-            onError = {}
+            onBackClick = ::navigateUp,
+            onVerifyOtp = ::onVerifyOtp,
+            onForgotPassword = ::onForgotPassword
         )
     }
 }

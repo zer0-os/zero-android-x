@@ -157,4 +157,8 @@ class FakeMatrixAuthenticationService(
     override suspend fun createZeroAccountWithWeb3(web3Token: String, inviteCode: String): Result<SessionId> {
         return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
     }
+
+    override suspend fun requestResetPassword(email: String): Result<Unit> {
+        return Result.success(Unit)
+    }
 }

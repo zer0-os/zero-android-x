@@ -70,6 +70,8 @@ import io.element.android.support.zero.screens.onboarding.components.ZeroOnboard
 fun ZeroLoginPasswordView(
     state: LoginPasswordState,
     onBackClick: () -> Unit,
+    onVerifyOtp: () -> Unit,
+    onForgotPassword: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val autofillManager = LocalAutofillManager.current
@@ -122,6 +124,7 @@ fun ZeroLoginPasswordView(
                         ZeroLoginForm(
                             state = state,
                             showSingleSignOnForm = showSingleSignOnForm.value,
+                            onForgotPassword = onForgotPassword,
                             onSubmit = {
                                 if (showSingleSignOnForm.value) {
                                     submitSSO()
@@ -174,6 +177,7 @@ fun ZeroLoginPasswordView(
 private fun ZeroLoginForm(
     state: LoginPasswordState,
     showSingleSignOnForm: Boolean,
+    onForgotPassword: () -> Unit,
     onSubmit: () -> Unit,
 ) {
     var loginFieldState by textFieldState(stateValue = state.formState.login)
@@ -265,7 +269,7 @@ private fun ZeroLoginForm(
                     TextButton(
                         modifier = Modifier.align(Alignment.Center),
                         text = "Forgot Password?",
-                        onClick = { },
+                        onClick = onForgotPassword,
                         size = ButtonSize.Medium,
                         contentColor = ElementTheme.colors.zeroBrandColor
                     )
@@ -338,5 +342,7 @@ internal fun ZeroLoginPasswordViewPreview(@PreviewParameter(LoginPasswordStatePr
     ZeroLoginPasswordView(
         state = state,
         onBackClick = {},
+        onVerifyOtp = {},
+        onForgotPassword = {}
     )
 }

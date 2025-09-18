@@ -31,4 +31,6 @@ interface AuthRepository {
     suspend fun signUpWithWallet(walletToken: String, inviteSlug: String): Flow<AuthSSOToken>
 
     suspend fun logout()
+
+    suspend fun resetPasswordRequest(email: String): Flow<Unit>
 }

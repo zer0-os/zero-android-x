@@ -429,6 +429,13 @@ class RustMatrixAuthenticationService(
         )
     }
 
+    override suspend fun requestResetPassword(email: String): Result<Unit> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        return runCatching {
+            authRepository.resetPasswordRequest(email).firstOrNull()
+        }
+    }
+
     private suspend fun executeZeroAuthFlow(
         fromCreateAccountFlow: Boolean = false,
         executeCall: suspend () -> Flow<AuthSSOToken>
