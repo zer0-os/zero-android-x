@@ -130,6 +130,7 @@ fun OnBoardingView(
                         state.eventSink(OnBoardingEvents.OnSignIn(defaultAccountProvider))
                     }
                 },
+                onSignUp = onCreateAccount,
                 onLoginWithX = {
                     context.getActivity()?.let {
                         state.eventSink(OnBoardingEvents.OnLoginWithX(it))

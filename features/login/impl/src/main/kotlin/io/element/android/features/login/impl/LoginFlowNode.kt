@@ -39,6 +39,7 @@ import io.element.android.features.login.impl.screens.extendedOnboarding.Extende
 import io.element.android.features.login.impl.screens.loginpassword.LoginPasswordNode
 import io.element.android.features.login.impl.screens.onboarding.OnBoardingNode
 import io.element.android.features.login.impl.screens.searchaccountprovider.SearchAccountProviderNode
+import io.element.android.features.login.impl.screens.verifyzeroinvite.VerifyZeroInviteNode
 import io.element.android.features.login.impl.screens.zerocreateaccount.ZeroCreateAccountNode
 import io.element.android.libraries.androidutils.browser.openUrlInChromeCustomTab
 import io.element.android.libraries.architecture.BackstackView
@@ -131,7 +132,10 @@ class LoginFlowNode(
         data object ForgotPassword : NavTarget
 
         @Parcelize
-        data class VerifyOTP(val userEmail: String): NavTarget
+        data class VerifyOTP(val userEmail: String) : NavTarget
+
+        @Parcelize
+        data object VerifyZeroInvite : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -139,9 +143,10 @@ class LoginFlowNode(
             NavTarget.OnBoarding -> {
                 val callback = object : OnBoardingNode.Callback {
                     override fun onSignUp() {
-                        backstack.push(
-                            NavTarget.ConfirmAccountProvider(isAccountCreation = true)
-                        )
+//                        backstack.push(
+//                            NavTarget.ConfirmAccountProvider(isAccountCreation = true)
+//                        )
+                        backstack.push(NavTarget.VerifyZeroInvite)
                     }
 
                     override fun onSignIn(mustChooseAccountProvider: Boolean) {
@@ -275,7 +280,14 @@ class LoginFlowNode(
                 )
                 createNode<CreateAccountNode>(buildContext, listOf(inputs))
             }
-
+            NavTarget.VerifyZeroInvite -> {
+                val callback = object : VerifyZeroInviteNode.Callback {
+                    override fun onCreateZeroAccount(inviteCode: String) {
+                        backstack.push(NavTarget.ZeroCreateAccount(inviteCode))
+                    }
+                }
+                createNode<VerifyZeroInviteNode>(buildContext, listOf(callback))
+            }
             is NavTarget.ZeroCreateAccount -> {
                 val inputs = ZeroCreateAccountNode.Inputs(
                     inviteCode = navTarget.inviteCode,

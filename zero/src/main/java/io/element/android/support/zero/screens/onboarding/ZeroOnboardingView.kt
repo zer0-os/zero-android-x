@@ -28,6 +28,7 @@ import io.element.android.support.zero.common.ui.ZeroSecondaryButton
 @Composable
 fun ZeroOnboardingView(
     onSignIn: () -> Unit = {},
+    onSignUp: () -> Unit = {},
     onLoginWithX: () -> Unit = {},
     onLoginWithEpic: () -> Unit = {},
     onLoginWithWalletConnect: () -> Unit = {},
@@ -42,7 +43,7 @@ fun ZeroOnboardingView(
         appbarActions = {
             TextButton(
                 text = "Sign up",
-                onClick = {},
+                onClick = onSignUp,
                 contentColor = ElementTheme.colors.textPrimary
             )
         },
