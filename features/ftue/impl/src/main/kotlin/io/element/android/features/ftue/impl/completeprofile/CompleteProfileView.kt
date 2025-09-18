@@ -143,7 +143,7 @@ fun CompleteProfileView(
                             .fillMaxWidth()
                             .padding(vertical = PADDING_4X.dp),
                         text = state.displayName,
-                        placeholder = io.element.android.support.zero.R.string.display_name,
+                        placeholder = io.element.android.support.zero.R.string.enter_display_name,
                         onTextChanged = {
                             state.eventSink(CompleteProfileEvents.SetDisplayName(it))
                         },

@@ -342,7 +342,6 @@ class RustMatrixClient(
     }
 
     override suspend fun getRoom(roomId: RoomId): BaseRoom? = withContext(sessionDispatcher) {
-        innerClient.rooms()
         roomFactory.getBaseRoom(roomId)
     }
 
