@@ -8,6 +8,7 @@
 package io.element.android.features.ftue.impl.completeprofile
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -15,15 +16,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
@@ -47,15 +47,16 @@ import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.EditableAvatarView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.support.zero.common.extension.getActivity
-import io.element.android.support.zero.common.ui.ZeroAuthScreensBackground
+import io.element.android.support.zero.common.ui.ZeroPrimaryButton
 import io.element.android.support.zero.common.ui.component.SimpleInputField
-import io.element.android.support.zero.common.ui.component.ZImageButton
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_10X
+import io.element.android.support.zero.common.ui.theme.SPACING_2X
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,19 +85,10 @@ fun CompleteProfileView(
         state.eventSink(CompleteProfileEvents.Submit)
     }
 
-    ZeroAuthScreensBackground(isLoading = false) {
+    Box {
         Scaffold(
             modifier = modifier.clearFocusOnTap(focusManager),
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text(stringResource(io.element.android.support.zero.R.string.create_account)) },
-                    navigationIcon = { },
-                    colors = TopAppBarDefaults
-                        .centerAlignedTopAppBarColors()
-                        .copy(containerColor = Color.Transparent)
-                )
-            },
-            containerColor = Color.Transparent
+            containerColor = Color.Black
         ) { padding ->
             val scrollState = rememberScrollState()
 
@@ -106,48 +98,74 @@ fun CompleteProfileView(
                     .imePadding()
                     .padding(padding)
                     .consumeWindowInsets(padding)
-                    .verticalScroll(state = scrollState)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                    .verticalScroll(state = scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(SPACING_10X.dp))
+                Text(
+                    text = "Enter your details",
+                    style = ElementTheme.zeroTypography.fontHeadingMdBold,
+                    color = ElementTheme.colors.textPrimary
+                )
+                Spacer(modifier = Modifier.height(SPACING_2X.dp))
+                Text(
+                    text = "Complete your profile",
+                    style = ElementTheme.zeroTypography.fontBodyLgRegular,
+                    color = ElementTheme.colors.textSecondary
+                )
+
                 Spacer(modifier = Modifier.height(SPACING_10X.dp))
                 EditableAvatarView(
                     matrixId = "",
                     displayName = state.displayName,
                     avatarUrl = state.userAvatarUrl,
-                    avatarSize = AvatarSize.EditProfileDetails,
+                    avatarSize = AvatarSize.CompleteProfileScreen,
                     onAvatarClick = { onAvatarClick() },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     avatarType = AvatarType.User
                 )
 
                 Spacer(modifier = Modifier.height(SPACING_10X.dp))
-                SimpleInputField(
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 24.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Start),
+                        text = "Display Name",
+                        style = ElementTheme.zeroTypography.fontBodySmRegular,
+                        color = ElementTheme.colors.textSecondary
+                    )
+                    SimpleInputField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = PADDING_4X.dp),
+                        text = state.displayName,
+                        placeholder = io.element.android.support.zero.R.string.display_name,
+                        onTextChanged = {
+                            state.eventSink(CompleteProfileEvents.SetDisplayName(it))
+                        },
+                        maxInputLength = 24,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done,
+                            capitalization = KeyboardCapitalization.Words
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { submit() }
+                        )
+                    )
+                }
+
+                ZeroPrimaryButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = PADDING_4X.dp),
-                    text = state.displayName,
-                    placeholder = io.element.android.support.zero.R.string.display_name,
-                    onTextChanged = {
-                        state.eventSink(CompleteProfileEvents.SetDisplayName(it))
-                    },
-                    maxInputLength = 24,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done,
-                        capitalization = KeyboardCapitalization.Words
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            state.eventSink(CompleteProfileEvents.Submit)
-                        }
-                    )
-                )
-
-                Spacer(modifier = Modifier.size(SPACING_10X.dp))
-                ZImageButton(
-                    image = io.element.android.support.zero.R.drawable.img_btn_create_account,
-                    text = stringResource(id = io.element.android.support.zero.R.string.create_account),
+                        .navigationBarsPadding()
+                        .imePadding()
+                        .padding(24.dp),
+                    text = "Continue",
                     enabled = state.saveButtonEnabled,
                     onClick = { submit() }
                 )

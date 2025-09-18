@@ -11,5 +11,5 @@ internal fun ApiUser.toModel() = ZeroUser(
     primaryZeroId = primaryZID,
     primaryWalletAddress = primaryWalletAddress,
     thirdWebWalletAddress = thirdWebWallet?.publicAddress,
-    isZeroProSubscriber = subscriptions.zeroPro
+    isZeroProSubscriber = subscriptions?.zeroPro ?:false
 )

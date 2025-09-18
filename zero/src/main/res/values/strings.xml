@@ -17,6 +17,7 @@
     <string name="password">Password</string>
     <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_your_password">Confirm your password</string>
 
     <string name="email_required">Email is required</string>
     <string name="email_invalid">Email is invalid</string>
@@ -43,5 +44,6 @@
 
     <string name="already_on_zero">Already on ZERO?</string>
     <string name="display_name">Display Name</string>
+    <string name="enter_display_name">Enter your display name</string>
     <string name="error_complete_profile">Unable to update profile</string>
 </resources>

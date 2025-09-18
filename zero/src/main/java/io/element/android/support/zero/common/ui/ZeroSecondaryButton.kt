@@ -9,6 +9,7 @@ package io.element.android.support.zero.common.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,12 +27,14 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+import io.element.android.support.zero.common.ui.theme.SPACING_2X
 
 @Composable
 fun ZeroSecondaryButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: ImageVector? = null,
+    trailingIcon: ImageVector? = null,
     onClick: () -> Unit = {},
 ) {
     Button(
@@ -55,6 +58,15 @@ fun ZeroSecondaryButton(
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
+            if (trailingIcon != null) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = trailingIcon,
+                    contentDescription = "logo_icon_trailing",
+                    tint = ElementTheme.colors.zeroBrandColor
+                )
+                Spacer(Modifier.size(SPACING_2X.dp))
+            }
             Text(
                 text = textBuilderString,
                 style = ElementTheme.typography.fontBodyMdMedium

@@ -32,7 +32,7 @@ data class ApiUser(
     val primaryWalletAddress: String? = null,
     val wallets: List<ApiWallet>? = null,
     val primaryWallet: ApiWallet? = null,
-    val subscriptions: ZeroSubscription
+    val subscriptions: ZeroSubscription? = null
 ) : ApiBaseMember {
     val firstName
         get() = profile?.firstName.orEmpty()
