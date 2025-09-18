@@ -11,6 +11,8 @@ import io.element.android.support.zero.network.model.request.CreateAndAuthoriseU
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetPasswordRequest
+import io.element.android.support.zero.network.model.request.SendOtpRequest
+import io.element.android.support.zero.network.model.request.VerifyOtpRequest
 import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroUserService
@@ -102,9 +104,20 @@ class AuthRepositoryImpl(
         dataCleaner.clean()
     }
 
-    override suspend fun resetPasswordRequest(email: String) = channelFlowWithAwait {
+    override suspend fun resetPasswordRequest(email: String) {
         zeroAuthService.resetPasswordRequest(request = ResetPasswordRequest(email))
-        trySend(Unit)
+    }
+
+    override suspend fun requestOTP(email: String) {
+        zeroAuthService.requestOtp(request = SendOtpRequest(email))
+    }
+
+    override suspend fun verifyOTP(email: String, code: String): Flow<AuthSSOToken> = channelFlowWithAwait {
+        val credentials = zeroAuthService.verifyOtp(
+            request = VerifyOtpRequest(email, code)
+        )
+        val ssoToken = proceedLoginFlow(credentials)
+        trySend(ssoToken)
     }
 
     private suspend fun <T> runSafeCall(run: suspend () -> T) =

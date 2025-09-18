@@ -27,12 +27,12 @@ class LoginPasswordNode(
 ) : Node(buildContext, plugins = plugins) {
 
     interface Callback : Plugin {
-        fun onVerifyOtp()
+        fun onVerifyOtp(email: String)
         fun onForgotPassword()
     }
 
-    private fun onVerifyOtp() {
-        plugins<Callback>().forEach { it.onVerifyOtp() }
+    private fun onVerifyOtp(email: String) {
+        plugins<Callback>().forEach { it.onVerifyOtp(email) }
     }
 
     private fun onForgotPassword() {

@@ -131,7 +131,7 @@ class LoginFlowNode(
         data object ForgotPassword : NavTarget
 
         @Parcelize
-        data object VerifyOTP : NavTarget
+        data class VerifyOTP(val userEmail: String): NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -259,8 +259,8 @@ class LoginFlowNode(
             }
             NavTarget.LoginPassword -> {
                 val callback = object : LoginPasswordNode.Callback {
-                    override fun onVerifyOtp() {
-                        backstack.push(NavTarget.VerifyOTP)
+                    override fun onVerifyOtp(email: String) {
+                        backstack.push(NavTarget.VerifyOTP(email))
                     }
 
                     override fun onForgotPassword() {
@@ -288,9 +288,12 @@ class LoginFlowNode(
                 }
                 createNode<ZeroCreateAccountNode>(buildContext, listOf(inputs, callback))
             }
-            NavTarget.VerifyOTP -> {
+            is NavTarget.VerifyOTP -> {
                 val params = ExtendedOnboardingNode
-                    .Inputs(flow = ExtendedOnboardingNode.ExtendedOnboardingFlow.VERIFY_OTP)
+                    .Inputs(
+                        flow = ExtendedOnboardingNode.ExtendedOnboardingFlow.VERIFY_OTP,
+                        userEmail = navTarget.userEmail
+                    )
                 createNode<ExtendedOnboardingNode>(buildContext, listOf(params))
             }
             NavTarget.ForgotPassword -> {

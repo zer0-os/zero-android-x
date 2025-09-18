@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.login.impl.error.loginError
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -70,7 +71,7 @@ import io.element.android.support.zero.screens.onboarding.components.ZeroOnboard
 fun ZeroLoginPasswordView(
     state: LoginPasswordState,
     onBackClick: () -> Unit,
-    onVerifyOtp: () -> Unit,
+    onVerifyOtp: (String) -> Unit,
     onForgotPassword: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -88,6 +89,15 @@ fun ZeroLoginPasswordView(
             state.loginAction is AsyncData.Loading
         }
     }
+    val isRequestOtpSuccess by remember(state.requestOtpAction) {
+        derivedStateOf {
+            state.requestOtpAction is AsyncAction.Success
+        }
+    }
+    if (isRequestOtpSuccess) {
+        onVerifyOtp(state.formState.login.trim())
+    }
+
     val focusManager = LocalFocusManager.current
 
     fun submit() {

@@ -9,6 +9,8 @@ package io.element.android.features.login.impl.screens.extendedOnboarding
 
 sealed interface ExtendedOnboardingEvents {
     data class SetForgotPasswordEmail(val email: String) : ExtendedOnboardingEvents
+    data class SubmitSSO(val otp: String) : ExtendedOnboardingEvents
     data object Submit : ExtendedOnboardingEvents
+    data object ResendOTP : ExtendedOnboardingEvents
     data object ClearError : ExtendedOnboardingEvents
 }

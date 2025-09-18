@@ -19,9 +19,9 @@ open class ExtendedOnboardingStateProvider : PreviewParameterProvider<ExtendedOn
 
 fun aExtendedOnboardingState(
     forgotPasswordEmail: String = "example@user.com",
-    forgotPasswordAction: AsyncAction<Unit> = AsyncAction.Uninitialized
+    actionState: AsyncAction<Unit> = AsyncAction.Uninitialized
 ) = ExtendedOnboardingState(
     forgotPasswordEmail = forgotPasswordEmail,
-    forgotPasswordAction = forgotPasswordAction,
+    actionState = actionState,
     eventSink = {}
 )

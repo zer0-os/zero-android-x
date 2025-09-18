@@ -19,7 +19,7 @@ import io.element.android.libraries.architecture.inputs
 class ExtendedOnboardingNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
-    private val presenter: ExtendedOnboardingPresenter,
+    presenterFactory: ExtendedOnboardingPresenter.Factory
 ) : Node(buildContext, plugins = plugins) {
 
     enum class ExtendedOnboardingFlow {
@@ -28,10 +28,15 @@ class ExtendedOnboardingNode(
     }
 
     data class Inputs(
-        val flow: ExtendedOnboardingFlow
+        val flow: ExtendedOnboardingFlow,
+        val userEmail: String = ""
     ) : NodeInputs
 
     private val inputs: Inputs = inputs()
+
+    private val presenter = presenterFactory.create(
+        params = inputs,
+    )
 
     @Composable
     override fun View(modifier: Modifier) {

@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import dev.zacsweers.metro.Inject
 import io.element.android.features.login.impl.accountprovider.AccountProviderDataSource
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
@@ -34,6 +35,9 @@ class LoginPasswordPresenter(
         val localCoroutineScope = rememberCoroutineScope()
         val loginAction: MutableState<AsyncData<SessionId>> = remember {
             mutableStateOf(AsyncData.Uninitialized)
+        }
+        val requestOtpAction: MutableState<AsyncAction<Unit>> = remember {
+            mutableStateOf(AsyncAction.Uninitialized)
         }
 
         val formState = rememberSaveable {
@@ -53,7 +57,7 @@ class LoginPasswordPresenter(
                     localCoroutineScope.submit(formState.value, loginAction)
                 }
                 LoginPasswordEvents.SubmitSSO -> {
-                    localCoroutineScope.submitSSO(formState.value, loginAction)
+                    localCoroutineScope.submitSSO(formState.value, loginAction, requestOtpAction)
                 }
                 LoginPasswordEvents.ClearError -> loginAction.value = AsyncData.Uninitialized
             }
@@ -63,6 +67,7 @@ class LoginPasswordPresenter(
             accountProvider = accountProvider,
             formState = formState.value,
             loginAction = loginAction.value,
+            requestOtpAction = requestOtpAction.value,
             eventSink = ::handleEvents
         )
     }
@@ -78,15 +83,21 @@ class LoginPasswordPresenter(
             }
     }
 
-    private fun CoroutineScope.submitSSO(formState: LoginFormState, loggedInState: MutableState<AsyncData<SessionId>>) = launch {
-//        loggedInState.value = AsyncData.Loading()
-//        authenticationService.loginWithZero(formState.login.trim(), formState.password)
-//            .onSuccess { sessionId ->
-//                loggedInState.value = AsyncData.Success(sessionId)
-//            }
-//            .onFailure { failure ->
-//                loggedInState.value = AsyncData.Failure(failure)
-//            }
+    private fun CoroutineScope.submitSSO(
+        formState: LoginFormState,
+        loggedInState: MutableState<AsyncData<SessionId>>,
+        requestOtpAction: MutableState<AsyncAction<Unit>>
+    ) = launch {
+        loggedInState.value = AsyncData.Loading()
+        authenticationService.requestOtp(formState.login.trim())
+            .onSuccess {
+                loggedInState.value = AsyncData.Uninitialized
+                requestOtpAction.value = AsyncAction.Success(Unit)
+            }
+            .onFailure { failure ->
+                loggedInState.value = AsyncData.Failure(failure)
+                requestOtpAction.value = AsyncAction.Failure(failure)
+            }
     }
 
     private fun updateFormState(formState: MutableState<LoginFormState>, updateLambda: LoginFormState.() -> LoginFormState) {

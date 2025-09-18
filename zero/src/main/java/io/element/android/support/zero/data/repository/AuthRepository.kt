@@ -32,5 +32,9 @@ interface AuthRepository {
 
     suspend fun logout()
 
-    suspend fun resetPasswordRequest(email: String): Flow<Unit>
+    suspend fun resetPasswordRequest(email: String)
+
+    suspend fun requestOTP(email: String)
+
+    suspend fun verifyOTP(email: String, code: String): Flow<AuthSSOToken>
 }

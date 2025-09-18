@@ -12,6 +12,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
@@ -21,13 +23,21 @@ import kotlinx.coroutines.launch
 
 @Inject
 class ExtendedOnboardingPresenter(
+    @Assisted private val params: ExtendedOnboardingNode.Inputs,
     private val authenticationService: MatrixAuthenticationService,
-): Presenter<ExtendedOnboardingState> {
+) : Presenter<ExtendedOnboardingState> {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            params: ExtendedOnboardingNode.Inputs,
+        ): ExtendedOnboardingPresenter
+    }
 
     @Composable
     override fun present(): ExtendedOnboardingState {
         val localCoroutineScope = rememberCoroutineScope()
-        val forgotPasswordAction: MutableState<AsyncAction<Unit>> = remember {
+        val actionState: MutableState<AsyncAction<Unit>> = remember {
             mutableStateOf(AsyncAction.Uninitialized)
         }
 
@@ -38,31 +48,64 @@ class ExtendedOnboardingPresenter(
                 is ExtendedOnboardingEvents.SetForgotPasswordEmail -> {
                     forgotPasswordEmail.value = event.email
                 }
+                is ExtendedOnboardingEvents.SubmitSSO ->
+                    localCoroutineScope.submitSSO(params.userEmail, event.otp, actionState)
                 ExtendedOnboardingEvents.Submit ->
-                    localCoroutineScope.submitForgotPassword(forgotPasswordEmail.value, forgotPasswordAction)
+                    localCoroutineScope.submitForgotPassword(forgotPasswordEmail.value, actionState)
+                ExtendedOnboardingEvents.ResendOTP ->
+                    localCoroutineScope.resentOtp(params.userEmail, actionState)
                 ExtendedOnboardingEvents.ClearError ->
-                    forgotPasswordAction.value = AsyncAction.Uninitialized
+                    actionState.value = AsyncAction.Uninitialized
             }
         }
 
         return ExtendedOnboardingState(
             forgotPasswordEmail = forgotPasswordEmail.value,
-            forgotPasswordAction = forgotPasswordAction.value,
+            actionState = actionState.value,
             eventSink = ::handleEvents
         )
     }
 
     private fun CoroutineScope.submitForgotPassword(
         email: String,
-        forgotPasswordAction: MutableState<AsyncAction<Unit>>
+        actionState: MutableState<AsyncAction<Unit>>
     ) = launch {
-        forgotPasswordAction.value = AsyncAction.Loading
+        actionState.value = AsyncAction.Loading
         authenticationService.requestResetPassword(email)
             .onSuccess {
-                forgotPasswordAction.value = AsyncAction.Success(Unit)
+                actionState.value = AsyncAction.Success(Unit)
             }
             .onFailure { failure ->
-                forgotPasswordAction.value = AsyncAction.Failure(failure)
+                actionState.value = AsyncAction.Failure(failure)
+            }
+    }
+
+    private fun CoroutineScope.submitSSO(
+        email: String,
+        code: String,
+        actionState: MutableState<AsyncAction<Unit>>
+    ) = launch {
+        actionState.value = AsyncAction.Loading
+        authenticationService.verifyOtp(email, code)
+            .onSuccess {
+                actionState.value = AsyncAction.Uninitialized
+            }
+            .onFailure { failure ->
+                actionState.value = AsyncAction.Failure(failure)
+            }
+    }
+
+    private fun CoroutineScope.resentOtp(
+        email: String,
+        actionState: MutableState<AsyncAction<Unit>>
+    ) = launch {
+        actionState.value = AsyncAction.Loading
+        authenticationService.requestOtp(email)
+            .onSuccess {
+                actionState.value = AsyncAction.Uninitialized
+            }
+            .onFailure { failure ->
+                actionState.value = AsyncAction.Failure(failure)
             }
     }
 }

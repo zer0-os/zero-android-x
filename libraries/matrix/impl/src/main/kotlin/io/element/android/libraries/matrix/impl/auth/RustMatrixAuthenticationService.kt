@@ -432,8 +432,24 @@ class RustMatrixAuthenticationService(
     override suspend fun requestResetPassword(email: String): Result<Unit> {
         val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
         return runCatching {
-            authRepository.resetPasswordRequest(email).firstOrNull()
+            authRepository.resetPasswordRequest(email)
         }
+    }
+
+    override suspend fun requestOtp(email: String): Result<Unit> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        return runCatching {
+            authRepository.requestOTP(email)
+        }
+    }
+
+    override suspend fun verifyOtp(email: String, code: String): Result<SessionId> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        return executeZeroAuthFlow(
+            executeCall = {
+                authRepository.verifyOTP(email, code)
+            }
+        )
     }
 
     private suspend fun executeZeroAuthFlow(

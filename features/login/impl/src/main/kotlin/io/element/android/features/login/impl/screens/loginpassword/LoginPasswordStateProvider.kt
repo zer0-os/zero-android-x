@@ -10,6 +10,7 @@ package io.element.android.features.login.impl.screens.loginpassword
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.element.android.features.login.impl.accountprovider.AccountProvider
 import io.element.android.features.login.impl.accountprovider.anAccountProvider
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.core.SessionId
 
@@ -28,11 +29,13 @@ fun aLoginPasswordState(
     accountProvider: AccountProvider = anAccountProvider(),
     formState: LoginFormState = LoginFormState.Default,
     loginAction: AsyncData<SessionId> = AsyncData.Uninitialized,
+    requestOtpAction: AsyncAction<Unit> = AsyncAction.Uninitialized,
     eventSink: (LoginPasswordEvents) -> Unit = {},
 ) = LoginPasswordState(
     accountProvider = accountProvider,
     formState = formState,
     loginAction = loginAction,
+    requestOtpAction = requestOtpAction,
     eventSink = eventSink,
 )
 

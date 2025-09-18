@@ -5,6 +5,8 @@ import io.element.android.support.zero.network.model.request.CreateAndAuthoriseU
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
 import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetPasswordRequest
+import io.element.android.support.zero.network.model.request.SendOtpRequest
+import io.element.android.support.zero.network.model.request.VerifyOtpRequest
 import io.element.android.support.zero.network.model.response.auth.ApiInviter
 import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.model.response.auth.ZeroNonce
@@ -48,4 +50,14 @@ interface ZeroAuthService {
     suspend fun resetPasswordRequest(
         @Body request: ResetPasswordRequest
     )
+
+    @POST(value = "api/otp/request")
+    suspend fun requestOtp(
+        @Body request: SendOtpRequest
+    )
+
+    @POST(value = "api/otp/verify")
+    suspend fun verifyOtp(
+        @Body request: VerifyOtpRequest
+    ): ZeroAuthCredentials
 }

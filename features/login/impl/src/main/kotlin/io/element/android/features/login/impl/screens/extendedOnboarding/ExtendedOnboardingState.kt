@@ -11,10 +11,10 @@ import io.element.android.libraries.architecture.AsyncAction
 
 data class ExtendedOnboardingState(
     val forgotPasswordEmail: String,
-    val forgotPasswordAction: AsyncAction<Unit>,
+    val actionState: AsyncAction<Unit>,
     val eventSink: (ExtendedOnboardingEvents) -> Unit
 ) {
     val submitEnabled: Boolean
-        get() = forgotPasswordAction !is AsyncAction.Failure &&
+        get() = actionState !is AsyncAction.Failure &&
             forgotPasswordEmail.isNotBlank()
 }

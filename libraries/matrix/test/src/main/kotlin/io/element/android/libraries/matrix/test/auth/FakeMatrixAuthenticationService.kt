@@ -161,4 +161,12 @@ class FakeMatrixAuthenticationService(
     override suspend fun requestResetPassword(email: String): Result<Unit> {
         return Result.success(Unit)
     }
+
+    override suspend fun requestOtp(email: String): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override suspend fun verifyOtp(email: String, code: String): Result<SessionId> {
+        return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
 }
