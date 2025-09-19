@@ -31,7 +31,6 @@ interface HomeEntryPoint : FeatureEntryPoint {
         fun onSessionConfirmRecoveryKeyClick()
         fun onRoomSettingsClick(roomId: RoomId)
         fun onReportBugClick()
-        fun onLogoutForNativeSlidingSyncMigrationNeeded()
         fun onFeedClick(feed: ZeroFeed)
         fun onCreateFeedClick()
         fun onFeedUserClick(profile: FeedUserProfileView)

@@ -41,8 +41,8 @@ object RewardsUtil {
     fun parseCredits(credits: String, decimals: Int): Double {
         return try {
             if (credits.isBlank()) return 0.0
-            val mCredits = if (credits.length < 18) {
-                "0".repeat(18 - credits.length) + credits  // pad with leading zeros
+            val mCredits = if (credits.length < decimals) {
+                "0".repeat(decimals - credits.length) + credits  // pad with leading zeros
             } else {
                 credits
             }

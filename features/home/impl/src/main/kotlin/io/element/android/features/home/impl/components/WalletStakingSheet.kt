@@ -232,22 +232,46 @@ fun PoolDetailsView(
 
         Spacer(Modifier.size(SPACING_4X.dp))
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Row(Modifier.align(Alignment.Center)) {
-                DetailBorderedCell(
-                    title = "Claimable Rewards $rewardTokenName",
-                    subTitle = ZeroWalletUtil.getFormattedNumber(claimableRewardsToken)
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .background(
+                    color = Color.Transparent, shape = RoundedCornerShape(12.dp)
                 )
-            }
-            if (hasClaimableRewards) {
-                ClaimRewardsButton(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(horizontal = 12.dp),
-                    onClick = onClaimRewards,
-                    size = ButtonSize.XSmall
+                .border(
+                    width = 1.dp,
+                    color = ElementTheme.colors.bgCanvasDefaultLevel1,
+                    shape = RoundedCornerShape(12.dp)
                 )
+                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "Claimable Rewards $rewardTokenName",
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (hasClaimableRewards) {
+                    ClaimRewardsButton(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp),
+                        onClick = onClaimRewards,
+                        size = ButtonSize.XSmall
+                    )
+                }
             }
+
+            Text(
+                modifier = Modifier.padding(vertical = 4.dp),
+                text = ZeroWalletUtil.getFormattedNumber(claimableRewardsToken),
+                style = ElementTheme.typography.fontHeadingMdBold,
+                color = ElementTheme.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         Spacer(Modifier.size(SPACING_2X.dp))
@@ -601,6 +625,8 @@ fun RowScope.DetailBorderedCell(
             text = title,
             style = ElementTheme.typography.fontBodyMdRegular,
             color = ElementTheme.colors.textSecondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Text(
