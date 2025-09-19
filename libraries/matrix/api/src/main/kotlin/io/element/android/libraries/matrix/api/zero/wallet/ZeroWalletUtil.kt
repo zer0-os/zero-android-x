@@ -27,30 +27,27 @@ object ZeroWalletUtil {
         }
     }
 
-    fun getBalance(meowTokenAmount: Double, meowPrice: ZeroMeowPrice): Double {
-        return getBalance(meowTokenAmount, meowPrice.price)
-    }
-
-    fun getBalance(meowTokenAmount: Double, price: Double?): Double {
-        return meowTokenAmount.times(price ?: 0.0)
+    fun getBalance(meowTokenAmount: Double, meowPrice: Double?): Double {
+        return meowTokenAmount.times(meowPrice ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)
             .toDouble()
     }
 
-    fun getMeowTokenPriceFormatted(tokenAmount: Double, meowPrice: ZeroMeowPrice): String {
-        val amount = tokenAmount.times(meowPrice.price ?: 0.0)
-            .toBigDecimal()
-            .setScale(2, RoundingMode.UP)
-            .toDouble()
+    fun getBalanceFormatted(tokenAmount: Double, meowPrice: ZeroMeowPrice): String {
+        val amount = getBalance(tokenAmount, meowPrice.price)
         return getFormattedNumber(amount, withAbbreviations = false)
     }
 
-    fun getTokenPriceFormatted(tokenAmount: Double, tokenPrice: Double?): String {
-        val amount = tokenAmount.times(tokenPrice ?: 0.0)
+    fun getTokenPrice(tokenAmount: Double, tokenPrice: Double?): Double {
+        return tokenAmount.times(tokenPrice ?: 0.0)
             .toBigDecimal()
             .setScale(2, RoundingMode.UP)
             .toDouble()
+    }
+
+    fun getTokenPriceFormatted(tokenAmount: Double, tokenPrice: Double?): String {
+        val amount = getTokenPrice(tokenAmount, tokenPrice)
         return getFormattedNumber(amount, withAbbreviations = false)
     }
 

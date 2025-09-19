@@ -55,7 +55,8 @@ import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
-import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.libraries.matrix.api.zero.wallet.meowPriceFormatted
+import io.element.android.libraries.matrix.api.zero.wallet.tokenPriceFormatted
 import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 import kotlin.math.abs
@@ -238,14 +239,8 @@ private fun TokenRow(
 
         if (token.isClaimableToken) {
             val refPrice = when {
-                WalletChainsUtil.isAvaxChain(token.chainId) -> {
-                    ZeroWalletUtil.getTokenPriceFormatted(token.tokenAmount, token.price)
-                }
-                else -> {
-                    if (meowPrice != null) {
-                        ZeroWalletUtil.getMeowTokenPriceFormatted(token.tokenAmount, meowPrice)
-                    } else ""
-                }
+                WalletChainsUtil.isAvaxChain(token.chainId) -> token.tokenPriceFormatted
+                else -> if (meowPrice != null) { token.meowPriceFormatted(meowPrice) } else ""
             }
 
             val priceChange = when {

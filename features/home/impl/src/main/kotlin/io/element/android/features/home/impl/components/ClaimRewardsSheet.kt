@@ -68,7 +68,7 @@ fun ClaimRewardsSheet(
     val unClaimedRewards = RewardsUtil.getEarnedRewards(userRewards.unclaimedRewards, userRewards.decimals)
     val unclaimedRewardsFormatted = ZeroWalletUtil.thousandSeparatedFormat(unClaimedRewards.toString())
     val unclaimedRewardsRefPrice = meowPrice?.let {
-        ZeroWalletUtil.getMeowTokenPriceFormatted(
+        ZeroWalletUtil.getBalanceFormatted(
             tokenAmount = unClaimedRewards.toDouble(),
             meowPrice = it
         )

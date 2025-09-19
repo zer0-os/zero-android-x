@@ -75,9 +75,9 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensRespo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
-import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
-import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
+import io.element.android.libraries.matrix.api.zero.wallet.meowPrice
+import io.element.android.libraries.matrix.api.zero.wallet.tokenPrice
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
@@ -809,13 +809,22 @@ class HomePresenter(
                                  meowPrice: ZeroMeowPrice?,
                                  userWalletBalance: MutableDoubleState
     ) {
-        val meowPrice = meowPrice ?: return
-        val meowTokens = tokensList.filter { it.isClaimableToken }
-        val userBalance = ZeroWalletUtil.getBalance(
-            meowTokenAmount = meowTokens.sumOf { it.tokenAmount },
-            meowPrice = meowPrice
-        )
-        userWalletBalance.doubleValue = userBalance
+        val totalBalance = tokensList
+            .asSequence()
+            .filter { it.isClaimableToken }
+            .sumOf { token ->
+                val isZChain = WalletChainsUtil.isZChain(token.chainId)
+                if (isZChain) {
+                    meowPrice?.let { price -> token.meowPrice(meowPrice) } ?: 0.0
+                } else {
+                    token.tokenPrice
+                }
+            }
+            .toBigDecimal()
+            .setScale(2, RoundingMode.FLOOR)
+            .toDouble()
+
+        userWalletBalance.doubleValue = totalBalance
     }
 
     private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,

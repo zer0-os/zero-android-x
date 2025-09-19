@@ -60,7 +60,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.displayName
-import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
@@ -149,7 +148,7 @@ fun TokenInfoView(
             color = ElementTheme.colors.textPrimary
         )
 
-        val amount = transferAmount.toDoubleOrNull() ?: 0.0
+        /*val amount = transferAmount.toDoubleOrNull() ?: 0.0
         if (token.isClaimableToken && amount > 0) {
             Spacer(Modifier.size(6.dp))
             val meowPrice = ZeroWalletUtil.getMeowTokenPriceFormatted(amount, meowPrice)
@@ -158,7 +157,7 @@ fun TokenInfoView(
                 style = ElementTheme.typography.fontBodyLgRegular,
                 color = ElementTheme.colors.zeroBrandColor
             )
-        }
+        }*/
     }
 }
 
