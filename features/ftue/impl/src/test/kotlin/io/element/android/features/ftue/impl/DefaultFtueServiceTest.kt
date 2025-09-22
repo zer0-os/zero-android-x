@@ -228,8 +228,9 @@ class DefaultFtueServiceTest {
         resetPermissionLambda.assertions().isCalledOnce()
             .with(value("android.permission.POST_NOTIFICATIONS"))
     }
+}
 
-    private fun TestScope.createDefaultFtueService(
+internal fun TestScope.createDefaultFtueService(
         sessionVerificationService: SessionVerificationService = FakeSessionVerificationService(),
         analyticsService: AnalyticsService = FakeAnalyticsService(),
         permissionStateProvider: PermissionStateProvider = FakePermissionStateProvider(permissionGranted = false),
@@ -247,5 +248,4 @@ class DefaultFtueServiceTest {
         lockScreenService = lockScreenService,
         sessionPreferencesStore = sessionPreferencesStore,
         client = matrixClient
-    )
-}
+)

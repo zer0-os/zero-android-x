@@ -1,4 +1,5 @@
 import extension.setupDependencyInjection
+import extension.testCommonDependencies
 
 /*
  * Copyright 2022-2024 New Vector Ltd.
@@ -42,9 +43,7 @@ dependencies {
     implementation(libs.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
 
-    testImplementation(libs.test.junit)
-    testImplementation(libs.test.truth)
-    testImplementation(libs.test.robolectric)
+    testCommonDependencies(libs)
     testImplementation(projects.libraries.featureflag.test)
     testImplementation(projects.libraries.matrix.test)
     testImplementation(projects.libraries.preferences.test)
@@ -52,7 +51,4 @@ dependencies {
     testImplementation(projects.libraries.sessionStorage.test)
     testImplementation(projects.services.analytics.test)
     testImplementation(projects.services.toolbox.test)
-    testImplementation(projects.tests.testutils)
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.test.turbine)
 }

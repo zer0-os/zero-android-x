@@ -218,7 +218,7 @@ class DeveloperSettingsPresenter(
         val result = deleteAccountUseCase()
         deleteAccountAction.value = false
         if (result) {
-            logoutUseCase.logout(true)
+            logoutUseCase.logoutAll(true)
         }
     }
 }
