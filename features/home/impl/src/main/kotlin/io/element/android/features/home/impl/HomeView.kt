@@ -406,8 +406,11 @@ internal fun HomeScreenContent(
         }
         HomeScreenTab.CHANNEL -> {
             HomeChannelListContentView(
-                contentState = state.channelContentState,
+                channelsContentState = state.channelContentState,
+                roomListState = state.roomListState,
                 eventSink = state.eventSink,
+                roomEventSink = state.roomListState.eventSink,
+                onRoomClick = onRoomClick,
                 modifier = modifier
             )
         }

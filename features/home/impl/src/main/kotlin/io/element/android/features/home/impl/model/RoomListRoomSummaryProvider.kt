@@ -172,4 +172,5 @@ internal fun aRoomListRoomSummary(
     canonicalAlias = canonicalAlias,
     heroes = heroes.toImmutableList(),
     isTombstoned = isTombstoned,
+    isEncrypted = true
 )

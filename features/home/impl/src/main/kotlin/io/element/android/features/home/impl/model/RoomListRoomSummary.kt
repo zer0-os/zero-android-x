@@ -39,6 +39,7 @@ data class RoomListRoomSummary(
     val inviteSender: InviteSender?,
     val isTombstoned: Boolean,
     val heroes: ImmutableList<AvatarData>,
+    val isEncrypted: Boolean,
 ) {
     val isHighlighted = userDefinedNotificationMode != RoomNotificationMode.MUTE &&
         (numberOfUnreadNotifications > 0 || numberOfUnreadMentions > 0) ||

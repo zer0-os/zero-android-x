@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,6 +25,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.features.home.impl.model.channelId
+import io.element.android.libraries.designsystem.components.avatar.Avatar
+import io.element.android.libraries.designsystem.components.avatar.AvatarData
+import io.element.android.libraries.designsystem.components.avatar.AvatarSize
+import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
@@ -42,6 +48,16 @@ fun HomeChannelRow(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Avatar(
+            avatarData = AvatarData(
+                id = channel.channelId() ?: "",
+                name = channel.displayTitle,
+                url = null,
+                size = AvatarSize.RoomListItem
+            ),
+            avatarType = AvatarType.Room()
+        )
+        Spacer(modifier = Modifier.width(16.dp))
         val channelDisplayName = buildAnnotatedString {
             append(ZERO_CHANNEL_PREFIX)
             withStyle(

@@ -64,7 +64,7 @@ fun RoomListContentView(
 ) {
     when (contentState) {
         is RoomListContentState.Skeleton -> {
-            SkeletonView(
+            RoomListSkeletonView(
                 modifier = modifier,
                 count = contentState.count,
                 contentPadding = contentPadding,
@@ -98,7 +98,7 @@ fun RoomListContentView(
 }
 
 @Composable
-private fun SkeletonView(
+fun RoomListSkeletonView(
     count: Int,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -255,7 +255,7 @@ private fun RoomsViewList(
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.
         itemsIndexed(
-            items = state.summaries.filter { !it.isAChannel },
+            items = state.summaries.filter { !it.isAChannel && !it.isMuted && it.isEncrypted },
             contentType = { _, room -> room.contentType() },
         ) { index, room ->
             RoomSummaryRow(

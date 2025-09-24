@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -89,7 +88,6 @@ fun WalletStakingSheet(
     Box(
         modifier = modifier
             .padding(vertical = 16.dp, horizontal = 24.dp)
-            .navigationBarsPadding()
     ) {
         when (actionState) {
             AsyncAction.Loading -> {
