@@ -21,13 +21,13 @@ data class MatrixUser(
     val avatarUrl: String? = null,
     val primaryZeroId: String? = null,
     val primaryWalletAddress: String? = null,
+    val zeroWalletAddress: String? = null,
     val thirdWebWalletAddress: String? = null,
     val isZeroProSubscriber: Boolean = false
 ) : Parcelable
 
 val MatrixUser.walletAddress
-//    get() = primaryWalletAddress ?: thirdWebWalletAddress
-    get() = thirdWebWalletAddress
+    get() = zeroWalletAddress
 
 val MatrixUser.primaryZIdOrWalletAddress
     get() = primaryZeroId ?: walletAddress

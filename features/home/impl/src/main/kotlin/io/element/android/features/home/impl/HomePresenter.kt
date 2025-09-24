@@ -181,7 +181,7 @@ class HomePresenter(
 
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
-            client.getUserProfile()
+            client.getUserProfile(true)
             // Fetch initial zero data
             fetchInitialData()
         }

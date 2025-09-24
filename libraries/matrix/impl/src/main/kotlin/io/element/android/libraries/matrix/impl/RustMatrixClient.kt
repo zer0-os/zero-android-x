@@ -451,7 +451,13 @@ class RustMatrixClient(
         runCatchingExceptions {
             val profiles = awaitAll(
                 async { innerClient.getProfile(userId.value) },
-                async { zeroCoreRepository?.user?.getUser(userId.value, forceRefresh)?.firstOrNull() }
+                async {
+                    if (userId == sessionId) {
+                        zeroCoreRepository?.user?.getCurrentUser(userId)?.firstOrNull()
+                    } else {
+                        zeroCoreRepository?.user?.getUser(userId.value, forceRefresh)?.firstOrNull()
+                    }
+                }
             )
             val matrixProfile = profiles.first() as UserProfile
             val zeroUser = profiles.getOrNull(1) as? ZeroUser

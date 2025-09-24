@@ -16,6 +16,7 @@ sealed interface TransferTokenEvents {
     data class RecipientSelected(val recipient: ZeroWalletRecipient) : TransferTokenEvents
     data class TokenSelected(val token: ZeroWalletToken) : TransferTokenEvents
     data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>) : TransferTokenEvents
-    data class ConfirmTransaction(val amount: String) : TransferTokenEvents
+    data class ConfirmAmount(val amount: String) : TransferTokenEvents
+    data object ConfirmTransaction : TransferTokenEvents
     data class ViewTransaction(val url: String) : TransferTokenEvents
 }

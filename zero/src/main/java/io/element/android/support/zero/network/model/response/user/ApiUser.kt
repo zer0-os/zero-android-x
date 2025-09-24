@@ -30,6 +30,7 @@ data class ApiUser(
     val matrixAccessToken: String? = null,
     val primaryZID: String? = null,
     val primaryWalletAddress: String? = null,
+    val zeroWalletAddress: String? = null,
     val wallets: List<ApiWallet>? = null,
     val primaryWallet: ApiWallet? = null,
     val subscriptions: ZeroSubscription? = null
@@ -42,6 +43,9 @@ data class ApiUser(
 
     val avatar
         get() = profileImage ?: profile?.profileImage
+
+    val walletAddress
+        get() = zeroWalletAddress
 
     val thirdWebWallet
         get() = wallets?.firstOrNull { it.isThirdWeb }

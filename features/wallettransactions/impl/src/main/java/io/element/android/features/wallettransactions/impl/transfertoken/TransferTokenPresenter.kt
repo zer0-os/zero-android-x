@@ -90,7 +90,7 @@ class TransferTokenPresenter(
                     selectedRecipient.value = event.recipient
                 }
                 is TransferTokenEvents.TokenSelected -> {
-                    flowStep.value = TransferTokenFlowStep.CONFIRMATION
+                    flowStep.value = TransferTokenFlowStep.AMOUNT
                     selectedToken.value = event.token
                 }
                 is TransferTokenEvents.LoadMoreTokens -> {
@@ -103,9 +103,12 @@ class TransferTokenPresenter(
                         )
                     }
                 }
+                is TransferTokenEvents.ConfirmAmount -> {
+                    transferAmount.value = event.amount
+                    flowStep.value = TransferTokenFlowStep.CONFIRMATION
+                }
                 is TransferTokenEvents.ConfirmTransaction -> {
                     flowStep.value = TransferTokenFlowStep.IN_PROGRESS
-                    transferAmount.value = event.amount
                     coroutineScope.transferToken(
                         currentUser.value,
                         selectedRecipient.value,

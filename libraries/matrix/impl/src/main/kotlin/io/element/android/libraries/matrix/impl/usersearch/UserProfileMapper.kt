@@ -19,8 +19,9 @@ object UserProfileMapper {
             displayName = userProfile.displayName,
             avatarUrl = userProfile.avatarUrl,
             primaryZeroId = zeroUser?.primaryZeroId,
-            primaryWalletAddress = zeroUser?.primaryWalletAddress,
-            thirdWebWalletAddress = zeroUser?.thirdWebWalletAddress,
-            isZeroProSubscriber = zeroUser?.isZeroProSubscriber ?: false
+            zeroWalletAddress = zeroUser?.walletAddress,
+            isZeroProSubscriber = zeroUser?.isZeroProSubscriber ?: false,
+            primaryWalletAddress = null,
+            thirdWebWalletAddress = null,
         )
 }

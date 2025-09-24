@@ -42,6 +42,7 @@ data class TransferTokenState(
 enum class TransferTokenFlowStep {
     RECIPIENT,
     TOKEN,
+    AMOUNT,
     CONFIRMATION,
     IN_PROGRESS,
     COMPLETED,

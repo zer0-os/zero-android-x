@@ -28,9 +28,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.wallettransactions.impl.transfertoken.amount.ConfirmAmountView
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.CompletedTransferView
 import io.element.android.features.wallettransactions.impl.transfertoken.confirmation.ConfirmTransferView
-import io.element.android.support.zero.common.ui.TransactionInProgressView
 import io.element.android.features.wallettransactions.impl.transfertoken.recipient.SelectRecipientView
 import io.element.android.features.wallettransactions.impl.transfertoken.token.SelectTokenView
 import io.element.android.libraries.designsystem.components.button.BackButton
@@ -39,6 +39,7 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Scaffold
+import io.element.android.support.zero.common.ui.TransactionInProgressView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +51,7 @@ fun TransferTokenRootView(
     val topBarText: () -> String = {
         when (state.flowStep) {
             TransferTokenFlowStep.TOKEN -> "Select Asset"
+            TransferTokenFlowStep.CONFIRMATION -> "Review"
             TransferTokenFlowStep.COMPLETED -> "Sent"
             TransferTokenFlowStep.ERROR -> "Failed"
             else -> "Send"
@@ -98,6 +100,7 @@ fun TransferTokenRootView(
                 when (state.flowStep) {
                     TransferTokenFlowStep.RECIPIENT -> SelectRecipientView(state = state)
                     TransferTokenFlowStep.TOKEN -> SelectTokenView(state = state)
+                    TransferTokenFlowStep.AMOUNT -> ConfirmAmountView(state = state)
                     TransferTokenFlowStep.CONFIRMATION -> ConfirmTransferView(state = state)
                     TransferTokenFlowStep.IN_PROGRESS -> TransactionInProgressView()
                     TransferTokenFlowStep.COMPLETED,
@@ -115,7 +118,8 @@ fun TransferTokenRootView(
 private fun handleBackClick(state: TransferTokenState, onRootBackClick: () -> Unit) {
     when (state.flowStep) {
         TransferTokenFlowStep.TOKEN -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.RECIPIENT))
-        TransferTokenFlowStep.CONFIRMATION -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.TOKEN))
+        TransferTokenFlowStep.AMOUNT -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.TOKEN))
+        TransferTokenFlowStep.CONFIRMATION -> state.eventSink(TransferTokenEvents.ToState(TransferTokenFlowStep.AMOUNT))
         TransferTokenFlowStep.IN_PROGRESS -> {
             //not allowed
         }
