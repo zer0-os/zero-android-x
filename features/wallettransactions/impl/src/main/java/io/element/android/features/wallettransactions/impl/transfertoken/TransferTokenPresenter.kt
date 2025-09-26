@@ -29,7 +29,9 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.common.extension.openExternalUri
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -146,7 +148,15 @@ class TransferTokenPresenter(
             client.searchWalletRecipient(query)
                 .onSuccess {
                     if (it.isEmpty()) {
-                        recipientListState.value = WalletRecipientsListState.Empty
+                        val isValidWalletAddress = ZeroWalletUtil.isValidEthereumAddress(query)
+                        if (isValidWalletAddress) {
+                            val externalWalletRecipient = ZeroWalletRecipient.fromAddress(query)
+                            recipientListState.value = WalletRecipientsListState.Recipients(
+                                persistentListOf(externalWalletRecipient)
+                            )
+                        } else {
+                            recipientListState.value = WalletRecipientsListState.Empty
+                        }
                     } else {
                         recipientListState.value = WalletRecipientsListState.Recipients(it.toPersistentList())
                     }

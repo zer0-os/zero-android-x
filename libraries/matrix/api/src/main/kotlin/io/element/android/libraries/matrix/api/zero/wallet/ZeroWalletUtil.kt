@@ -15,6 +15,12 @@ import kotlin.math.pow
 
 object ZeroWalletUtil {
 
+    private val ethereumAddressRegex = Regex("^0x[a-fA-F0-9]{40}$")
+
+    fun isValidEthereumAddress(address: String): Boolean {
+        return ethereumAddressRegex.matches(address)
+    }
+
     fun walletAddressDisplayText(walletAddress: String?): String? {
         return if (walletAddress.isNullOrBlank()) {
             null

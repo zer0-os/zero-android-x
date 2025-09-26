@@ -9,6 +9,7 @@ package io.element.android.libraries.matrix.api.zero.wallet
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 data class ZeroWalletRecipient(
@@ -18,7 +19,22 @@ data class ZeroWalletRecipient(
     val name: String? = null,
     val profileImage: String? = null,
     val primaryZid: String? = null
-): Parcelable
+): Parcelable {
+
+    companion object {
+        fun fromAddress(walletAddress: String): ZeroWalletRecipient {
+            val customId = UUID.randomUUID().toString()
+            return ZeroWalletRecipient(
+                userId = customId,
+                matrixId = customId,
+                publicAddress = walletAddress,
+                name = "External Wallet",
+                profileImage = null,
+                primaryZid = null
+            )
+        }
+    }
+}
 
 val ZeroWalletRecipient.displayName: String
     get() = run {
