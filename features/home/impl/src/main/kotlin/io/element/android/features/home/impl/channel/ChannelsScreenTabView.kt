@@ -27,7 +27,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 
 @Composable
 fun ChannelsScreenTabView(
-    selectedTab: ChannelsScreenTab = ChannelsScreenTab.ALL,
+    selectedTab: ChannelsScreenTab = ChannelsScreenTab.CHANNELS,
     onTabSelected: (ChannelsScreenTab) -> Unit = {}
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(selectedTab.ordinal) }

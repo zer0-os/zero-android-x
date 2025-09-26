@@ -52,13 +52,19 @@ data class RoomListRoomSummary(
 
     val hasUnreadMentions = numberOfUnreadMentions > 0
 
-    val isMuted = userDefinedNotificationMode == RoomNotificationMode.MUTE
+    val isAChannel = name?.startsWith(ZERO_CHANNEL_PREFIX) == true
+
+    val isMuted = !isAChannel && userDefinedNotificationMode == RoomNotificationMode.MUTE
+
+    val isPrimary: Boolean
+        get() = !isAChannel && !isMuted && isEncrypted
+
+    val isSecondary: Boolean
+        get() = !isAChannel && !isMuted && !isEncrypted
 
     fun toInviteData() = InviteData(
         roomId = roomId,
         roomName = name ?: roomId.value,
         isDm = isDm,
     )
-
-    val isAChannel = name?.startsWith(ZERO_CHANNEL_PREFIX) == true
 }

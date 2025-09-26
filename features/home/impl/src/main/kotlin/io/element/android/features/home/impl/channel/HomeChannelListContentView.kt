@@ -19,10 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.element.android.features.home.impl.HomeEvents
@@ -43,22 +41,19 @@ import io.element.android.libraries.designsystem.theme.components.HorizontalDivi
 
 @Composable
 fun HomeChannelListContentView(
+    selectedChannelContentTab: ChannelsScreenTab,
     channelsContentState: ChannelListContentState,
     roomListState: RoomListState,
     eventSink: (HomeEvents) -> Unit,
     roomEventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    onChannelTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedChannelsTab = rememberSaveable { mutableStateOf(ChannelsScreenTab.ALL) }
     Column(modifier = modifier) {
-        ChannelsScreenTabView(
-            onTabSelected = { tab ->
-                selectedChannelsTab.value = tab
-            }
-        )
-        when (selectedChannelsTab.value) {
-            ChannelsScreenTab.ALL,
+        ChannelsScreenTabView(onTabSelected = onChannelTabSelected)
+        when (selectedChannelContentTab) {
+            ChannelsScreenTab.CHANNELS,
             ChannelsScreenTab.MUTED -> {
                 Box {
                     when (roomListState.contentState) {
@@ -77,7 +72,7 @@ fun HomeChannelListContentView(
                                 state = roomListState.contentState,
                                 roomMappedUserProStatus = roomListState.roomMappedUserProStatus,
                                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
-                                selectedTab = selectedChannelsTab.value,
+                                selectedTab = selectedChannelContentTab,
                                 eventSink = roomEventSink,
                                 onRoomClick = onRoomClick
                             )
@@ -85,7 +80,7 @@ fun HomeChannelListContentView(
                     }
                 }
             }
-            ChannelsScreenTab.Gated -> {
+            ChannelsScreenTab.GATED -> {
                 Box {
                     when (channelsContentState) {
                         is ChannelListContentState.Skeleton -> {
@@ -182,14 +177,11 @@ private fun ChannelTabRoomsViewList(
         modifier = modifier,
         contentPadding = PaddingValues(0.dp),
     ) {
-        val roomsList = state.summaries.filter { !it.isAChannel }
+        val roomsList = state.summaries
         val filteredRoomsList = when (selectedTab) {
-            ChannelsScreenTab.ALL ->
-                roomsList.filter { !it.isEncrypted }
-            ChannelsScreenTab.MUTED -> {
-                roomsList.filter { it.isMuted }
-            }
-            else -> roomsList
+            ChannelsScreenTab.CHANNELS -> roomsList.filter { it.isSecondary }
+            ChannelsScreenTab.MUTED -> roomsList.filter { it.isMuted }
+            else -> roomsList.filter { it.isPrimary }
         }
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.
@@ -220,10 +212,12 @@ private fun ChannelTabRoomsViewList(
 @Composable
 internal fun HomeChannelListContentViewPreview() = ElementPreview {
     HomeChannelListContentView(
+        selectedChannelContentTab = ChannelsScreenTab.CHANNELS,
         channelsContentState = aHomeState().channelContentState,
         roomListState = aHomeState().roomListState,
         onRoomClick = {},
         eventSink = {},
+        onChannelTabSelected = {},
         roomEventSink = {}
     )
 }

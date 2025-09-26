@@ -43,6 +43,7 @@ import io.element.android.features.home.impl.components.HomeScreenTopBar
 import io.element.android.features.home.impl.components.WalletReceiveTokenSheet
 import io.element.android.features.home.impl.components.WalletStakingSheet
 import io.element.android.features.home.impl.feed.HomeFeedListContentView
+import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.notification.HomeNotificationListContentView
@@ -114,6 +115,9 @@ fun HomeView(
         homeState.eventSink(HomeEvents.OnWalletTransactionViewed)
     }
 
+    val selectedHomeNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
+    val selectedChannelsTab = rememberSaveable { mutableStateOf(ChannelsScreenTab.CHANNELS) }
+
     ConnectivityIndicatorContainer(
         modifier = modifier,
         isOnline = homeState.hasNetworkConnection,
@@ -141,6 +145,8 @@ fun HomeView(
 
             HomeScaffold(
                 state = homeState,
+                selectedHomeNavigationTab = selectedHomeNavigationTab.value,
+                selectedChannelContentTab = selectedChannelsTab.value,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
@@ -153,15 +159,21 @@ fun HomeView(
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
                 onSendWalletToken = onSendWalletToken,
+                onHomeNavTabSelected = { selectedHomeNavigationTab.value = it },
+                onChannelsContentTabSelected = { selectedChannelsTab.value = it },
                 modifier = Modifier.padding(top = topPadding),
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
                 state = roomListState.searchState,
+                channelsListState = homeState.channelContentState,
                 eventSink = roomListState.eventSink,
                 roomMappedUserProStatus = roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
+                selectedHomeNavigationTab = selectedHomeNavigationTab.value,
+                selectedChannelContentTab = selectedChannelsTab.value,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
+                onChannelClick = { homeState.eventSink(HomeEvents.OpenChannel(it)) },
                 modifier = Modifier
                     .statusBarsPadding()
                     .padding(top = topPadding)
@@ -188,6 +200,8 @@ fun HomeView(
 @Composable
 private fun HomeScaffold(
     state: HomeState,
+    selectedHomeNavigationTab: HomeScreenTab,
+    selectedChannelContentTab: ChannelsScreenTab,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomId) -> Unit,
@@ -200,6 +214,8 @@ private fun HomeScaffold(
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     onSendWalletToken: () -> Unit,
+    onHomeNavTabSelected: (HomeScreenTab) -> Unit,
+    onChannelsContentTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -211,7 +227,6 @@ private fun HomeScaffold(
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
     val roomListState: RoomListState = state.roomListState
 
-    val selectedNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
     val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
         mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
     }
@@ -231,7 +246,7 @@ private fun HomeScaffold(
                     showAvatarIndicator = state.showAvatarIndicator,
                     areSearchResultsDisplayed = roomListState.searchState.isSearchActive,
                     onToggleSearch = {
-                        when (selectedNavigationTab.value) {
+                        when (selectedHomeNavigationTab) {
                             HomeScreenTab.FEED -> {
                                 onSearchUserClick()
                             }
@@ -244,8 +259,8 @@ private fun HomeScaffold(
                     onOpenSettings = onOpenSettings,
                     onOpenProfile = onUserProfileClick,
                     scrollBehavior = scrollBehavior,
-                    displayMenuItems = state.showDisplayMenuItems(selectedNavigationTab.value),
-                    displayFilters = roomListState.shouldDisplayFilters(selectedNavigationTab.value),
+                    displayMenuItems = state.showDisplayMenuItems(selectedHomeNavigationTab),
+                    displayFilters = roomListState.shouldDisplayFilters(selectedHomeNavigationTab),
                     filtersState = roomListState.filtersState,
                     canReportBug = state.canReportBug,
                     shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
@@ -258,7 +273,8 @@ private fun HomeScaffold(
             content = { padding ->
                 HomeScreenContent(
                     state = state,
-                    selectedHomeScreenTab = selectedNavigationTab.value,
+                    selectedHomeScreenTab = selectedHomeNavigationTab,
+                    selectedChannelContentTab = selectedChannelContentTab,
                     onSetUpRecoveryClick = onSetUpRecoveryClick,
                     onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                     onRoomClick = ::onRoomClick,
@@ -269,6 +285,7 @@ private fun HomeScaffold(
                     onReceiveWalletToken = {
                         showWalletReceiveTokenSheet.value = true
                     },
+                    onChannelsContentTabSelected = onChannelsContentTabSelected,
                     modifier = Modifier
                         .padding(padding)
                         .consumeWindowInsets(padding)
@@ -283,14 +300,14 @@ private fun HomeScaffold(
                 .padding(bottom = 24.dp)
         ) {
             // Floating Action button
-            if (state.shouldDisplayActions(selectedNavigationTab.value)) {
+            if (state.shouldDisplayActions(selectedHomeNavigationTab)) {
                 HomeFabButton(
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(horizontal = 16.dp),
                     onClick = {
                         when {
-                            selectedNavigationTab.value == HomeScreenTab.CHAT -> onCreateRoomClick()
+                            selectedHomeNavigationTab == HomeScreenTab.CHAT -> onCreateRoomClick()
                             else -> onCreateFeedClick()
                         }
                     }
@@ -299,10 +316,8 @@ private fun HomeScaffold(
 
             // Home tab view
             HomeScreenTabView(
-                selectedNavigationTab = selectedNavigationTab.value,
-                onTabSelected = { tab ->
-                    selectedNavigationTab.value = tab
-                }
+                selectedNavigationTab = selectedHomeNavigationTab,
+                onTabSelected = onHomeNavTabSelected
             )
         }
     }
@@ -374,6 +389,7 @@ private fun HomeScaffold(
 internal fun HomeScreenContent(
     state: HomeState,
     selectedHomeScreenTab: HomeScreenTab,
+    selectedChannelContentTab: ChannelsScreenTab,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
@@ -382,6 +398,7 @@ internal fun HomeScreenContent(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onSendWalletToken: () -> Unit = {},
     onReceiveWalletToken: () -> Unit = {},
+    onChannelsContentTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier,
 ) {
     fun onNotificationClick(room: RoomListRoomSummary) {
@@ -406,11 +423,13 @@ internal fun HomeScreenContent(
         }
         HomeScreenTab.CHANNEL -> {
             HomeChannelListContentView(
+                selectedChannelContentTab = selectedChannelContentTab,
                 channelsContentState = state.channelContentState,
                 roomListState = state.roomListState,
                 eventSink = state.eventSink,
                 roomEventSink = state.roomListState.eventSink,
                 onRoomClick = onRoomClick,
+                onChannelTabSelected = onChannelsContentTabSelected,
                 modifier = modifier
             )
         }
