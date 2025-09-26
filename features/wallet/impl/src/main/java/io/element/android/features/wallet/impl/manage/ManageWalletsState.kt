@@ -22,6 +22,7 @@ sealed interface ManageWalletUserAction {
 @Immutable
 data class ManageWalletsState(
     val userId: UserId,
+    val userZeroWalletAddress: String?,
     val wallets: List<ZeroWallet>,
 
     val userActionState: ManageWalletUserAction,
@@ -39,5 +40,5 @@ data class ManageWalletsState(
         get() = selfCustodyWallets.firstOrNull()
 
     val zeroWallets: List<ZeroWallet>
-        get() = wallets.filter { it.isThirdWeb }
+        get() = wallets.filter { it.isThirdWeb && it.publicAddress == userZeroWalletAddress }
 }

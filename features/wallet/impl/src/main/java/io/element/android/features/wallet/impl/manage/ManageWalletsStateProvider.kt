@@ -21,6 +21,7 @@ open class ManageWalletsStateProvider : PreviewParameterProvider<ManageWalletsSt
 fun aManageWalletsState(
 ) = ManageWalletsState(
     userId = UserId(""),
+    userZeroWalletAddress = "",
     wallets = emptyList(),
     userActionState = ManageWalletUserAction.None,
     actionState = AsyncAction.Uninitialized,

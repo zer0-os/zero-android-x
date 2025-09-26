@@ -149,6 +149,7 @@ class ManageWalletsPresenter(
 
         return ManageWalletsState(
             userId = currentUser.value.userId,
+            userZeroWalletAddress = currentUser.value.zeroWalletAddress,
             wallets = userWalletsState.value,
             userActionState = userActionState.value,
             actionState = genericActionState.value,
