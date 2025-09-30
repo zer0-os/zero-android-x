@@ -177,7 +177,7 @@ class OnBoardingPresenter(
         }
 
         return OnBoardingState(
-//            isAddingAccount = isAddingAccount,
+            isAddingAccount = false,
             productionApplicationName = buildMeta.productionApplicationName,
             defaultAccountProvider = defaultAccountProvider,
             mustChooseAccountProvider = mustChooseAccountProvider,

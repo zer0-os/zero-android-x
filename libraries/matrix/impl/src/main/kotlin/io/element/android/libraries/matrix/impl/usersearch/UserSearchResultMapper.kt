@@ -8,7 +8,7 @@
 package io.element.android.libraries.matrix.impl.usersearch
 
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
-import io.element.android.libraries.matrix.impl.mapper.map
+import io.element.android.libraries.matrix.impl.mapper.UserProfileMapper
 import kotlinx.collections.immutable.toImmutableList
 import org.matrix.rustcomponents.sdk.SearchUsersResults
 
@@ -16,7 +16,7 @@ object UserSearchResultMapper {
     fun map(result: SearchUsersResults): MatrixSearchUserResults {
         return MatrixSearchUserResults(
             results = result.results
-                .map { userProfile -> userProfile.map() }
+                .map { userProfile -> UserProfileMapper.map(userProfile) }
                 .toImmutableList(),
             limited = result.limited,
         )

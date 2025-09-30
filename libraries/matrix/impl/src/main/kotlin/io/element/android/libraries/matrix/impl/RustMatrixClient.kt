@@ -81,7 +81,7 @@ import io.element.android.libraries.matrix.impl.conversion.map
 import io.element.android.libraries.matrix.impl.conversion.toModel
 import io.element.android.libraries.matrix.impl.encryption.RustEncryptionService
 import io.element.android.libraries.matrix.impl.exception.mapClientException
-import io.element.android.libraries.matrix.impl.mapper.map
+import io.element.android.libraries.matrix.impl.mapper.UserProfileMapper
 import io.element.android.libraries.matrix.impl.media.RustMediaLoader
 import io.element.android.libraries.matrix.impl.media.RustMediaPreviewService
 import io.element.android.libraries.matrix.impl.notification.RustNotificationService

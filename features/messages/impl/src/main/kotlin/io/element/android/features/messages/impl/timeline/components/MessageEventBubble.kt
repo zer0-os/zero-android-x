@@ -7,6 +7,7 @@
 
 package io.element.android.features.messages.impl.timeline.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -53,6 +55,7 @@ private val avatarRadius = AvatarSize.TimelineSender.dp / 2
 
 private val MIN_BUBBLE_WIDTH = 80.dp
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MessageEventBubble(
     state: BubbleState,
@@ -76,12 +79,7 @@ fun MessageEventBubble(
     }
 
     // Ignore state.isHighlighted for now, we need a design decision on it.
-    val backgroundBubbleColor = when {
-        state.isMine -> ElementTheme.colors.zeroChatBubbleOutgoingColor
-        else -> ElementTheme.colors.zeroChatBubbleIncomingColor
-
-    }
-//    val backgroundBubbleColor = MessageEventBubbleDefaults.backgroundBubbleColor(state.isMine)
+    val backgroundBubbleColor = MessageEventBubbleDefaults.backgroundBubbleColor(state.isMine)
     val bubbleShape = remember(state) { MessageEventBubbleDefaults.shape(state.cutTopStart, state.groupPosition, state.isMine) }
     val radiusPx = (avatarRadius + SENDER_AVATAR_BORDER_WIDTH).toPx()
     val yOffsetPx = -(NEGATIVE_MARGIN_FOR_BUBBLE + avatarRadius).toPx()
@@ -158,10 +156,9 @@ object MessageEventBubbleDefaults {
 
     @Composable
     fun backgroundBubbleColor(isMine: Boolean): Color {
-        return if (isMine) {
-            ElementTheme.colors.messageFromMeBackground
-        } else {
-            ElementTheme.colors.messageFromOtherBackground
+        return when {
+            isMine -> ElementTheme.colors.zeroChatBubbleOutgoingColor
+            else -> ElementTheme.colors.zeroChatBubbleIncomingColor
         }
     }
 

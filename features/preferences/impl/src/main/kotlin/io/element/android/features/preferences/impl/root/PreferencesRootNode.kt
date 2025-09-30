@@ -140,7 +140,7 @@ class PreferencesRootNode(
             state = state,
             modifier = modifier,
             onBackClick = this::navigateUp,
-            onAddAccountClick = this::onAddAccount,
+//            onAddAccountClick = this::onAddAccount,
             onOpenRageShake = this::onOpenBugReport,
             onOpenAnalytics = this::onOpenAnalytics,
             onOpenAbout = this::onOpenAbout,

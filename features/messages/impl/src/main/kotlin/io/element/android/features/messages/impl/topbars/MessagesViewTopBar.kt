@@ -11,10 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -29,7 +28,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.messages.impl.timeline.components.CallMenuItem
 import io.element.android.features.roomcall.api.RoomCallState
 import io.element.android.features.roomcall.api.aStandByCallState
 import io.element.android.features.roomcall.api.anOngoingCallState
@@ -45,6 +43,8 @@ import io.element.android.libraries.designsystem.theme.components.HorizontalDivi
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.matrix.ui.components.aMatrixUserList
 import io.element.android.libraries.matrix.ui.model.getAvatarData
@@ -55,20 +55,20 @@ import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MessagesViewTopBar(
+fun MessagesViewTopBar(
     roomName: String?,
     roomAvatar: AvatarData,
+    showZeroProBadge: Boolean,
     isTombstoned: Boolean,
+    roomSubTitle: String?,
     heroes: ImmutableList<AvatarData>,
     roomCallState: RoomCallState,
     dmUserIdentityState: IdentityState?,
     onRoomDetailsClick: () -> Unit,
     onJoinCallClick: () -> Unit,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
-        modifier = modifier,
         navigationIcon = {
             BackButton(onClick = onBackClick)
         },
@@ -85,7 +85,9 @@ internal fun MessagesViewTopBar(
                 RoomAvatarAndNameRow(
                     roomName = roomName,
                     roomAvatar = roomAvatar,
+                    showZeroProBadge = showZeroProBadge,
                     isTombstoned = isTombstoned,
+                    roomSubTitle = roomSubTitle,
                     heroes = heroes,
                     modifier = titleModifier
                 )
@@ -110,13 +112,28 @@ internal fun MessagesViewTopBar(
             }
         },
         actions = {
-            CallMenuItem(
+            /*CallMenuItem(
                 roomCallState = roomCallState,
                 onJoinCallClick = onJoinCallClick,
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))*/
         },
         windowInsets = WindowInsets(0.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ThreadTopBar(
+    onBackClick: () -> Unit,
+) {
+    TopAppBar(
+        navigationIcon = {
+            BackButton(onClick = onBackClick)
+        },
+        title = {
+            Text(stringResource(CommonStrings.common_thread))
+        }
     )
 }
 
@@ -124,7 +141,9 @@ internal fun MessagesViewTopBar(
 private fun RoomAvatarAndNameRow(
     roomName: String?,
     roomAvatar: AvatarData,
+    roomSubTitle: String? = null,
     heroes: ImmutableList<AvatarData>,
+    showZeroProBadge: Boolean,
     isTombstoned: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -139,18 +158,45 @@ private fun RoomAvatarAndNameRow(
                 isTombstoned = isTombstoned,
             ),
         )
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .semantics {
-                    heading()
-                },
-            text = roomName ?: stringResource(CommonStrings.common_no_room_name),
-            style = ElementTheme.typography.fontBodyLgMedium,
-            fontStyle = FontStyle.Italic.takeIf { roomName == null },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Column {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .semantics {
+                            heading()
+                        },
+                    text = roomName ?: stringResource(CommonStrings.common_no_room_name),
+                    style = ElementTheme.zeroTypography.fontBodyLgMedium,
+                    fontStyle = FontStyle.Italic.takeIf { roomName == null },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (showZeroProBadge) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(20.dp),
+                        imageVector = CompoundIcons.Verified(),
+                        contentDescription = stringResource(CommonStrings.common_verified),
+                        tint = ElementTheme.colors.zeroBrandColor
+                    )
+                }
+            }
+            if (!roomSubTitle.isNullOrBlank()) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = roomSubTitle,
+                    style = ElementTheme.zeroTypography.fontBodySmRegular,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = ElementTheme.colors.textSecondary
+                )
+            }
+        }
     }
 }
 
@@ -178,6 +224,8 @@ internal fun MessagesViewTopBarPreview() = ElementPreview {
         onRoomDetailsClick = {},
         onJoinCallClick = {},
         onBackClick = {},
+        showZeroProBadge = false,
+        roomSubTitle = null,
     )
     Column {
         AMessagesViewTopBar()

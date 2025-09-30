@@ -57,7 +57,7 @@ class DefaultTimelineEventFormatter(
                 profileChangeContentFormatter.format(content, sender, senderDisambiguatedDisplayName, isOutgoing)
             }
             is StateContent -> {
-                stateContentFormatter.format(content, senderDisambiguatedDisplayName, event.sender, isOutgoing, RenderingMode.Timeline)
+                stateContentFormatter.format(content, senderDisambiguatedDisplayName, sender, isOutgoing, RenderingMode.Timeline)
             }
             is CallNotifyContent -> {
                 sp.getString(CommonStrings.common_call_started)

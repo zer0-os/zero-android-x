@@ -481,7 +481,7 @@ private fun DmHeaderSection(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val avatarData = otherMember.getAvatarData(size = AvatarSize.RoomHeader)
+        val avatarData = otherMember.getAvatarData(size = AvatarSize.RoomDetailsHeader)
         Avatar(
             avatarData = avatarData,
             modifier = Modifier

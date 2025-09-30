@@ -31,6 +31,7 @@ data class HomeState(
      * current user in the middle.
      */
     val currentUserAndNeighbors: ImmutableList<MatrixUser>,
+    val matrixUser: MatrixUser,
     val showAvatarIndicator: Boolean,
     val hasNetworkConnection: Boolean,
     val genericActionState: AsyncAction<Unit>,

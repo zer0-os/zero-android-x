@@ -104,10 +104,6 @@ import java.math.RoundingMode
 import kotlin.jvm.optionals.getOrNull
 
 private const val HOME_FEED_PAGE_SIZE = 15
-import io.element.android.libraries.sessionstorage.api.SessionStore
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 @Inject
 class HomePresenter(
@@ -189,7 +185,7 @@ class HomePresenter(
         val walletStakeActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
-            coroutineScope.fetchWalletData(
+            coroutineState.fetchWalletData(
                 meowPrice, walletAddress, userWalletBalance,
                 walletStakingContent, walletTokensListState, walletTransactionsListState,
                 walletTokenPaginationParams, walletTransactionsPaginationParams
@@ -227,32 +223,32 @@ class HomePresenter(
                     }
                 }
                 HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
-                is HomeEvents.OpenChannel -> coroutineScope.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                is HomeEvents.OpenChannel -> coroutineState.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
                 HomeEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
                 is HomeEvents.LoadMoreFeeds -> {
                     _allFeeds.apply {
                         clear()
                         addAll(event.currentFeeds)
                     }
-                    coroutineScope.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
+                    coroutineState.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
                 }
-                is HomeEvents.RefreshFeeds -> coroutineScope.forceRefreshHomeFeeds(event.followingFeeds)
+                is HomeEvents.RefreshFeeds -> coroutineState.forceRefreshHomeFeeds(event.followingFeeds)
                 is HomeEvents.LoadMoreMyFeeds -> {
                     _myFeeds.apply {
                         clear()
                         addAll(event.currentFeeds)
                     }
-                    coroutineScope.loadMoreMyFeeds(event.currentFeeds.size)
+                    coroutineState.loadMoreMyFeeds(event.currentFeeds.size)
                 }
-                HomeEvents.RefreshMyFeeds -> coroutineScope.forceRefreshMyFeeds()
+                HomeEvents.RefreshMyFeeds -> coroutineState.forceRefreshMyFeeds()
                 is HomeEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount)
                 is HomeEvents.LoadFeedMedia -> {
-                    coroutineScope.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
+                    coroutineState.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
                 }
                 HomeEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
                 is HomeEvents.LoadMoreTokens -> {
-                    matrixUser.value.walletAddress?.let { address ->
-                        coroutineScope.loadMoreWalletTokens(
+                    matrixUser.walletAddress?.let { address ->
+                        coroutineState.loadMoreWalletTokens(
                             walletAddress = address,
                             currentList = event.currentTokens,
                             walletTokensListState = walletTokensListState,
@@ -263,8 +259,8 @@ class HomePresenter(
                     }
                 }
                 is HomeEvents.LoadMoreTransactions -> {
-                    matrixUser.value.walletAddress?.let { address ->
-                        coroutineScope.loadMoreWalletTransactions(
+                    matrixUser.walletAddress?.let { address ->
+                        coroutineState.loadMoreWalletTransactions(
                             walletAddress = address,
                             currentList = event.currentTransactions,
                             walletTransactionsListState = walletTransactionsListState,
@@ -273,7 +269,7 @@ class HomePresenter(
                     }
                 }
                 is HomeEvents.ViewWalletTransaction -> {
-                    coroutineScope.loadWalletTransaction(
+                    coroutineState.loadWalletTransaction(
                         event.transactionId, event.chainId, walletTransactionUrlState, genericActionState
                     )
                 }
@@ -282,8 +278,8 @@ class HomePresenter(
                 HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> {
                     claimableUserRewards.value = userRewards.value
-                    coroutineScope.claimUserRewards(
-                        matrixUser = matrixUser.value,
+                    coroutineState.claimUserRewards(
+                        matrixUser = matrixUser,
                         claimRewardsActionState = claimRewardsActionState,
                         refreshWallet = {
                             client.userProfile.value.walletAddress?.let { walletAddress ->
@@ -293,10 +289,10 @@ class HomePresenter(
                     )
                 }
                 HomeEvents.RefreshWalletBalance -> {
-                    matrixUser.value.walletAddress?.let { address ->
+                    matrixUser.walletAddress?.let { address ->
                         val currentList = (walletTokensListState.value as? WalletTokensListState.Tokens)
                             ?.tokens ?: emptyList()
-                        coroutineScope.loadMoreWalletTokens(
+                        coroutineState.loadMoreWalletTokens(
                             walletAddress = address,
                             currentList = currentList,
                             walletTokensListState = walletTokensListState,
@@ -307,7 +303,7 @@ class HomePresenter(
                     }
                 }
                 is HomeEvents.StakePoolSelected -> {
-                    coroutineScope.fetchPoolData(
+                    coroutineState.fetchPoolData(
                         pool = event.pool,
                         selectedStakePoolState = selectedStakePool,
                         genericActionState = genericActionState,
@@ -316,12 +312,12 @@ class HomePresenter(
                 }
                 is HomeEvents.StakeAmount -> {
                     selectedStakePool.value?.let {
-                        coroutineScope.stakeAmount(it, event.amount, walletStakeActionState)
+                        coroutineState.stakeAmount(it, event.amount, walletStakeActionState)
                     }
                 }
                 is HomeEvents.UnstakeAmount -> {
                     selectedStakePool.value?.let {
-                        coroutineScope.unstakeAmount(it, event.amount, walletStakeActionState)
+                        coroutineState.unstakeAmount(it, event.amount, walletStakeActionState)
                     }
                 }
                 HomeEvents.DismissStakingSheet -> {
@@ -334,7 +330,7 @@ class HomePresenter(
                 }
                 HomeEvents.ClaimStakingRewards -> {
                     selectedStakePool.value?.poolInfo?.let { pool ->
-                        coroutineScope.claimStakingRewards(
+                        coroutineState.claimStakingRewards(
                             pool = pool,
                             genericActionState = genericActionState,
                             onDone = {
@@ -345,7 +341,7 @@ class HomePresenter(
                                     userAddress = walletAddress,
                                     refreshAllData = true,
                                     onRefreshAllData = { pool ->
-                                        coroutineScope.fetchPoolData(
+                                        coroutineState.fetchPoolData(
                                             pool = pool,
                                             selectedStakePoolState = selectedStakePool,
                                             genericActionState = genericActionState,
@@ -405,6 +401,7 @@ class HomePresenter(
 
         return HomeState(
             currentUserAndNeighbors = currentUserAndNeighbors,
+            matrixUser = matrixUser,
             showAvatarIndicator = showAvatarIndicator,
             hasNetworkConnection = isOnline,
             genericActionState = genericActionState.value,
@@ -425,7 +422,7 @@ class HomePresenter(
             userRewards = userRewards.value,
             feedMediaPreviewState = feedMediaPreviewActionState.value,
             walletContentState = WalletContentState(
-                userName = matrixUser.value.displayName ?: "",
+                userName = matrixUser.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
                 walletBalance = userWalletBalance.doubleValue,
                 walletTransactionUrlState = walletTransactionUrlState.value,
@@ -720,14 +717,18 @@ class HomePresenter(
     ) = launch(context = Dispatchers.IO) {
         val results = awaitAll(
             async { client.getMeowPrice() },
-            async { client.getWalletTokens(
-                walletAddress = walletAddress,
-                paginationParams = tokenPaginationParams.value
-            ) },
-            async { client.getWalletTransactions(
-                walletAddress = walletAddress,
-                paginationParams = transactionPaginationParams.value
-            ) },
+            async {
+                client.getWalletTokens(
+                    walletAddress = walletAddress,
+                    paginationParams = tokenPaginationParams.value
+                )
+            },
+            async {
+                client.getWalletTransactions(
+                    walletAddress = walletAddress,
+                    paginationParams = transactionPaginationParams.value
+                )
+            },
         )
         (results[0] as? Result<ZeroMeowPrice>)?.let {
             meowPrice.value = it.getOrNull()
@@ -825,9 +826,10 @@ class HomePresenter(
             }
     }
 
-    private fun setWalletBalance(tokensList: List<ZeroWalletToken>,
-                                 meowPrice: ZeroMeowPrice?,
-                                 userWalletBalance: MutableDoubleState
+    private fun setWalletBalance(
+        tokensList: List<ZeroWalletToken>,
+        meowPrice: ZeroMeowPrice?,
+        userWalletBalance: MutableDoubleState
     ) {
         val totalBalance = tokensList
             .asSequence()
@@ -847,9 +849,10 @@ class HomePresenter(
         userWalletBalance.doubleValue = totalBalance
     }
 
-    private fun CoroutineScope.claimUserRewards(matrixUser: MatrixUser,
-                                                claimRewardsActionState: MutableState<AsyncAction<String>>,
-                                                refreshWallet: () -> Unit
+    private fun CoroutineScope.claimUserRewards(
+        matrixUser: MatrixUser,
+        claimRewardsActionState: MutableState<AsyncAction<String>>,
+        refreshWallet: () -> Unit
     ) = launch {
         matrixUser.walletAddress?.let {
             claimRewardsActionState.value = AsyncAction.Loading
@@ -896,7 +899,9 @@ class HomePresenter(
 
                         val tokenPrice = if (WalletChainsUtil.isAvaxChain(chainId)) {
                             client.getAvaxTokenPrice(stakeToken.address).getOrNull()?.usd
-                        } else {  meowPrice.price }
+                        } else {
+                            meowPrice.price
+                        }
 
                         val pool = HomeStakePool.from(
                             userAddress = userAddress,
@@ -913,7 +918,9 @@ class HomePresenter(
                             .distinctBy { it.poolAddress }
                             .sortedBy { it.chainId }
 
-                        if (refreshAllData) { onRefreshAllData(pool) }
+                        if (refreshAllData) {
+                            onRefreshAllData(pool)
+                        }
                     }
                 }
             }
