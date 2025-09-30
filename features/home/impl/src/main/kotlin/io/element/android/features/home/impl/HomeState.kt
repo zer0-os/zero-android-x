@@ -22,10 +22,15 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
 data class HomeState(
-    val matrixUser: MatrixUser,
+    /**
+     * The current user of this session, in case of multiple accounts, will contains 3 items, with the
+     * current user in the middle.
+     */
+    val currentUserAndNeighbors: ImmutableList<MatrixUser>,
     val showAvatarIndicator: Boolean,
     val hasNetworkConnection: Boolean,
     val genericActionState: AsyncAction<Unit>,

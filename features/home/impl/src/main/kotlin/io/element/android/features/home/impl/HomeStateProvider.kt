@@ -31,6 +31,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.toPersistentList
 
 open class HomeStateProvider : PreviewParameterProvider<HomeState> {
     override val values: Sequence<HomeState>
@@ -60,6 +61,7 @@ open class HomeStateProvider : PreviewParameterProvider<HomeState> {
 
 internal fun aHomeState(
     matrixUser: MatrixUser = MatrixUser(userId = UserId("@id:domain"), displayName = "User#1"),
+    currentUserAndNeighbors: List<MatrixUser> = listOf(matrixUser),
     showAvatarIndicator: Boolean = false,
     hasNetworkConnection: Boolean = true,
     genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
@@ -79,7 +81,7 @@ internal fun aHomeState(
     walletContentState: WalletContentState = aWalletContentState(),
     eventSink: (HomeEvents) -> Unit = {}
 ) = HomeState(
-    matrixUser = matrixUser,
+    currentUserAndNeighbors = currentUserAndNeighbors.toPersistentList(),
     showAvatarIndicator = showAvatarIndicator,
     hasNetworkConnection = hasNetworkConnection,
     genericActionState = genericActionState,

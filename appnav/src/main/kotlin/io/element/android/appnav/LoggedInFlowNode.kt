@@ -38,6 +38,7 @@ import com.bumble.appyx.navmodel.backstack.operation.replace
 import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import im.vector.app.features.analytics.plan.JoinedRoom
 import io.element.android.annotations.ContributesNode
@@ -82,7 +83,6 @@ import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.MAIN_SPACE
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
-import io.element.android.libraries.matrix.api.core.SessionId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
@@ -112,7 +112,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
 
 @ContributesNode(SessionScope::class)
-@Inject
+@AssistedInject
 class LoggedInFlowNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
@@ -156,6 +156,7 @@ class LoggedInFlowNode(
 ) {
     interface Callback : Plugin {
         fun onOpenBugReport()
+        fun onAddAccount()
     }
 
     private val loggedInFlowProcessor = LoggedInEventProcessor(
@@ -436,8 +437,8 @@ class LoggedInFlowNode(
                     }
                 }
                 val spaceCallback = object : SpaceEntryPoint.Callback {
-                    override fun onOpenRoom(roomId: RoomId) {
-                        backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
+                    override fun onOpenRoom(roomId: RoomId, viaParameters: List<String>) {
+                        backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), serverNames = viaParameters))
                     }
                 }
                 val inputs = RoomFlowNode.Inputs(
@@ -478,6 +479,10 @@ class LoggedInFlowNode(
             }
             is NavTarget.Settings -> {
                 val callback = object : PreferencesEntryPoint.Callback {
+                    override fun onAddAccount() {
+                        plugins<Callback>().forEach { it.onAddAccount() }
+                    }
+
                     override fun onOpenBugReport() {
                         plugins<Callback>().forEach { it.onOpenBugReport() }
                     }
@@ -490,11 +495,7 @@ class LoggedInFlowNode(
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), initialElement = RoomNavigationTarget.NotificationSettings))
                     }
 
-                    override fun navigateTo(sessionId: SessionId, roomId: RoomId, eventId: EventId) {
-                        // We do not check the sessionId, but it will have to be done at some point (multi account)
-                        if (sessionId != matrixClient.sessionId) {
-                            Timber.e("SessionId mismatch, expected ${matrixClient.sessionId} but got $sessionId")
-                        }
+                    override fun navigateTo(roomId: RoomId, eventId: EventId) {
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), initialElement = RoomNavigationTarget.Messages(eventId)))
                     }
                 }

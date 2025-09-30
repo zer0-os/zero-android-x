@@ -25,7 +25,7 @@ import com.bumble.appyx.navmodel.backstack.operation.push
 import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.AssistedInject
 import io.element.android.annotations.ContributesNode
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.login.api.LoginEntryPoint
@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 @ContributesNode(AppScope::class)
-@Inject
+@AssistedInject
 class LoginFlowNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
@@ -91,7 +91,7 @@ class LoginFlowNode(
                     // by pressing back or by closing the Custom Chrome Tab.
                     lifecycleScope.launch {
                         delay(5000)
-                        oidcActionFlow.post(OidcAction.GoBack)
+                        oidcActionFlow.post(OidcAction.GoBack(toUnblock = true))
                     }
                 }
             }

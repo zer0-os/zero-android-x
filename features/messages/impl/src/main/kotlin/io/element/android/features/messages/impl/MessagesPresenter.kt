@@ -24,7 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.AssistedInject
 import im.vector.app.features.analytics.plan.PinUnpinAction
 import io.element.android.appconfig.MessageComposerConfig
 import io.element.android.features.messages.api.timeline.HtmlConverterProvider
@@ -43,6 +43,7 @@ import io.element.android.features.messages.impl.timeline.components.customreact
 import io.element.android.features.messages.impl.timeline.components.reactionsummary.ReactionSummaryState
 import io.element.android.features.messages.impl.timeline.components.receipt.bottomsheet.ReadReceiptBottomSheetState
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
+import io.element.android.features.messages.impl.timeline.model.TimelineItemThreadInfo
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemEventContentWithAttachment
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemPollContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemStateContent
@@ -55,6 +56,7 @@ import io.element.android.libraries.androidutils.clipboard.ClipboardHelper
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
+import io.element.android.libraries.core.extensions.flatMap
 import io.element.android.libraries.core.extensions.runCatchingExceptions
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
@@ -68,6 +70,7 @@ import io.element.android.libraries.matrix.api.core.toThreadId
 import io.element.android.libraries.matrix.api.encryption.EncryptionService
 import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.matrix.api.permalink.PermalinkParser
+import io.element.android.libraries.matrix.api.recentemojis.AddRecentEmoji
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.MessageEventType
 import io.element.android.libraries.matrix.api.room.RoomInfo
@@ -92,7 +95,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@Inject
+@AssistedInject
 class MessagesPresenter(
     @Assisted private val navigator: MessagesNavigator,
     private val room: JoinedRoom,
@@ -120,6 +123,7 @@ class MessagesPresenter(
     private val analyticsService: AnalyticsService,
     private val encryptionService: EncryptionService,
     private val featureFlagService: FeatureFlagService,
+    private val addRecentEmoji: AddRecentEmoji,
 ) : Presenter<MessagesState> {
     @AssistedFactory
     interface Factory {
@@ -292,8 +296,8 @@ class MessagesPresenter(
         }
         return produceState(UserEventPermissions.DEFAULT, key1 = key) {
             value = UserEventPermissions(
-                canSendMessage = room.canSendMessage(type = MessageEventType.ROOM_MESSAGE).getOrElse { true },
-                canSendReaction = room.canSendMessage(type = MessageEventType.REACTION).getOrElse { true },
+                canSendMessage = room.canSendMessage(type = MessageEventType.RoomMessage).getOrElse { true },
+                canSendReaction = room.canSendMessage(type = MessageEventType.Reaction).getOrElse { true },
                 canRedactOwn = room.canRedactOwn().getOrElse { false },
                 canRedactOther = room.canRedactOther().getOrElse { false },
                 canPinUnpin = room.canPinUnpin().getOrElse { false },
@@ -339,7 +343,10 @@ class MessagesPresenter(
                 val displayThreads = featureFlagService.isFeatureEnabled(FeatureFlags.Threads)
                 if (displayThreads) {
                     // Get either the thread id this event is in, or the event id if it's not in a thread so we can start one
-                    val threadId = targetEvent.threadInfo.threadRootId ?: targetEvent.eventId!!.toThreadId()
+                    val threadId = when (targetEvent.threadInfo) {
+                        is TimelineItemThreadInfo.ThreadResponse -> targetEvent.threadInfo.threadRootId
+                        is TimelineItemThreadInfo.ThreadRoot, null -> targetEvent.eventId?.toThreadId()
+                    } ?: return@launch
                     navigator.onOpenThread(threadId, null)
                 } else {
                     handleActionReply(targetEvent, composerState, timelineProtectionState)
@@ -405,6 +412,7 @@ class MessagesPresenter(
     ) = launch(dispatchers.io) {
         timelineController.invokeOnCurrentTimeline {
             toggleReaction(emoji, eventOrTransactionId)
+                .flatMap { added -> if (added) addRecentEmoji(emoji) else Result.success(Unit) }
                 .onFailure { Timber.e(it) }
         }
     }

@@ -78,12 +78,14 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.meowPrice
 import io.element.android.libraries.matrix.api.zero.wallet.tokenPrice
+import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.extension.withScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +94,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
@@ -101,6 +104,10 @@ import java.math.RoundingMode
 import kotlin.jvm.optionals.getOrNull
 
 private const val HOME_FEED_PAGE_SIZE = 15
+import io.element.android.libraries.sessionstorage.api.SessionStore
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 @Inject
 class HomePresenter(
@@ -113,6 +120,7 @@ class HomePresenter(
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val featureFlagService: FeatureFlagService,
+    private val sessionStore: SessionStore,
 ) : Presenter<HomeState> {
 
     private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
@@ -120,10 +128,19 @@ class HomePresenter(
     private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
     private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
 
+    private val currentUserWithNeighborsBuilder = CurrentUserWithNeighborsBuilder()
+
     @Composable
     override fun present(): HomeState {
-        val coroutineScope = rememberCoroutineScope()
-        val matrixUser = client.userProfile.collectAsState()
+        val coroutineState = rememberCoroutineScope()
+        val matrixUser by client.userProfile.collectAsState()
+        val currentUserAndNeighbors by remember {
+            combine(
+                client.userProfile,
+                sessionStore.sessionsFlow(),
+                currentUserWithNeighborsBuilder::build,
+            )
+        }.collectAsState(initial = persistentListOf(matrixUser))
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug by remember { rageshakeFeatureAvailability.isAvailable() }.collectAsState(false)
         val roomListState = roomListPresenter.present()
@@ -343,6 +360,9 @@ class HomePresenter(
                 HomeEvents.RefreshWallet -> client.userProfile.value.walletAddress?.let { walletAddress ->
                     fetchWalletData(walletAddress)
                 }
+                is HomeEvents.SwitchToAccount -> coroutineState.launch {
+                    sessionStore.setLatestSession(event.sessionId.value)
+                }
             }
         }
 
@@ -384,7 +404,7 @@ class HomePresenter(
         fetchLinksMetaDataIfRequired(allCombinedFeeds, feedLinkMetaDataMap)
 
         return HomeState(
-            matrixUser = matrixUser.value,
+            currentUserAndNeighbors = currentUserAndNeighbors,
             showAvatarIndicator = showAvatarIndicator,
             hasNetworkConnection = isOnline,
             genericActionState = genericActionState.value,

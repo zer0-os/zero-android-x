@@ -35,7 +35,7 @@ import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun SessionDetailsView(
-    deviceName: String,
+    deviceName: String?,
     deviceId: DeviceId,
     signInFormattedTimestamp: String,
     modifier: Modifier = Modifier,
@@ -62,7 +62,7 @@ fun SessionDetailsView(
                 resourceId = CompoundDrawables.ic_compound_devices
             )
             Text(
-                text = deviceName,
+                text = deviceName ?: deviceId.value,
                 style = ElementTheme.zeroTypography.fontBodyMdMedium,
                 color = ElementTheme.colors.textPrimary,
             )
@@ -88,9 +88,16 @@ fun SessionDetailsView(
 @PreviewsDayNight
 @Composable
 internal fun SessionDetailsViewPreview() = ElementPreview {
-    SessionDetailsView(
-        deviceName = "Element X Android",
-        deviceId = DeviceId("ILAKNDNASDLK"),
-        signInFormattedTimestamp = "12:34",
-    )
+    Column {
+        SessionDetailsView(
+            deviceName = "Element X Android",
+            deviceId = DeviceId("ILAKNDNASDLK"),
+            signInFormattedTimestamp = "12:34",
+        )
+        SessionDetailsView(
+            deviceName = null,
+            deviceId = DeviceId("ILAKNDNASDLK"),
+            signInFormattedTimestamp = "12:34",
+        )
+    }
 }

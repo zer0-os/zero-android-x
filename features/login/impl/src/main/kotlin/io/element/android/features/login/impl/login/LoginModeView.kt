@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import io.element.android.features.login.impl.R
 import io.element.android.features.login.impl.dialogs.SlidingSyncNotSupportedDialog
 import io.element.android.features.login.impl.error.ChangeServerError
-import io.element.android.features.login.impl.error.ChangeServerErrorProvider
 import io.element.android.features.login.impl.screens.createaccount.AccountCreationNotSupported
 import io.element.android.libraries.androidutils.system.openGooglePlay
 import io.element.android.libraries.architecture.AsyncData
@@ -24,6 +23,7 @@ import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.LocalBuildMeta
+import io.element.android.libraries.matrix.api.auth.AuthenticationException
 import io.element.android.libraries.matrix.api.auth.OidcDetails
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -91,6 +91,12 @@ fun LoginModeView(
                         onSubmit = onClearError,
                     )
                 }
+                is AuthenticationException.AccountAlreadyLoggedIn -> {
+                    ErrorDialog(
+                        content = stringResource(CommonStrings.error_account_already_logged_in, error.message.orEmpty()),
+                        onSubmit = onClearError,
+                    )
+                }
                 is InvalidZeroInviteCode -> {
                     ErrorDialog(
                         content = stringResource(io.element.android.support.zero.R.string.error_invalid_invite_code),
@@ -123,7 +129,7 @@ fun LoginModeView(
 
 @PreviewsDayNight
 @Composable
-internal fun LoginModeViewPreview(@PreviewParameter(ChangeServerErrorProvider::class) error: ChangeServerError) {
+internal fun LoginModeViewPreview(@PreviewParameter(LoginModeViewErrorProvider::class) error: Throwable) {
     ElementPreview {
         LoginModeView(
             loginMode = AsyncData.Failure(error),

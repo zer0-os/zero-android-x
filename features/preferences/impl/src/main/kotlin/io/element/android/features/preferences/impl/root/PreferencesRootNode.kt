@@ -16,7 +16,7 @@ import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.core.plugin.plugins
 import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.AssistedInject
 import io.element.android.annotations.ContributesNode
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.logout.api.direct.DirectLogoutEvents
@@ -27,7 +27,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.support.zero.common.state.StateBus
 
 @ContributesNode(SessionScope::class)
-@Inject
+@AssistedInject
 class PreferencesRootNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,
@@ -35,6 +35,7 @@ class PreferencesRootNode(
     private val directLogoutView: DirectLogoutView,
 ) : Node(buildContext, plugins = plugins) {
     interface Callback : Plugin {
+        fun onAddAccount()
         fun onOpenBugReport()
         fun onSecureBackupClick()
         fun onOpenAnalytics()
@@ -50,6 +51,10 @@ class PreferencesRootNode(
         fun onOpenRewards()
         fun onInviteFriend()
         fun onManageWallets()
+    }
+
+    private fun onAddAccount() {
+        plugins<Callback>().forEach { it.onAddAccount() }
     }
 
     private fun onOpenBugReport() {
@@ -135,6 +140,7 @@ class PreferencesRootNode(
             state = state,
             modifier = modifier,
             onBackClick = this::navigateUp,
+            onAddAccountClick = this::onAddAccount,
             onOpenRageShake = this::onOpenBugReport,
             onOpenAnalytics = this::onOpenAnalytics,
             onOpenAbout = this::onOpenAbout,

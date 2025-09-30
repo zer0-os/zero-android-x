@@ -7,7 +7,10 @@
 
 package io.element.android.features.preferences.impl.root
 
+import io.element.android.libraries.matrix.api.core.SessionId
+
 sealed interface PreferencesRootEvents {
     data object OnVersionInfoClick : PreferencesRootEvents
     data object DismissRewardsIntimation: PreferencesRootEvents
+    data class SwitchToSession(val sessionId: SessionId) : PreferencesRootEvents
 }

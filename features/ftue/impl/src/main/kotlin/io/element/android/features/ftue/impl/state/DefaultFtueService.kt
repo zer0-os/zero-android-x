@@ -9,7 +9,6 @@ package io.element.android.features.ftue.impl.state
 
 import android.Manifest
 import android.os.Build
-import androidx.annotation.VisibleForTesting
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -18,6 +17,7 @@ import io.element.android.features.ftue.api.state.FtueState
 import io.element.android.features.lockscreen.api.LockScreenService
 import io.element.android.features.networkmonitor.api.NetworkMonitor
 import io.element.android.features.networkmonitor.api.NetworkStatus
+import io.element.android.libraries.core.coroutine.mapState
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -30,19 +30,19 @@ import io.element.android.services.toolbox.api.sdk.BuildVersionSdkIntProvider
 import io.element.android.support.zero.common.extension.withIOScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @ContributesBinding(SessionScope::class)
 @SingleIn(SessionScope::class)
 @Inject
 class DefaultFtueService(
     private val sdkVersionProvider: BuildVersionSdkIntProvider,
-    @SessionCoroutineScope sessionCoroutineScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
     private val analyticsService: AnalyticsService,
     private val permissionStateProvider: PermissionStateProvider,
     private val lockScreenService: LockScreenService,
@@ -51,40 +51,49 @@ class DefaultFtueService(
     private val networkMonitor: NetworkMonitor,
     private val client: MatrixClient,
 ) : FtueService {
-    override val state = MutableStateFlow<FtueState>(FtueState.Unknown)
+    private val userNeedsToConfirmSessionVerificationSuccess = MutableStateFlow(false)
 
-    /**
-     * This flow emits true when the FTUE flow is ready to be displayed.
-     * In this case, the FTUE flow is ready when the session verification status is known.
-     */
-    val isVerificationStatusKnown = sessionVerificationService.sessionVerifiedStatus
-        .map { it != SessionVerifiedStatus.Unknown }
-        .distinctUntilChanged()
+    val ftueStepStateFlow = MutableStateFlow<InternalFtueState>(InternalFtueState.Unknown)
 
     private var isSessionVerificationSkipped: Boolean = false
 
-    override suspend fun reset() {
-        analyticsService.reset()
-        if (sdkVersionProvider.isAtLeast(Build.VERSION_CODES.TIRAMISU)) {
-            permissionStateProvider.resetPermission(Manifest.permission.POST_NOTIFICATIONS)
+    override val state = ftueStepStateFlow
+        .mapState {
+            when (it) {
+                is InternalFtueState.Unknown -> FtueState.Unknown
+                is InternalFtueState.Incomplete -> FtueState.Incomplete
+                is InternalFtueState.Complete -> FtueState.Complete
+            }
         }
-    }
 
     init {
-        sessionVerificationService.sessionVerifiedStatus
-            .onEach { updateState() }
-            .launchIn(sessionCoroutineScope)
-
-        analyticsService.didAskUserConsentFlow
-            .distinctUntilChanged()
-            .onEach { updateState() }
+        combine(
+            sessionVerificationService.sessionVerifiedStatus.onEach { sessionVerifiedStatus ->
+                if (sessionVerifiedStatus == SessionVerifiedStatus.NotVerified) {
+                    // Ensure we wait for the user to confirm the session verified screen before going further
+                    userNeedsToConfirmSessionVerificationSuccess.value = true
+                }
+            },
+            userNeedsToConfirmSessionVerificationSuccess,
+            analyticsService.didAskUserConsentFlow.distinctUntilChanged(),
+        ) {
+            updateFtueStep()
+        }
             .launchIn(sessionCoroutineScope)
 
         checkAndLinkZeroUser()
     }
 
-    suspend fun getNextStep(currentStep: FtueStep? = null): FtueStep? =
-        when (currentStep) {
+    fun updateFtueStep() = sessionCoroutineScope.launch {
+        val step = getNextStep(null)
+        ftueStepStateFlow.value = when (step) {
+            null -> InternalFtueState.Complete
+            else -> InternalFtueState.Incomplete(step)
+        }
+    }
+
+    private suspend fun getNextStep(completedStep: FtueStep? = null): FtueStep? =
+        when (completedStep) {
             null -> if (networkMonitor.connectivity.value == NetworkStatus.Disconnected) {
                 getNextStep(FtueStep.WaitingForInitialState)
             } else if (!isSessionVerificationStateReady()) {
@@ -97,7 +106,7 @@ class DefaultFtueService(
             } else {
                 getNextStep(FtueStep.CompleteProfile)
             }
-            FtueStep.CompleteProfile -> if (isSessionNotVerified()) {
+            FtueStep.CompleteProfile -> if (isSessionNotVerified() || userNeedsToConfirmSessionVerificationSuccess.value) {
                 FtueStep.SessionVerification
             } else {
                 getNextStep(FtueStep.SessionVerification)
@@ -125,9 +134,6 @@ class DefaultFtueService(
     }
 
     private suspend fun isSessionNotVerified(): Boolean {
-        // Wait until the session verification status is known
-        isVerificationStatusKnown.filter { it }.first()
-
         return sessionVerificationService.sessionVerifiedStatus.value == SessionVerifiedStatus.NotVerified && !canSkipVerification() && !isSessionVerificationSkipped
     }
 
@@ -155,14 +161,8 @@ class DefaultFtueService(
         return lockScreenService.isSetupRequired().first()
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal suspend fun updateState() {
-        val nextStep = getNextStep()
-        state.value = when {
-            // Final state, there aren't any more next steps
-            nextStep == null -> FtueState.Complete
-            else -> FtueState.Incomplete
-        }
+    fun onUserCompletedSessionVerification() {
+        userNeedsToConfirmSessionVerificationSuccess.value = false
     }
 
     private suspend fun isProfileIncomplete(): Boolean {
