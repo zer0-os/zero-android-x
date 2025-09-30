@@ -31,7 +31,7 @@ data class ApiFeedReplies(
 data class ApiFeed(
     val id: String,
     val userId: String,
-    val zid: String,
+    val zid: String? = null,
     val createdAt: String,
     val updatedAt: String,
     val signedMessage: String,

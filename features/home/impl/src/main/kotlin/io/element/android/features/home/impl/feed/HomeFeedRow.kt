@@ -157,13 +157,15 @@ fun HomeFeedRow(
                 }
             }
             Spacer(Modifier.height(2.dp))
-            Text(
-                text = "$ZERO_CHANNEL_PREFIX${feed.zid}",
-                style = ElementTheme.typography.fontBodyMdRegular,
-                color = ElementTheme.colors.textSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (feed.zIDOrAddress != null) {
+                Text(
+                    text = feed.zIDOrAddress!!,
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Spacer(Modifier.height(16.dp))
             Text(
                 text = feed.annotatedText(

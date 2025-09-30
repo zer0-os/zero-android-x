@@ -25,7 +25,7 @@ import java.util.UUID
 data class ZeroFeed(
     val id: String,
     val userId: String,
-    val zid: String,
+    val zid: String?,
     val createdAt: String,
     val updatedAt: String,
     val signedMessage: String,
@@ -103,6 +103,9 @@ data class ZeroFeed(
             media = FeedMedia.placeholder
         )
     }
+
+    val zIDOrAddress: String?
+        get() = userProfile.primaryZid ?: ZeroWalletUtil.walletAddressDisplayText(userProfile.publicAddress)
 }
 
 @Parcelize
@@ -206,7 +209,7 @@ val FeedMedia.aspectRatio
 val FeedMedia.isVideo
     get() = mimeType?.contains("video") == true
 
-fun ZeroFeedAuthor.toZeroProfile(userZId: String) = FeedUserProfileView(
+fun ZeroFeedAuthor.toZeroProfile(userZId: String?) = FeedUserProfileView(
     userId = id,
     primaryZid = userZId,
     firstName = profileSummary.firstName,

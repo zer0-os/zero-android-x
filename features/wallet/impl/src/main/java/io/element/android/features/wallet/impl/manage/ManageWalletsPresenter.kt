@@ -30,6 +30,7 @@ import io.element.android.features.login.impl.walletconnect.WalletConnectService
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.user.walletAddress
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.support.zero.common.extension.openExternalUri
 import kotlinx.coroutines.CoroutineScope
@@ -149,7 +150,7 @@ class ManageWalletsPresenter(
 
         return ManageWalletsState(
             userId = currentUser.value.userId,
-            userZeroWalletAddress = currentUser.value.zeroWalletAddress,
+            userZeroWalletAddress = currentUser.value.walletAddress,
             wallets = userWalletsState.value,
             userActionState = userActionState.value,
             actionState = genericActionState.value,
