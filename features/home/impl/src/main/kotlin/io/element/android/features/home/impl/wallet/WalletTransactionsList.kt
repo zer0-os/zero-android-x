@@ -279,7 +279,7 @@ private fun TransactionRow(
             Text(
                 "--",
                 style = ElementTheme.typography.fontBodyMdRegular,
-                color = ElementTheme.colors.zeroBrandColor
+                color = ElementTheme.colors.textSecondary
             )
         }
 

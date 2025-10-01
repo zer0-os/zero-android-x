@@ -44,9 +44,13 @@ fun LoginModeView(
                 is ChangeServerError -> {
                     when (error) {
                         is ChangeServerError.Error -> {
-                            ErrorDialog(
+                            /*ErrorDialog(
                                 content = error.message(),
                                 onSubmit = onClearError,
+                            )*/
+                            ErrorDialog(
+                                content = "We’re having trouble right now. Please check your connection and try again.",
+                                onSubmit = onClearError
                             )
                         }
                         is ChangeServerError.SlidingSyncAlert -> {

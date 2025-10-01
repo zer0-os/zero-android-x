@@ -53,6 +53,7 @@ import io.element.android.libraries.matrix.ui.components.EditableAvatarView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.common.ui.ZeroPrimaryButton
+import io.element.android.support.zero.common.ui.component.InfoBox
 import io.element.android.support.zero.common.ui.component.SimpleInputField
 import io.element.android.support.zero.common.ui.theme.PADDING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_10X
@@ -154,8 +155,16 @@ fun CompleteProfileView(
                             capitalization = KeyboardCapitalization.Words
                         ),
                         keyboardActions = KeyboardActions(
-                            onDone = { submit() }
+                            onDone = {
+                                if (state.saveButtonEnabled) {
+                                    submit()
+                                }
+                            }
                         )
+                    )
+                    InfoBox(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        text = "Name must be atleast 3 characters or more upto 24 characters"
                     )
                 }
 

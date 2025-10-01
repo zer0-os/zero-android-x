@@ -60,9 +60,9 @@ fun ZeroOnboardingPager(
 
     val pageTitle: String = when (pagerState.currentPage) {
         0 -> "Make internet money."
-        1 -> "Securely chat with friends and family."
-        2 -> "Buy, sell, and swap millions of coins."
-        else -> "Work for yourself and own your future."
+        1 -> "Stay close, chat securely."
+        2 -> "Buy, sell & swap instantly."
+        else -> "Work for yourself."
     }
     val pageSubTitle = when (pagerState.currentPage) {
         0 -> "Turn your ideas into money with a platform that rewards creativity."

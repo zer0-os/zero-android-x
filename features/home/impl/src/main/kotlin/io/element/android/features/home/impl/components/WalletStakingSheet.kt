@@ -243,7 +243,12 @@ fun PoolDetailsView(
                 .padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            val rowModifier = if (hasClaimableRewards) {
+                Modifier.fillMaxWidth()
+            } else {
+                Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            }
+            Row(modifier = rowModifier, verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     modifier = Modifier.weight(1f),
                     text = "Claimable Rewards $rewardTokenName",

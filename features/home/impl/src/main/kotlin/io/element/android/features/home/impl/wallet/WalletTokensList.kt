@@ -57,6 +57,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.meowPriceFormatted
 import io.element.android.libraries.matrix.api.zero.wallet.tokenPriceFormatted
+import io.element.android.support.zero.common.extension.roundTo
 import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ZChainIcon
 import kotlin.math.abs
@@ -243,22 +244,12 @@ private fun TokenRow(
                 else -> if (meowPrice != null) { token.meowPriceFormatted(meowPrice) } else ""
             }
 
-            val priceChange = when {
+            val priceChange = (when {
                 WalletChainsUtil.isAvaxChain(token.chainId) -> {
-                    token.percentChange?.let {
-                        "$it%"
-                    } ?: ""
+                    token.percentChange?.toDoubleOrNull() ?: 0.0
                 }
-                else -> {
-                    if (meowPrice?.diff != null) {
-                        if (meowPrice.diff!! > 0) {
-                            "+${meowPrice.diff!!}%"
-                        } else {
-                            "-${abs(meowPrice.diff!!)}%"
-                        }
-                    } else ""
-                }
-            }
+                else -> meowPrice?.diff
+            })?.roundTo(2)
 
             Column(horizontalAlignment = Alignment.End) {
                 if (refPrice.isNotBlank()) {
@@ -268,12 +259,15 @@ private fun TokenRow(
                         color = ElementTheme.colors.textPrimary
                     )
                 }
-
-                if (priceChange.isNotBlank()) {
+                if (priceChange != null) {
                     Text(
-                        priceChange,
+                        text = if (priceChange > 0) {
+                            "+$priceChange%"
+                        } else {
+                            "-${abs(priceChange)}%"
+                        },
                         style = ElementTheme.typography.fontBodyMdRegular,
-                        color = ElementTheme.colors.zeroBrandColor
+                        color = if (priceChange > 0) ElementTheme.colors.zeroBrandColor else ElementTheme.colors.textCriticalPrimary
                     )
                 }
             }

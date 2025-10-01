@@ -188,7 +188,7 @@ class HomePresenter(
             coroutineState.fetchWalletData(
                 meowPrice, walletAddress, userWalletBalance,
                 walletStakingContent, walletTokensListState, walletTransactionsListState,
-                walletTokenPaginationParams, walletTransactionsPaginationParams
+                walletTokenPaginationParams, walletTransactionsPaginationParams, true
             )
         }
 
@@ -455,7 +455,7 @@ class HomePresenter(
             // Fetch all home feeds
             safeAsync { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
             // Fetch all my feeds
-            safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
+            //safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
     }
 
@@ -713,31 +713,32 @@ class HomePresenter(
         walletTokensListState: MutableState<WalletTokensListState>,
         walletTransactionsListState: MutableState<WalletTransactionsListState>,
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
-        transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>
+        transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>,
+        forceRefresh: Boolean,
     ) = launch(context = Dispatchers.IO) {
         val results = awaitAll(
             async { client.getMeowPrice() },
             async {
                 client.getWalletTokens(
                     walletAddress = walletAddress,
-                    paginationParams = tokenPaginationParams.value
+                    paginationParams = if (forceRefresh) null else tokenPaginationParams.value
                 )
             },
             async {
                 client.getWalletTransactions(
                     walletAddress = walletAddress,
-                    paginationParams = transactionPaginationParams.value
+                    paginationParams = if (forceRefresh) null else transactionPaginationParams.value
                 )
             },
         )
         (results[0] as? Result<ZeroMeowPrice>)?.let {
             meowPrice.value = it.getOrNull()
+            fetchStakingData(stakePoolsContent, meowPrice.value, walletAddress)
         }
         (results[1] as? Result<ZeroWalletTokensResponse>)?.let {
             it.onSuccess { result ->
                 val tokensList = result.tokens
                 setWalletBalance(tokensList, meowPrice.value, userWalletBalance)
-                fetchStakingData(stakePoolsContent, meowPrice.value, walletAddress)
                 walletTokensListState.value = WalletTokensListState.Tokens(
                     tokensList
                         .distinctBy { token -> token.tokenAddress }

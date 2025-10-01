@@ -129,13 +129,14 @@ class RustMatrixClientFactory(
             .addRootCertificates(userCertificatesProvider.provides())
             .autoEnableBackups(true)
             .autoEnableCrossSigning(true)
-            .roomKeyRecipientStrategy(
-                strategy = if (featureFlagService.isFeatureEnabled(FeatureFlags.OnlySignedDeviceIsolationMode)) {
-                    CollectStrategy.IDENTITY_BASED_STRATEGY
-                } else {
-                    CollectStrategy.ERROR_ON_VERIFIED_USER_PROBLEM
-                }
-            )
+//            .roomKeyRecipientStrategy(
+//                strategy = if (featureFlagService.isFeatureEnabled(FeatureFlags.OnlySignedDeviceIsolationMode)) {
+//                    CollectStrategy.IDENTITY_BASED_STRATEGY
+//                } else {
+//                    CollectStrategy.ERROR_ON_VERIFIED_USER_PROBLEM
+//                }
+//            )
+            .roomKeyRecipientStrategy(strategy = CollectStrategy.ALL_DEVICES)
             .decryptionSettings(
                 DecryptionSettings(
                     senderDeviceTrustRequirement = if (featureFlagService.isFeatureEnabled(FeatureFlags.OnlySignedDeviceIsolationMode)) {
