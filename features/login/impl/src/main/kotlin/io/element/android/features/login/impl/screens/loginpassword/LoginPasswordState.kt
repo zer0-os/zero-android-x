@@ -12,6 +12,7 @@ import io.element.android.features.login.impl.accountprovider.AccountProvider
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.matrix.api.core.SessionId
+import io.element.android.support.zero.common.util.ValidationUtil
 import kotlinx.parcelize.Parcelize
 
 data class LoginPasswordState(
@@ -21,14 +22,15 @@ data class LoginPasswordState(
     val requestOtpAction: AsyncAction<Unit>,
     val eventSink: (LoginPasswordEvents) -> Unit
 ) {
+    private val isEmailValid: Boolean
+        get() = ValidationUtil.validateEmail(formState.login) == null
+
     val submitEnabled: Boolean
         get() = loginAction !is AsyncData.Failure &&
-            formState.login.isNotEmpty() &&
-            formState.password.isNotEmpty()
+            isEmailValid && formState.password.isNotEmpty()
 
     val submitOtpEnabled: Boolean
-        get() = loginAction !is AsyncData.Failure &&
-            formState.login.isNotEmpty()
+        get() = loginAction !is AsyncData.Failure && isEmailValid
 }
 
 @Parcelize

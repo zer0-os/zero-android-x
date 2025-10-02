@@ -37,7 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.login.impl.error.loginError
+import io.element.android.features.login.impl.error.zeroAuthenticationError
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.ProgressDialog
@@ -136,10 +136,13 @@ fun ZeroLoginPasswordView(
                             showSingleSignOnForm = showSingleSignOnForm.value,
                             onForgotPassword = onForgotPassword,
                             onSubmit = {
-                                if (showSingleSignOnForm.value) {
-                                    submitSSO()
-                                } else {
-                                    submit()
+                                when (showSingleSignOnForm.value) {
+                                    true -> if (state.submitOtpEnabled) {
+                                        submitSSO()
+                                    }
+                                    false -> if (state.submitEnabled) {
+                                        submit()
+                                    }
                                 }
                             }
                         )
@@ -341,7 +344,7 @@ fun LoginPasswordFooter(
 private fun LoginErrorDialog(error: Throwable, onDismiss: () -> Unit) {
     ErrorDialog(
         title = stringResource(id = CommonStrings.dialog_title_error),
-        content = stringResource(loginError(error)),
+        content = zeroAuthenticationError(error),
         onSubmit = onDismiss
     )
 }

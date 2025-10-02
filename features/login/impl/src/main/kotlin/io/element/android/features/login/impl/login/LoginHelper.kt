@@ -23,6 +23,7 @@ import io.element.android.features.login.impl.walletconnect.WalletConnectService
 import io.element.android.features.login.impl.web.WebClientUrlForAuthenticationRetriever
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.runCatchingUpdatingState
+import io.element.android.libraries.matrix.api.auth.AuthenticationException
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.OidcPrompt
 import io.element.android.libraries.oidc.api.OidcAction
@@ -103,7 +104,9 @@ class LoginHelper(
             if (isCodeValid) {
                 loginModeState.value = AsyncData.Success(LoginMode.ZeroCreateAccountFlow(inviteCode))
             } else {
-                loginModeState.value = AsyncData.Failure(InvalidZeroInviteCode())
+                loginModeState.value = AsyncData.Failure(
+                    AuthenticationException.Generic("Invite code not found. Please check your invite message.")
+                )
             }
         }
 
@@ -214,5 +217,3 @@ class LoginHelper(
         loginModeState.value = AsyncData.Failure(Throwable("Wallet connection failed. Please try again."))
     }
 }
-
-internal class InvalidZeroInviteCode : Exception()

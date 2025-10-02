@@ -8,6 +8,7 @@
 package io.element.android.features.login.impl.screens.extendedOnboarding
 
 import io.element.android.libraries.architecture.AsyncAction
+import io.element.android.support.zero.common.util.ValidationUtil
 
 data class ExtendedOnboardingState(
     val forgotPasswordEmail: String,
@@ -16,5 +17,5 @@ data class ExtendedOnboardingState(
 ) {
     val submitEnabled: Boolean
         get() = actionState !is AsyncAction.Failure &&
-            forgotPasswordEmail.isNotBlank()
+            ValidationUtil.validateEmail(forgotPasswordEmail) == null
 }

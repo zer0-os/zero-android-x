@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.network.retrofit)
 
     testCommonDependencies(libs)
     testImplementation(projects.libraries.featureflag.test)

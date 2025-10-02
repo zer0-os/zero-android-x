@@ -85,10 +85,14 @@ class DefaultFtueService(
             } else {
                 getNextStep(FtueStep.WaitingForInitialState)
             }
-            FtueStep.WaitingForInitialState -> if (isProfileIncomplete()) {
-                FtueStep.CompleteProfile
-            } else {
-                getNextStep(FtueStep.CompleteProfile)
+            FtueStep.WaitingForInitialState -> {
+                val isProfileIncomplete = isProfileIncomplete()
+                if (isProfileIncomplete) {
+                    FtueStep.CompleteProfile
+                } else {
+                    setNameForMatrixUser()
+                    getNextStep(FtueStep.CompleteProfile)
+                }
             }
             FtueStep.CompleteProfile -> if (isSessionNotVerified()) {
                 FtueStep.SessionVerification
@@ -168,6 +172,10 @@ class DefaultFtueService(
 
     fun setSessionVerificationSkipped() {
         isSessionVerificationSkipped = true
+    }
+
+    private fun setNameForMatrixUser() {
+        withIOScope { client.setNameForMatrixProfile() }
     }
 }
 

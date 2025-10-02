@@ -86,10 +86,11 @@ class FeedRepositoryImpl(
         }.getOrNull()
     }
 
-    override suspend fun createNewFeed(channelZId: String, content: String, mediaId: String?, replyToPost: String?): Boolean {
+    override suspend fun createNewFeed(channelZId: String?, walletAddress: String, content: String, mediaId: String?, replyToPost: String?): Boolean {
         return runCatching {
+            val zid = channelZId?.replace(ZERO_CHANNEL_PREFIX, "")
             val result = zeroFeedService.postNewFeed(
-                channelZId = channelZId.replace(ZERO_CHANNEL_PREFIX, ""),
+                channelZId = zid,
                 request = PostNewFeedRequest.newRequest(content, mediaId, replyToPost)
             )
             result.isSuccessful

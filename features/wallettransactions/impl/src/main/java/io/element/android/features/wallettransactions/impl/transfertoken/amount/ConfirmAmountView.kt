@@ -228,6 +228,7 @@ fun TransferAmountInputField(
             if (amount.value != token.amount) {
                 Text(
                     modifier = Modifier
+                        .padding(horizontal = 12.dp)
                         .background(
                             color = ElementTheme.colors.bgCanvasDefaultLevel1,
                             shape = RoundedCornerShape(24.dp)

@@ -73,7 +73,7 @@ interface ZeroFeedService {
 
     @POST(value = "api/v2/posts/channel/raw/{channel_zid}")
     suspend fun postNewFeed(
-        @Path("channel_zid") channelZId: String,
+        @Path("channel_zid") channelZId: String?,
         @Body request: PostNewFeedRequest
     ): Response<ResponseBody>
 }

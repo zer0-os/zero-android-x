@@ -49,7 +49,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.reown.appkit.ui.components.internal.AppKitComponent
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.login.impl.error.loginError
+import io.element.android.features.login.impl.error.zeroAuthenticationError
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
@@ -325,7 +325,11 @@ private fun ZeroCreateAccountForm(
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
-                onDone = { onSubmit() }
+                onDone = {
+                    if (state.submitEnabled) {
+                        onSubmit()
+                    }
+                }
             ),
             iconTint = Color.White.copy(alpha = 0.75f)
         )
@@ -351,7 +355,7 @@ private fun ZeroCreateAccountForm(
 private fun ZeroCreateAccountErrorDialog(error: Throwable, onDismiss: () -> Unit) {
     ErrorDialog(
         title = stringResource(id = CommonStrings.dialog_title_error),
-        content = stringResource(loginError(error)),
+        content = zeroAuthenticationError(error),
         onSubmit = onDismiss
     )
 }

@@ -941,6 +941,13 @@ class RustMatrixClient(
             } ?: false
     }
 
+    override suspend fun setNameForMatrixProfile() {
+        zeroCoreRepository?.user?.getCurrentUser(sessionId)?.firstOrNull()?.let { user ->
+            val username = user.name
+            runCatchingExceptions { innerClient.setDisplayName(username) }
+        }
+    }
+
     override suspend fun completeZeroUserProfile(
         inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
     ): Result<Unit> = withContext(sessionDispatcher) {
@@ -1111,10 +1118,11 @@ class RustMatrixClient(
     override suspend fun createNewFeed(content: String, attachment: CreateFeedMediaAttachment?, replyToPost: String?): Result<Unit> =
         withContext(sessionDispatcher) {
             runCatching {
-                val channelZId = _userProfile.value.primaryZeroId
-                    ?: return@withContext Result.failure(Throwable("Please set user primaryZId in profile settings."))
                 val feedRepo = zeroCoreRepository?.feed
                     ?: return@withContext Result.failure(Throwable("Feed repository is not initialized yet."))
+                val walletAddress = _userProfile.value.zeroWalletAddress
+                    ?: return@withContext Result.failure(Throwable("Missing user information"))
+                val zid = _userProfile.value.primaryZeroId
                 var feedMediaId: String? = null
                 attachment?.let { feedAttachment ->
                     val mediaUploadResponse = zeroCoreRepository.metaData.uploadFeedMedia(
@@ -1123,7 +1131,7 @@ class RustMatrixClient(
                     )
                     feedMediaId = mediaUploadResponse?.id
                 }
-                val isSuccess = feedRepo.createNewFeed(channelZId, content, feedMediaId, replyToPost)
+                val isSuccess = feedRepo.createNewFeed(zid, walletAddress, content, feedMediaId, replyToPost)
                 if (isSuccess) {
                     CoroutineScope(sessionDispatcher).launch {
                         postCreateFeed(replyToPost)

@@ -166,8 +166,10 @@ private fun ForgotPasswordForm(state: ExtendedOnboardingState, scrollState: Scro
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    state.eventSink(ExtendedOnboardingEvents.Submit)
-                    focusManager.clearFocus()
+                    if (state.submitEnabled) {
+                        state.eventSink(ExtendedOnboardingEvents.Submit)
+                        focusManager.clearFocus()
+                    }
                 }
             )
         )

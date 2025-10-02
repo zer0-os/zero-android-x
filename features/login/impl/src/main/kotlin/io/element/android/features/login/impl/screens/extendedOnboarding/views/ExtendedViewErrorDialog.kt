@@ -9,7 +9,7 @@ package io.element.android.features.login.impl.screens.extendedOnboarding.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import io.element.android.features.login.impl.error.loginError
+import io.element.android.features.login.impl.error.zeroAuthenticationError
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.ui.strings.CommonStrings
 
@@ -17,7 +17,7 @@ import io.element.android.libraries.ui.strings.CommonStrings
 fun ExtendedViewErrorDialog(error: Throwable, onDismiss: () -> Unit) {
     ErrorDialog(
         title = stringResource(id = CommonStrings.dialog_title_error),
-        content = stringResource(loginError(error)),
+        content = zeroAuthenticationError(error),
         onSubmit = onDismiss
     )
 }

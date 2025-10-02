@@ -25,3 +25,9 @@ fun loginError(
         AuthErrorCode.UNKNOWN -> CommonStrings.error_unknown
     }
 }
+
+fun zeroAuthenticationError(
+    throwable: Throwable
+): String {
+    return (throwable as? AuthenticationException)?.message ?: return "Sorry, an error occurred."
+}

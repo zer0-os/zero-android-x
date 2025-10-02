@@ -166,8 +166,10 @@ fun VerifyInviteForm(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    state.eventSink(VerifyZeroInviteEvents.Submit)
-                    focusManager.clearFocus()
+                    if (state.submitEnabled) {
+                        state.eventSink(VerifyZeroInviteEvents.Submit)
+                        focusManager.clearFocus()
+                    }
                 }
             )
         )

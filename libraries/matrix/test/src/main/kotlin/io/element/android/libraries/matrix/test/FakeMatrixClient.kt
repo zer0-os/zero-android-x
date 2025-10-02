@@ -412,6 +412,8 @@ class FakeMatrixClient(
         return false
     }
 
+    override suspend fun setNameForMatrixProfile() {}
+
     override suspend fun completeZeroUserProfile(
         inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
     ): Result<Unit> {

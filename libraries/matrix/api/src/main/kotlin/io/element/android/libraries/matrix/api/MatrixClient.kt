@@ -233,6 +233,8 @@ interface MatrixClient {
 
     suspend fun isZeroProfileCompletionPending(): Boolean
 
+    suspend fun setNameForMatrixProfile()
+
     suspend fun completeZeroUserProfile(
         inviteCode: String, displayName: String, mimeType: String?, avatarData: ByteArray?
     ): Result<Unit>

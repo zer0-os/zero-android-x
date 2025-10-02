@@ -70,7 +70,9 @@ fun VerifyOtpView(
                 onBackClick = onBackClick,
                 content = {
                     VerifyOtpForm(otpValue, scrollState) {
-                        state.eventSink(ExtendedOnboardingEvents.SubmitSSO(otpValue.value))
+                        if (canSubmitOtp()) {
+                            state.eventSink(ExtendedOnboardingEvents.SubmitSSO(otpValue.value))
+                        }
                     }
                 },
                 footer = {

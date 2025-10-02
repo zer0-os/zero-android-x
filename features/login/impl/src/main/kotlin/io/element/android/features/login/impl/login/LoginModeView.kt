@@ -101,9 +101,9 @@ fun LoginModeView(
                         onSubmit = onClearError,
                     )
                 }
-                is InvalidZeroInviteCode -> {
+                is AuthenticationException -> {
                     ErrorDialog(
-                        content = stringResource(io.element.android.support.zero.R.string.error_invalid_invite_code),
+                        content = error.message ?: stringResource(CommonStrings.error_unknown),
                         onSubmit = onClearError
                     )
                 }

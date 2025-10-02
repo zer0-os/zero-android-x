@@ -13,9 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import dev.zacsweers.metro.Inject
-import io.element.android.features.login.impl.login.InvalidZeroInviteCode
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
+import io.element.android.libraries.matrix.api.auth.AuthenticationException
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -61,7 +61,9 @@ class VerifyZeroInvitePresenter(
                 if (isCodeValid) {
                     actionState.value = AsyncAction.Success(Unit)
                 } else {
-                    actionState.value = AsyncAction.Failure(InvalidZeroInviteCode())
+                    actionState.value = AsyncAction.Failure(
+                        AuthenticationException.Generic("Invite code not found. Please check your invite message.")
+                    )
                 }
             }
             .onFailure { failure ->
