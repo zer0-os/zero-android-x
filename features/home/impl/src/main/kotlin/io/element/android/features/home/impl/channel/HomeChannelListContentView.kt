@@ -51,7 +51,10 @@ fun HomeChannelListContentView(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        ChannelsScreenTabView(onTabSelected = onChannelTabSelected)
+        ChannelsScreenTabView(
+            selectedTab = selectedChannelContentTab,
+            onTabSelected = onChannelTabSelected
+        )
         when (selectedChannelContentTab) {
             ChannelsScreenTab.CHANNELS,
             ChannelsScreenTab.MUTED -> {

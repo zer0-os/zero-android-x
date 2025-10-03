@@ -7,6 +7,7 @@
 
 package io.element.android.features.home.impl
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,6 +71,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.common.extension.openExternalUri
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
@@ -117,6 +119,14 @@ fun HomeView(
 
     val selectedHomeNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
     val selectedChannelsTab = rememberSaveable { mutableStateOf(ChannelsScreenTab.CHANNELS) }
+
+    BackHandler {
+        if (selectedHomeNavigationTab.value != HomeScreenTab.CHAT) {
+            selectedHomeNavigationTab.value = HomeScreenTab.CHAT
+        } else {
+            context.getActivity()?.finishAffinity()
+        }
+    }
 
     ConnectivityIndicatorContainer(
         modifier = modifier,
