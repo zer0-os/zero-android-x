@@ -13,5 +13,5 @@ import kotlinx.serialization.Serializable
 data class StakeTransactionRequest(
     val amount: String,
     val poolAddress: String,
-    val chainId: Int
+    val chainId: Long
 )

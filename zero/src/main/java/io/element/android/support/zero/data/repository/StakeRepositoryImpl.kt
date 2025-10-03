@@ -21,41 +21,41 @@ import io.element.android.support.zero.network.service.ZeroStakeService
 class StakeRepositoryImpl(
     private val zeroStakeService: ZeroStakeService
 ) : StakeRepository {
-    override suspend fun getTotalStaked(poolAddress: String, chainId: Int): String {
+    override suspend fun getTotalStaked(poolAddress: String, chainId: Long): String {
         return zeroStakeService.getTotalStaked(poolAddress, chainId.toString())
     }
 
-    override suspend fun getStakingConfig(poolAddress: String, chainId: Int): ApiStakingConfig {
+    override suspend fun getStakingConfig(poolAddress: String, chainId: Long): ApiStakingConfig {
         return zeroStakeService.getStakingConfig(poolAddress, chainId.toString())
     }
 
-    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): ApiStakingStatus {
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Long): ApiStakingStatus {
         return zeroStakeService.getStakerStatusInfo(userAddress, poolAddress, chainId.toString())
     }
 
-    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): ApiStakingUserRewardsInfo {
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Long): ApiStakingUserRewardsInfo {
         return zeroStakeService.getStakeRewardsInfo(userAddress, poolAddress, chainId.toString())
     }
 
-    override suspend fun getStakingToken(poolAddress: String, chainId: Int): ApiWalletStakingToken {
+    override suspend fun getStakingToken(poolAddress: String, chainId: Long): ApiWalletStakingToken {
         return zeroStakeService.getStakingToken(poolAddress, chainId.toString())
     }
 
-    override suspend fun getRewardToken(poolAddress: String, chainId: Int): ApiWalletStakingRewardsToken {
+    override suspend fun getRewardToken(poolAddress: String, chainId: Long): ApiWalletStakingRewardsToken {
         return zeroStakeService.getRewardToken(poolAddress, chainId.toString())
     }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): ApiTransactionPerformed {
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Long): ApiTransactionPerformed {
         val request = StakeTransactionRequest(amount, poolAddress, chainId)
         return zeroStakeService.stakeAmount(userAddress, request)
     }
 
-    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): ApiTransactionPerformed {
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Long): ApiTransactionPerformed {
         val request = UnstakeTransactionRequest(amount, poolAddress, chainId)
         return zeroStakeService.unstakeAmount(userAddress, request)
     }
 
-    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): ApiTransactionPerformed {
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Long): ApiTransactionPerformed {
         val request = ClaimStakingRewardsRequest(poolAddress, chainId)
         return zeroStakeService.claimStakingRewards(userAddress, request)
     }

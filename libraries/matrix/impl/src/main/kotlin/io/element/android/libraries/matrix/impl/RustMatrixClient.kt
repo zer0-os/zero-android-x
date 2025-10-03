@@ -66,7 +66,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
@@ -1228,13 +1228,13 @@ class RustMatrixClient(
         }
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int?): Result<ZeroWalletTransactionReceipt>
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Long?): Result<ZeroWalletTransactionReceipt>
         = withContext(sessionDispatcher) {
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
             walletRepo.getTransactionReceipt(
                 transactionHash = transactionId,
-                chainId = chainId ?: WalletChainsUtil.Z_CHAIN_ID
+                chainId = chainId ?: WalletChainsUtil.z_chain.chainId
             ).toModel()
         }
     }
@@ -1254,7 +1254,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Long, amount: String, token: String): Result<ZeroWalletTransactionReceipt> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
@@ -1262,7 +1262,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getTokenInfo(tokenAddress: String, chainId: Int): Result<ZeroWalletTokenInfo> =
+    override suspend fun getTokenInfo(tokenAddress: String, chainId: Long): Result<ZeroWalletTokenInfo> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
@@ -1270,7 +1270,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): Result<ZeroWalletTokenBalance> =
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Long): Result<ZeroWalletTokenBalance> =
         withContext(sessionDispatcher) {
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
@@ -1278,7 +1278,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getTotalStaked(poolAddress: String, chainId: Int): Result<String> =
+    override suspend fun getTotalStaked(poolAddress: String, chainId: Long): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1286,7 +1286,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getStakingConfig(poolAddress: String, chainId: Int): Result<ZeroStakingConfig> =
+    override suspend fun getStakingConfig(poolAddress: String, chainId: Long): Result<ZeroStakingConfig> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1294,7 +1294,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingStatus> =
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Long): Result<ZeroStakingStatus> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1302,7 +1302,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingUserRewardsInfo> =
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Long): Result<ZeroStakingUserRewardsInfo> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1310,7 +1310,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getStakingToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> =
+    override suspend fun getStakingToken(poolAddress: String, chainId: Long): Result<ZeroTokenAddress> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1318,7 +1318,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun getRewardToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> =
+    override suspend fun getRewardToken(poolAddress: String, chainId: Long): Result<ZeroTokenAddress> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1326,7 +1326,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): Result<String> =
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Long): Result<String> =
         withContext(sessionDispatcher) {
             runCatchingExceptions {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
@@ -1348,7 +1348,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String> =
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Long): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
@@ -1356,7 +1356,7 @@ class RustMatrixClient(
             }
         }
 
-    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String> =
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Long): Result<String> =
         withContext(sessionDispatcher) {
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))

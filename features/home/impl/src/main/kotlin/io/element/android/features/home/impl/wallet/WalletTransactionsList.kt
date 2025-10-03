@@ -33,8 +33,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -49,16 +51,12 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
-import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.libraries.matrix.api.zero.wallet.isClaimableTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
-import io.element.android.libraries.matrix.api.zero.wallet.tokenAmount
-import io.element.android.support.zero.common.ui.AvaxChainIcon
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.ui.WalletChainIcon
 
 @Composable
 fun WalletTransactionsList(
@@ -218,13 +216,12 @@ private fun TransactionRow(
                 contentDescription = null,
                 error = painterResource(R.drawable.ic_zero_avatar_default),
             )
-            transaction.token.chainId?.let {
-                if (WalletChainsUtil.isAvaxChain(it)) {
-                    AvaxChainIcon()
-                } else {
-                    ZChainIcon()
+            transaction.token.chainId?.let { chainId ->
+                val chain = WalletChainsUtil.getChain(chainId)
+                if (chain != null) {
+                    WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
                 }
-            } ?: ZChainIcon()
+            } ?: WalletChainIcon(icon = ImageVector.vectorResource(WalletChainsUtil.z_chain.logo))
         }
 
         Column(

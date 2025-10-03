@@ -14,5 +14,5 @@ data class TransferWalletTokenRequest(
     val to: String,
     val amount: String,
     val tokenAddress: String,
-    val chainId: Int
+    val chainId: Long
 )

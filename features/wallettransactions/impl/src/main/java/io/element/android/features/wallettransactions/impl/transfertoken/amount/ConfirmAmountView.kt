@@ -35,8 +35,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,12 +59,11 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.support.zero.common.ui.AvaxChainIcon
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.ui.WalletChainIcon
 import io.element.android.support.zero.common.ui.ZeroPrimaryButton
 
 @Composable
@@ -309,10 +310,12 @@ fun TokenView(
                 contentDescription = null,
                 error = painterResource(R.drawable.ic_zero_avatar_default)
             )
-            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
-                AvaxChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
-            } else {
-                ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            val chain = WalletChainsUtil.getChain(token.chainId)
+            if (chain != null) {
+                WalletChainIcon(
+                    modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f),
+                    icon = ImageVector.vectorResource(chain.logo)
+                )
             }
         }
 

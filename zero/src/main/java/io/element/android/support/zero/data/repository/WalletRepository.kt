@@ -26,21 +26,21 @@ interface WalletRepository {
 
     suspend fun getTransactions(walletAddress: String, nextPageParams: TransactionNextPageParams?): ApiWalletTransactions
 
-    suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt
+    suspend fun getTransactionReceipt(transactionHash: String, chainId: Long): ApiWalletTransactionReceipt
 
     suspend fun claimRewards(walletAddress: String): ApiTransactionPerformed
 
     suspend fun searchRecipients(query: String): List<ApiWalletRecipient>
 
-    suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): ApiWalletTransactionReceipt
+    suspend fun transferToken(sender: String, recipient: String, chainId: Long, amount: String, token: String): ApiWalletTransactionReceipt
 
-    suspend fun getTokenInfo(tokenAddress: String, chainId: Int): ApiWalletTokenInfo
+    suspend fun getTokenInfo(tokenAddress: String, chainId: Long): ApiWalletTokenInfo
 
-    suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): ApiWalletTokenBalance
+    suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Long): ApiWalletTokenBalance
 
-    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiTransactionPerformed
+    suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Long): ApiTransactionPerformed
 
-    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiWalletStakingApprovalResponse
+    suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Long): ApiWalletStakingApprovalResponse
 
     suspend fun getAvaxTokenPrice(tokenAddress: String): ApiAvaxTokenPrice
 }

@@ -53,7 +53,7 @@ class WalletRepositoryImpl(
         )
     }
 
-    override suspend fun getTransactionReceipt(transactionHash: String, chainId: Int): ApiWalletTransactionReceipt {
+    override suspend fun getTransactionReceipt(transactionHash: String, chainId: Long): ApiWalletTransactionReceipt {
         val receipt = zeroWalletService.getTransactionReceipt(transactionHash, chainId.toString())
         return receipt.copy(
             blockExplorerUrl = receipt.blockExplorerUrl.replace("zscan.io", "zscan.live")
@@ -68,7 +68,7 @@ class WalletRepositoryImpl(
         return zeroWalletService.searchRecipient(query).recipients
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): ApiWalletTransactionReceipt {
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Long, amount: String, token: String): ApiWalletTransactionReceipt {
         val transaction = zeroWalletService.transferToken(
             senderWalletAddress = sender,
             request = TransferWalletTokenRequest(to = recipient, amount = amount, tokenAddress = token, chainId = chainId)
@@ -76,20 +76,20 @@ class WalletRepositoryImpl(
         return getTransactionReceipt(transaction.transactionHash, chainId)
     }
 
-    override suspend fun getTokenInfo(tokenAddress: String, chainId: Int): ApiWalletTokenInfo {
+    override suspend fun getTokenInfo(tokenAddress: String, chainId: Long): ApiWalletTokenInfo {
         return zeroWalletService.getTokenInfo(tokenAddress, chainId.toString())
     }
 
-    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): ApiWalletTokenBalance {
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Long): ApiWalletTokenBalance {
         return zeroWalletService.getTokenBalance(userAddress, tokenAddress, chainId.toString())
     }
 
-    override suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiTransactionPerformed {
+    override suspend fun approveERC20(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Long): ApiTransactionPerformed {
         val request = ApproveERC20Request(amount = amount, spenderAddress = poolAddress, tokenAddress = tokenAddress, chainId = chainId)
         return zeroWalletService.approveERC20(userAddress, request)
     }
 
-    override suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Int): ApiWalletStakingApprovalResponse {
+    override suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Long): ApiWalletStakingApprovalResponse {
         return zeroWalletService.verifyERC20Approval(userAddress, tokenAddress, poolAddress, chainId = chainId.toString())
     }
 

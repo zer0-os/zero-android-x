@@ -38,8 +38,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,13 +62,12 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
-import io.element.android.support.zero.common.ui.AvaxChainIcon
 import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
 import io.element.android.support.zero.common.ui.TransactionInProgressView
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.ui.WalletChainIcon
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 
@@ -192,10 +193,9 @@ fun PoolDetailsView(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
-                    AvaxChainIcon()
-                } else {
-                    ZChainIcon()
+                val chain = WalletChainsUtil.getChain(pool.poolInfo.chainId)
+                if (chain != null) {
+                    WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
                 }
             }
             Column(
@@ -340,10 +340,9 @@ fun StakeUnstakeAmountView(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
-                    AvaxChainIcon()
-                } else {
-                    ZChainIcon()
+                val chain = WalletChainsUtil.getChain(pool.poolInfo.chainId)
+                if (chain != null) {
+                    WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
                 }
             }
             Column(
@@ -550,10 +549,9 @@ fun TransactionSuccessOrFailureView(
                         contentDescription = null,
                         error = painterResource(R.drawable.ic_zero_avatar_default)
                     )
-                    if (WalletChainsUtil.isAvaxChain(pool.poolInfo.chainId)) {
-                        AvaxChainIcon()
-                    } else {
-                        ZChainIcon()
+                    val chain = WalletChainsUtil.getChain(pool.poolInfo.chainId)
+                    if (chain != null) {
+                        WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
                     }
                 }
                 Column(

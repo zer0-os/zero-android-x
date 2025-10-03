@@ -14,5 +14,5 @@ data class ApproveERC20Request(
     val amount: String,
     val spenderAddress: String,
     val tokenAddress: String,
-    val chainId: Int
+    val chainId: Long
 )

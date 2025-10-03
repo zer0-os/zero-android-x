@@ -24,7 +24,7 @@ data class ApiWalletToken(
     val amount: String,
     val logo: String? = null,
     val decimals: Int,
-    val chainId: Int,
+    val chainId: Long,
     val percentChange: String? = null,
     val price: Double? = null
 )

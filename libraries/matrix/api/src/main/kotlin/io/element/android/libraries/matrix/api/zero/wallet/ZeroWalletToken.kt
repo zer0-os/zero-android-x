@@ -25,7 +25,7 @@ data class ZeroWalletToken(
     val amount: String,
     val logo: String?,
     val decimals: Int,
-    val chainId: Int,
+    val chainId: Long,
     val percentChange: String?,
     val price: Double?
 ): Parcelable

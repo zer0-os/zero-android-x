@@ -5,9 +5,7 @@
  * Please see LICENSE files in the repository root for full details.
  */
 
-package io.element.android.libraries.matrix.api.zero.staking
-
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+package io.element.android.support.zero.common.util.wallet
 
 object ZeroStakingUtil {
     // Meow Pool
@@ -17,7 +15,7 @@ object ZeroStakingUtil {
             address = "0xfbDC0647F0652dB9eC56c7f09B7dD3192324AD6a",
             name = "MEOW Pool",
             image = "https://zos.zero.tech/tokens/meow.png",
-            chainId = WalletChainsUtil.Z_CHAIN_ID
+            chainId = WalletChainsUtil.z_chain.chainId
         )
     }
 
@@ -28,11 +26,11 @@ object ZeroStakingUtil {
             address = "0xD7A1583286cEB8ce8F3C1a6d50C5eBDB1Cd83358",
             name = "MEOW Pool",
             image = "https://zos.zero.tech/tokens/meow-avax.png",
-            chainId = WalletChainsUtil.AVAX_CHAIN_ID
+            chainId = WalletChainsUtil.avax_chain.chainId
         )
     }
 
-    val stakePools = listOf<WalletStakePool>(meowPool, meowAvaxPool)
+    val stakePools = listOf(meowPool, meowAvaxPool)
 }
 
 data class WalletStakePool(
@@ -40,5 +38,5 @@ data class WalletStakePool(
     val address: String,
     val name: String,
     val image: String?,
-    val chainId: Int
+    val chainId: Long
 )

@@ -20,20 +20,22 @@ import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.support.zero.R
 
 @Composable
-fun AvaxChainIcon(
+fun WalletChainIcon(
     modifier: Modifier = Modifier,
+    icon: ImageVector,
     size: Dp = 16.dp,
 ) {
     Image(
         modifier = modifier
             .size(size),
-        imageVector = ImageVector.vectorResource(R.drawable.ic_avax_chain),
+        imageVector = icon,
         contentDescription = null,
     )
 }
 
 @PreviewsDayNight
 @Composable
-fun AvaxChainIconPreview() = ElementPreview {
-    AvaxChainIcon()
+fun WalletChainIconPreview() = ElementPreview {
+    WalletChainIcon(icon = ImageVector.vectorResource(R.drawable.ic_chain_z))
 }
+

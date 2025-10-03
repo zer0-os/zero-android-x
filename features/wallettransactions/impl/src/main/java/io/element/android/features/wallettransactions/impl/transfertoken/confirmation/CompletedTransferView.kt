@@ -30,8 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -54,15 +56,14 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionReceipt
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.displayName
 import io.element.android.libraries.matrix.ui.model.getAvatarData
-import io.element.android.support.zero.common.ui.AvaxChainIcon
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.ui.WalletChainIcon
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -133,10 +134,12 @@ fun TokenInfoView(
                 contentDescription = null,
                 error = painterResource(io.element.android.libraries.designsystem.R.drawable.ic_zero_avatar_default)
             )
-            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
-                AvaxChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
-            } else {
-                ZChainIcon(modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f))
+            val chain = WalletChainsUtil.getChain(token.chainId)
+            if (chain != null) {
+                WalletChainIcon(
+                    modifier = Modifier.align(Alignment.BottomEnd).zIndex(1f),
+                    icon = ImageVector.vectorResource(chain.logo)
+                )
             }
         }
 

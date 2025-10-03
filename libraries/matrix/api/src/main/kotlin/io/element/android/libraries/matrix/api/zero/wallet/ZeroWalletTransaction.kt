@@ -50,7 +50,7 @@ data class ZeroWalletTransactionToken(
     val name: String,
     val logo: String?,
     val decimals: Int? = null,
-    val chainId: Int? = null
+    val chainId: Long? = null
 ) : Parcelable
 
 @Parcelize

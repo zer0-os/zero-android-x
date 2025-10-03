@@ -526,7 +526,7 @@ class FakeMatrixClient(
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTransactionReceipt(transactionId: String, chainId: Int?): Result<ZeroWalletTransactionReceipt> {
+    override suspend fun getTransactionReceipt(transactionId: String, chainId: Long?): Result<ZeroWalletTransactionReceipt> {
         return Result.failure(Throwable("fake"))
     }
 
@@ -538,51 +538,51 @@ class FakeMatrixClient(
         return Result.success(emptyList())
     }
 
-    override suspend fun transferToken(sender: String, recipient: String, chainId: Int, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
+    override suspend fun transferToken(sender: String, recipient: String, chainId: Long, amount: String, token: String): Result<ZeroWalletTransactionReceipt> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTokenInfo(tokenAddress: String, chainId: Int): Result<ZeroWalletTokenInfo> {
+    override suspend fun getTokenInfo(tokenAddress: String, chainId: Long): Result<ZeroWalletTokenInfo> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Int): Result<ZeroWalletTokenBalance> {
+    override suspend fun getTokenBalance(userAddress: String, tokenAddress: String, chainId: Long): Result<ZeroWalletTokenBalance> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getTotalStaked(poolAddress: String, chainId: Int): Result<String> {
+    override suspend fun getTotalStaked(poolAddress: String, chainId: Long): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakingConfig(poolAddress: String, chainId: Int): Result<ZeroStakingConfig> {
+    override suspend fun getStakingConfig(poolAddress: String, chainId: Long): Result<ZeroStakingConfig> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingStatus> {
+    override suspend fun getStakerStatusInfo(userAddress: String, poolAddress: String, chainId: Long): Result<ZeroStakingStatus> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Int): Result<ZeroStakingUserRewardsInfo> {
+    override suspend fun getStakeRewardsInfo(userAddress: String, poolAddress: String, chainId: Long): Result<ZeroStakingUserRewardsInfo> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getStakingToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> {
+    override suspend fun getStakingToken(poolAddress: String, chainId: Long): Result<ZeroTokenAddress> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun getRewardToken(poolAddress: String, chainId: Int): Result<ZeroTokenAddress> {
+    override suspend fun getRewardToken(poolAddress: String, chainId: Long): Result<ZeroTokenAddress> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Int): Result<String> {
+    override suspend fun stakeAmount(userAddress: String, amount: String, poolAddress: String, tokenAddress: String, chainId: Long): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Int): Result<String> {
+    override suspend fun unstakeAmount(userAddress: String, amount: String, poolAddress: String, chainId: Long): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 
-    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Int): Result<String> {
+    override suspend fun claimStakingRewards(userAddress: String, poolAddress: String, chainId: Long): Result<String> {
         return Result.failure(Throwable("fake"))
     }
 

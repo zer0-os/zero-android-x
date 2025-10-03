@@ -35,7 +35,7 @@ data class ApiTransactionToken(
     val name: String,
     val logo: String? = null,
     val decimals: Int? = null,
-    val chainId: Int? = null
+    val chainId: Long? = null
 )
 
 @Serializable

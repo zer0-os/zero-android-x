@@ -64,9 +64,9 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
-import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUtil
+import io.element.android.support.zero.common.util.wallet.ZeroStakingUtil
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -812,7 +812,7 @@ class HomePresenter(
 
     private fun CoroutineScope.loadWalletTransaction(
         transactionId: String,
-        chainId: Int?,
+        chainId: Long?,
         walletTransactionUrlState: MutableState<AsyncAction<String>>,
         genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {

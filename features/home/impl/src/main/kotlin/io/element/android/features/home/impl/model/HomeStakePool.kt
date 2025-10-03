@@ -8,8 +8,7 @@
 package io.element.android.features.home.impl.model
 
 import androidx.compose.runtime.Immutable
-import io.element.android.libraries.matrix.api.zero.staking.WalletStakePool
-import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
+import io.element.android.support.zero.common.util.wallet.WalletStakePool
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
@@ -19,7 +18,7 @@ import io.element.android.support.zero.data.model.helper.RewardsUtil
 data class HomeStakePool(
     val userWalletAddress: String,
     val poolAddress: String,
-    val chainId: Int,
+    val chainId: Long,
     val poolIcon: String?,
     val poolDisplayName: String,
     val tokenAmount: String,

@@ -33,8 +33,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -51,15 +53,14 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
 import io.element.android.libraries.matrix.api.zero.wallet.meowPriceFormatted
 import io.element.android.libraries.matrix.api.zero.wallet.tokenPriceFormatted
 import io.element.android.support.zero.common.extension.roundTo
-import io.element.android.support.zero.common.ui.AvaxChainIcon
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.ui.WalletChainIcon
 import kotlin.math.abs
 
 @Composable
@@ -210,10 +211,9 @@ private fun TokenRow(
                 contentDescription = null,
                 error = painterResource(R.drawable.ic_zero_avatar_default)
             )
-            if (WalletChainsUtil.isAvaxChain(token.chainId)) {
-                AvaxChainIcon()
-            } else {
-                ZChainIcon()
+            val chain = WalletChainsUtil.getChain(token.chainId)
+            if (chain != null) {
+                WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
             }
         }
 

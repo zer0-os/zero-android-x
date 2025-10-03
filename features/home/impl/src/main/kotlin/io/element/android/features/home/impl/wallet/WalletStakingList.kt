@@ -20,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -34,9 +36,8 @@ import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.matrix.api.zero.wallet.WalletChainsUtil
-import io.element.android.support.zero.common.ui.AvaxChainIcon
-import io.element.android.support.zero.common.ui.ZChainIcon
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
+import io.element.android.support.zero.common.ui.WalletChainIcon
 
 @Composable
 fun WalletStakingList(
@@ -115,10 +116,9 @@ fun StakePoolCell(
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_zero_avatar_default)
                 )
-                if (WalletChainsUtil.isAvaxChain(pool.chainId)) {
-                    AvaxChainIcon()
-                } else {
-                    ZChainIcon()
+                val chain = WalletChainsUtil.getChain(pool.chainId)
+                if (chain != null) {
+                    WalletChainIcon(icon = ImageVector.vectorResource(chain.logo))
                 }
             }
             Text(
