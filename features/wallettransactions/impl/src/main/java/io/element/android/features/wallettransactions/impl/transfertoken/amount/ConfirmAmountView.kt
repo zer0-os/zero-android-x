@@ -53,6 +53,7 @@ import io.element.android.features.wallettransactions.impl.transfertoken.Transfe
 import io.element.android.features.wallettransactions.impl.transfertoken.TransferTokenState
 import io.element.android.features.wallettransactions.impl.transfertoken.TransferTokenStateProvider
 import io.element.android.features.wallettransactions.impl.transfertoken.token.SelectedRecipientView
+import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -65,6 +66,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.common.ui.WalletChainIcon
 import io.element.android.support.zero.common.ui.ZeroPrimaryButton
+import java.util.Locale
 
 @Composable
 fun ConfirmAmountView(
@@ -73,7 +75,7 @@ fun ConfirmAmountView(
 ) {
     val transferAmount = remember { mutableStateOf("0") }
     val isValidAmount: () -> Boolean = {
-        (transferAmount.value.toDoubleOrNull() ?: 0.0) > 0
+        (transferAmount.value.toLocalizedDoubleOrZero()) > 0
     }
     val sender = state.currentUser
     val recipient = state.recipient
@@ -186,8 +188,8 @@ fun TransferAmountInputField(
     }
 
     val onAmountChanged: (String) -> Unit = {
-        val tokenMaxAmount = token.amount.toDoubleOrNull() ?: 0.0
-        val enteredAmount = it.toDoubleOrNull() ?: 0.0
+        val tokenMaxAmount = token.amount.toLocalizedDoubleOrZero()
+        val enteredAmount = it.toLocalizedDoubleOrZero()
         if (enteredAmount > tokenMaxAmount) {
             amount.value = token.amount
         } else {
@@ -197,10 +199,10 @@ fun TransferAmountInputField(
     }
 
     val getBalance: () -> String = {
-        val tokenMaxAmount = token.amount.toDoubleOrNull() ?: 0.0
-        val enteredAmount = amount.value.toDoubleOrNull() ?: 0.0
+        val tokenMaxAmount = token.amount.toLocalizedDoubleOrZero()
+        val enteredAmount = amount.value.toLocalizedDoubleOrZero()
         val balance = maxOf(0.0, tokenMaxAmount.minus(enteredAmount))
-        String.format("%.2f", balance)
+        String.format(Locale.getDefault(), "%.2f", balance)
     }
 
     Column(horizontalAlignment = Alignment.Start) {

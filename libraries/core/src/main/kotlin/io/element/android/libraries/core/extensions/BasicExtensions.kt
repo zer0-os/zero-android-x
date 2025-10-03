@@ -8,6 +8,7 @@
 package io.element.android.libraries.core.extensions
 
 import java.text.Normalizer
+import java.text.NumberFormat
 import java.util.Locale
 
 fun Boolean.toOnOff() = if (this) "ON" else "OFF"
@@ -116,4 +117,19 @@ fun String.toSafeLength(
     } else {
         this
     }
+}
+
+fun String.toLocalizedDoubleOrZero(locale: Locale = Locale.getDefault()): Double {
+    return try {
+        val format = NumberFormat.getInstance(locale)
+        format.parse(this)?.toDouble() ?: 0.0
+    } catch (e: Exception) {
+        0.0
+    }
+}
+
+fun Double.toLocalizedString(locale: Locale = Locale.getDefault(), maximumFractionDigits: Int = 2): String {
+    val format = NumberFormat.getInstance(locale)
+    format.maximumFractionDigits = maximumFractionDigits
+    return format.format(this)
 }

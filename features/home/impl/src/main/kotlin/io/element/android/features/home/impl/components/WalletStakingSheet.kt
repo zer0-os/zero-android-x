@@ -55,6 +55,8 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.libraries.architecture.AsyncAction
+import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
+import io.element.android.libraries.core.extensions.toLocalizedString
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
@@ -62,7 +64,6 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
-import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.SwipeToConfirmButton
@@ -70,6 +71,7 @@ import io.element.android.support.zero.common.ui.TransactionInProgressView
 import io.element.android.support.zero.common.ui.WalletChainIcon
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 
 @Composable
 fun WalletStakingSheet(
@@ -318,8 +320,9 @@ fun StakeUnstakeAmountView(
     val rewardTokenName = pool.rewardsTokenInfo.name.uppercase()
 
     val isAmountValid: () -> Boolean = {
-        val amount = transactionAmount.value.toDoubleOrNull() ?: 0.0
-        amount > 0
+        val maxAmount = if (isUserStaking) pool.totalAvailableTokenBalance else pool.myStakedTokens
+        val amount = transactionAmount.value.toLocalizedDoubleOrZero()
+        amount > 0 && amount <= maxAmount
     }
 
     Column(horizontalAlignment = Alignment.Start) {
@@ -425,9 +428,9 @@ fun StakeUnstakeAmountView(
                     modifier = Modifier
                         .clickable {
                             if (isUserStaking) {
-                                transactionAmount.value = pool.totalAvailableTokenBalance.toString()
+                                transactionAmount.value = pool.totalAvailableTokenBalance.toLocalizedString()
                             } else {
-                                transactionAmount.value = pool.myStakedTokens.toString()
+                                transactionAmount.value = pool.myStakedTokens.toLocalizedString()
                             }
                         }
                         .border(
@@ -707,9 +710,9 @@ fun RowScope.StakeUnstakeAmountTextField(
 
     val onAmountChanged: (String) -> Unit = {
         val maxAmount = if (isUserStaking) pool.totalAvailableTokenBalance else pool.myStakedTokens
-        val enteredAmount = it.toDoubleOrNull() ?: 0.0
+        val enteredAmount = it.toLocalizedDoubleOrZero()
         if (enteredAmount > maxAmount) {
-            onAmountEntered(maxAmount.toString())
+            onAmountEntered(maxAmount.toLocalizedString())
         } else {
             onAmountEntered(it)
         }

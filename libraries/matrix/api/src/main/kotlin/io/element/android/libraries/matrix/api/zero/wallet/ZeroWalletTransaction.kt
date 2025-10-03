@@ -8,6 +8,7 @@
 package io.element.android.libraries.matrix.api.zero.wallet
 
 import android.os.Parcelable
+import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -39,7 +40,7 @@ val ZeroWalletTransaction.isClaimableTransaction: Boolean
     get() = isMeowTransaction || isVMeowTransaction
 
 val ZeroWalletTransaction.tokenAmount: Double
-    get() = amount.toDoubleOrNull() ?: 0.0
+    get() = amount.toLocalizedDoubleOrZero()
 
 val ZeroWalletTransaction.isTransactionReceived: Boolean
     get() = action.equals("Receive", true)

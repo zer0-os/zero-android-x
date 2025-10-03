@@ -44,6 +44,7 @@ import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.components.HomeTabContentEmptyView
+import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.atomic.atoms.PlaceholderAtom
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
@@ -246,7 +247,7 @@ private fun TokenRow(
 
             val priceChange = (when {
                 WalletChainsUtil.isAvaxChain(token.chainId) -> {
-                    token.percentChange?.toDoubleOrNull() ?: 0.0
+                    token.percentChange?.toLocalizedDoubleOrZero()
                 }
                 else -> meowPrice?.diff
             })?.roundTo(2)
