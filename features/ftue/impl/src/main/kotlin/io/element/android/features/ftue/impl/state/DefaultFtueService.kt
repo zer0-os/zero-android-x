@@ -17,7 +17,6 @@ import io.element.android.features.ftue.api.state.FtueService
 import io.element.android.features.ftue.api.state.FtueState
 import io.element.android.features.lockscreen.api.LockScreenService
 import io.element.android.features.networkmonitor.api.NetworkMonitor
-import io.element.android.features.networkmonitor.api.NetworkStatus
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -78,11 +77,14 @@ class DefaultFtueService(
 
     suspend fun getNextStep(currentStep: FtueStep? = null): FtueStep? =
         when (currentStep) {
-            null -> if (networkMonitor.connectivity.value == NetworkStatus.Disconnected) {
-                getNextStep(FtueStep.WaitingForInitialState)
-            } else if (!isSessionVerificationStateReady()) {
-                FtueStep.WaitingForInitialState
-            } else {
+            null -> {
+//                if (networkMonitor.connectivity.value == NetworkStatus.Disconnected) {
+//                    getNextStep(FtueStep.WaitingForInitialState)
+//                } else if (!isSessionVerificationStateReady()) {
+//                    FtueStep.WaitingForInitialState
+//                } else {
+//                    getNextStep(FtueStep.WaitingForInitialState)
+//                }
                 getNextStep(FtueStep.WaitingForInitialState)
             }
             FtueStep.WaitingForInitialState -> {
@@ -94,9 +96,12 @@ class DefaultFtueService(
                     getNextStep(FtueStep.CompleteProfile)
                 }
             }
-            FtueStep.CompleteProfile -> if (isSessionNotVerified()) {
-                FtueStep.SessionVerification
-            } else {
+            FtueStep.CompleteProfile -> {
+//                if (isSessionNotVerified()) {
+//                    FtueStep.SessionVerification
+//                } else {
+//                    getNextStep(FtueStep.SessionVerification)
+//                }
                 getNextStep(FtueStep.SessionVerification)
             }
             FtueStep.SessionVerification -> if (shouldAskNotificationPermissions()) {

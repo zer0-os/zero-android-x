@@ -24,6 +24,7 @@ import io.element.android.libraries.architecture.runCatchingUpdatingState
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.encryption.BackupUploadState
 import io.element.android.libraries.matrix.api.encryption.EncryptionService
+import io.element.android.libraries.matrix.api.encryption.RecoveryState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,8 @@ class DirectLogoutPresenter(
         }
             .collectAsState(initial = BackupUploadState.Unknown)
 
+        val recoveryStateState by encryptionService.recoveryStateStateFlow.collectAsState()
+
         val isLastDevice by encryptionService.isLastDevice.collectAsState()
 
         fun handleEvents(event: DirectLogoutEvents) {
@@ -62,9 +65,16 @@ class DirectLogoutPresenter(
             }
         }
 
+        val canDoDirectSignOut: () -> Boolean = {
+            when {
+                recoveryStateState == RecoveryState.DISABLED -> false
+                backupUploadState.isBackingUp() -> false
+                else -> true
+            }
+        }
+
         return DirectLogoutState(
-            canDoDirectSignOut = !isLastDevice &&
-                !backupUploadState.isBackingUp(),
+            canDoDirectSignOut = canDoDirectSignOut(),
             logoutAction = logoutAction.value,
             eventSink = ::handleEvents
         )

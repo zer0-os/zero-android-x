@@ -7,6 +7,8 @@
 
 package io.element.android.features.home.impl.roomlist
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -20,8 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,7 +34,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.R
-import io.element.android.features.home.impl.components.ConfirmRecoveryKeyBanner
 import io.element.android.features.home.impl.components.EmptyScaffold
 import io.element.android.features.home.impl.components.SetUpRecoveryKeyBanner
 import io.element.android.features.home.impl.contentType
@@ -62,6 +66,16 @@ fun RoomListContentView(
     onCreateRoomClick: () -> Unit,
     contentPadding: PaddingValues,
 ) {
+    var hasShownVerifyScreen by rememberSaveable { mutableStateOf(false) }
+    val showVerifyEncryptionScreen: () -> Unit = {
+        if (!hasShownVerifyScreen) {
+            hasShownVerifyScreen = true
+            Handler(Looper.getMainLooper()).postDelayed({
+                onSetUpRecoveryClick()
+            }, 2_000)
+        }
+    }
+
     when (contentState) {
         is RoomListContentState.Skeleton -> {
             RoomListSkeletonView(
@@ -78,6 +92,7 @@ fun RoomListContentView(
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onCreateRoomClick = onCreateRoomClick,
+                verifyEncryption = showVerifyEncryptionScreen
             )
         }
         is RoomListContentState.Rooms -> {
@@ -91,6 +106,7 @@ fun RoomListContentView(
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = onRoomClick,
+                verifyEncryption = showVerifyEncryptionScreen,
                 contentPadding = contentPadding,
             )
         }
@@ -125,6 +141,7 @@ private fun EmptyView(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onCreateRoomClick: () -> Unit,
+    verifyEncryption: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize()) {
@@ -149,10 +166,11 @@ private fun EmptyView(
                     )
                 }
                 SecurityBannerState.RecoveryKeyConfirmation -> {
-                    ConfirmRecoveryKeyBanner(
-                        onContinueClick = onConfirmRecoveryKeyClick,
-                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
-                    )
+//                    ConfirmRecoveryKeyBanner(
+//                        onContinueClick = onConfirmRecoveryKeyClick,
+//                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
+//                    )
+                    verifyEncryption.invoke()
                 }
                 SecurityBannerState.None -> Unit
             }
@@ -170,6 +188,7 @@ private fun RoomsView(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    verifyEncryption: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -187,6 +206,7 @@ private fun RoomsView(
             onSetUpRecoveryClick = onSetUpRecoveryClick,
             onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
             onRoomClick = onRoomClick,
+            verifyEncryption = verifyEncryption,
             contentPadding = contentPadding,
             modifier = modifier.fillMaxSize(),
         )
@@ -202,6 +222,7 @@ private fun RoomsViewList(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    verifyEncryption: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -223,7 +244,7 @@ private fun RoomsViewList(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
-        /*when (state.securityBannerState) {
+        when (state.securityBannerState) {
             SecurityBannerState.SetUpRecovery -> {
                 item {
                     SetUpRecoveryKeyBanner(
@@ -232,16 +253,10 @@ private fun RoomsViewList(
                     )
                 }
             }
-            else -> {}
             SecurityBannerState.RecoveryKeyConfirmation -> {
-                item {
-                    ConfirmRecoveryKeyBanner(
-                        onContinueClick = onConfirmRecoveryKeyClick,
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) },
-                    )
-                }
+                verifyEncryption()
             }
-            SecurityBannerState.None -> if (state.fullScreenIntentPermissionsState.shouldDisplayBanner) {
+            /*SecurityBannerState.None -> if (state.fullScreenIntentPermissionsState.shouldDisplayBanner) {
                 item {
                     FullScreenIntentPermissionBanner(state = state.fullScreenIntentPermissionsState)
                 }
@@ -249,8 +264,9 @@ private fun RoomsViewList(
                 item {
                     BatteryOptimizationBanner(state = state.batteryOptimizationState)
                 }
-            }
-        }*/
+            }*/
+            else -> {}
+        }
 
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.

@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,10 +36,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.features.preferences.impl.R
 import io.element.android.features.preferences.impl.user.UserPreferences
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
+import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
 import io.element.android.libraries.designsystem.preview.ElementPreviewDark
@@ -59,6 +62,7 @@ import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.ui.components.MatrixUserProvider
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.ClaimRewardsButton
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.ui.theme.SPACING_6X
@@ -88,6 +92,7 @@ fun PreferencesRootView(
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
+    var showLogoutErrorDialog by remember { mutableStateOf(false) }
 
     // Include pref from other modules
     PreferencePage(
@@ -127,7 +132,13 @@ fun PreferencesRootView(
             onInviteFriend = onInviteFriend,
             onManageWallets = onManageWallets,
             onOpenDeveloperSettings = onOpenDeveloperSettings,
-            onSignOutClick = onSignOutClick,
+            onSignOutClick = {
+                if (state.directLogoutState.canDoDirectSignOut) {
+                    onSignOutClick()
+                } else {
+                    showLogoutErrorDialog = true
+                }
+            },
         )
 
         HorizontalDivider()
@@ -170,6 +181,18 @@ fun PreferencesRootView(
 //                null
 //            }
         )
+
+        if (showLogoutErrorDialog) {
+            ErrorDialog(
+                content = "You have not setup a recovery key yet. Please generate your recovery key before you log out.",
+                submitText = "Settings",
+                onSubmit = {
+                    showLogoutErrorDialog = false
+                    onSecureBackupClick()
+                },
+                onDismiss = { showLogoutErrorDialog = false },
+            )
+        }
     }
 }
 
