@@ -16,7 +16,10 @@ object ZeroPatterns {
     ): String {
         val baseUrl = MATRIX_USER_LINK_BASE_URL
         val htmlBody: String = messageBody
-        val actualText: String = (text.orEmpty()).replace("\n", "<br>")
+
+        //        val actualText: String = (text.orEmpty()).replace("\n", "<br>")
+        //TODO: This is temporary fix. The library function `fromHtmlToSpans(formattedBody.body.trimEnd())` adds extra line breaks for `<br>` Tag
+        val actualText: String = (text.orEmpty()).replace("\n", "**LB**")
 
         // Use a regular expression to find user mentions in the format @[Name](user:UUID)
         val regexPattern = ZERO_USER_MENTION_REGEX
