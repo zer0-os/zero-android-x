@@ -256,20 +256,18 @@ class TimelineItemContentMessageFactory(
         if (formattedBody == null || formattedBody.format != MessageFormat.HTML) return null
         val result = htmlConverterProvider.provide()
             .fromHtmlToSpans(formattedBody.body.trimEnd())
+            //TODO: This is temporary fix. The library function `fromHtmlToSpans(formattedBody.body.trimEnd())` adds extra line breaks for `<br>` Tag
+            .replace(Regex("\\*\\*LB\\*\\*"), "\n")
             .let { textPillificationHelper.pillify(it) }
             .safeLinkify()
-
-        //TODO: This is temporary fix. The library function `fromHtmlToSpans(formattedBody.body.trimEnd())` adds extra line breaks for `<br>` Tag
-        val mResult = result.toString().replace("**LB**", "\n")
-
         return if (prefix != null) {
             buildSpannedString {
                 append(prefix)
                 append(" ")
-                append(mResult)
+                append(result)
             }
         } else {
-            mResult
+            result
         }
     }
 }
