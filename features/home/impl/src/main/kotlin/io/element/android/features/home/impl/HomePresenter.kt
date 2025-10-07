@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Inject
+import io.element.android.features.announcement.api.Announcement
+import io.element.android.features.announcement.api.AnnouncementService
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenChannel
@@ -118,6 +120,7 @@ class HomePresenter(
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val featureFlagService: FeatureFlagService,
     private val sessionStore: SessionStore,
+    private val announcementService: AnnouncementService,
 ) : Presenter<HomeState> {
 
     private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
@@ -228,7 +231,10 @@ class HomePresenter(
 
         fun handleEvents(event: HomeEvents) {
             when (event) {
-                is HomeEvents.SelectHomeNavigationBarItem -> {
+                is HomeEvents.SelectHomeNavigationBarItem -> coroutineState.launch {
+                    if (event.item == HomeNavigationBarItem.Spaces) {
+                        announcementService.showAnnouncement(Announcement.Space)
+                    }
                     currentHomeNavigationBarItemOrdinal = event.item.ordinal
                 }
                 is HomeEvents.DismissRewardsIntimation -> {

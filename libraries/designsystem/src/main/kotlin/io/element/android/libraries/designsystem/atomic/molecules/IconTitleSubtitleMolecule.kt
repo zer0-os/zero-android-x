@@ -7,7 +7,9 @@
 
 package io.element.android.libraries.designsystem.atomic.molecules
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.libraries.designsystem.atomic.atoms.BetaLabel
 import io.element.android.libraries.designsystem.components.BigIcon
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -33,6 +36,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
  * @param subTitle the subtitle to display
  * @param iconStyle the style of the [BigIcon] to display
  * @param modifier the modifier to apply to this layout
+ * @param showBetaLabel whether to show a "BETA" label next to the title
  */
 @Composable
 fun IconTitleSubtitleMolecule(
@@ -40,6 +44,7 @@ fun IconTitleSubtitleMolecule(
     subTitle: String?,
     iconStyle: BigIcon.Style,
     modifier: Modifier = Modifier,
+    showBetaLabel: Boolean = false,
 ) {
     Column(modifier) {
         BigIcon(
@@ -47,17 +52,25 @@ fun IconTitleSubtitleMolecule(
             style = iconStyle,
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics {
-                    heading()
-                },
-            textAlign = TextAlign.Center,
-            style = ElementTheme.zeroTypography.fontHeadingMdBold,
-            color = ElementTheme.colors.textPrimary,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier
+                    .semantics {
+                        heading()
+                    },
+                textAlign = TextAlign.Center,
+                style = ElementTheme.zeroTypography.fontHeadingMdBold,
+                color = ElementTheme.colors.textPrimary,
+            )
+            if (showBetaLabel) {
+                BetaLabel()
+            }
+        }
         if (subTitle != null) {
             Spacer(Modifier.height(8.dp))
             Text(
