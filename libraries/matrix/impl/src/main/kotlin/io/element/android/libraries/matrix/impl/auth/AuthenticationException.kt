@@ -8,8 +8,6 @@
 package io.element.android.libraries.matrix.impl.auth
 
 import io.element.android.libraries.matrix.api.auth.AuthenticationException
-import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
-import io.element.android.support.zero.network.model.response.ApiErrorResponse
 import org.matrix.rustcomponents.sdk.ClientBuildException
 import org.matrix.rustcomponents.sdk.OidcException
 import retrofit2.HttpException
@@ -38,31 +36,9 @@ fun Throwable.mapAuthenticationException(): AuthenticationException {
         }
         // Handling ZERO error cases
         is HttpException -> {
-            val zeroError = parseError(this)
-            if (zeroError != null) {
-                when (zeroError.code) {
-                    "INVALID_EMAIL_PASSWORD" -> AuthenticationException.Generic("Incorrect email or password")
-                    "INVALID_OTP" -> AuthenticationException.Generic("Invalid or expired OTP")
-                    "USER_NOT_FOUND" -> AuthenticationException.Generic("User not found")
-                    "INVITE_CODE_NOT_FOUND" -> AuthenticationException.Generic("Invite code not found. Please check your invite message.")
-                    "PROFILE_PRIMARY_EMAIL_ALREADY_EXISTS" -> AuthenticationException.Generic("This email is already associated with a ZERO account")
-                    "PUBLIC_ADDRESS_ALREADY_EXISTS" -> AuthenticationException.Generic("This wallet is already associated with a ZERO account")
-                    else -> AuthenticationException.Generic(zeroError.message)
-                }
-            } else {
-                AuthenticationException.Generic(message)
-            }
+            val zeroException = this.mapZeroException(fallback = AuthenticationException.Generic(message))
+            AuthenticationException.Generic(zeroException.message ?: message)
         }
         else -> AuthenticationException.Generic(message)
-    }
-}
-
-private fun parseError(exception: HttpException): ApiErrorResponse? {
-    return try {
-        val errorBody = exception.response()?.errorBody()?.string()
-        if (errorBody.isNullOrEmpty()) return null
-        errorBody.decodeJson<ApiErrorResponse>()
-    } catch (e: Exception) {
-        null // fallback if parsing fails
     }
 }

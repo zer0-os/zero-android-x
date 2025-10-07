@@ -8,6 +8,8 @@
 package io.element.android.libraries.matrix.impl.exception
 
 import io.element.android.libraries.matrix.api.exception.ClientException
+import io.element.android.libraries.matrix.impl.auth.mapZeroException
+import retrofit2.HttpException
 import org.matrix.rustcomponents.sdk.ClientException as RustClientException
 
 fun Throwable.mapClientException(): ClientException {
@@ -22,6 +24,11 @@ fun Throwable.mapClientException(): ClientException {
                     details = details,
                 )
             }
+        }
+        is HttpException -> {
+            val fallback = Exception(message ?: "Unknown error")
+            val zeroException = this.mapZeroException(fallback = fallback)
+            ClientException.Other(zeroException.message ?: message ?: "Unknown error")
         }
         else -> ClientException.Other(message ?: "Unknown error")
     }

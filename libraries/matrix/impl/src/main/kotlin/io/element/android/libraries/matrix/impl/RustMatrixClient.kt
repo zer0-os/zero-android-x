@@ -1262,6 +1262,8 @@ class RustMatrixClient(
             runCatching {
                 val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
                 walletRepo.transferToken(sender, recipient, chainId, amount, token).toModel()
+            }.mapFailure {
+                it.mapClientException()
             }
         }
 
@@ -1348,6 +1350,8 @@ class RustMatrixClient(
                 walletRepo.verifyERC20Approval(userAddress, poolAddress, tokenAddress, chainId)
                 //4. stake amount
                 stake.stakeAmount(userAddress, amount, poolAddress, chainId).transactionHash
+            }.mapFailure {
+                it.mapClientException()
             }
         }
 
@@ -1356,6 +1360,8 @@ class RustMatrixClient(
             runCatching {
                 val stake = zeroCoreRepository?.stake ?: return@withContext Result.failure(Throwable("Stake repository is not initialized yet."))
                 stake.unstakeAmount(userAddress, amount, poolAddress, chainId).transactionHash
+            }.mapFailure {
+                it.mapClientException()
             }
         }
 

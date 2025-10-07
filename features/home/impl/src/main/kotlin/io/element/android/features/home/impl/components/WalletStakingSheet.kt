@@ -121,6 +121,7 @@ fun WalletStakingSheet(
                     isUserStaking = (isUserStaking.value == true),
                     transactionAmount = transactionAmount.value,
                     isSuccess = false,
+                    error = actionState.error.message,
                     onDismiss = {
                         eventSink(HomeEvents.DismissStakingSheet)
                     }
@@ -519,6 +520,7 @@ fun TransactionSuccessOrFailureView(
     isUserStaking: Boolean = true,
     transactionAmount: String,
     isSuccess: Boolean,
+    error: String? = null,
     onDismiss: () -> Unit,
 ) {
     val stakeTokenName = pool.stakeTokenInfo.name.uppercase()
@@ -581,13 +583,13 @@ fun TransactionSuccessOrFailureView(
                 if (isSuccess) {
                     "You have successfully staked $transactionAmount $stakeTokenName without lock."
                 } else {
-                    "Failed to stake $transactionAmount $stakeTokenName without lock."
+                    error ?: "Failed to stake $transactionAmount $stakeTokenName without lock."
                 }
             } else {
                 if (isSuccess) {
                     "You have successfully unstaked $transactionAmount $stakeTokenName, and claimed your pool rewards."
                 } else {
-                    "Failed to unstake $transactionAmount $stakeTokenName, and claim your pool rewards."
+                    error ?: "Failed to unstake $transactionAmount $stakeTokenName, and claim your pool rewards."
                 }
             }
             val color = if (isSuccess) {
