@@ -17,14 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.Lifecycle
 import io.element.android.appnav.R
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialog
 import io.element.android.libraries.designsystem.components.dialogs.ErrorDialogWithDoNotShowAgain
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.matrix.api.exception.isNetworkError
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.component.BorderLoadingView
 
 @Composable
 fun LoggedInView(
@@ -42,9 +45,15 @@ fun LoggedInView(
             .fillMaxSize()
             .systemBarsPadding()
     ) {
-        SyncStateView(
+        /*SyncStateView(
             modifier = Modifier.align(Alignment.TopCenter),
             isVisible = state.showSyncSpinner,
+        )*/
+        BorderLoadingView(
+            modifier = Modifier.fillMaxSize(),
+            baseColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.5f),
+            highlightColor = ElementTheme.colors.zeroBrandColor,
+            isVisible = state.showSyncSpinner
         )
     }
     when (state.pusherRegistrationState) {
