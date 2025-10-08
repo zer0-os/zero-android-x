@@ -73,7 +73,15 @@ interface MatrixClient {
     val userProfile: StateFlow<MatrixUser>
     val roomListService: RoomListService
     val spaceService: SpaceService
-    val mediaLoader: MatrixMediaLoader
+    val syncService: SyncService
+    val sessionVerificationService: SessionVerificationService
+    val pushersService: PushersService
+    val notificationService: NotificationService
+    val notificationSettingsService: NotificationSettingsService
+    val encryptionService: EncryptionService
+    val roomDirectoryService: RoomDirectoryService
+    val mediaPreviewService: MediaPreviewService
+    val matrixMediaLoader: MatrixMediaLoader
     val sessionCoroutineScope: CoroutineScope
     val ignoredUsersFlow: StateFlow<ImmutableList<UserId>>
 
@@ -84,6 +92,7 @@ interface MatrixClient {
     val allFeeds: StateFlow<List<ZeroFeed>>
     val allMyFeeds: StateFlow<List<ZeroFeed>>
 
+    val roomMembershipObserver: RoomMembershipObserver
     suspend fun getJoinedRoom(roomId: RoomId): JoinedRoom?
     suspend fun getRoom(roomId: RoomId): BaseRoom?
     suspend fun findDM(userId: UserId): Result<RoomId?>
@@ -103,14 +112,6 @@ interface MatrixClient {
     suspend fun leaveInvitedRoom(roomId: RoomId): Result<Unit>
     suspend fun joinRoomByIdOrAlias(roomIdOrAlias: RoomIdOrAlias, serverNames: List<String>): Result<RoomInfo?>
     suspend fun knockRoom(roomIdOrAlias: RoomIdOrAlias, message: String, serverNames: List<String>): Result<RoomInfo?>
-    fun syncService(): SyncService
-    fun sessionVerificationService(): SessionVerificationService
-    fun pushersService(): PushersService
-    fun notificationService(): NotificationService
-    fun notificationSettingsService(): NotificationSettingsService
-    fun encryptionService(): EncryptionService
-    fun roomDirectoryService(): RoomDirectoryService
-    fun mediaPreviewService(): MediaPreviewService
     suspend fun getCacheSize(): Long
 
     /**
@@ -132,7 +133,6 @@ interface MatrixClient {
     suspend fun getUserProfile(forceRefresh: Boolean = false): Result<MatrixUser>
     suspend fun getAccountManagementUrl(action: AccountManagementAction?): Result<String?>
     suspend fun uploadMedia(mimeType: String, data: ByteArray): Result<String>
-    fun roomMembershipObserver(): RoomMembershipObserver
 
     /**
      * Get a room info flow for a given room ID.

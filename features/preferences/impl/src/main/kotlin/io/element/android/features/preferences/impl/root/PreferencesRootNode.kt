@@ -44,6 +44,7 @@ class PreferencesRootNode(
         fun onOpenNotificationSettings()
         fun onOpenLockScreenSettings()
         fun onOpenAdvancedSettings()
+        fun onOpenLabs()
         fun onOpenUserProfile(matrixUser: MatrixUser)
         fun onOpenBlockedUsers()
         fun onSignOutClick()
@@ -71,6 +72,10 @@ class PreferencesRootNode(
 
     private fun onOpenAdvancedSettings() {
         plugins<Callback>().forEach { it.onOpenAdvancedSettings() }
+    }
+
+    private fun onOpenLabs() {
+        plugins<Callback>().forEach { it.onOpenLabs() }
     }
 
     private fun onOpenAnalytics() {
@@ -147,6 +152,7 @@ class PreferencesRootNode(
             onSecureBackupClick = this::onSecureBackupClick,
             onOpenDeveloperSettings = this::onOpenDeveloperSettings,
             onOpenAdvancedSettings = this::onOpenAdvancedSettings,
+//            onOpenLabs = this::onOpenLabs,
             onManageAccountClick = { onManageAccountClick(activity, it, isDark) },
             onOpenNotificationSettings = this::onOpenNotificationSettings,
             onOpenLockScreenSettings = this::onOpenLockScreenSettings,

@@ -75,7 +75,7 @@ import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
-import io.element.android.libraries.matrix.api.room.join.JoinRule
+import io.element.android.libraries.matrix.api.spaces.SpaceRoomVisibility
 import io.element.android.libraries.matrix.ui.components.SpaceInfoRow
 import io.element.android.libraries.matrix.ui.components.SpaceMembersView
 import io.element.android.libraries.matrix.ui.model.InviteSender
@@ -568,10 +568,7 @@ private fun DefaultLoadedContent(
         subtitle = {
             when {
                 contentState.details is LoadedDetails.Space -> {
-                    SpaceInfoRow(
-                        joinRule = contentState.joinRule ?: JoinRule.Public,
-                        numberOfRooms = contentState.details.childrenCount,
-                    )
+                    SpaceInfoRow(visibility = SpaceRoomVisibility.fromJoinRule(contentState.joinRule))
                 }
                 contentState.alias != null -> {
                     RoomPreviewSubtitleAtom(contentState.alias.value)

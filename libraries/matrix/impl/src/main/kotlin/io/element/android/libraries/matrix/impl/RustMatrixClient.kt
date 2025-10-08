@@ -24,13 +24,8 @@ import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.createroom.CreateRoomParameters
 import io.element.android.libraries.matrix.api.createroom.RoomPreset
-import io.element.android.libraries.matrix.api.encryption.EncryptionService
 import io.element.android.libraries.matrix.api.media.MatrixMediaLoader
-import io.element.android.libraries.matrix.api.media.MediaPreviewService
-import io.element.android.libraries.matrix.api.notification.NotificationService
-import io.element.android.libraries.matrix.api.notificationsettings.NotificationSettingsService
 import io.element.android.libraries.matrix.api.oidc.AccountManagementAction
-import io.element.android.libraries.matrix.api.pusher.PushersService
 import io.element.android.libraries.matrix.api.room.BaseRoom
 import io.element.android.libraries.matrix.api.room.CurrentUserMembership
 import io.element.android.libraries.matrix.api.room.JoinedRoom
@@ -40,17 +35,14 @@ import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomMembershipObserver
 import io.element.android.libraries.matrix.api.room.alias.ResolvedRoomAlias
 import io.element.android.libraries.matrix.api.room.join.JoinRule
-import io.element.android.libraries.matrix.api.roomdirectory.RoomDirectoryService
 import io.element.android.libraries.matrix.api.roomdirectory.RoomVisibility
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.spaces.SpaceService
 import io.element.android.libraries.matrix.api.sync.SlidingSyncVersion
-import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.sync.SyncState
 import io.element.android.libraries.matrix.api.user.MatrixSearchUserResults
 import io.element.android.libraries.matrix.api.user.MatrixUser
-import io.element.android.libraries.matrix.api.verification.SessionVerificationService
 import io.element.android.libraries.matrix.api.zero.feed.CreateFeedMediaAttachment
 import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
@@ -66,7 +58,6 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewar
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
-import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
@@ -117,6 +108,7 @@ import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.support.zero.data.conversion.toApi
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
@@ -172,11 +164,10 @@ import org.matrix.rustcomponents.sdk.SyncService as ClientSyncService
 
 class RustMatrixClient(
     private val innerClient: Client,
-    private val baseDirectory: File,
     private val sessionStore: SessionStore,
-    private val appCoroutineScope: CoroutineScope,
     private val sessionDelegate: RustClientSessionDelegate,
     private val innerSyncService: ClientSyncService,
+    appCoroutineScope: CoroutineScope,
     dispatchers: CoroutineDispatchers,
     baseCacheDirectory: File,
     clock: SystemClock,
@@ -192,30 +183,30 @@ class RustMatrixClient(
     private val innerRoomListService = innerSyncService.roomListService()
     private val innerSpaceService = innerClient.spaceService()
 
-    private val roomMembershipObserver = RoomMembershipObserver()
+    override val roomMembershipObserver = RoomMembershipObserver()
 
-    private val rustSyncService = RustSyncService(
+    override val syncService = RustSyncService(
         inner = innerSyncService,
         dispatcher = sessionDispatcher,
         sessionCoroutineScope = sessionCoroutineScope
     )
-    private val pushersService = RustPushersService(
+    override val pushersService = RustPushersService(
         client = innerClient,
         dispatchers = dispatchers,
     )
     private val notificationProcessSetup = NotificationProcessSetup.SingleProcess(innerSyncService)
     private val innerNotificationClient = runBlocking { innerClient.notificationClient(notificationProcessSetup) }
-    private val notificationService = RustNotificationService(sessionId, innerNotificationClient, dispatchers, clock)
-    private val notificationSettingsService = RustNotificationSettingsService(innerClient, sessionCoroutineScope, dispatchers)
-    private val encryptionService = RustEncryptionService(
+    override val notificationService = RustNotificationService(sessionId, innerNotificationClient, dispatchers, clock)
+    override val notificationSettingsService = RustNotificationSettingsService(innerClient, sessionCoroutineScope, dispatchers)
+    override val encryptionService = RustEncryptionService(
         client = innerClient,
-        syncService = rustSyncService,
+        syncService = syncService,
         sessionCoroutineScope = sessionCoroutineScope,
         zeroAccountRepository = zeroCoreRepository?.account,
         dispatchers = dispatchers,
     )
 
-    private val roomDirectoryService = RustRoomDirectoryService(
+    override val roomDirectoryService = RustRoomDirectoryService(
         client = innerClient,
         sessionDispatcher = sessionDispatcher,
     )
@@ -242,9 +233,9 @@ class RustMatrixClient(
         sessionDispatcher = sessionDispatcher,
     )
 
-    private val verificationService = RustSessionVerificationService(
+    override val sessionVerificationService = RustSessionVerificationService(
         client = innerClient,
-        isSyncServiceReady = rustSyncService.syncState.map { it == SyncState.Running },
+        isSyncServiceReady = syncService.syncState.map { it == SyncState.Running },
         sessionCoroutineScope = sessionCoroutineScope,
     )
 
@@ -268,13 +259,13 @@ class RustMatrixClient(
         zeroCoreRepository = zeroCoreRepository
     )
 
-    override val mediaLoader: MatrixMediaLoader = RustMediaLoader(
+    override val matrixMediaLoader: MatrixMediaLoader = RustMediaLoader(
         baseCacheDirectory = baseCacheDirectory,
         dispatchers = dispatchers,
         innerClient = innerClient,
     )
 
-    private val mediaPreviewService = RustMediaPreviewService(
+    override val mediaPreviewService = RustMediaPreviewService(
         sessionCoroutineScope = sessionCoroutineScope,
         innerClient = innerClient,
         sessionDispatcher = sessionDispatcher,
@@ -666,33 +657,17 @@ class RustMatrixClient(
         }.mapFailure { it.mapClientException() }
     }
 
-    override fun syncService(): SyncService = rustSyncService
-
-    override fun sessionVerificationService(): SessionVerificationService = verificationService
-
-    override fun pushersService(): PushersService = pushersService
-
-    override fun notificationService(): NotificationService = notificationService
-
-    override fun encryptionService(): EncryptionService = encryptionService
-
-    override fun notificationSettingsService(): NotificationSettingsService = notificationSettingsService
-
-    override fun roomDirectoryService(): RoomDirectoryService = roomDirectoryService
-
-    override fun mediaPreviewService(): MediaPreviewService = mediaPreviewService
-
     internal suspend fun destroy() {
         innerNotificationClient.close()
 
         roomFactory.destroy()
-        rustSyncService.destroy()
+        syncService.destroy()
         notificationSettingsService.destroy()
         notificationProcessSetup.destroy()
 
         sessionCoroutineScope.cancel()
         clientDelegateTaskHandle?.cancelAndDestroy()
-        verificationService.destroy()
+        sessionVerificationService.destroy()
 
         sessionDelegate.clearCurrentClient()
         innerRoomListService.close()
@@ -703,7 +678,7 @@ class RustMatrixClient(
     }
 
     override suspend fun getCacheSize(): Long {
-        return baseDirectory.getCacheSize()
+        return getCacheSize(includeCryptoDb = false)
     }
 
     override suspend fun clearCache() {
@@ -804,8 +779,6 @@ class RustMatrixClient(
         }
     }
 
-    override fun roomMembershipObserver(): RoomMembershipObserver = roomMembershipObserver
-
     override fun getRoomInfoFlow(roomId: RoomId): Flow<Optional<RoomInfo>> {
         return mxCallbackFlow {
             val roomNotFound = innerRoomListService.roomOrNull(roomId.value).use { it == null }
@@ -887,7 +860,7 @@ class RustMatrixClient(
         }
     }
 
-    private suspend fun File.getCacheSize(
+    private suspend fun getCacheSize(
         includeCryptoDb: Boolean = false,
     ): Long = withContext(sessionDispatcher) {
         val sessionDirectory = sessionPathsProvider.provides(sessionId) ?: return@withContext 0L

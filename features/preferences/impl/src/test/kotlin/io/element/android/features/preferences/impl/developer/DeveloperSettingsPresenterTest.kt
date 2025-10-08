@@ -23,6 +23,7 @@ import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.core.meta.BuildType
 import io.element.android.libraries.featureflag.api.FeatureFlags
+import io.element.android.libraries.featureflag.test.FakeFeature
 import io.element.android.libraries.featureflag.test.FakeFeatureFlagService
 import io.element.android.libraries.matrix.test.core.aBuildMeta
 import io.element.android.libraries.preferences.test.InMemoryAppPreferencesStore
@@ -39,7 +40,16 @@ class DeveloperSettingsPresenterTest {
 
     @Test
     fun `present - ensures initial states are correct`() = runTest {
-        val presenter = createDeveloperSettingsPresenter()
+        val availableFeatures = listOf(
+            FakeFeature(
+                key = "feature_1",
+                title = "Feature 1",
+                isInLabs = false,
+            )
+        )
+        val presenter = createDeveloperSettingsPresenter(
+            featureFlagService = FakeFeatureFlagService(providedAvailableFeatures = availableFeatures)
+        )
         presenter.test {
             awaitItem().also { state ->
                 assertThat(state.features).isEmpty()
@@ -54,8 +64,7 @@ class DeveloperSettingsPresenterTest {
             }
             awaitItem().also { state ->
                 assertThat(state.features).isNotEmpty()
-                val numberOfModifiableFeatureFlags = FeatureFlags.entries.count { it.isFinished.not() }
-                assertThat(state.features).hasSize(numberOfModifiableFeatureFlags)
+                assertThat(state.features).hasSize(1)
                 assertThat(state.tracingLogLevel.dataOrNull()).isEqualTo(LogLevelItem.INFO)
             }
             awaitItem().also { state ->
@@ -165,8 +174,51 @@ class DeveloperSettingsPresenterTest {
         }
     }
 
+    @Test
+    fun `present - won't display features in labs or finished`() = runTest {
+        val availableFeatures = listOf(
+            // Only this feature should be displayed
+            FakeFeature(
+                key = "feature_1",
+                title = "Feature 1",
+                isInLabs = false,
+            ),
+            FakeFeature(
+                key = "feature_2",
+                title = "Feature 2",
+                isInLabs = true,
+            ),
+            FakeFeature(
+                key = "feature_3",
+                title = "Feature 3",
+                isInLabs = false,
+                isFinished = true,
+            )
+        )
+
+        val presenter = createDeveloperSettingsPresenter(
+            featureFlagService = FakeFeatureFlagService(
+                providedAvailableFeatures = availableFeatures,
+            )
+        )
+        presenter.test {
+            skipItems(2)
+            awaitItem().also { state ->
+                assertThat(state.features).hasSize(1)
+            }
+        }
+    }
+
     private fun createDeveloperSettingsPresenter(
-        featureFlagService: FakeFeatureFlagService = FakeFeatureFlagService(),
+        featureFlagService: FakeFeatureFlagService = FakeFeatureFlagService(
+            providedAvailableFeatures = listOf(
+                FakeFeature(
+                    key = "feature_1",
+                    title = "Feature 1",
+                    isInLabs = false,
+                )
+            )
+        ),
         cacheSizeUseCase: FakeComputeCacheSizeUseCase = FakeComputeCacheSizeUseCase(),
         clearCacheUseCase: FakeClearCacheUseCase = FakeClearCacheUseCase(),
         preferencesStore: InMemoryAppPreferencesStore = InMemoryAppPreferencesStore(),
