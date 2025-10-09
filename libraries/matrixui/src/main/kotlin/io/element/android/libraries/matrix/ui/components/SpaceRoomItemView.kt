@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -54,6 +53,8 @@ import io.element.android.libraries.matrix.ui.model.icon
 import io.element.android.libraries.matrix.ui.model.label
 import io.element.android.libraries.ui.strings.CommonPlurals
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SpaceRoomItemView(
@@ -71,13 +72,15 @@ fun SpaceRoomItemView(
         avatarData = spaceRoom.getAvatarData(AvatarSize.SpaceListItem),
         isSpace = spaceRoom.isSpace,
         hideAvatars = hideAvatars,
+        heroes = spaceRoom.heroes
+            .map { hero -> hero.getAvatarData(AvatarSize.SpaceListItem) }
+            .toImmutableList(),
         onClick = onClick,
         onLongClick = onLongClick,
         trailingAction = trailingAction,
     ) {
         NameAndIndicatorRow(
-            isSpace = spaceRoom.isSpace,
-            name = spaceRoom.name,
+            name = spaceRoom.displayName,
             showIndicator = showUnreadIndicator
         )
         Spacer(modifier = Modifier.height(1.dp))
@@ -92,7 +95,6 @@ fun SpaceRoomItemView(
                 modifier = Modifier.weight(1f),
                 style = ElementTheme.typography.fontBodyMdRegular,
                 text = info,
-                fontStyle = FontStyle.Italic.takeIf { spaceRoom.name == null },
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -118,8 +120,8 @@ private fun SubtitleRow(
         if (visibilityIcon != null) {
             Icon(
                 modifier = Modifier
-                        .size(16.dp)
-                        .padding(end = 4.dp),
+                    .size(16.dp)
+                    .padding(end = 4.dp),
                 imageVector = visibilityIcon,
                 contentDescription = null,
                 tint = ElementTheme.colors.iconTertiary,
@@ -138,8 +140,7 @@ private fun SubtitleRow(
 
 @Composable
 private fun NameAndIndicatorRow(
-    isSpace: Boolean,
-    name: String?,
+    name: String,
     showIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -151,8 +152,7 @@ private fun NameAndIndicatorRow(
         Text(
             modifier = Modifier.weight(1f),
             style = ElementTheme.typography.fontBodyLgMedium,
-            text = name ?: stringResource(id = if (isSpace) CommonStrings.common_no_space_name else CommonStrings.common_no_room_name),
-            fontStyle = FontStyle.Italic.takeIf { name == null },
+            text = name,
             color = ElementTheme.colors.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -169,6 +169,7 @@ private fun NameAndIndicatorRow(
 private fun SpaceRoomItemScaffold(
     avatarData: AvatarData,
     isSpace: Boolean,
+    heroes: ImmutableList<AvatarData>,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     hideAvatars: Boolean,
@@ -177,24 +178,24 @@ private fun SpaceRoomItemScaffold(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val clickModifier = Modifier
-            .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                    onLongClickLabel = stringResource(CommonStrings.action_open_context_menu),
-                    indication = ripple(),
-                    interactionSource = remember { MutableInteractionSource() }
-            )
-            .onKeyboardContextMenuAction { onLongClick }
+        .combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick,
+            onLongClickLabel = stringResource(CommonStrings.action_open_context_menu),
+            indication = ripple(),
+            interactionSource = remember { MutableInteractionSource() }
+        )
+        .onKeyboardContextMenuAction { onLongClick }
     Row(
         modifier = modifier
-                .fillMaxWidth()
-                .then(clickModifier)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(IntrinsicSize.Min),
+            .fillMaxWidth()
+            .then(clickModifier)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .height(IntrinsicSize.Min),
     ) {
         Avatar(
             avatarData = avatarData,
-            avatarType = if (isSpace) AvatarType.Space() else AvatarType.Room(),
+            avatarType = if (isSpace) AvatarType.Space() else AvatarType.Room(heroes = heroes),
             hideImage = hideAvatars,
         )
         Spacer(modifier = Modifier.width(16.dp))
