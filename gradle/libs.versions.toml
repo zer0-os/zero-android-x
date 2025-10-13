@@ -47,7 +47,7 @@ coil = "3.3.0"
 showkase = "1.0.5"
 appyx = "1.7.1"
 sqldelight = "2.1.0"
-wysiwyg = "2.39.0"
+wysiwyg = "2.40.0"
 telephoto = "0.18.0"
 haze = "1.6.10"
 
@@ -55,7 +55,7 @@ haze = "1.6.10"
 dependencyAnalysis = "3.0.4"
 
 # DI
-metro = "0.6.8"
+metro = "0.6.9"
 
 # Auto service
 autoservice = "1.1.1"
@@ -201,7 +201,7 @@ sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
 sqlite = "androidx.sqlite:sqlite-ktx:2.6.1"
-unifiedpush = "org.unifiedpush.android:connector:3.0.10"
+unifiedpush = "org.unifiedpush.android:connector:3.1.0"
 vanniktech_blurhash = "com.vanniktech:blurhash:0.3.0"
 telephoto_zoomableimage = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
 telephoto_flick = { module = "me.saket.telephoto:flick-android", version.ref = "telephoto" }

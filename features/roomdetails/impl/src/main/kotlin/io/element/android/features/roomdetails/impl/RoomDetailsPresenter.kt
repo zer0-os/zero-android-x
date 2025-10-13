@@ -203,6 +203,7 @@ class RoomDetailsPresenter(
             displayRolesAndPermissionsSettings = !isDm && isUserAdmin,
             isPublic = joinRule == JoinRule.Public,
             heroes = roomMembers.roomMembers().orEmpty().toImmutableList(),
+//            heroes = roomInfo.heroes.toImmutableList(),
             pinnedMessagesCount = pinnedMessagesCount,
             snackbarMessage = snackbarMessage,
             canShowKnockRequests = canShowKnockRequests,

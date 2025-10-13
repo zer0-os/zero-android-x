@@ -45,6 +45,7 @@ import org.matrix.rustcomponents.sdk.Encryption
 import org.matrix.rustcomponents.sdk.UserIdentity
 import org.matrix.rustcomponents.sdk.BackupUploadState as RustBackupUploadState
 import org.matrix.rustcomponents.sdk.EnableRecoveryProgress as RustEnableRecoveryProgress
+import org.matrix.rustcomponents.sdk.RecoveryException as RustRecoveryException
 import org.matrix.rustcomponents.sdk.SteadyStateException as RustSteadyStateException
 
 class RustEncryptionService(
@@ -207,8 +208,12 @@ class RustEncryptionService(
     override suspend fun recover(recoveryKey: String): Result<Unit> = withContext(dispatchers.io) {
         runCatchingExceptions {
             service.recover(recoveryKey)
-        }.mapFailure {
-            it.mapRecoveryException()
+        }.recoverCatching {
+            when (it) {
+                // We ignore import errors because the user will be notified about them via the "Key storage out of sync" detection.
+                is RustRecoveryException.Import -> Unit
+                else -> throw it.mapRecoveryException()
+            }
         }
     }
 

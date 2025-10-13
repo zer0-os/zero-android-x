@@ -10,6 +10,7 @@ package io.element.android.libraries.designsystem.components.avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
@@ -33,8 +33,8 @@ import coil3.compose.SubcomposeAsyncImageContent
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementThemedPreview
 import io.element.android.libraries.designsystem.preview.PreviewGroup
-import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.utils.CommonDrawables
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun Avatar(
@@ -117,18 +117,54 @@ private fun ZeroPlaceholderImage(
 
 @Preview(group = PreviewGroup.Avatars)
 @Composable
-internal fun AvatarPreview(@PreviewParameter(AvatarDataProvider::class) avatarData: AvatarData) =
-    ElementThemedPreview(
-        drawableFallbackForImages = CommonDrawables.sample_avatar,
+internal fun AvatarPreview() = ElementThemedPreview(
+    drawableFallbackForImages = CommonDrawables.sample_background,
+) {
+    Column(
+        modifier = Modifier.padding(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Avatar(
-                avatarData = avatarData,
-                avatarType = AvatarType.User,
-            )
-            Text(text = avatarData.size.name + " " + avatarData.size.dp)
+        listOf(
+            anAvatarData(size = AvatarSize.UserListItem),
+            anAvatarData(size = AvatarSize.UserListItem, name = null),
+            anAvatarData(size = AvatarSize.UserListItem, url = "aUrl"),
+        ).forEach { avatarData ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.User,
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.Room(isTombstoned = false),
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.Room(
+                        heroes = persistentListOf(
+                            anAvatarData("@carol:server.org", "Carol", size = AvatarSize.UserListItem),
+                            anAvatarData("@david:server.org", "David", size = AvatarSize.UserListItem),
+                            anAvatarData("@eve:server.org", "Eve", size = AvatarSize.UserListItem),
+                            anAvatarData("@justin:server.org", "Justin", size = AvatarSize.UserListItem),
+                        )
+                    )
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.Room(isTombstoned = true),
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.Space(isTombstoned = false),
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.Space(isTombstoned = true),
+                )
+            }
         }
     }
+}

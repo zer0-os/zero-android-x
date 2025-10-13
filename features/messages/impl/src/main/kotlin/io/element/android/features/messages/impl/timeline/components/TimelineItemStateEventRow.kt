@@ -36,7 +36,7 @@ import io.element.android.features.messages.impl.timeline.util.defaultTimelineCo
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.matrix.api.room.RoomMember
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TimelineItemStateEventRow(
@@ -118,7 +118,7 @@ internal fun TimelineItemStateEventRowPreview() = ElementPreview {
             content = aTimelineItemStateEventContent(),
             groupPosition = TimelineItemGroupPosition.None,
             readReceiptState = TimelineItemReadReceipts(
-                receipts = listOf(aReadReceiptData(0)).toPersistentList(),
+                receipts = persistentListOf(aReadReceiptData(0)),
             )
         ),
         roomMembers = emptyList(),

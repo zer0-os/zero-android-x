@@ -80,7 +80,7 @@ class PreferencesRootPresenter(
 //                            avatarUrl = it.userAvatarUrl,
 //                        )
 //                    }
-//                    .toPersistentList()
+//                    .toImmutableList()
 //            }
 //        }.collectAsState(initial = persistentListOf())
 

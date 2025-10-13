@@ -64,7 +64,7 @@ fun DeveloperSettingsView(
                 title = "Tracing log level",
                 supportingText = "Requires app reboot",
                 selectedOption = state.tracingLogLevel.dataOrNull(),
-                options = LogLevelItem.entries.toPersistentList(),
+                options = LogLevelItem.entries.toImmutableList(),
                 onSelectOption = { logLevel ->
                     state.eventSink(DeveloperSettingsEvents.SetTracingLogLevel(logLevel))
                 }

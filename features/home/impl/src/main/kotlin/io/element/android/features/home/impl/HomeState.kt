@@ -7,7 +7,6 @@
 
 package io.element.android.features.home.impl
 
-import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.channel.ChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenTab
@@ -24,7 +23,6 @@ import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import kotlinx.collections.immutable.ImmutableList
 
-@Immutable
 data class HomeState(
     /**
      * The current user of this session, in case of multiple accounts, will contains 3 items, with the

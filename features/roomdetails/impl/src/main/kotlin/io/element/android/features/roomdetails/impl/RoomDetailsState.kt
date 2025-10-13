@@ -18,7 +18,7 @@ import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomNotificationSettings
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toImmutableList
 
 data class RoomDetailsState(
     val roomId: RoomId,
@@ -62,7 +62,7 @@ data class RoomDetailsState(
         /*if (isPublic) {
             add(RoomBadge.PUBLIC)
         }*/
-    }.toPersistentList()
+    }.toImmutableList()
 
     fun canLeaveRoom(): Boolean {
         val user = heroes.firstOrNull { it.userId == loggedInUser }

@@ -41,7 +41,6 @@ import io.element.android.libraries.matrix.ui.messages.reply.aProfileTimelineDet
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
 import kotlin.random.Random
 
@@ -198,7 +197,7 @@ fun aTimelineItemReactions(
                     )
                 )
             }
-        }.toPersistentList()
+        }.toImmutableList()
     )
 }
 
@@ -261,7 +260,7 @@ internal fun aTimelineRoomInfo(
     userHasPermissionToSendMessage = userHasPermissionToSendMessage,
     userHasPermissionToSendReaction = true,
     roomCallState = aStandByCallState(),
-    pinnedEventIds = pinnedEventIds,
+    pinnedEventIds = pinnedEventIds.toImmutableList(),
     typingNotificationState = typingNotificationState,
     predecessorRoom = predecessorRoom,
     roomMembers = emptyList()

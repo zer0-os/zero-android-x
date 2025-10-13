@@ -89,7 +89,7 @@ import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
 import io.element.android.libraries.textcomposer.model.MessageComposerMode
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -170,7 +170,7 @@ class MessagesPresenter(
         val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.zIdOrWalletAddressDisplay } }
         val showZeroProBadge: Boolean by remember { derivedStateOf { directZeroMember.value?.isZeroProSubscriber ?: false} }
         val heroes by remember {
-            derivedStateOf { roomInfo.heroes().toPersistentList() }
+            derivedStateOf { roomInfo.heroes().toImmutableList() }
         }
 
         var hasDismissedInviteDialog by rememberSaveable {
