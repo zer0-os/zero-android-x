@@ -71,7 +71,7 @@ fun HomeChannelRow(
                     )
                 }
             ) {
-                append(channel.displayTitle.orEmpty())
+                append(channel.displayTitle)
             }
         }
         Text(

@@ -8,17 +8,22 @@
 package io.element.android.features.home.impl.model
 
 import androidx.compose.runtime.Immutable
+import io.element.android.libraries.designsystem.components.avatar.AvatarData
+import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
+import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class HomeScreenChannel(
     val channelFullName: String
 ) {
-    val displayTitle: String? = channelFullName
+    val displayTitle: String = channelFullName
         .replace(ZERO_CHANNEL_PREFIX, "")
         .split(".")
         .firstOrNull()
+        .orEmpty()
 
     var notificationsCount = 0
 
@@ -30,7 +35,35 @@ data class HomeScreenChannel(
 }
 
 fun HomeScreenChannel.channelId(): String? {
-    return displayTitle?.let {
+    return displayTitle.let {
         "#${it}:${MatrixSessionCommon.getHomeServerPostfix()}"
     }
 }
+
+fun HomeScreenChannel.toRoomSummary() = RoomListRoomSummary(
+    id = channelFullName,
+    roomId = RoomId("!room_id:domain"), // Placeholder for channel as we won't be using it for channels.
+    name = buildString {
+        append(ZERO_CHANNEL_PREFIX)
+        append(displayTitle)
+    },
+    numberOfUnreadMessages = 0,
+    numberOfUnreadMentions = 0,
+    numberOfUnreadNotifications = 0,
+    isMarkedUnread = false,
+    timestamp = null,
+    lastMessage = null,
+    avatarData = AvatarData(id = channelFullName, name = displayTitle, url = null, size = AvatarSize.RoomListItem),
+    userDefinedNotificationMode = null,
+    hasRoomCall = false,
+    isDirect = false,
+    isDm = false,
+    isFavorite = false,
+    inviteSender = null,
+    displayType = RoomSummaryDisplayType.ROOM,
+    canonicalAlias = null,
+    heroes = persistentListOf(),
+    isTombstoned = false,
+    isSpace = false,
+    isEncrypted = false
+)

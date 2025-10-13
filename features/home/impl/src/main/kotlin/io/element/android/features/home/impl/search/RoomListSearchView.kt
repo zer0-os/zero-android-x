@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,12 +40,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.channel.ChannelListContentState
-import io.element.android.features.home.impl.channel.HomeChannelRow
 import io.element.android.features.home.impl.contentType
 import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.features.home.impl.model.HomeScreenChannel
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
+import io.element.android.features.home.impl.model.toRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
 import io.element.android.libraries.designsystem.components.button.BackButton
@@ -120,7 +119,18 @@ private fun RoomListSearchContent(
     }
 
     fun onRoomClick(room: RoomListRoomSummary) {
-        onRoomClick(room.roomId)
+        if (room.isAChannel) {
+            val channelsList = if (state.query.isNotBlank()) {
+                ((channelsListState as? ChannelListContentState.Channels)
+                    ?.channels ?: emptyList())
+            } else {
+                emptyList()
+            }
+            channelsList.firstOrNull { it.channelFullName == room.id }
+                ?.let(onChannelClick)
+        } else {
+            onRoomClick(room.roomId)
+        }
     }
     Scaffold(
         topBar = {
@@ -143,16 +153,7 @@ private fun RoomListSearchContent(
                             .fillMaxWidth()
                             .focusRequester(focusRequester),
                         placeholder = {
-                            val placeholderText = if (selectedHomeNavigationTab == HomeScreenTab.CHANNEL) {
-                                when (selectedChannelContentTab) {
-                                    ChannelsScreenTab.CHANNELS -> "Search Channels"
-                                    ChannelsScreenTab.GATED -> "Search Gated"
-                                    ChannelsScreenTab.MUTED -> "Search Muted"
-                                }
-                            } else {
-                                "Search"
-                            }
-                            Text(placeholderText)
+                            Text(text = stringResource(CommonStrings.action_search))
                         },
                         value = TextFieldValue(filter, TextRange(filter.length)),
                         singleLine = true,
@@ -199,7 +200,36 @@ private fun RoomListSearchContent(
             LazyColumn(
                 modifier = Modifier.weight(1f),
             ) {
-                if (selectedHomeNavigationTab == HomeScreenTab.CHANNEL &&
+                val channelsList = if (state.query.isNotBlank()) {
+                    ((channelsListState as? ChannelListContentState.Channels)
+                        ?.channels ?: emptyList())
+                } else {
+                    emptyList()
+                }
+                    .filter { it.displayTitle.contains(state.query, true) }
+                    .map { it.toRoomSummary()  }
+                val roomResults = state.results
+                    .filter { !it.isAChannel }
+                    .toMutableList()
+                    .apply {
+                        // add channel search results as well
+                        addAll(channelsList)
+                    }
+                items(
+                    items = roomResults,
+                    contentType = { room -> room.contentType() },
+                ) { room ->
+                    RoomSummaryRow(
+                        room = room,
+                        showProBadgeWithRoom = roomMappedUserProStatus.getOrDefault(room.id, false),
+                        hideInviteAvatars = hideInvitesAvatars,
+                        // TODO
+                        isInviteSeen = false,
+                        onClick = ::onRoomClick,
+                        eventSink = eventSink,
+                    )
+                }
+                /*if (selectedHomeNavigationTab == HomeScreenTab.CHANNEL &&
                     selectedChannelContentTab == ChannelsScreenTab.GATED) {
                     val channelsList = if (state.query.isNotBlank()) {
                         ((channelsListState as? ChannelListContentState.Channels)
@@ -243,7 +273,7 @@ private fun RoomListSearchContent(
                             eventSink = eventSink,
                         )
                     }
-                }
+                }*/
             }
         }
     }
