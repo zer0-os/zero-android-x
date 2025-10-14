@@ -188,8 +188,10 @@ class FeedUserProfilePresenter(
         genericActionState: MutableState<AsyncAction<Unit>>,
     ) = launch {
         val userProfile = userProfileFlow.value ?: return@launch
-        genericActionState.value = AsyncAction.Loading
+        // genericActionState.value = AsyncAction.Loading
         val isFollowing = userProfileFollowingFlow.value ?: false
+        // update the result locally first
+        userProfileFollowingFlow.value = !isFollowing
         val call = if (isFollowing) {
             client.unFollowUser(userProfile.userId)
         } else {

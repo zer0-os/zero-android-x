@@ -7,6 +7,7 @@
 
 package io.element.android.features.feeduserprofile.impl
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -120,10 +121,12 @@ private fun FeedUserProfile(
             openAvatarPreview = openAvatarPreview,
             onBackClick = onBackClick
         )
-        UserFeedsListView(
-            state = state,
-            onUserFeedClick = onUserFeedClick
-        )
+        AnimatedVisibility(visible = state.userFeeds.isNotEmpty()) {
+            UserFeedsListView(
+                state = state,
+                onUserFeedClick = onUserFeedClick
+            )
+        }
     }
 }
 

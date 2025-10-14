@@ -48,6 +48,7 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.zIdOrWalletAddressDisplay
 import io.element.android.support.zero.R
+import io.element.android.support.zero.common.ui.animation.FadeAnimation
 
 @Composable
 fun UserProfileHeaderView(
@@ -136,7 +137,7 @@ fun UserProfileHeaderView(
                             )
                         }
                     }
-                    if (state.shouldShowFollowButton) {
+                    FadeAnimation(visible = state.shouldShowFollowButton) {
                         val buttonText = if (state.isUserFollowed == true) "Unfollow" else "Follow"
                         Button(
                             text = buttonText,

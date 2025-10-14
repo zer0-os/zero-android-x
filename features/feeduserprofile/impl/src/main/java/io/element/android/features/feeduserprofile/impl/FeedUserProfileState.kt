@@ -33,5 +33,5 @@ data class FeedUserProfileState(
     val genericActionState: AsyncAction<Unit>,
 ) {
     val shouldShowFollowButton: Boolean
-        get() = !isMyOwnProfile && isUserFollowed != null && !userProfile?.primaryZid.isNullOrBlank()
+        get() = !isMyOwnProfile && isUserFollowed != null
 }

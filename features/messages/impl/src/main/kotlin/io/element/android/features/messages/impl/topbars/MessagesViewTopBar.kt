@@ -7,6 +7,7 @@
 
 package io.element.android.features.messages.impl.topbars
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -175,7 +176,7 @@ private fun RoomAvatarAndNameRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                if (showZeroProBadge) {
+                AnimatedVisibility(visible = showZeroProBadge) {
                     Icon(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
@@ -186,10 +187,10 @@ private fun RoomAvatarAndNameRow(
                     )
                 }
             }
-            if (!roomSubTitle.isNullOrBlank()) {
+            AnimatedVisibility(visible = !roomSubTitle.isNullOrBlank()) {
                 Text(
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    text = roomSubTitle,
+                    text = roomSubTitle.orEmpty(),
                     style = ElementTheme.zeroTypography.fontBodySmRegular,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
