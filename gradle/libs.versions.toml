@@ -19,7 +19,7 @@ constraintlayout_compose = "1.1.1"
 lifecycle = "2.9.2"
 activity = "1.11.0"
 media3 = "1.8.0"
-camera = "1.5.0"
+camera = "1.5.1"
 
 # Firebase
 firebase_bom = "33.15.0"
@@ -52,10 +52,10 @@ telephoto = "0.18.0"
 haze = "1.6.10"
 
 # Dependency analysis
-dependencyAnalysis = "3.0.4"
+dependencyAnalysis = "3.1.0"
 
 # DI
-metro = "0.6.9"
+metro = "0.6.10"
 
 # Auto service
 autoservice = "1.1.1"
@@ -145,7 +145,8 @@ accompanist_navigation = "com.google.accompanist:accompanist-navigation-material
 squareup_seismic = "com.squareup:seismic:1.0.3"
 
 # network
-network_okhttp_bom = "com.squareup.okhttp3:okhttp-bom:4.12.0"
+network_okhttp_bom = "com.squareup.okhttp3:okhttp-bom:5.2.1"
+# network_okhttp_bom = "com.squareup.okhttp3:okhttp-bom:4.12.0"
 network_okhttp_logging = { module = "com.squareup.okhttp3:logging-interceptor" }
 network_okhttp_okhttp = { module = "com.squareup.okhttp3:okhttp" }
 network_okhttp = { module = "com.squareup.okhttp3:okhttp" }
@@ -167,7 +168,7 @@ test_truth = "com.google.truth:truth:1.4.5"
 test_parameter_injector = "com.google.testparameterinjector:test-parameter-injector:1.19"
 test_robolectric = "org.robolectric:robolectric:4.15.1"
 test_appyx_junit = { module = "com.bumble.appyx:testing-junit4", version.ref = "appyx" }
-test_composable_preview_scanner = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.7.0"
+test_composable_preview_scanner = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.7.1"
 test_detekt_api = { module = "io.gitlab.arturbosch.detekt:detekt-api", version.ref = "detekt" }
 test_detekt_test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref = "detekt" }
 
@@ -177,7 +178,7 @@ test_detekt_test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version
 # https://github.com/matrix-org/matrix-rust-components-kotlin/commits/main/sdk/sdk-android/src/main/kotlin/org/matrix/rustcomponents/sdk/matrix_sdk_ffi.kt
 # All new features should not be implemented in the pull request that upgrades the version, developers should
 # only fix API breaks and may add some TODOs.
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.10.7"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.10.13"
 
 # Others
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
@@ -200,8 +201,9 @@ sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.6.1"
+#sqlcipher = "net.zetetic:sqlcipher-android:4.11.0"
 sqlite = "androidx.sqlite:sqlite-ktx:2.6.1"
-unifiedpush = "org.unifiedpush.android:connector:3.1.0"
+unifiedpush = "org.unifiedpush.android:connector:3.1.2"
 vanniktech_blurhash = "com.vanniktech:blurhash:0.3.0"
 telephoto_zoomableimage = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
 telephoto_flick = { module = "me.saket.telephoto:flick-android", version.ref = "telephoto" }
@@ -263,7 +265,7 @@ metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = "org.jlleitschuh.gradle.ktlint:13.1.0"
 dependencygraph = "com.savvasdalkitsis.module-dependency-graph:0.12"
-dependencycheck = "org.owasp.dependencycheck:12.1.6"
+dependencycheck = "org.owasp.dependencycheck:12.1.7"
 dependencyanalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysis" }
 paparazzi = "app.cash.paparazzi:2.0.0-alpha02"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
@@ -271,6 +273,6 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 firebaseAppDistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 knit = { id = "org.jetbrains.kotlinx.knit", version = "0.5.0" }
 sonarqube = "org.sonarqube:6.3.1.5724"
-licensee = "app.cash.licensee:1.13.0"
+licensee = "app.cash.licensee:1.14.1"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-gms_google_services = { id = "com.google.gms.google-services", version = "4.4.3" }
+gms_google_services = { id = "com.google.gms.google-services", version = "4.4.4" }

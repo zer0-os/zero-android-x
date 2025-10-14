@@ -7,7 +7,6 @@
 
 package io.element.android.features.createroom.impl.configureroom
 
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -190,7 +189,7 @@ private fun ConfigureRoomToolbar(
 
 @Composable
 private fun RoomNameWithAvatar(
-    avatarUri: Uri?,
+    avatarUri: String?,
     roomName: String,
     onAvatarClick: () -> Unit,
     onChangeRoomName: (String) -> Unit,

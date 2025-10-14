@@ -119,7 +119,7 @@ fun CompleteProfileView(
                 EditableAvatarView(
                     matrixId = "",
                     displayName = state.displayName,
-                    avatarUrl = state.userAvatarUrl,
+                    avatarUrl = state.userAvatarUrl?.toString(),
                     avatarSize = AvatarSize.CompleteProfileScreen,
                     onAvatarClick = { onAvatarClick() },
                     modifier = Modifier.align(Alignment.CenterHorizontally),

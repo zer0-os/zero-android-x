@@ -238,6 +238,12 @@ android {
             excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
         }
     }
+
+    packaging {
+        resources.pickFirsts += setOf(
+            "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
+        )
+    }
 }
 
 androidComponents {
