@@ -7,6 +7,7 @@
 
 package io.element.android.features.roommembermoderation.impl
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -248,7 +249,7 @@ private fun RoomMemberActionsBottomSheet(
                         textAlign = TextAlign.Center,
                     )
                 }
-                if (user.isZeroProSubscriber) {
+                AnimatedVisibility(user.isZeroProSubscriber) {
                     Icon(
                         modifier = Modifier.size(26.dp),
                         imageVector = CompoundIcons.Verified(),

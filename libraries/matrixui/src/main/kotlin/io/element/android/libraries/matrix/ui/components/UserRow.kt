@@ -7,6 +7,7 @@
 
 package io.element.android.libraries.matrix.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -67,7 +68,7 @@ internal fun UserRow(
                     color = if (enabled) ElementTheme.colors.textPrimary else ElementTheme.colors.textDisabled,
                     style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 )
-                if (showProSubscriberBadge) {
+                AnimatedVisibility(showProSubscriberBadge) {
                     Icon(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)

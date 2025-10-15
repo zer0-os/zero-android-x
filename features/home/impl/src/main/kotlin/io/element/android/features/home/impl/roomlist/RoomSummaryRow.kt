@@ -7,6 +7,7 @@
 
 package io.element.android.features.home.impl.roomlist
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -237,7 +238,7 @@ private fun NameAndTimestampRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            if (showProBadgeWithRoom) {
+            AnimatedVisibility(showProBadgeWithRoom) {
                 Icon(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)

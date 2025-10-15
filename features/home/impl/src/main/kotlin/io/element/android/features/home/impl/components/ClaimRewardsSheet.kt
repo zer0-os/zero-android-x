@@ -151,7 +151,7 @@ fun ClaimRewardsSheet(
 
                 if (actionState is AsyncAction.Success) {
                     Text(
-                        text = "Your daily earnings have been added to you Wallet.",
+                        text = "Your daily earnings have been added to your Wallet.",
                         style = ElementTheme.typography.fontBodyLgRegular,
                         color = ElementTheme.colors.textSecondary
                     )

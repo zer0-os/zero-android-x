@@ -330,7 +330,7 @@ private fun RoomMemberListItem(
 //                    }
 //                    else -> Unit
 //                }
-                if (member.isZeroProSubscriber) {
+                AnimatedVisibility(member.isZeroProSubscriber) {
                     Icon(
                         modifier = Modifier.size(20.dp),
                         imageVector = CompoundIcons.Verified(),
