@@ -7,14 +7,19 @@
 
 package io.element.android.libraries.mediaviewer.impl.local.image
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import coil3.ImageLoader
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.utils.CommonDrawables
@@ -22,7 +27,7 @@ import io.element.android.libraries.mediaviewer.api.local.LocalMedia
 import io.element.android.libraries.mediaviewer.impl.local.LocalMediaViewState
 import io.element.android.libraries.mediaviewer.impl.local.rememberLocalMediaViewState
 import io.element.android.libraries.ui.strings.CommonStrings
-import me.saket.telephoto.zoomable.coil.ZoomableAsyncImage
+import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableImageState
 
 @Composable
@@ -32,6 +37,7 @@ fun MediaImageView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     if (LocalInspectionMode.current) {
         Image(
             painter = painterResource(id = CommonDrawables.sample_background),
@@ -45,6 +51,15 @@ fun MediaImageView(
             modifier = modifier,
             state = zoomableImageState,
             model = localMedia?.uri,
+            imageLoader = ImageLoader.Builder(context)
+                .components {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        add(AnimatedImageDecoder.Factory())
+                    } else {
+                        add(GifDecoder.Factory())
+                    }
+                }
+                .build(),
             contentDescription = stringResource(id = CommonStrings.common_image),
             contentScale = ContentScale.Fit,
             onClick = { onClick() }

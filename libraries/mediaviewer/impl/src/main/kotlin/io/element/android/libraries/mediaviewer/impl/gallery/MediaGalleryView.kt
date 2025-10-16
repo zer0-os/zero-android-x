@@ -471,7 +471,7 @@ private fun EmptyContent(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        OnboardingBackground()
+//        OnboardingBackground()
         IconTitleSubtitleMolecule(
             modifier = Modifier
                 .fillMaxWidth()
@@ -491,7 +491,7 @@ private fun LoadingContent(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        OnboardingBackground()
+//        OnboardingBackground()
         Column(
             modifier = Modifier
                 .fillMaxSize()

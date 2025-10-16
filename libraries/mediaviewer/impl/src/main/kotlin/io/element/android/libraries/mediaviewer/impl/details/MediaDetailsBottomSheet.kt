@@ -164,13 +164,13 @@ private fun SenderRow(
                 style = ElementTheme.typography.fontBodyMdMedium,
             )
             // Id
-            Text(
+            /*Text(
                 text = mediaInfo.senderId?.value.orEmpty(),
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = ElementTheme.typography.fontBodyMdRegular,
-            )
+            )*/
         }
     }
 }
