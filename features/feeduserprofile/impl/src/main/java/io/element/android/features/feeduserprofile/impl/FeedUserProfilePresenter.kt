@@ -103,8 +103,7 @@ class FeedUserProfilePresenter(
                 is FeedUserProfileEvents.AddMeowToFeed ->
                     GlobalScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
                 FeedUserProfileEvents.LoadMoreUserFeeds -> {
-                    val primaryZId = userProfileFlow.value?.primaryZid ?: return
-                    coroutineScope.loadMoreUserFeeds(primaryZId, userFeedsFlow)
+                    coroutineScope.loadMoreUserFeeds(userId.extractedDisplayName, userFeedsFlow)
                 }
                 FeedUserProfileEvents.ToggleFollowUser ->
                     coroutineScope.toggleFollowUser(userProfileFlow, userProfileFollowingFlow, userFeedsFlow, genericActionState)
