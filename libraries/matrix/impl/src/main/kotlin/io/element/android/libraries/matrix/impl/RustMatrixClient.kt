@@ -7,6 +7,8 @@
 
 package io.element.android.libraries.matrix.impl
 
+import io.element.android.features.networkmonitor.api.NetworkMonitor
+import io.element.android.features.networkmonitor.api.NetworkStatus
 import io.element.android.libraries.androidutils.file.getSizeOfFiles
 import io.element.android.libraries.core.bool.orFalse
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
@@ -166,6 +168,7 @@ class RustMatrixClient(
     private val sessionStore: SessionStore,
     private val sessionDelegate: RustClientSessionDelegate,
     private val innerSyncService: ClientSyncService,
+    private val networkMonitor: NetworkMonitor,
     appCoroutineScope: CoroutineScope,
     dispatchers: CoroutineDispatchers,
     baseCacheDirectory: File,
@@ -451,13 +454,15 @@ class RustMatrixClient(
 
     override suspend fun getProfile(userId: UserId, forceRefresh: Boolean): Result<MatrixUser> = withContext(sessionDispatcher) {
         runCatchingExceptions {
+//            val refresh = forceRefresh
+            val refresh = networkMonitor.connectivity.value == NetworkStatus.Connected
             val profiles = awaitAll(
                 async { innerClient.getProfile(userId.value) },
                 async {
                     if (userId == sessionId) {
                         zeroCoreRepository?.user?.getCurrentUser(userId)?.firstOrNull()
                     } else {
-                        zeroCoreRepository?.user?.getUser(userId.value, forceRefresh)?.firstOrNull()
+                        zeroCoreRepository?.user?.getUser(userId.value, refresh)?.firstOrNull()
                     }
                 }
             )

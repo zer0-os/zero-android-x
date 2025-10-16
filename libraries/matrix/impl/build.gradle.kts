@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.network.retrofit)
+    implementation(projects.features.networkmonitor.api)
 
     testCommonDependencies(libs)
     testImplementation(projects.libraries.featureflag.test)
