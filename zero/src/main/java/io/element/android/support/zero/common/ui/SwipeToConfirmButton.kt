@@ -62,7 +62,7 @@ fun SwipeToConfirmButton(
     var isConfirmed by remember { mutableStateOf(false) }
 
     val brandColor = ElementTheme.colors.zeroBrandColor
-    val disabledColor = Color.DarkGray
+    val disabledColor = ElementTheme.colors.textDisabled
     val currentColor = if (enabled) brandColor else disabledColor
 
     BoxWithConstraints(

@@ -18,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Inject
+import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.features.logout.api.LogoutUseCase
 import io.element.android.features.preferences.impl.developer.tracing.toLogLevel
 import io.element.android.features.preferences.impl.developer.tracing.toLogLevelItem
@@ -58,6 +60,7 @@ class DeveloperSettingsPresenter(
     private val appPreferencesStore: AppPreferencesStore,
     private val logoutUseCase: LogoutUseCase,
     private val buildMeta: BuildMeta,
+    private val enterpriseService: EnterpriseService,
 ) : Presenter<DeveloperSettingsState> {
     @Composable
     override fun present(): DeveloperSettingsState {
@@ -74,6 +77,9 @@ class DeveloperSettingsPresenter(
         }
         val clearCacheAction = remember {
             mutableStateOf<AsyncAction<Unit>>(AsyncAction.Uninitialized)
+        }
+        var showColorPicker by remember {
+            mutableStateOf(false)
         }
         val customElementCallBaseUrl by remember {
             appPreferencesStore
@@ -144,6 +150,14 @@ class DeveloperSettingsPresenter(
                     }
                     appPreferencesStore.setTracingLogPacks(currentPacks)
                 }
+                is DeveloperSettingsEvents.ChangeBrandColor -> {
+                    showColorPicker = false
+                    val color = event.color?.value?.toHexString(HexFormat.UpperCase)?.substring(2, 8)
+                    enterpriseService.overrideBrandColor(color)
+                }
+                is DeveloperSettingsEvents.SetShowColorPicker -> {
+                    showColorPicker = event.show
+                }
                 DeveloperSettingsEvents.DeleteUserAccount -> {
                     coroutineScope.deleteAccount(isDeleteAccountInProgress)
                 }
@@ -161,6 +175,8 @@ class DeveloperSettingsPresenter(
             ),
             tracingLogLevel = tracingLogLevel,
             tracingLogPacks = tracingLogPacks,
+            isEnterpriseBuild = enterpriseService.isEnterpriseBuild,
+            showColorPicker = showColorPicker,
             isDeleteAccountInProgress = isDeleteAccountInProgress.value,
             eventSink = ::handleEvents
         )

@@ -40,7 +40,6 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.colors.gradientActionColors
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.LocalBuildMeta
 import io.element.android.libraries.designsystem.theme.components.ButtonSize
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.lowHorizontalPaddingValue
@@ -65,15 +64,7 @@ fun SuperButton(
             ButtonSize.XSmall -> PaddingValues(horizontal = 8.dp, vertical = 2.5.dp)
         }
     }
-    val colors = if (LocalBuildMeta.current.isEnterpriseBuild) {
-        listOf(
-            ElementTheme.colors.textActionAccent,
-            ElementTheme.colors.textActionAccent,
-        )
-    } else {
-        gradientActionColors()
-    }
-
+    val colors = gradientActionColors()
     val shaderBrush = remember(colors) {
         object : ShaderBrush() {
             override fun createShader(size: Size): Shader {

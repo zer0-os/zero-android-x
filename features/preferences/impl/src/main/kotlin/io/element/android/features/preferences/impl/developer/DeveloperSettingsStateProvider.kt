@@ -29,6 +29,10 @@ open class DeveloperSettingsStateProvider : PreviewParameterProvider<DeveloperSe
                     baseUrl = "https://call.element.ahoy",
                 )
             ),
+            aDeveloperSettingsState(
+                isEnterpriseBuild = true,
+                showColorPicker = true,
+            ),
         )
 }
 
@@ -36,6 +40,8 @@ fun aDeveloperSettingsState(
     clearCacheAction: AsyncAction<Unit> = AsyncAction.Uninitialized,
     customElementCallBaseUrlState: CustomElementCallBaseUrlState = aCustomElementCallBaseUrlState(),
     traceLogPacks: List<TraceLogPack> = emptyList(),
+    isEnterpriseBuild: Boolean = false,
+    showColorPicker: Boolean = false,
     isDeleteAccountInProgress: Boolean = false,
     eventSink: (DeveloperSettingsEvents) -> Unit = {},
 ) = DeveloperSettingsState(
@@ -46,6 +52,8 @@ fun aDeveloperSettingsState(
     customElementCallBaseUrlState = customElementCallBaseUrlState,
     tracingLogLevel = AsyncData.Success(LogLevelItem.INFO),
     tracingLogPacks = traceLogPacks.toImmutableList(),
+    isEnterpriseBuild = isEnterpriseBuild,
+    showColorPicker = showColorPicker,
     isDeleteAccountInProgress = isDeleteAccountInProgress,
     eventSink = eventSink,
 )

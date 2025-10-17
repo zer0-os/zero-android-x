@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
@@ -73,8 +73,8 @@ fun ElementThemeApp(
             }
         )
     }
-    val compoundLight = remember { enterpriseService.semanticColorsLight() }
-    val compoundDark = remember { enterpriseService.semanticColorsDark() }
+    val compoundLight by enterpriseService.semanticColorsLight()
+    val compoundDark by enterpriseService.semanticColorsDark()
     CompositionLocalProvider(
         LocalBuildMeta provides buildMeta,
     ) {
