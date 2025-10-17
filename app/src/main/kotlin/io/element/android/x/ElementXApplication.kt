@@ -9,6 +9,7 @@ package io.element.android.x
 
 import android.app.Application
 import androidx.startup.AppInitializer
+import com.google.firebase.FirebaseApp
 import dev.zacsweers.metro.createGraphFactory
 import io.element.android.features.cachecleaner.api.CacheCleanerInitializer
 import io.element.android.libraries.di.DependencyInjectionGraphOwner
@@ -30,6 +31,7 @@ class ElementXApplication : Application(), DependencyInjectionGraphOwner {
         }
         logApplicationInfo(this)
 
+        FirebaseApp.initializeApp(this)
         WalletConnectInitializer.initialize(this)
     }
 }

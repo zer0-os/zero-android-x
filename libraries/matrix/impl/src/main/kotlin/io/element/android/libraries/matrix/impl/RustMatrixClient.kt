@@ -115,6 +115,7 @@ import io.element.android.support.zero.data.conversion.toApi
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.UserRewards
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
+import io.element.android.support.zero.network.service.ZeroLogService
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -484,6 +485,10 @@ class RustMatrixClient(
         return runCatchingExceptions {
             getProfile(sessionId, forceRefresh)
                 .onSuccess {
+                    ZeroLogService.setup(
+                        userId = it.userId.extractedDisplayName,
+                        userName = it.displayName ?: it.userId.extractedDisplayName
+                    )
                     _userProfile.tryEmit(it)
                     zeroCoreRepository?.account?.saveLoggedInUserInfo(it)
                     // Also update our session storage

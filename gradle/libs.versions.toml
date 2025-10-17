@@ -131,6 +131,7 @@ androidx_compose_navigation = "androidx.navigation:navigation-compose:2.8.5"
 # Firebase
 google_firebase_bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase_bom" }
 google_firebase_remote_configs = { module = "com.google.firebase:firebase-config-ktx" }
+google_firebase_firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
 google_firebase_analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 
 # Coroutines

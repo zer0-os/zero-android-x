@@ -369,6 +369,7 @@ licensee {
     allow("BSD-3-Clause")
     allow("EPL-1.0")
     allowUrl("https://opensource.org/licenses/MIT")
+    allowUrl("https://spdx.org/licenses/MIT.txt")
     allowUrl("https://developer.android.com/studio/terms.html")
     allowUrl("https://www.zetetic.net/sqlcipher/license/")
     allowUrl("https://jsoup.org/license")

@@ -2,7 +2,9 @@ package io.element.android.support.zero.data.model.helper
 
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.data.model.UserRewards
+import io.element.android.support.zero.network.service.ZeroLogService
 import java.math.RoundingMode
+import java.util.Locale
 
 object RewardsUtil {
 
@@ -52,8 +54,28 @@ object RewardsUtil {
             val prefixPart = mCredits.substring(0, delimiter)
             val suffixPart = mCredits.drop(delimiter).take(3) // take 3 decimals
             val value = "$prefixPart.$suffixPart"
+            ZeroLogService.logEvent(
+                eventName = "RewardsUtil",
+                category = "parseCredits",
+                parameters = mapOf(
+                    "credits" to credits,
+                    "decimals" to decimals,
+                    "value" to (value.toDoubleOrNull() ?: 0.0),
+                    "locale" to Locale.getDefault().toString()
+                )
+            )
             value.toDoubleOrNull() ?: 0.0
         } catch (e: Exception) {
+            ZeroLogService.logEvent(
+                eventName = "RewardsUtil",
+                category = "parseCredits",
+                parameters = mapOf(
+                    "credits" to credits,
+                    "decimals" to decimals,
+                    "error" to (e.localizedMessage ?: e.message ?: "Failed to parse credits"),
+                    "locale" to Locale.getDefault().toString()
+                )
+            )
             0.0
         }
     }

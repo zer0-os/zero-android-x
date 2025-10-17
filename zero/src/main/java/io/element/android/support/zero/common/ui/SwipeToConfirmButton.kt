@@ -51,6 +51,7 @@ import kotlin.math.roundToInt
 @Composable
 fun SwipeToConfirmButton(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onConfirm: () -> Unit
 ) {
     val buttonHeight = 56.dp
@@ -60,34 +61,42 @@ fun SwipeToConfirmButton(
     val dragOffset = remember { mutableFloatStateOf(0f) }
     var isConfirmed by remember { mutableStateOf(false) }
 
+    val brandColor = ElementTheme.colors.zeroBrandColor
+    val disabledColor = Color.DarkGray
+    val currentColor = if (enabled) brandColor else disabledColor
+
     BoxWithConstraints(
         modifier = modifier
             .padding(horizontal = horizontalPadding)
             .height(buttonHeight)
+            .alpha(if (enabled) 1f else 0.6f) // visually indicate disabled state
     ) {
         val fullWidth = constraints.maxWidth.toFloat()
         val knobPx = with(LocalDensity.current) { knobSize.toPx() }
         val maxOffset = fullWidth - knobPx
         val threshold = maxOffset
 
+        // Background
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(buttonHeight / 4))
-                .background(ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f))
-                .border(1.dp, ElementTheme.colors.zeroBrandColor, RoundedCornerShape(buttonHeight / 4)) // border color = .zero.bgAccentRest
+                .background(currentColor.copy(alpha = 0.1f))
+                .border(1.dp, currentColor, RoundedCornerShape(buttonHeight / 4))
         )
 
+        // Text
         Text(
             text = if (isConfirmed) "Confirmed" else "Swipe to Confirm",
             modifier = Modifier
                 .align(Alignment.Center)
                 .alpha(if (isConfirmed) 1f else 1f - (dragOffset.floatValue / threshold).coerceIn(0f, 1f)),
-            color = ElementTheme.colors.zeroBrandColor,
+            color = currentColor,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp
         )
 
+        // Knob + Drag gesture
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
@@ -97,30 +106,35 @@ fun SwipeToConfirmButton(
                     .offset { IntOffset(dragOffset.floatValue.roundToInt(), 0) }
                     .size(knobSize)
                     .clip(RoundedCornerShape(knobSize / 4))
-                    .background(ElementTheme.colors.zeroBrandColor) // .zero.bgAccentRest
-                    .pointerInput(isConfirmed) {
-                        detectDragGestures(
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                if (!isConfirmed) {
-                                    dragOffset.floatValue =
-                                        (dragOffset.floatValue + dragAmount.x).coerceIn(0f, maxOffset)
-                                }
-                            },
-                            onDragEnd = {
-                                if (!isConfirmed) {
-                                    if (dragOffset.floatValue >= threshold) {
-                                        isConfirmed = true
-                                        dragOffset.floatValue = maxOffset
-                                        onConfirm()
-                                        // optional: haptic feedback if needed
-                                    } else {
-                                        dragOffset.floatValue = 0f
+                    .background(currentColor)
+                    .then(
+                        if (enabled) {
+                            Modifier.pointerInput(isConfirmed) {
+                                detectDragGestures(
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        if (!isConfirmed) {
+                                            dragOffset.floatValue =
+                                                (dragOffset.floatValue + dragAmount.x).coerceIn(0f, maxOffset)
+                                        }
+                                    },
+                                    onDragEnd = {
+                                        if (!isConfirmed) {
+                                            if (dragOffset.floatValue >= threshold) {
+                                                isConfirmed = true
+                                                dragOffset.floatValue = maxOffset
+                                                onConfirm()
+                                            } else {
+                                                dragOffset.floatValue = 0f
+                                            }
+                                        }
                                     }
-                                }
+                                )
                             }
-                        )
-                    },
+                        } else {
+                            Modifier // no gesture when disabled
+                        }
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

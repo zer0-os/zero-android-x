@@ -72,6 +72,7 @@ import io.element.android.support.zero.common.ui.WalletChainIcon
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_4X
 import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
+import io.element.android.support.zero.network.service.ZeroLogService
 
 @Composable
 fun WalletStakingSheet(
@@ -323,6 +324,15 @@ fun StakeUnstakeAmountView(
     val isAmountValid: () -> Boolean = {
         val maxAmount = if (isUserStaking) pool.totalAvailableTokenBalance else pool.myStakedTokens
         val amount = transactionAmount.value.toLocalizedDoubleOrZero()
+        ZeroLogService.logEvent(
+            eventName = "WALLET",
+            category = "STAKE_UNSTAKE",
+            parameters = mapOf(
+                "maxAmount" to maxAmount,
+                "userAmount" to amount,
+                "isUserStaking" to isUserStaking,
+                "isAmountValid" to (amount > 0 && amount <= maxAmount)
+            ))
         amount > 0 && amount <= maxAmount
     }
 
@@ -505,12 +515,10 @@ fun StakeUnstakeAmountView(
 
         Spacer(Modifier.size(SPACING_4X.dp))
 
-        if (isAmountValid()) {
-            SwipeToConfirmButton {
-                onConfirmTransaction(transactionAmount.value)
-            }
-            Spacer(Modifier.size(SPACING_4X.dp))
+        SwipeToConfirmButton(enabled = isAmountValid()) {
+            onConfirmTransaction(transactionAmount.value)
         }
+        Spacer(Modifier.size(SPACING_4X.dp))
     }
 }
 
