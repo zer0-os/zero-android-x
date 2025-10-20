@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import io.element.android.features.startchat.api.StartDMAction
 import io.element.android.libraries.architecture.AsyncAction
@@ -48,7 +49,7 @@ import kotlinx.coroutines.launch
 
 private const val USER_FEED_PAGE_SIZE = 15
 
-@Inject
+@AssistedInject
 class FeedUserProfilePresenter(
     private val client: MatrixClient,
     private val startDMAction: StartDMAction,

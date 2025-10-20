@@ -14,6 +14,7 @@ import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.core.plugin.plugins
 import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import io.element.android.annotations.ContributesNode
 import io.element.android.features.userprofile.api.SearchUserEntryPoint
@@ -21,7 +22,7 @@ import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.core.UserId
 
 @ContributesNode(SessionScope::class)
-@Inject
+@AssistedInject
 class SearchUserNode constructor(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,

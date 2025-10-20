@@ -15,11 +15,12 @@ import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.core.plugin.plugins
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import io.element.android.annotations.ContributesNode
 
 @ContributesNode(AppScope::class)
-@Inject
+@AssistedInject
 class VerifyZeroInviteNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,

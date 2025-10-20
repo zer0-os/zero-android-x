@@ -27,7 +27,9 @@ data class DeveloperSettingsState(
     val showColorPicker: Boolean,
     val isDeleteAccountInProgress: Boolean,
     val eventSink: (DeveloperSettingsEvents) -> Unit
-)
+) {
+    val showLoader = clearCacheAction is AsyncAction.Loading
+}
 
 data class CustomElementCallBaseUrlState(
     val baseUrl: String?,

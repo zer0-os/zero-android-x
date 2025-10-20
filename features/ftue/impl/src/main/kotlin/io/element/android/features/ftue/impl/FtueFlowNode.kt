@@ -191,7 +191,7 @@ class FtueFlowNode(
 }
 
 @ContributesNode(AppScope::class)
-@Inject
+@AssistedInject
 class PlaceholderNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,

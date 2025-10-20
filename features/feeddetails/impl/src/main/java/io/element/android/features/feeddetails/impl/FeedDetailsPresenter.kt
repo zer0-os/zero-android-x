@@ -21,6 +21,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.platform.LocalContext
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
@@ -42,7 +43,7 @@ import kotlinx.coroutines.launch
 
 private const val FEED_DETAILS_COMMENTS_PAGE_SIZE = 15
 
-@Inject
+@AssistedInject
 class FeedDetailsPresenter(
     private val client: MatrixClient,
     @Assisted private val feed: ZeroFeed,

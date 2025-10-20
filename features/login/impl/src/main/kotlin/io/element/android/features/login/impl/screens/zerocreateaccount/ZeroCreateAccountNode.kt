@@ -16,13 +16,14 @@ import com.bumble.appyx.core.plugin.plugins
 import com.reown.appkit.client.AppKit
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.Inject
 import io.element.android.annotations.ContributesNode
 import io.element.android.libraries.architecture.NodeInputs
 import io.element.android.libraries.architecture.inputs
 
 @ContributesNode(AppScope::class)
-@Inject
+@AssistedInject
 class ZeroCreateAccountNode(
     @Assisted buildContext: BuildContext,
     @Assisted plugins: List<Plugin>,

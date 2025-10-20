@@ -7,6 +7,7 @@
 
 package io.element.android.features.preferences.impl.developer
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.preferences.impl.R
+import io.element.android.libraries.designsystem.components.ProgressDialog
 import io.element.android.libraries.designsystem.components.list.ListItemContent
 import io.element.android.libraries.designsystem.components.preferences.PreferenceCategory
 import io.element.android.libraries.designsystem.components.preferences.PreferencePage
@@ -43,9 +45,20 @@ fun DeveloperSettingsView(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    if (state.showLoader) {
+        ProgressDialog()
+    }
+    BackHandler(
+        enabled = !state.showLoader,
+        onBack = onBackClick,
+    )
     PreferencePage(
         modifier = modifier,
-        onBackClick = onBackClick,
+        onBackClick = {
+            if (!state.showLoader) {
+                onBackClick()
+            }
+        },
         //title = stringResource(id = CommonStrings.common_developer_options)
         title = stringResource(id = CommonStrings.common_advanced_settings)
     ) {
