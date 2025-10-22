@@ -265,7 +265,7 @@ class HomePresenter(
                     coroutineState.loadMoreMyFeeds(event.currentFeeds.size)
                 }
                 HomeEvents.RefreshMyFeeds -> coroutineState.forceRefreshMyFeeds()
-                is HomeEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount)
+                is HomeEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, genericActionState)
                 is HomeEvents.LoadFeedMedia -> {
                     coroutineState.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
                 }
@@ -636,8 +636,11 @@ class HomePresenter(
         client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
     }
 
-    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int) = launch {
+    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, genericActionState: MutableState<AsyncAction<Unit>>) = launch {
         client.addMeowToFeed(feed, meowCount)
+            .onFailure {
+                genericActionState.value = AsyncAction.Failure(it)
+            }
     }
 
     private fun extractFeedsToFetchData(

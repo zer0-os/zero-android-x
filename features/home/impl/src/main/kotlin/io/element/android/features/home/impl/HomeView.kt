@@ -198,7 +198,7 @@ fun HomeView(
 
             if (homeState.genericActionState is AsyncAction.Failure) {
                 ErrorDialog(
-                    content = stringResource(CommonStrings.error_unknown),
+                    content = homeState.genericActionState.errorOrNull()?.message ?: stringResource(CommonStrings.error_unknown),
                     onSubmit = { homeState.eventSink(HomeEvents.HideError) }
                 )
             }

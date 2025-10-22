@@ -23,7 +23,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
-import dev.zacsweers.metro.Inject
 import io.element.android.features.startchat.api.StartDMAction
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
@@ -102,7 +101,7 @@ class FeedUserProfilePresenter(
         fun handleEvents(event: FeedUserProfileEvents) {
             when (event) {
                 is FeedUserProfileEvents.AddMeowToFeed ->
-                    GlobalScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow)
+                    GlobalScope.addMeowToFeed(event.feed, event.meowCount, userFeedsFlow, genericActionState)
                 FeedUserProfileEvents.LoadMoreUserFeeds -> {
                     coroutineScope.loadMoreUserFeeds(userId.extractedDisplayName, userFeedsFlow)
                 }
@@ -205,7 +204,12 @@ class FeedUserProfilePresenter(
         }
     }
 
-    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, userFeedsFlow: MutableState<List<ZeroFeed>>) = launch {
+    private fun CoroutineScope.addMeowToFeed(
+        feed: ZeroFeed,
+        meowCount: Int,
+        userFeedsFlow: MutableState<List<ZeroFeed>>,
+        genericActionState: MutableState<AsyncAction<Unit>>
+    ) = launch {
         val updateList: (ZeroFeed) -> Unit = { updatedFeed ->
             val allFeeds = userFeedsFlow.value.toMutableList()
             allFeeds.indexOfFirst { it.id == updatedFeed.id }
@@ -218,11 +222,16 @@ class FeedUserProfilePresenter(
                 }
         }
         //update locally
-        updateList(feed.withLocalMeowCount(meowCount))
-        val result = client.addMeowToFeed(feed, meowCount)
-        result.getOrNull()?.let { updatedFeed ->
-            updateList(updatedFeed)
-        }
+        val locallyUpdatedFeed = feed.withLocalMeowCount(meowCount)
+        updateList(locallyUpdatedFeed)
+        client.addMeowToFeed(feed, meowCount)
+            .onSuccess { updatedFeed ->
+                updatedFeed?.let(updateList)
+            }
+            .onFailure {
+                updateList(feed)
+                genericActionState.value = AsyncAction.Failure(it)
+            }
     }
 
     private fun CoroutineScope.loadMoreUserFeeds(userZId: String, userFeedsFlow: MutableState<List<ZeroFeed>>) = launch {

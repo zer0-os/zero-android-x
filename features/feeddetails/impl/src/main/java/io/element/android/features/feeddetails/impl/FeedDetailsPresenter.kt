@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
-import dev.zacsweers.metro.Inject
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.MatrixClient
@@ -84,7 +83,7 @@ class FeedDetailsPresenter(
         fun handleEvents(event: FeedDetailsEvents) {
             when (event) {
                 FeedDetailsEvents.RefreshFeed -> coroutineScope.refreshFeed(feed.id, feedDetailsFlow, feedRepliesFlow)
-                is FeedDetailsEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, event.isReplyFeed, feedDetailsFlow, feedRepliesFlow)
+                is FeedDetailsEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, event.isReplyFeed, feedDetailsFlow, feedRepliesFlow, genericActionState)
                 FeedDetailsEvents.LoadMoreReplies -> coroutineScope.loadMoreReplies(feed.id, feedRepliesFlow)
                 is FeedDetailsEvents.PostReplyTextChanged -> postReplyText.value = event.text
                 FeedDetailsEvents.PostReply -> coroutineScope.postMyReply(
@@ -154,23 +153,35 @@ class FeedDetailsPresenter(
         meowCount: Int,
         isReplyFeed: Boolean,
         feedDetailsFlow: MutableState<ZeroFeed>,
-        feedRepliesFlow: MutableState<List<ZeroFeed>>
+        feedRepliesFlow: MutableState<List<ZeroFeed>>,
+        genericActionState: MutableState<AsyncAction<Unit>>
     ) = launch {
+        val locallyUpdatedFeed = feed.withLocalMeowCount(meowCount)
+        // update locally
         if (!isReplyFeed) {
-            //update locally
-            feedDetailsFlow.value = feed.withLocalMeowCount(meowCount)
-            val result = client.addMeowToFeed(feed, meowCount)
-            result.getOrNull()?.let {
-                feedDetailsFlow.value = it
-            }
+            feedDetailsFlow.value = locallyUpdatedFeed
         } else {
-            //update locally
-            updateReplyFeed(feed.withLocalMeowCount(meowCount), feedRepliesFlow)
-            val result = client.addMeowToFeed(feed, meowCount)
-            result.getOrNull()?.let {
-                updateReplyFeed(it, feedRepliesFlow)
+            updateReplyFeed(locallyUpdatedFeed, feedRepliesFlow)
+        }
+
+        val handleOnSuccess: (ZeroFeed?) -> Unit = { updatedFeed ->
+            if (!isReplyFeed) {
+                updatedFeed?.let { feedDetailsFlow.value = it }
+            } else {
+                updatedFeed?.let { updateReplyFeed(it, feedRepliesFlow) }
             }
         }
+        val handleOnFailure: (Throwable) -> Unit = {
+            if (!isReplyFeed) {
+                feedDetailsFlow.value = feed
+            } else {
+                updateReplyFeed(feed, feedRepliesFlow)
+            }
+            genericActionState.value = AsyncAction.Failure(it)
+        }
+        client.addMeowToFeed(feed, meowCount)
+            .onSuccess { updatedFeed -> handleOnSuccess(updatedFeed) }
+            .onFailure { handleOnFailure(it) }
     }
 
     private fun updateReplyFeed(feed: ZeroFeed, feedRepliesFlow: MutableState<List<ZeroFeed>>) {

@@ -49,7 +49,7 @@ interface FeedRepository {
         includeMeows: Boolean = true
     ): List<ApiFeed>
 
-    suspend fun addMeowToFeed(feedId: String, meowAmount: Int): ApiFeed?
+    suspend fun addMeowToFeed(feedId: String, meowAmount: Int): Result<ApiFeed>
 
     suspend fun createNewFeed(channelZId: String?,
                               walletAddress: String,

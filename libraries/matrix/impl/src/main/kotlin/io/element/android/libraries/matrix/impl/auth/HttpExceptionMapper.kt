@@ -24,6 +24,7 @@ fun HttpException.mapZeroException(
             "PROFILE_PRIMARY_EMAIL_ALREADY_EXISTS" -> Exception("This email is already associated with a ZERO account")
             "PUBLIC_ADDRESS_ALREADY_EXISTS" -> Exception("This wallet is already associated with a ZERO account")
             "INSUFFICIENT_BALANCE" -> Exception("Gas balance is not enough for this transaction")
+            "INSUFFICIENT_MEOW_BALANCE" -> Exception("Insufficient Meow Balance")
             else -> Exception(zeroError.message)
         }
     } else {

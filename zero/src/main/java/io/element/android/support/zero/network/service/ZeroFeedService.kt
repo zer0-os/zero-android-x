@@ -69,7 +69,7 @@ interface ZeroFeedService {
     suspend fun meowFeed(
         @Path("feed_id") feedId: String,
         @Body request: MeowFeedRequest
-    ): Response<ResponseBody>
+    )
 
     @POST(value = "api/v2/posts/channel/raw/{channel_zid}")
     suspend fun postNewFeed(

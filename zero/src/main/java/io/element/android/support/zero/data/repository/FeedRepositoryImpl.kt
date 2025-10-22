@@ -75,15 +75,11 @@ class FeedRepositoryImpl(
         }.getOrDefault(emptyList())
     }
 
-    override suspend fun addMeowToFeed(feedId: String, meowAmount: Int): ApiFeed? {
+    override suspend fun addMeowToFeed(feedId: String, meowAmount: Int): Result<ApiFeed> {
         return runCatching {
-            val result = zeroFeedService.meowFeed(feedId, MeowFeedRequest(amount = meowAmount))
-            if (result.isSuccessful) {
-                zeroFeedService.fetchFeedDetails(feedId).feed
-            } else {
-                null
-            }
-        }.getOrNull()
+            zeroFeedService.meowFeed(feedId, MeowFeedRequest(amount = meowAmount))
+            zeroFeedService.fetchFeedDetails(feedId).feed
+        }
     }
 
     override suspend fun createNewFeed(channelZId: String?, walletAddress: String, content: String, mediaId: String?, replyToPost: String?): Boolean {

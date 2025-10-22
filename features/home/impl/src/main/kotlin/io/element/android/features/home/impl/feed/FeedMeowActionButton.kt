@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,9 +29,11 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.support.zero.R
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-private const val MAX_MEOW_LIMIT = 100
+private const val MAX_MEOW_LIMIT = 50
 
 @Composable
 fun FeedMeowActionButton(
@@ -41,11 +44,23 @@ fun FeedMeowActionButton(
 ) {
     var count by remember { mutableIntStateOf(0) }
     var isPressed by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var debounceJob by remember { mutableStateOf<Job?>(null) }
 
     val onPressReleased: () -> Unit = {
         isPressed = false
-        onAddMeowToFeed(count)
-        count = 0
+
+        // Cancel any existing debounce job
+        debounceJob?.cancel()
+
+        // Create a new debounce job that waits 300ms before calling onAddMeowToFeed
+        debounceJob = scope.launch {
+            delay(300)
+            if (count > 0) {
+                onAddMeowToFeed(count)
+                count = 0
+            }
+        }
     }
 
     LaunchedEffect(isPressed) {
@@ -67,6 +82,8 @@ fun FeedMeowActionButton(
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
+                            // Cancel debounce if user presses again
+                            debounceJob?.cancel()
                             isPressed = true
                             tryAwaitRelease() // Waits for the user to lift the finger
                             onPressReleased()

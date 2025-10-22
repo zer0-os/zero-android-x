@@ -1073,14 +1073,14 @@ class RustMatrixClient(
             runCatching {
                 val feedRepo = zeroCoreRepository?.feed ?: return@runCatching null
                 //update locally
-                updateFeedInHome(feed.withLocalMeowCount(meowAmount))
-                val updatedFeed = feedRepo
-                    .addMeowToFeed(feedId = feed.id, meowAmount)
-                    ?.toModel()
-                if (updatedFeed != null) {
-                    updateFeedInHome(updatedFeed)
-                }
-                return@runCatching updatedFeed
+                val locallyUpdatedFeed = feed.withLocalMeowCount(meowAmount)
+                updateFeedInHome(locallyUpdatedFeed)
+                feedRepo.addMeowToFeed(feedId = feed.id, meowAmount)
+                    .getOrThrow().toModel()
+            }.mapFailure {
+                //revert to original feed
+                updateFeedInHome(feed)
+                it.mapClientException()
             }
         }
 
