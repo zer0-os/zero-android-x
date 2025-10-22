@@ -56,6 +56,7 @@ import io.element.android.features.ftue.api.state.FtueState
 import io.element.android.features.home.api.HomeEntryPoint
 import io.element.android.features.networkmonitor.api.NetworkMonitor
 import io.element.android.features.networkmonitor.api.NetworkStatus
+import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.features.preferences.api.PreferencesEntryPoint
 import io.element.android.features.roomdirectory.api.RoomDescription
 import io.element.android.features.roomdirectory.api.RoomDirectoryEntryPoint
@@ -84,6 +85,7 @@ import io.element.android.libraries.matrix.api.core.RoomIdOrAlias
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
 import io.element.android.libraries.matrix.api.permalink.PermalinkData
+import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.verification.SessionVerificationServiceListener
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
@@ -135,6 +137,7 @@ class LoggedInFlowNode(
     private val sessionEnterpriseService: SessionEnterpriseService,
     private val networkMonitor: NetworkMonitor,
     private val notificationConversationService: NotificationConversationService,
+    private val syncService: SyncService,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
@@ -704,11 +707,17 @@ class LoggedInFlowNode(
 
     @Composable
     override fun View(modifier: Modifier) {
-        Box(modifier = modifier) {
-            val ftueState by ftueService.state.collectAsState()
-            BackstackView()
-            if (ftueState is FtueState.Complete) {
-                PermanentChild(permanentNavModel = permanentNavModel, navTarget = NavTarget.LoggedInPermanent)
+        val isOnline by syncService.isOnline.collectAsState()
+        ConnectivityIndicatorContainer(
+            isOnline = isOnline,
+            modifier = modifier,
+        ) { contentModifier ->
+            Box(modifier = contentModifier) {
+                val ftueState by ftueService.state.collectAsState()
+                BackstackView()
+                if (ftueState is FtueState.Complete) {
+                    PermanentChild(permanentNavModel = permanentNavModel, navTarget = NavTarget.LoggedInPermanent)
+                }
             }
         }
     }

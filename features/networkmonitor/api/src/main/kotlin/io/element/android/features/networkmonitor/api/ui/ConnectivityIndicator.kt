@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.element.android.compound.theme.ElementTheme
@@ -33,7 +34,8 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
-internal fun Indicator(
+internal fun ConnectivityIndicator(
+    verticalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -41,7 +43,7 @@ internal fun Indicator(
             .fillMaxWidth()
             .background(ElementTheme.colors.bgSubtlePrimary)
             .statusBarsPadding()
-            .padding(vertical = 6.dp),
+            .padding(vertical = verticalPadding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -62,6 +64,6 @@ internal fun Indicator(
 
 @PreviewsDayNight
 @Composable
-internal fun IndicatorPreview() = ElementPreview {
-    Indicator()
+internal fun ConnectivityIndicatorPreview() = ElementPreview {
+    ConnectivityIndicator(verticalPadding = 6.dp)
 }

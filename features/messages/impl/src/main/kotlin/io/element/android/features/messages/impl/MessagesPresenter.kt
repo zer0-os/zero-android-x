@@ -80,7 +80,6 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canPinUnpin
 import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOther
 import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOwn
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendMessage
-import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.messages.reply.map
@@ -112,7 +111,6 @@ class MessagesPresenter(
     private val pinnedMessagesBannerPresenter: Presenter<PinnedMessagesBannerState>,
     private val roomCallStatePresenter: Presenter<RoomCallState>,
     private val roomMemberModerationPresenter: Presenter<RoomMemberModerationState>,
-    private val syncService: SyncService,
     private val snackbarDispatcher: SnackbarDispatcher,
     private val dispatchers: CoroutineDispatchers,
     private val clipboardHelper: ClipboardHelper,
@@ -201,7 +199,6 @@ class MessagesPresenter(
                 showReinvitePrompt = !hasDismissedInviteDialog && composerHasFocus && roomInfo.isDm && roomInfo.activeMembersCount == 1L
             }
         }
-        val isOnline by syncService.isOnline.collectAsState()
 
         val snackbarMessage by snackbarDispatcher.collectSnackbarMessageAsState()
 
@@ -260,8 +257,8 @@ class MessagesPresenter(
             roomAvatar = roomAvatar,
             roomSubTitle = roomSubTitle,
             heroes = heroes,
-            composerState = composerState,
             userEventPermissions = userEventPermissions,
+            composerState = composerState,
             voiceMessageComposerState = voiceMessageComposerState,
             timelineState = timelineState,
             timelineProtectionState = timelineProtectionState,
@@ -271,20 +268,18 @@ class MessagesPresenter(
             customReactionState = customReactionState,
             reactionSummaryState = reactionSummaryState,
             readReceiptBottomSheetState = readReceiptBottomSheetState,
-            hasNetworkConnection = isOnline,
             snackbarMessage = snackbarMessage,
             showZeroProBadge = showZeroProBadge,
             showReinvitePrompt = showReinvitePrompt,
             inviteProgress = inviteProgress.value,
             enableTextFormatting = MessageComposerConfig.ENABLE_RICH_TEXT_EDITING,
-            appName = buildMeta.applicationName,
             roomCallState = roomCallState,
+            appName = buildMeta.applicationName,
             pinnedMessagesBannerState = pinnedMessagesBannerState,
             dmUserVerificationState = dmUserVerificationState,
             roomMemberModerationState = roomMemberModerationState,
-            successorRoom = roomInfo.successorRoom,
-            eventSink = { handleEvents(it) }
-        )
+            successorRoom = roomInfo.successorRoom
+        ) { handleEvents(it) }
     }
 
     @Composable

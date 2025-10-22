@@ -131,7 +131,7 @@ fun HomeView(
     ConnectivityIndicatorContainer(
         modifier = modifier,
         isOnline = homeState.hasNetworkConnection,
-    ) { topPadding ->
+    ) { contentModifier ->
         Box {
             if (roomListState.contextMenu is RoomListState.ContextMenu.Shown) {
                 RoomListContextMenu(
@@ -171,7 +171,7 @@ fun HomeView(
                 onSendWalletToken = onSendWalletToken,
                 onHomeNavTabSelected = { selectedHomeNavigationTab.value = it },
                 onChannelsContentTabSelected = { selectedChannelsTab.value = it },
-                modifier = Modifier.padding(top = topPadding),
+                modifier = contentModifier,
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
@@ -184,9 +184,8 @@ fun HomeView(
                 selectedChannelContentTab = selectedChannelsTab.value,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 onChannelClick = { homeState.eventSink(HomeEvents.OpenChannel(it)) },
-                modifier = Modifier
+                modifier = contentModifier
                     .statusBarsPadding()
-                    .padding(top = topPadding)
                     .fillMaxSize()
                     .background(ElementTheme.colors.bgCanvasDefault)
             )

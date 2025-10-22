@@ -45,7 +45,6 @@ data class MessagesState(
     val customReactionState: CustomReactionState,
     val reactionSummaryState: ReactionSummaryState,
     val readReceiptBottomSheetState: ReadReceiptBottomSheetState,
-    val hasNetworkConnection: Boolean,
     val snackbarMessage: SnackbarMessage?,
     val inviteProgress: AsyncData<Unit>,
     val showZeroProBadge: Boolean,
