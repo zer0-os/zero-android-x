@@ -47,6 +47,7 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOther
 import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOwn
 import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.ui.room.isDmAsState
+import io.element.android.libraries.matrix.ui.room.isEncryptedAsState
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
@@ -94,6 +95,7 @@ class PinnedMessagesListPresenter(
     @Composable
     override fun present(): PinnedMessagesListState {
         val isDm by room.isDmAsState()
+        val isEncrypted by room.isEncryptedAsState()
 
         val roomMembersState = room.membersStateFlow.collectAsState()
 
@@ -114,7 +116,8 @@ class PinnedMessagesListPresenter(
                     reserveSpace = false,
                 ),
                 predecessorRoom = room.predecessorRoom(),
-                roomMembers = roomMembersState.value.roomMembers().orEmpty()
+                roomMembers = roomMembersState.value.roomMembers().orEmpty(),
+                isEncrypted = isEncrypted
             )
         }
         val timelineProtectionState = timelineProtectionPresenter.present()

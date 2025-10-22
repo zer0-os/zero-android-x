@@ -72,6 +72,8 @@ fun TimelineItemStateEventRow(
             ) {
                 TimelineItemEventContentView(
                     content = event.content.updatedContent(roomMembers),
+                    isMyMessage = false,
+                    isRoomEncrypted = false,
                     onLinkClick = {},
                     onLinkLongClick = {},
                     hideMediaContent = false,

@@ -10,6 +10,7 @@ package io.element.android.features.messages.impl
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.bumble.appyx.core.lifecycle.subscribe
@@ -78,6 +79,7 @@ import io.element.android.libraries.matrix.api.timeline.Timeline
 import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugInfo
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.messages.RoomNamesCache
+import io.element.android.libraries.matrix.ui.room.isEncryptedAsState
 import io.element.android.libraries.mediaviewer.api.MediaInfo
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.libraries.textcomposer.mentions.LocalMentionSpanUpdater
@@ -585,7 +587,9 @@ class MessagesFlowNode(
 
     @Composable
     override fun View(modifier: Modifier) {
-        mentionSpanTheme.updateStyles()
+        val isRoomEncrypted by room.isEncryptedAsState()
+
+        mentionSpanTheme.updateStyles(isRoomEncrypted = isRoomEncrypted)
         CompositionLocalProvider(
             LocalMentionSpanUpdater provides mentionSpanUpdater
         ) {

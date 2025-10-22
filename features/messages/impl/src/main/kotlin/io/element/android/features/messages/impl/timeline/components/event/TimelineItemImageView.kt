@@ -63,6 +63,8 @@ import io.element.android.wysiwyg.link.Link
 @Composable
 fun TimelineItemImageView(
     content: TimelineItemImageContent,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     hideMediaContent: Boolean,
     onContentClick: (() -> Unit)?,
     onLongClick: (() -> Unit)?,
@@ -125,8 +127,13 @@ fun TimelineItemImageView(
             } else {
                 content.formattedCaption ?: SpannedString(content.caption)
             }
+            val textColor = if (isMyMessage && !isRoomEncrypted) {
+                Color.Black
+            } else {
+                ElementTheme.colors.textPrimary
+            }
             CompositionLocalProvider(
-                LocalContentColor provides ElementTheme.colors.textPrimary,
+                LocalContentColor provides textColor,
                 LocalTextStyle provides ElementTheme.zeroTypography.fontBodyLgRegular
             ) {
                 val aspectRatio = content.aspectRatio ?: DEFAULT_ASPECT_RATIO
@@ -151,6 +158,8 @@ fun TimelineItemImageView(
 internal fun TimelineItemImageViewPreview(@PreviewParameter(TimelineItemImageContentProvider::class) content: TimelineItemImageContent) = ElementPreview {
     TimelineItemImageView(
         content = content,
+        isMyMessage = false,
+        isRoomEncrypted = false,
         hideMediaContent = false,
         onShowContentClick = {},
         onContentClick = {},
@@ -166,6 +175,8 @@ internal fun TimelineItemImageViewPreview(@PreviewParameter(TimelineItemImageCon
 internal fun TimelineItemImageViewHideMediaContentPreview() = ElementPreview {
     TimelineItemImageView(
         content = aTimelineItemImageContent(),
+        isMyMessage = false,
+        isRoomEncrypted = false,
         hideMediaContent = true,
         onShowContentClick = {},
         onContentClick = {},

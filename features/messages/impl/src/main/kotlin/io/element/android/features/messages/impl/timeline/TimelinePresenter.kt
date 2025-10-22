@@ -335,7 +335,8 @@ class TimelinePresenter(
                     pinnedEventIds = roomInfo.pinnedEventIds,
                     typingNotificationState = typingNotificationState,
                     predecessorRoom = room.predecessorRoom(),
-                    roomMembers = roomMembers.roomMembers().orEmpty()
+                    roomMembers = roomMembers.roomMembers().orEmpty(),
+                    isEncrypted = roomInfo.isEncrypted.orFalse()
                 )
             }
         }

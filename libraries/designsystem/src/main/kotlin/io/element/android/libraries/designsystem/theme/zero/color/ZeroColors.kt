@@ -7,6 +7,7 @@ internal val zeroAccentColor = Color(0xFF01F4CB)
 internal val zeroDialogBackground = Color(0xFF1F1B22)
 internal val zeroChatBubbleOutgoing = Color(0xFF400999)
 internal val zeroChatBubbleIncoming = Color(0xFF111213)
+internal val zeroMentionSecondary = Color(0xFF3D5AFE)
 
 internal val Color.Companion.ZeroNewBackground
     get() = Color(0xFF0D0D0D)
@@ -32,5 +33,14 @@ val SemanticColors.zeroDialogBackgroundColor
 val SemanticColors.zeroChatBubbleOutgoingColor
     get() = zeroChatBubbleOutgoing
 
+val SemanticColors.zeroChatBubbleOutgoingSecondaryColor
+    get() = zeroAccentColor
+
 val SemanticColors.zeroChatBubbleIncomingColor
     get() = zeroChatBubbleIncoming
+
+val SemanticColors.zeroMentionPrimaryColor
+    get() = zeroAccentColor
+
+val SemanticColors.zeroMentionSecondaryColor
+    get() = zeroMentionSecondary

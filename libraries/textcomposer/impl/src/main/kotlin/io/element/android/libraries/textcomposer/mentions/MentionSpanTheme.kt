@@ -40,9 +40,11 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.messageFromMeBackground
 import io.element.android.libraries.designsystem.theme.messageFromOtherBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroMentionPrimaryColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroMentionSecondaryColor
+import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.MatrixClient
-import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.RoomAlias
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
@@ -76,11 +78,16 @@ class MentionSpanTheme(val currentUserId: UserId) {
      */
     @Suppress("ComposableNaming")
     @Composable
-    fun updateStyles() {
-        currentUserTextColor = ElementTheme.colors.zeroBrandColor.toArgb()
-        currentUserBackgroundColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f).toArgb()
-        otherTextColor = ElementTheme.colors.zeroBrandColor.toArgb()
-        otherBackgroundColor = ElementTheme.colors.zeroBrandColor.copy(alpha = 0.1f).toArgb()
+    fun updateStyles(isRoomEncrypted: Boolean = true) {
+        val (mentionColor, mentionBgColor) = if (isRoomEncrypted) {
+            (ElementTheme.colors.zeroMentionPrimaryColor to ElementTheme.colors.zeroMentionPrimaryColor.copy(alpha = 0.1f))
+        } else {
+            (ElementTheme.colors.zeroMentionSecondaryColor to ElementTheme.colors.zeroMentionSecondaryColor.copy(alpha = 0.1f))
+        }
+        currentUserTextColor = mentionColor.toArgb()
+        currentUserBackgroundColor = mentionBgColor.toArgb()
+        otherTextColor = mentionColor.toArgb()
+        otherBackgroundColor = mentionBgColor.toArgb()
 
         typeface.value = ElementTheme.zeroTypography.fontBodyLgMedium.rememberTypeface().value
         val density = LocalDensity.current

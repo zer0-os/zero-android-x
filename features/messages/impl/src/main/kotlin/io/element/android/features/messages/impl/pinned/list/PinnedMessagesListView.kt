@@ -238,6 +238,8 @@ private fun PinnedMessagesListLoaded(
                 eventContentView = { event, contentModifier, onContentLayoutChange ->
                     TimelineItemEventContentViewWrapper(
                         event = event,
+                        isMyMessage = event.isMine,
+                        isRoomEncrypted = state.timelineRoomInfo.isEncrypted,
                         timelineProtectionState = state.timelineProtectionState,
                         onContentClick = { onEventClick(event) },
                         onLongClick = { onMessageLongClick(event) },
@@ -262,6 +264,8 @@ private fun PinnedMessagesListLoaded(
 private fun TimelineItemEventContentViewWrapper(
     event: TimelineItem.Event,
     timelineProtectionState: TimelineProtectionState,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     onContentClick: () -> Unit,
     onLinkClick: (Link) -> Unit,
     onLinkLongClick: (Link) -> Unit,
@@ -278,6 +282,8 @@ private fun TimelineItemEventContentViewWrapper(
     } else {
         TimelineItemEventContentView(
             content = event.content,
+            isMyMessage = isMyMessage,
+            isRoomEncrypted = isRoomEncrypted,
             hideMediaContent = timelineProtectionState.hideMediaContent(event.eventId),
             onShowContentClick = { timelineProtectionState.eventSink(TimelineProtectionEvent.ShowContent(event.eventId)) },
             onLinkClick = onLinkClick,

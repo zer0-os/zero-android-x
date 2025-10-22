@@ -87,6 +87,8 @@ internal fun TimelineItemRow(
 
             TimelineItemEventContentView(
                 content = event.content,
+                isMyMessage = event.isMine,
+                isRoomEncrypted = timelineRoomInfo.isEncrypted,
                 hideMediaContent = timelineProtectionState.hideMediaContent(event.eventId),
                 onShowContentClick = { timelineProtectionState.eventSink(TimelineProtectionEvent.ShowContent(event.eventId)) },
                 onContentClick = {

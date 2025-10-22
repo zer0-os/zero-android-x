@@ -62,6 +62,8 @@ fun TimelineItemGroupedEventsRow(
         { event, contentModifier, onContentLayoutChange ->
             TimelineItemEventContentView(
                 content = event.content,
+                isMyMessage = event.isMine,
+                isRoomEncrypted = timelineRoomInfo.isEncrypted,
                 hideMediaContent = timelineProtectionState.hideMediaContent(event.eventId),
                 onShowContentClick = { timelineProtectionState.eventSink(TimelineProtectionEvent.ShowContent(event.eventId)) },
                 onLinkClick = onLinkClick,
@@ -135,6 +137,8 @@ private fun TimelineItemGroupedEventsRowContent(
         { event, contentModifier, onContentLayoutChange ->
             TimelineItemEventContentView(
                 content = event.content,
+                isMyMessage = false,
+                isRoomEncrypted = false,
                 hideMediaContent = timelineProtectionState.hideMediaContent(event.eventId),
                 onShowContentClick = { timelineProtectionState.eventSink(TimelineProtectionEvent.ShowContent(event.eventId)) },
                 onLinkClick = onLinkClick,

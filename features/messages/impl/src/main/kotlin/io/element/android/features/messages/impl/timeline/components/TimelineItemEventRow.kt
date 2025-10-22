@@ -166,6 +166,8 @@ fun TimelineItemEventRow(
 
         TimelineItemEventContentView(
             content = event.content,
+            isMyMessage = event.isMine,
+            isRoomEncrypted = timelineRoomInfo.isEncrypted,
             hideMediaContent = timelineProtectionState.hideMediaContent(event.eventId),
             onContentClick = onContentClick,
             onLongClick = onLongClick,
@@ -287,6 +289,7 @@ fun TimelineItemEventRow(
                 threadSummary = event.threadInfo.summary,
                 latestEventText = event.threadInfo.latestEventText,
                 isOutgoing = event.isMine,
+                isRoomEncrypted = timelineRoomInfo.isEncrypted,
                 onClick = {
                     event.eventId?.let {
                         eventSink(TimelineEvents.OpenThread(it.toThreadId(), null))
@@ -309,11 +312,13 @@ fun TimelineItemEventRow(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun ThreadSummaryView(
     threadSummary: ThreadSummary,
     latestEventText: String?,
     isOutgoing: Boolean,
+    isRoomEncrypted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -325,7 +330,7 @@ private fun ThreadSummaryView(
                     shape = RoundedCornerShape(8.dp)
                     clip = true
                 }
-                .background(MessageEventBubbleDefaults.backgroundBubbleColor(isOutgoing))
+                .background(MessageEventBubbleDefaults.backgroundBubbleColor(isOutgoing, isRoomEncrypted))
                 .niceClickable(onClick)
                 .padding(horizontal = 12.dp, vertical = 10.dp)
                 .widthIn(max = (maxWidth - 24.dp) * MessageEventBubbleDefaults.BUBBLE_WIDTH_RATIO),
@@ -953,6 +958,7 @@ internal fun ThreadSummaryViewPreview() {
             threadSummary = threadSummary,
             latestEventText = "Some event with a very long text that should get clipped",
             isOutgoing = true,
+            isRoomEncrypted = true,
             onClick = {},
         )
     }

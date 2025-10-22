@@ -36,6 +36,8 @@ import io.element.android.wysiwyg.link.Link
 @Composable
 fun TimelineItemEventContentView(
     content: TimelineItemEventContent,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     hideMediaContent: Boolean,
     onContentClick: (() -> Unit)?,
     onLongClick: (() -> Unit)?,
@@ -60,6 +62,8 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemTextBasedContent -> TimelineItemTextView(
             content = content,
+            isMyMessage = isMyMessage,
+            isRoomEncrypted = isRoomEncrypted,
             modifier = modifier,
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
@@ -76,6 +80,8 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemImageContent -> TimelineItemImageView(
             content = content,
+            isMyMessage = isMyMessage,
+            isRoomEncrypted = isRoomEncrypted,
             hideMediaContent = hideMediaContent,
             onContentClick = onContentClick,
             onLongClick = onLongClick,
@@ -95,6 +101,8 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemVideoContent -> TimelineItemVideoView(
             content = content,
+            isMyMessage = isMyMessage,
+            isRoomEncrypted = isRoomEncrypted,
             hideMediaContent = hideMediaContent,
             onContentClick = onContentClick,
             onLongClick = onLongClick,

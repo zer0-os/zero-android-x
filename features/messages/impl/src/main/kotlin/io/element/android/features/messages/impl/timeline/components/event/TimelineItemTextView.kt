@@ -15,6 +15,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +39,8 @@ import io.element.android.wysiwyg.link.Link
 @Composable
 fun TimelineItemTextView(
     content: TimelineItemTextBasedContent,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     onLinkClick: (Link) -> Unit,
     onLinkLongClick: (Link) -> Unit,
     modifier: Modifier = Modifier,
@@ -49,8 +52,13 @@ fun TimelineItemTextView(
         emojiOnly -> ElementTheme.zeroTypography.fontHeadingXlRegular
         else -> ElementTheme.zeroTypography.fontBodyLgRegular
     }
+    val textColor = if (isMyMessage && !isRoomEncrypted) {
+        Color.Black
+    } else {
+        ElementTheme.colors.textPrimary
+    }
     CompositionLocalProvider(
-        LocalContentColor provides ElementTheme.colors.textPrimary,
+        LocalContentColor provides textColor,
         LocalTextStyle provides textStyle
     ) {
         val text = getTextWithResolvedMentions(content)
@@ -82,6 +90,8 @@ internal fun TimelineItemTextViewPreview(
 ) = ElementPreview {
     TimelineItemTextView(
         content = content,
+        isMyMessage = false,
+        isRoomEncrypted = false,
         onLinkClick = {},
         onLinkLongClick = {},
     )
@@ -95,6 +105,8 @@ internal fun TimelineItemTextViewWithLinkifiedUrlPreview() = ElementPreview {
     )
     TimelineItemTextView(
         content = content,
+        isMyMessage = false,
+        isRoomEncrypted = false,
         onLinkClick = {},
         onLinkLongClick = {},
     )
@@ -108,6 +120,8 @@ internal fun TimelineItemTextViewWithLinkifiedUrlAndNestedParenthesisPreview() =
     )
     TimelineItemTextView(
         content = content,
+        isMyMessage = false,
+        isRoomEncrypted = false,
         onLinkClick = {},
         onLinkLongClick = {},
     )

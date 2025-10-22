@@ -71,6 +71,8 @@ import io.element.android.wysiwyg.link.Link
 @Composable
 fun TimelineItemVideoView(
     content: TimelineItemVideoContent,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     hideMediaContent: Boolean,
     onContentClick: (() -> Unit)?,
     onLongClick: (() -> Unit)?,
@@ -151,8 +153,13 @@ fun TimelineItemVideoView(
             } else {
                 content.formattedCaption ?: SpannedString(content.caption)
             }
+            val textColor = if (isMyMessage && !isRoomEncrypted) {
+                Color.Black
+            } else {
+                ElementTheme.colors.textPrimary
+            }
             CompositionLocalProvider(
-                LocalContentColor provides ElementTheme.colors.textPrimary,
+                LocalContentColor provides textColor,
                 LocalTextStyle provides ElementTheme.zeroTypography.fontBodyLgRegular,
             ) {
                 val aspectRatio = content.aspectRatio ?: DEFAULT_ASPECT_RATIO
@@ -177,6 +184,8 @@ fun TimelineItemVideoView(
 internal fun TimelineItemVideoViewPreview(@PreviewParameter(TimelineItemVideoContentProvider::class) content: TimelineItemVideoContent) = ElementPreview {
     TimelineItemVideoView(
         content = content,
+        isMyMessage = false,
+        isRoomEncrypted = false,
         hideMediaContent = false,
         onShowContentClick = {},
         onContentClick = {},
@@ -192,6 +201,8 @@ internal fun TimelineItemVideoViewPreview(@PreviewParameter(TimelineItemVideoCon
 internal fun TimelineItemVideoViewHideMediaContentPreview() = ElementPreview {
     TimelineItemVideoView(
         content = aTimelineItemVideoContent(),
+        isMyMessage = false,
+        isRoomEncrypted = false,
         hideMediaContent = true,
         onShowContentClick = {},
         onContentClick = {},

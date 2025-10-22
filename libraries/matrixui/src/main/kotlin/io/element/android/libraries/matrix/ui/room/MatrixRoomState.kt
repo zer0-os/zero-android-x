@@ -75,6 +75,13 @@ fun BaseRoom.isDmAsState(): State<Boolean> {
 }
 
 @Composable
+fun BaseRoom.isEncryptedAsState(): State<Boolean> {
+    return produceState(initialValue = false) {
+        roomInfoFlow.collect { value = it.isEncrypted ?: false }
+    }
+}
+
+@Composable
 fun BaseRoom.canKickAsState(updateKey: Long): State<Boolean> {
     return produceState(initialValue = false, key1 = updateKey) {
         value = canKick().getOrElse { false }

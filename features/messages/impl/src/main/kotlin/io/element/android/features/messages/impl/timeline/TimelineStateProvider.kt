@@ -250,6 +250,7 @@ internal fun aGroupedEvents(
 internal fun aTimelineRoomInfo(
     name: String = "Room name",
     isDm: Boolean = false,
+    isEncrypted: Boolean = true,
     userHasPermissionToSendMessage: Boolean = true,
     pinnedEventIds: List<EventId> = emptyList(),
     typingNotificationState: TypingNotificationState = aTypingNotificationState(),
@@ -263,5 +264,6 @@ internal fun aTimelineRoomInfo(
     pinnedEventIds = pinnedEventIds.toImmutableList(),
     typingNotificationState = typingNotificationState,
     predecessorRoom = predecessorRoom,
-    roomMembers = emptyList()
+    roomMembers = emptyList(),
+    isEncrypted = isEncrypted
 )

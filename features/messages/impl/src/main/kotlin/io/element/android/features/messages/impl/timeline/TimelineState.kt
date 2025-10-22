@@ -83,5 +83,6 @@ data class TimelineRoomInfo(
     val pinnedEventIds: ImmutableList<EventId>,
     val typingNotificationState: TypingNotificationState,
     val predecessorRoom: PredecessorRoom?,
-    val roomMembers: List<RoomMember>
+    val roomMembers: List<RoomMember>,
+    val isEncrypted: Boolean
 )

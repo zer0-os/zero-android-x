@@ -59,7 +59,8 @@ object ElementRichTextEditorStyle {
                 color = colors.iconAccentTertiary,
             ),
             link = RichTextEditorDefaults.linkStyle(
-                color = colors.textLinkExternal,
+                // color = colors.textLinkExternal,
+                color = LocalTextStyle.current.color.takeIf { it.isSpecified } ?: LocalContentColor.current,
             ),
             codeBlock = RichTextEditorDefaults.codeBlockStyle(
                 leadingMargin = 8.dp,

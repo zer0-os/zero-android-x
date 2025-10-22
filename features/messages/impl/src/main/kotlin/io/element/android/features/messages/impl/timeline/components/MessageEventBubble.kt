@@ -45,6 +45,7 @@ import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleIncomingColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroChatBubbleOutgoingSecondaryColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
@@ -79,7 +80,7 @@ fun MessageEventBubble(
     }
 
     // Ignore state.isHighlighted for now, we need a design decision on it.
-    val backgroundBubbleColor = MessageEventBubbleDefaults.backgroundBubbleColor(state.isMine)
+    val backgroundBubbleColor = MessageEventBubbleDefaults.backgroundBubbleColor(state.isMine, state.timelineRoomInfo.isEncrypted)
     val bubbleShape = remember(state) { MessageEventBubbleDefaults.shape(state.cutTopStart, state.groupPosition, state.isMine) }
     val radiusPx = (avatarRadius + SENDER_AVATAR_BORDER_WIDTH).toPx()
     val yOffsetPx = -(NEGATIVE_MARGIN_FOR_BUBBLE + avatarRadius).toPx()
@@ -155,9 +156,13 @@ object MessageEventBubbleDefaults {
     }
 
     @Composable
-    fun backgroundBubbleColor(isMine: Boolean): Color {
+    fun backgroundBubbleColor(isMine: Boolean, isEncryptedRoom: Boolean): Color {
         return when {
-            isMine -> ElementTheme.colors.zeroChatBubbleOutgoingColor
+            isMine -> if (isEncryptedRoom) {
+                ElementTheme.colors.zeroChatBubbleOutgoingColor
+            } else {
+                ElementTheme.colors.zeroChatBubbleOutgoingSecondaryColor
+            }
             else -> ElementTheme.colors.zeroChatBubbleIncomingColor
         }
     }
