@@ -9,7 +9,9 @@ package io.element.android.features.messages.impl.timeline.components.event
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.messages.impl.timeline.TimelineEvents
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemPollContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemPollContentProvider
@@ -22,6 +24,8 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun TimelineItemPollView(
     content: TimelineItemPollContent,
+    isMyMessage: Boolean,
+    isRoomEncrypted: Boolean,
     eventSink: (TimelineEvents.TimelineItemPollEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -37,11 +41,18 @@ fun TimelineItemPollView(
         eventSink(TimelineEvents.EditPoll(pollStartId))
     }
 
+    val pollAccentColor = if (isMyMessage && !isRoomEncrypted) {
+        Color.Black
+    } else {
+        ElementTheme.colors.textPrimary
+    }
+
     PollContentView(
         eventId = content.eventId,
         question = content.question,
         answerItems = content.answerItems.toImmutableList(),
         pollKind = content.pollKind,
+        pollAccentColor = pollAccentColor,
         isPollEnded = content.isEnded,
         isPollEditable = content.isEditable,
         isMine = content.isMine,
@@ -58,6 +69,8 @@ internal fun TimelineItemPollViewPreview(@PreviewParameter(TimelineItemPollConte
     ElementPreview {
         TimelineItemPollView(
             content = content,
+            isMyMessage = false,
+            isRoomEncrypted = true,
             eventSink = {},
         )
     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -26,6 +27,7 @@ import io.element.android.libraries.ui.strings.CommonStrings
 @Composable
 fun PollTitleView(
     title: String,
+    titleColor: Color = ElementTheme.colors.textPrimary,
     isPollEnded: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -37,18 +39,21 @@ fun PollTitleView(
             Icon(
                 imageVector = CompoundIcons.PollsEnd(),
                 contentDescription = stringResource(id = CommonStrings.a11y_poll_end),
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(22.dp),
+                tint = titleColor
             )
         } else {
             Icon(
                 imageVector = CompoundIcons.Polls(),
                 contentDescription = stringResource(id = CommonStrings.a11y_poll),
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(22.dp),
+                tint = titleColor
             )
         }
         Text(
             text = title,
-            style = ElementTheme.zeroTypography.fontBodyLgMedium
+            style = ElementTheme.zeroTypography.fontBodyLgMedium,
+            color = titleColor
         )
     }
 }

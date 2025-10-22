@@ -21,6 +21,15 @@ fun Boolean.toEnabledColor(): Color {
 }
 
 @Composable
+fun Boolean.toCustomEnabledColor(color: Color): Color {
+    return if (this) {
+        color
+    } else {
+        ElementTheme.colors.textDisabled
+    }
+}
+
+@Composable
 fun Boolean.toSecondaryEnabledColor(): Color {
     return if (this) {
         ElementTheme.colors.textSecondary
