@@ -23,11 +23,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -87,10 +84,6 @@ import io.element.android.libraries.designsystem.text.toAnnotatedString
 import io.element.android.libraries.designsystem.theme.components.BottomSheetDragHandle
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.libraries.designsystem.theme.components.TopAppBar
-import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
-import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import io.element.android.libraries.designsystem.utils.HideKeyboardWhenDisposed
 import io.element.android.libraries.designsystem.utils.KeepScreenOn
 import io.element.android.libraries.designsystem.utils.OnLifecycleEvent
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarHost
@@ -129,8 +122,6 @@ fun MessagesView(
     }
 
     KeepScreenOn(state.voiceMessageComposerState.keepScreenOn)
-
-    HideKeyboardWhenDisposed()
 
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
 

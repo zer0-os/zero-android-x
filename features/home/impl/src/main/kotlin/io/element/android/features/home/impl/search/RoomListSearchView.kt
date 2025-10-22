@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -49,7 +50,6 @@ import io.element.android.features.home.impl.model.toRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
 import io.element.android.libraries.designsystem.components.button.BackButton
-import io.element.android.libraries.designsystem.components.form.textFieldState
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.FilledTextField
@@ -145,7 +145,7 @@ private fun RoomListSearchContent(
                 },
                 navigationIcon = { BackButton(onClick = ::onBackButtonClick) },
                 title = {
-                    var filter by textFieldState(state.query)
+                    var value by remember { mutableStateOf(TextFieldValue(state.query, TextRange(state.query.length))) }
 
                     val focusRequester = remember { FocusRequester() }
                     FilledTextField(
@@ -155,10 +155,10 @@ private fun RoomListSearchContent(
                         placeholder = {
                             Text(text = stringResource(CommonStrings.action_search))
                         },
-                        value = TextFieldValue(filter, TextRange(filter.length)),
+                        value = value,
                         singleLine = true,
                         onValueChange = {
-                            filter = it.text
+                            value = it
                             state.eventSink(RoomListSearchEvents.QueryChanged(it.text))
                         },
                         colors = TextFieldDefaults.colors(
@@ -171,7 +171,7 @@ private fun RoomListSearchContent(
                             errorIndicatorColor = Color.Transparent,
                         ),
                         trailingIcon = {
-                            if (filter.isNotEmpty()) {
+                            if (value.text.isNotEmpty()) {
                                 IconButton(onClick = {
                                     state.eventSink(RoomListSearchEvents.ClearQuery)
                                 }) {
@@ -185,7 +185,11 @@ private fun RoomListSearchContent(
                     )
 
                     LaunchedEffect(Unit) {
-                        focusRequester.requestFocus()
+                        value = value.copy(selection = TextRange(value.text.length))
+                        if (!focusRequester.restoreFocusedChild()) {
+                            focusRequester.requestFocus()
+                        }
+                        focusRequester.saveFocusedChild()
                     }
                 },
                 windowInsets = TopAppBarDefaults.windowInsets.copy(top = 0)
