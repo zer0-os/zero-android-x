@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.bumble.appyx.core.composable.PermanentChild
@@ -46,7 +47,9 @@ import io.element.android.appnav.loggedin.SendQueues
 import io.element.android.appnav.room.RoomFlowNode
 import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
+import io.element.android.compound.colors.SemanticColorsLightDark
 import io.element.android.features.createfeed.api.CreateFeedEntryPoint
+import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.features.enterprise.api.SessionEnterpriseService
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
@@ -73,6 +76,8 @@ import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.createNode
 import io.element.android.libraries.architecture.overlay.operation.hide
 import io.element.android.libraries.architecture.waitForNavTargetAttached
+import io.element.android.libraries.core.meta.BuildMeta
+import io.element.android.libraries.designsystem.theme.ElementThemeApp
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
 import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.di.annotations.SessionCoroutineScope
@@ -91,6 +96,7 @@ import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
+import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.push.api.notifications.conversations.NotificationConversationService
 import io.element.android.libraries.ui.common.nodes.emptyNode
 import io.element.android.services.appnavstate.api.AppNavigationStateService
@@ -138,6 +144,9 @@ class LoggedInFlowNode(
     private val networkMonitor: NetworkMonitor,
     private val notificationConversationService: NotificationConversationService,
     private val syncService: SyncService,
+    private val enterpriseService: EnterpriseService,
+    private val appPreferencesStore: AppPreferencesStore,
+    private val buildMeta: BuildMeta,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val createFeedEntryPoint: CreateFeedEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
@@ -707,16 +716,26 @@ class LoggedInFlowNode(
 
     @Composable
     override fun View(modifier: Modifier) {
-        val isOnline by syncService.isOnline.collectAsState()
-        ConnectivityIndicatorContainer(
-            isOnline = isOnline,
-            modifier = modifier,
-        ) { contentModifier ->
-            Box(modifier = contentModifier) {
-                val ftueState by ftueService.state.collectAsState()
-                BackstackView()
-                if (ftueState is FtueState.Complete) {
-                    PermanentChild(permanentNavModel = permanentNavModel, navTarget = NavTarget.LoggedInPermanent)
+        val colors by remember {
+            enterpriseService.semanticColorsFlow(sessionId = matrixClient.sessionId)
+        }.collectAsState(SemanticColorsLightDark.default)
+        ElementThemeApp(
+            appPreferencesStore = appPreferencesStore,
+            compoundLight = colors.light,
+            compoundDark = colors.dark,
+            buildMeta = buildMeta,
+        ) {
+            val isOnline by syncService.isOnline.collectAsState()
+            ConnectivityIndicatorContainer(
+                isOnline = isOnline,
+                modifier = modifier,
+            ) { contentModifier ->
+                Box(modifier = contentModifier) {
+                    val ftueState by ftueService.state.collectAsState()
+                    BackstackView()
+                    if (ftueState is FtueState.Complete) {
+                        PermanentChild(permanentNavModel = permanentNavModel, navTarget = NavTarget.LoggedInPermanent)
+                    }
                 }
             }
         }

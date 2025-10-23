@@ -11,15 +11,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.theme.Theme
 import io.element.android.compound.theme.isDark
 import io.element.android.compound.theme.toMaterialColorScheme
+import io.element.android.compound.tokens.generated.SemanticColors
 import io.element.android.compound.tokens.generated.compoundColorsDark
-import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.core.meta.BuildType
 import io.element.android.libraries.designsystem.theme.zero.color.ZeroNewBackground
@@ -55,7 +54,8 @@ val LocalBuildMeta = staticCompositionLocalOf {
 @Composable
 fun ElementThemeApp(
     appPreferencesStore: AppPreferencesStore,
-    enterpriseService: EnterpriseService,
+    compoundLight: SemanticColors,
+    compoundDark: SemanticColors,
     buildMeta: BuildMeta,
     content: @Composable () -> Unit,
 ) {
@@ -73,8 +73,6 @@ fun ElementThemeApp(
             }
         )
     }
-    val compoundLight by enterpriseService.semanticColorsLight()
-    val compoundDark by enterpriseService.semanticColorsDark()
     CompositionLocalProvider(
         LocalBuildMeta provides buildMeta,
     ) {

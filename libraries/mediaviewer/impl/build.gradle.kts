@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.vanniktech.blurhash)
     implementation(libs.telephoto.flick)
 
+    implementation(projects.features.enterprise.api)
     implementation(projects.features.viewfolder.api)
     implementation(projects.libraries.androidutils)
     implementation(projects.libraries.architecture)
@@ -55,6 +56,7 @@ dependencies {
     implementation(projects.libraries.matrix.api)
 
     testCommonDependencies(libs, true)
+    testImplementation(projects.features.enterprise.test)
     testImplementation(projects.libraries.audio.test)
     testImplementation(projects.libraries.dateformatter.test)
     testImplementation(projects.libraries.featureflag.test)
