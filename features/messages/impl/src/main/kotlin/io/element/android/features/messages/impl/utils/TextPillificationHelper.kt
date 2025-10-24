@@ -14,7 +14,6 @@ import android.text.style.URLSpan
 import android.util.Patterns
 import androidx.core.text.getSpans
 import dev.zacsweers.metro.ContributesBinding
-import dev.zacsweers.metro.Inject
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.common.MatrixSessionCommon
 import io.element.android.libraries.matrix.api.core.MatrixPatternType
@@ -38,7 +37,6 @@ interface TextPillificationHelper {
 }
 
 @ContributesBinding(RoomScope::class)
-@Inject
 class DefaultTextPillificationHelper(
     private val mentionSpanProvider: MentionSpanProvider,
     private val permalinkParser: PermalinkParser,
