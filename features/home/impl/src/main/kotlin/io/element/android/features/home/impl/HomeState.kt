@@ -65,4 +65,7 @@ data class HomeState(
         return displayActions &&
             selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.CHANNEL, HomeScreenTab.FEED)
     }
+
+    val displayRoomListFilters = currentHomeNavigationBarItem == HomeNavigationBarItem.Chats && roomListState.displayFilters
+    val showNavigationBar = isSpaceFeatureEnabled && homeSpacesState.spaceRooms.isNotEmpty()
 }

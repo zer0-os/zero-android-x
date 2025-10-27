@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -226,7 +225,6 @@ private fun RoomsViewList(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    val lazyListState = rememberLazyListState()
     val visibleRange by remember {
         derivedStateOf {
             val layoutInfo = lazyListState.layoutInfo

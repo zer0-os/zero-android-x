@@ -44,8 +44,8 @@ class DefaultPushService(
         observeSessions()
     }
 
-    override suspend fun getCurrentPushProvider(): PushProvider? {
-        val currentPushProvider = getCurrentPushProvider.getCurrentPushProvider()
+    override suspend fun getCurrentPushProvider(sessionId: SessionId): PushProvider? {
+        val currentPushProvider = getCurrentPushProvider.getCurrentPushProvider(sessionId)
         return pushProviders.find { it.name == currentPushProvider }
     }
 
@@ -97,19 +97,15 @@ class DefaultPushService(
         userPushStoreFactory.getOrCreate(sessionId).setIgnoreRegistrationError(ignore)
     }
 
-    override suspend fun testPush(): Boolean {
-        val pushProvider = getCurrentPushProvider() ?: return false
-        val config = pushProvider.getCurrentUserPushConfig() ?: return false
+    override suspend fun testPush(sessionId: SessionId): Boolean {
+        val pushProvider = getCurrentPushProvider(sessionId) ?: return false
+        val config = pushProvider.getPushConfig(sessionId) ?: return false
         testPush.execute(config)
         return true
     }
 
     private fun observeSessions() {
         sessionObserver.addListener(this)
-    }
-
-    override suspend fun onSessionCreated(userId: String) {
-        // Nothing to do
     }
 
     /**
@@ -119,7 +115,7 @@ class DefaultPushService(
      * The current push provider may want to take action, and we need to
      * cleanup the stores.
      */
-    override suspend fun onSessionDeleted(userId: String) {
+    override suspend fun onSessionDeleted(userId: String, wasLastSession: Boolean) {
         val sessionId = SessionId(userId)
         val userPushStore = userPushStoreFactory.getOrCreate(sessionId)
         val currentPushProviderName = userPushStore.getPushProviderName()

@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+========
+import androidx.compose.foundation.layout.height
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -25,7 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -38,8 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+========
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -54,26 +60,34 @@ import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.filters.RoomListFiltersView
 import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.libraries.designsystem.atomic.atoms.RedIndicatorAtom
+import io.element.android.libraries.designsystem.components.TopAppBarScrollBehaviorLayout
 import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 import io.element.android.libraries.designsystem.text.applyScaleDown
 import io.element.android.libraries.designsystem.text.toSp
+========
+import io.element.android.libraries.designsystem.theme.aliasScreenTitle
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
 import io.element.android.libraries.designsystem.theme.components.DropdownMenu
 import io.element.android.libraries.designsystem.theme.components.DropdownMenuItem
-import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
-import io.element.android.libraries.designsystem.theme.components.MediumTopAppBar
 import io.element.android.libraries.designsystem.theme.components.Text
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha20
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha50
 import io.element.android.libraries.designsystem.theme.zero.color.zeroDialogBackgroundColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
+========
+import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.matrix.api.core.SessionId
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
@@ -87,10 +101,16 @@ import io.element.android.support.zero.data.model.helper.RewardsUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 fun HomeScreenTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
     matrixUser: MatrixUser,
+========
+fun HomeTopBar(
+    title: String,
+    currentUserAndNeighbors: ImmutableList<MatrixUser>,
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
     showAvatarIndicator: Boolean,
     customTabs: (@Composable () -> Unit)? = null,
     areSearchResultsDisplayed: Boolean,
@@ -100,8 +120,10 @@ fun HomeScreenTopBar(
     onOpenSettings: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     displayMenuItems: Boolean,
+    canReportBug: Boolean,
     displayFilters: Boolean,
     filtersState: RoomListFiltersState,
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
     canReportBug: Boolean,
     shouldShowNewRewardsIntimation: Boolean,
     userRewards: ZeroUserRewards,
@@ -275,87 +297,112 @@ private fun DefaultRoomListTopBar(
                             shouldShowNewRewardsIntimation = shouldShowNewRewardsIntimation,
                             userRewards = userRewards,
                             onDismissRewardsTooltip = onDismissRewardsTooltip
-                        )
+========
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
+        TopAppBar(
+            modifier = Modifier
+                .backgroundVerticalGradient(
+                    isVisible = !areSearchResultsDisplayed,
+                )
+                .statusBarsPadding(),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                scrolledContainerColor = Color.Transparent,
+            ),
+            title = {
+                Text(
+                    modifier = Modifier.semantics {
+                        heading()
                     },
-                    actions = {
-                        if (displayMenuItems) {
-                            IconButton(
-                                onClick = onSearchClick,
-                            ) {
-                                Icon(
-                                    imageVector = CompoundIcons.Search(),
-                                    contentDescription = stringResource(CommonStrings.action_search),
+                    style = ElementTheme.typography.aliasScreenTitle,
+                    text = title,
+                )
+            },
+            navigationIcon = {
+                NavigationIcon(
+                    currentUserAndNeighbors = currentUserAndNeighbors,
+                    showAvatarIndicator = showAvatarIndicator,
+                    onAccountSwitch = onAccountSwitch,
+                    onClick = onOpenSettings,
+                )
+            },
+            actions = {
+                if (displayMenuItems) {
+                    IconButton(
+                        onClick = onToggleSearch,
+                    ) {
+                        Icon(
+                            imageVector = CompoundIcons.Search(),
+                            contentDescription = stringResource(CommonStrings.action_search),
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
+                        )
+                    }
+                    if (RoomListConfig.HAS_DROP_DOWN_MENU) {
+                        var showMenu by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = { showMenu = !showMenu }
+                        ) {
+                            Icon(
+                                imageVector = CompoundIcons.OverflowVertical(),
+                                contentDescription = null,
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            if (RoomListConfig.SHOW_INVITE_MENU_ITEM) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                        onMenuActionClick(RoomListMenuAction.InviteFriends)
+                                    },
+                                    text = { Text(stringResource(id = CommonStrings.action_invite)) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = CompoundIcons.ShareAndroid(),
+                                            tint = ElementTheme.colors.iconSecondary,
+                                            contentDescription = null,
+                                        )
+                                    }
                                 )
                             }
-                            if (RoomListConfig.HAS_DROP_DOWN_MENU) {
-                                var showMenu by remember { mutableStateOf(false) }
-                                IconButton(
-                                    onClick = { showMenu = !showMenu }
-                                ) {
-                                    Icon(
-                                        imageVector = CompoundIcons.OverflowVertical(),
-                                        contentDescription = null,
-                                    )
-                                }
-                                DropdownMenu(
-                                    expanded = showMenu,
-                                    onDismissRequest = { showMenu = false }
-                                ) {
-                                    if (RoomListConfig.SHOW_INVITE_MENU_ITEM) {
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                showMenu = false
-                                                onMenuActionClick(RoomListMenuAction.InviteFriends)
-                                            },
-                                            text = { Text(stringResource(id = CommonStrings.action_invite)) },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = CompoundIcons.ShareAndroid(),
-                                                    tint = ElementTheme.colors.iconSecondary,
-                                                    contentDescription = null,
-                                                )
-                                            }
+                            if (RoomListConfig.SHOW_REPORT_PROBLEM_MENU_ITEM && canReportBug) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                        onMenuActionClick(RoomListMenuAction.ReportBug)
+                                    },
+                                    text = { Text(stringResource(id = CommonStrings.common_report_a_problem)) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = CompoundIcons.ChatProblem(),
+                                            tint = ElementTheme.colors.iconSecondary,
+                                            contentDescription = null,
                                         )
                                     }
-                                    if (RoomListConfig.SHOW_REPORT_PROBLEM_MENU_ITEM && canReportBug) {
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                showMenu = false
-                                                onMenuActionClick(RoomListMenuAction.ReportBug)
-                                            },
-                                            text = { Text(stringResource(id = CommonStrings.common_report_a_problem)) },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = CompoundIcons.ChatProblem(),
-                                                    tint = ElementTheme.colors.iconSecondary,
-                                                    contentDescription = null,
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
+                                )
                             }
                         }
-                    },
-                    scrollBehavior = scrollBehavior,
-                    windowInsets = WindowInsets(0.dp),
-                )
-                if (displayFilters) {
-                    RoomListFiltersView(
-                        state = filtersState,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    }
                 }
+            },
+            // We want a 16dp left padding for the navigationIcon :
+            // 4dp from default TopAppBarHorizontalPadding
+            // 8dp from AccountIcon default padding (because of IconButton)
+            // 4dp extra padding using left insets
+            windowInsets = WindowInsets(left = 4.dp),
+        )
+        if (displayFilters) {
+            TopAppBarScrollBehaviorLayout(scrollBehavior = scrollBehavior) {
+                RoomListFiltersView(
+                    state = filtersState,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
             }
         }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .alpha(collapsedFraction)
-                .align(Alignment.BottomCenter),
-            color = ElementTheme.materialColors.outlineVariant,
-        )
     }
 }
 
@@ -406,6 +453,7 @@ private fun NavigationIcon(
 }
 
 @Composable
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 private fun NewRewardsIntimationGlow(avatarSize: Dp) {
     Box {
         Box(
@@ -441,6 +489,19 @@ private fun UserRewardsToolTip(
     Row(
         modifier = Modifier.offset(x = -16.dp),
         verticalAlignment = Alignment.CenterVertically
+========
+private fun AccountIcon(
+    matrixUser: MatrixUser,
+    isCurrentAccount: Boolean,
+    showAvatarIndicator: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val testTag = if (isCurrentAccount) Modifier.testTag(TestTags.homeScreenSettings) else Modifier
+    IconButton(
+        modifier = modifier.then(testTag),
+        onClick = onClick,
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
     ) {
         val earnedRewards = RewardsUtil.getRefPrice(
             zero = userRewards.zero,
@@ -487,19 +548,24 @@ private fun UserRewardsToolTip(
 /*@OptIn(ExperimentalMaterial3Api::class)
 @PreviewsDayNight
 @Composable
-internal fun DefaultRoomListTopBarPreview() = ElementPreview {
-    DefaultRoomListTopBar(
+internal fun HomeTopBarPreview() = ElementPreview {
+    HomeTopBar(
         title = stringResource(R.string.screen_roomlist_main_space_title),
         matrixUser = MatrixUser(UserId("@id:domain"), "Alice"),
         showAvatarIndicator = false,
         areSearchResultsDisplayed = false,
-        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState()),
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
         onOpenSettings = {},
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
         onSearchClick = {},
+========
+        onAccountSwitch = {},
+        onToggleSearch = {},
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
         displayMenuItems = true,
+        canReportBug = true,
         displayFilters = true,
         filtersState = aRoomListFiltersState(),
-        canReportBug = true,
         onMenuActionClick = {},
         shouldShowNewRewardsIntimation = true,
         userRewards = ZeroUserRewards.empty()
@@ -509,6 +575,7 @@ internal fun DefaultRoomListTopBarPreview() = ElementPreview {
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewsDayNight
 @Composable
+<<<<<<<< HEAD:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeScreenTopBar.kt
 internal fun DefaultRoomListTopBarWithIndicatorPreview() = ElementPreview {
     ZeroStyledTopBar(
         matrixUser = MatrixUser(UserId("@id:domain"), "Alice"),
@@ -520,5 +587,43 @@ internal fun DefaultRoomListTopBarWithIndicatorPreview() = ElementPreview {
         onOpenProfile = {},
         shouldShowNewRewardsIntimation = true,
         userRewards = ZeroUserRewards.empty(),
+========
+internal fun HomeTopBarWithIndicatorPreview() = ElementPreview {
+    HomeTopBar(
+        title = stringResource(R.string.screen_roomlist_main_space_title),
+        currentUserAndNeighbors = persistentListOf(MatrixUser(UserId("@id:domain"), "Alice")),
+        showAvatarIndicator = true,
+        areSearchResultsDisplayed = false,
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
+        onOpenSettings = {},
+        onAccountSwitch = {},
+        onToggleSearch = {},
+        displayMenuItems = true,
+        canReportBug = true,
+        displayFilters = true,
+        filtersState = aRoomListFiltersState(),
+        onMenuActionClick = {},
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@PreviewsDayNight
+@Composable
+internal fun HomeTopBarMultiAccountPreview() = ElementPreview {
+    HomeTopBar(
+        title = stringResource(R.string.screen_roomlist_main_space_title),
+        currentUserAndNeighbors = aMatrixUserList().take(3).toImmutableList(),
+        showAvatarIndicator = false,
+        areSearchResultsDisplayed = false,
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
+        onOpenSettings = {},
+        onAccountSwitch = {},
+        onToggleSearch = {},
+        displayMenuItems = true,
+        canReportBug = true,
+        displayFilters = true,
+        filtersState = aRoomListFiltersState(),
+        onMenuActionClick = {},
+>>>>>>>> origin/develop-copy:features/home/impl/src/main/kotlin/io/element/android/features/home/impl/components/HomeTopBar.kt
     )
 }
