@@ -20,6 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import io.element.android.appnav.di.RoomGraphFactory
 import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
+import io.element.android.features.forward.api.ForwardEntryPoint
 import io.element.android.features.messages.api.MessagesEntryPoint
 import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
 import io.element.android.features.space.api.SpaceEntryPoint
@@ -36,7 +37,10 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class JoinedRoomLoadedFlowNodeTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -122,22 +126,35 @@ class JoinedRoomLoadedFlowNodeTest {
         }
     }
 
+    private class FakeForwardEntryPoint : ForwardEntryPoint {
+        override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): ForwardEntryPoint.NodeBuilder {
+            return object : ForwardEntryPoint.NodeBuilder {
+                override fun params(params: ForwardEntryPoint.Params) = this
+                override fun callback(callback: ForwardEntryPoint.Callback) = this
+                override fun build() = node(buildContext) {}
+            }
+        }
+    }
+
     private fun TestScope.createJoinedRoomLoadedFlowNode(
         plugins: List<Plugin>,
         messagesEntryPoint: MessagesEntryPoint = FakeMessagesEntryPoint(),
         roomDetailsEntryPoint: RoomDetailsEntryPoint = FakeRoomDetailsEntryPoint(),
         spaceEntryPoint: SpaceEntryPoint = FakeSpaceEntryPoint(),
+        forwardEntryPoint: ForwardEntryPoint = FakeForwardEntryPoint(),
         activeRoomsHolder: ActiveRoomsHolder = ActiveRoomsHolder(),
+        matrixClient: FakeMatrixClient = FakeMatrixClient(),
     ) = JoinedRoomLoadedFlowNode(
         buildContext = BuildContext.root(savedStateMap = null),
         plugins = plugins,
         messagesEntryPoint = messagesEntryPoint,
         roomDetailsEntryPoint = roomDetailsEntryPoint,
         spaceEntryPoint = spaceEntryPoint,
+        forwardEntryPoint = forwardEntryPoint,
         appNavigationStateService = FakeAppNavigationStateService(),
-        sessionCoroutineScope = this,
+        sessionCoroutineScope = backgroundScope,
         roomGraphFactory = FakeRoomGraphFactory(),
-        matrixClient = FakeMatrixClient(),
+        matrixClient = matrixClient,
         activeRoomsHolder = activeRoomsHolder,
     )
 

@@ -495,6 +495,7 @@ class JoinedRustRoom(
     override fun destroy() {
         baseRoom.destroy()
         liveInnerTimeline.destroy()
+        Timber.d("Room $roomId destroyed")
     }
 
     private fun InnerTimeline.map(

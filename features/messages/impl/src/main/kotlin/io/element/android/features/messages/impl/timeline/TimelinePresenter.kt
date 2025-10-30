@@ -9,7 +9,6 @@ package io.element.android.features.messages.impl.timeline
 
 import android.util.Patterns
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -90,7 +89,6 @@ class TimelinePresenter(
     private val resolveVerifiedUserSendFailurePresenter: Presenter<ResolveVerifiedUserSendFailureState>,
     private val typingNotificationPresenter: Presenter<TypingNotificationState>,
     private val roomCallStatePresenter: Presenter<RoomCallState>,
-    private val markAsFullyRead: MarkAsFullyRead,
     private val featureFlagService: FeatureFlagService,
 ) : Presenter<TimelineState> {
     @AssistedFactory
@@ -227,12 +225,6 @@ class TimelinePresenter(
                 is TimelineEvents.GetLinkPreviewIfApplicable -> {
                     localScope.getLinkPreviewIfRequired(event.event, eventLinkPreviewMap)
                 }
-            }
-        }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                markAsFullyRead(room.roomId)
             }
         }
 
@@ -402,7 +394,7 @@ class TimelinePresenter(
     ) = launch(dispatchers.computation) {
         // If we are at the bottom of timeline, we mark the room as read.
         if (firstVisibleIndex == 0) {
-            room.markAsRead(receiptType = readReceiptType)
+            room.liveTimeline.markAsRead(receiptType = readReceiptType)
         } else {
             // Get last valid EventId seen by the user, as the first index might refer to a Virtual item
             val eventId = getLastEventIdBeforeOrAt(firstVisibleIndex, timelineItems)

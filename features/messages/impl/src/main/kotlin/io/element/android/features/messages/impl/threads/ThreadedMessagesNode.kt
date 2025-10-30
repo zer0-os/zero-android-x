@@ -230,6 +230,8 @@ class ThreadedMessagesNode(
         callbacks.forEach { it.onOpenThread(threadRootId, focusedEventId) }
     }
 
+    override fun onNavigateUp() = navigateUp()
+
     private fun onSendLocationClick() {
         callbacks.forEach { it.onSendLocationClick() }
     }

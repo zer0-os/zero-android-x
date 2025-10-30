@@ -412,10 +412,6 @@ class LoggedInFlowNode(
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias(), serverNames))
                     }
 
-                    override fun onForwardedToSingleRoom(roomId: RoomId) {
-                        sessionCoroutineScope.launch { attachRoom(roomId.toRoomIdOrAlias(), clearBackstack = false) }
-                    }
-
                     override fun onPermalinkClick(data: PermalinkData, pushToBackstack: Boolean) {
                         when (data) {
                             is PermalinkData.UserLink -> {
@@ -559,9 +555,8 @@ class LoggedInFlowNode(
                     .callback(object : ShareEntryPoint.Callback {
                         override fun onDone(roomIds: List<RoomId>) {
                             navigateUp()
-                            if (roomIds.size == 1) {
-                                val targetRoomId = roomIds.first()
-                                backstack.push(NavTarget.Room(targetRoomId.toRoomIdOrAlias()))
+                            roomIds.singleOrNull()?.let { roomId ->
+                                backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                             }
                         }
                     })
@@ -627,6 +622,8 @@ class LoggedInFlowNode(
                     override fun onViewInTimeline(eventId: EventId) {
                         // Cannot happen
                     }
+
+                    override fun onForwardEvent(eventId: EventId) {}
                 }
                 mediaViewerEntryPoint.nodeBuilder(this, buildContext)
                     .avatar(

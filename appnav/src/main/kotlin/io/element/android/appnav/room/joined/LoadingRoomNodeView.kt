@@ -26,6 +26,7 @@ import io.element.android.libraries.designsystem.theme.components.CircularProgre
 import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.components.TopAppBar
+import io.element.android.libraries.designsystem.utils.DelayedVisibility
 import io.element.android.libraries.matrix.ui.room.LoadingRoomState
 import io.element.android.libraries.matrix.ui.room.LoadingRoomStateProvider
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
@@ -58,7 +59,9 @@ fun LoadingRoomNodeView(
                         style = ElementTheme.zeroTypography.fontBodyMdRegular,
                     )
                 } else {
-                    CircularProgressIndicator()
+                    DelayedVisibility {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         },
