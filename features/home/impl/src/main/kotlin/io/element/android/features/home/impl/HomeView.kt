@@ -169,7 +169,12 @@ fun HomeView(
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
                 onSendWalletToken = onSendWalletToken,
-                onHomeNavTabSelected = { selectedHomeNavigationTab.value = it },
+                onHomeNavTabSelected = {
+                    // clear room filters just to clean content
+                    homeState.roomListState.filtersState.clearFilters()
+                    selectedChannelsTab.value = ChannelsScreenTab.CHANNELS
+                    selectedHomeNavigationTab.value = it
+                },
                 onChannelsContentTabSelected = { selectedChannelsTab.value = it },
                 modifier = contentModifier,
             )

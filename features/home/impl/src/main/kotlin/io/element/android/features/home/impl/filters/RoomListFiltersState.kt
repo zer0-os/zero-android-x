@@ -23,4 +23,8 @@ data class RoomListFiltersState(
             .map { it.filter }
             .toImmutableList()
     }
+
+    fun clearFilters() {
+        eventSink(RoomListFiltersEvents.ClearSelectedFilters)
+    }
 }

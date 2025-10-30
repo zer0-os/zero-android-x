@@ -62,3 +62,32 @@ data class RoomListFiltersEmptyStateResources(
         }
     }
 }
+
+data class RoomListFiltersEmptyStateMessages(
+    val title: String,
+    val subtitle: String? = null,
+) {
+    companion object {
+        fun fromSelectedFilters(selectedFilters: List<RoomListFilter>): RoomListFiltersEmptyStateMessages? {
+            return when {
+                selectedFilters.isEmpty() -> null
+                selectedFilters.size == 1 -> {
+                    when (selectedFilters.first()) {
+                        RoomListFilter.Rooms -> RoomListFiltersEmptyStateMessages(
+                            title = "You don't have any unread chats."
+                        )
+                        RoomListFilter.Favourites -> RoomListFiltersEmptyStateMessages(
+                            title = "You don't have favourite chats yet."
+                        )
+                        else -> RoomListFiltersEmptyStateMessages(
+                            title = "You don't have chats for this section."
+                        )
+                    }
+                }
+                else -> RoomListFiltersEmptyStateMessages(
+                    title = "You don't have chats for this section."
+                )
+            }
+        }
+    }
+}

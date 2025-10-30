@@ -10,6 +10,7 @@ package io.element.android.features.home.impl.roomlist
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,10 +39,12 @@ import io.element.android.features.home.impl.components.EmptyScaffold
 import io.element.android.features.home.impl.components.SetUpRecoveryKeyBanner
 import io.element.android.features.home.impl.contentType
 import io.element.android.features.home.impl.filters.RoomListFilter
-import io.element.android.features.home.impl.filters.RoomListFiltersEmptyStateResources
+import io.element.android.features.home.impl.filters.RoomListFiltersEmptyStateMessages
+import io.element.android.features.home.impl.filters.RoomListFiltersEvents
 import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.filters.aRoomListFiltersState
 import io.element.android.features.home.impl.filters.selection.FilterSelectionState
+import io.element.android.features.home.impl.model.ChatScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -96,19 +99,34 @@ fun RoomListContentView(
             )
         }
         is RoomListContentState.Rooms -> {
-            RoomsView(
-                modifier = modifier,
-                state = contentState,
-                roomMappedUserProStatus = roomMappedUserProStatus,
-                hideInvitesAvatars = hideInvitesAvatars,
-                filtersState = filtersState,
-                eventSink = eventSink,
-                onSetUpRecoveryClick = onSetUpRecoveryClick,
-                onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
-                onRoomClick = onRoomClick,
-                verifyEncryption = showVerifyEncryptionScreen,
-                contentPadding = contentPadding,
-            )
+            Column(modifier = modifier) {
+                val selectedChatTab = rememberSaveable { mutableStateOf(ChatScreenTab.ALL) }
+                RoomListScreenTabView(
+                    selectedTab = selectedChatTab.value,
+                    onTabSelected = { tab ->
+                        selectedChatTab.value = tab
+                        when (tab) {
+                            ChatScreenTab.ALL -> filtersState.clearFilters()
+                            ChatScreenTab.UNREAD -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Rooms))
+                            ChatScreenTab.FAVORITE -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Favourites))
+                        }
+                    }
+                )
+                Box {
+                    RoomsView(
+                        state = contentState,
+                        roomMappedUserProStatus = roomMappedUserProStatus,
+                        hideInvitesAvatars = hideInvitesAvatars,
+                        filtersState = filtersState,
+                        eventSink = eventSink,
+                        onSetUpRecoveryClick = onSetUpRecoveryClick,
+                        onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
+                        onRoomClick = onRoomClick,
+                        verifyEncryption = showVerifyEncryptionScreen,
+                        contentPadding = contentPadding,
+                    )
+                }
+            }
         }
     }
 }
@@ -305,10 +323,9 @@ private fun EmptyViewForFilterStates(
     selectedFilters: ImmutableList<RoomListFilter>,
     modifier: Modifier = Modifier,
 ) {
-    val emptyStateResources = RoomListFiltersEmptyStateResources.fromSelectedFilters(selectedFilters) ?: return
+    val emptyStateResources = RoomListFiltersEmptyStateMessages.fromSelectedFilters(selectedFilters) ?: return
     EmptyScaffold(
         title = emptyStateResources.title,
-        subtitle = emptyStateResources.subtitle,
         modifier = modifier,
     )
 }

@@ -34,6 +34,8 @@ class RoomListFiltersPresenter(
                     filterSelectionStrategy.clear()
                 }
                 is RoomListFiltersEvents.ToggleFilter -> {
+                    //Clear previous filter before applying new
+                    filterSelectionStrategy.clear()
                     filterSelectionStrategy.toggle(event.filter)
                 }
             }
