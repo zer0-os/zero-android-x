@@ -209,10 +209,12 @@ class RustTimeline(
         backwardPaginationStatus,
         forwardPaginationStatus,
         joinedRoom.roomInfoFlow.map { it.creators to it.isDm }.distinctUntilChanged(),
-    ) { timelineItems,
+    ) {
+        timelineItems,
         backwardPaginationStatus,
         forwardPaginationStatus,
-        (roomCreators, isDm) ->
+        (roomCreators, isDm),
+        ->
         withContext(dispatcher) {
             timelineItems
                 .let { items ->

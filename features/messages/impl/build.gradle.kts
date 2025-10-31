@@ -49,6 +49,7 @@ dependencies {
     implementation(projects.libraries.mediaupload.api)
     implementation(projects.libraries.permissions.api)
     implementation(projects.libraries.preferences.api)
+    implementation(projects.libraries.recentemojis.api)
     implementation(projects.libraries.roomselect.api)
     implementation(projects.libraries.voiceplayer.api)
     implementation(projects.libraries.voicerecorder.api)
@@ -58,6 +59,7 @@ dependencies {
     implementation(projects.libraries.testtags)
     implementation(projects.features.networkmonitor.api)
     implementation(projects.services.analytics.compose)
+    implementation(projects.services.appnavstate.api)
     implementation(projects.services.toolbox.api)
     implementation(libs.coil.compose)
     implementation(libs.datetime)
@@ -95,4 +97,5 @@ dependencies {
     testImplementation(projects.libraries.testtags)
     testImplementation(projects.features.poll.test)
     testImplementation(projects.libraries.eventformatter.test)
+    testImplementation(projects.libraries.recentemojis.test)
 }

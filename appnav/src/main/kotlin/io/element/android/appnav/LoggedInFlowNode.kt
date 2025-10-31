@@ -74,6 +74,7 @@ import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.createNode
 import io.element.android.libraries.architecture.overlay.operation.hide
+import io.element.android.libraries.architecture.waitForChildAttached
 import io.element.android.libraries.architecture.waitForNavTargetAttached
 import io.element.android.libraries.core.meta.BuildMeta
 import io.element.android.libraries.designsystem.theme.ElementThemeApp
@@ -664,7 +665,7 @@ class LoggedInFlowNode(
         trigger: JoinedRoom.Trigger? = null,
         eventId: EventId? = null,
         clearBackstack: Boolean,
-    ) {
+    ): RoomFlowNode {
         waitForNavTargetAttached { navTarget ->
             navTarget is NavTarget.Home
         }
@@ -676,6 +677,15 @@ class LoggedInFlowNode(
                 initialElement = RoomNavigationTarget.Root(eventId = eventId)
             )
             backstack.accept(AttachRoomOperation(roomNavTarget, clearBackstack))
+        }
+
+        // If we don't do this check, we might be returning while a previous node with the same type is still displayed
+        // This means we may attach some new nodes to that one, which will be quickly replaced by the one instantiated above
+        return waitForChildAttached<RoomFlowNode, NavTarget> {
+            it is NavTarget.Room &&
+                it.roomIdOrAlias == roomIdOrAlias &&
+                it.initialElement is RoomNavigationTarget.Root &&
+                it.initialElement.eventId == eventId
         }
     }
 
