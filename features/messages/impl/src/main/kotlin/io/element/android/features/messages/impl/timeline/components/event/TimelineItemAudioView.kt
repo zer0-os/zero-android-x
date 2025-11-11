@@ -11,7 +11,6 @@ package io.element.android.features.messages.impl.timeline.components.event
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -28,22 +27,13 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 @Composable
 fun TimelineItemAudioView(
     content: TimelineItemAudioContent,
-    isMyMessage: Boolean,
-    isRoomEncrypted: Boolean,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val captionColor = if (isMyMessage && !isRoomEncrypted) {
-        Color.Black
-    } else {
-        ElementTheme.colors.textPrimary
-    }
-
     TimelineItemAttachmentView(
         filename = content.filename,
         fileExtensionAndSize = content.fileExtensionAndSize,
         caption = content.caption,
-        captionColor = captionColor,
         onContentLayoutChange = onContentLayoutChange,
         modifier = modifier,
         icon = {
@@ -64,8 +54,6 @@ internal fun TimelineItemAudioViewPreview(@PreviewParameter(TimelineItemAudioCon
     ElementPreview {
         TimelineItemAudioView(
             content,
-            isMyMessage = false,
-            isRoomEncrypted = true,
             onContentLayoutChange = {},
         )
     }

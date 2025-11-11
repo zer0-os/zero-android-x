@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -30,23 +29,14 @@ import io.element.android.libraries.ui.strings.CommonStrings
 @Composable
 fun TimelineItemFileView(
     content: TimelineItemFileContent,
-    isMyMessage: Boolean,
-    isRoomEncrypted: Boolean,
     onContentClick: (() -> Unit)?,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val captionColor = if (isMyMessage && !isRoomEncrypted) {
-        Color.Black
-    } else {
-        ElementTheme.colors.textPrimary
-    }
-
     TimelineItemAttachmentView(
         filename = content.filename,
         fileExtensionAndSize = content.fileExtensionAndSize,
         caption = content.caption,
-        captionColor = captionColor,
         onContentLayoutChange = onContentLayoutChange,
         modifier = modifier.clickable {
             onContentClick?.invoke()
@@ -69,8 +59,6 @@ fun TimelineItemFileView(
 internal fun TimelineItemFileViewPreview(@PreviewParameter(TimelineItemFileContentProvider::class) content: TimelineItemFileContent) = ElementPreview {
     TimelineItemFileView(
         content,
-        isMyMessage = false,
-        isRoomEncrypted = true,
         onContentLayoutChange = {},
         onContentClick = {}
     )

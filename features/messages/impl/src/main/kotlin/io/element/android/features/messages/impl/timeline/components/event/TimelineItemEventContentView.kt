@@ -115,16 +115,12 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemFileContent -> TimelineItemFileView(
             content = content,
-            isMyMessage = isMyMessage,
-            isRoomEncrypted = isRoomEncrypted,
             onContentClick = onContentClick,
             onContentLayoutChange = onContentLayoutChange,
             modifier = modifier
         )
         is TimelineItemAudioContent -> TimelineItemAudioView(
             content = content,
-            isMyMessage = isMyMessage,
-            isRoomEncrypted = isRoomEncrypted,
             onContentLayoutChange = onContentLayoutChange,
             modifier = modifier
         )
@@ -135,8 +131,6 @@ fun TimelineItemEventContentView(
         )
         is TimelineItemPollContent -> TimelineItemPollView(
             content = content,
-            isMyMessage = isMyMessage,
-            isRoomEncrypted = isRoomEncrypted,
             eventSink = eventSink,
             modifier = modifier,
         )

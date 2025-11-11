@@ -20,12 +20,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import im.vector.app.features.analytics.plan.Interaction
-import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.messages.impl.actionlist.ActionListEvents
 import io.element.android.features.messages.impl.actionlist.ActionListView
@@ -277,14 +275,8 @@ private fun TimelineItemEventContentViewWrapper(
     modifier: Modifier = Modifier,
 ) {
     if (event.content is TimelineItemPollContent) {
-        val titleColor = if (isMyMessage && !isRoomEncrypted) {
-            Color.Black
-        } else {
-            ElementTheme.colors.textPrimary
-        }
         PollTitleView(
             title = event.content.question,
-            titleColor = titleColor,
             isPollEnded = event.content.isEnded,
             modifier = modifier
         )

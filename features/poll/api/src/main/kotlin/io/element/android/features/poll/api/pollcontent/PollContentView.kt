@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -52,7 +51,6 @@ fun PollContentView(
         question = state.question,
         answerItems = state.answerItems,
         pollKind = state.pollKind,
-        pollAccentColor = ElementTheme.colors.textSecondary,
         isPollEditable = state.isPollEditable,
         isPollEnded = state.isPollEnded,
         isMine = state.isMine,
@@ -69,7 +67,6 @@ fun PollContentView(
     question: String,
     answerItems: ImmutableList<PollAnswerItem>,
     pollKind: PollKind,
-    pollAccentColor: Color = ElementTheme.colors.textPrimary,
     isPollEditable: Boolean,
     isPollEnded: Boolean,
     isMine: Boolean,
@@ -109,9 +106,9 @@ fun PollContentView(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        PollTitleView(title = question, titleColor = pollAccentColor, isPollEnded = isPollEnded)
+        PollTitleView(title = question, isPollEnded = isPollEnded)
 
-        PollAnswers(answerItems = answerItems, answersColor = pollAccentColor, onSelectAnswer = ::onSelectAnswer)
+        PollAnswers(answerItems = answerItems, onSelectAnswer = ::onSelectAnswer)
 
         if (isPollEnded || pollKind == PollKind.Disclosed) {
             DisclosedPollBottomNotice(votesCount = votesCount)
@@ -134,7 +131,6 @@ fun PollContentView(
 @Composable
 private fun PollAnswers(
     answerItems: ImmutableList<PollAnswerItem>,
-    answersColor: Color,
     onSelectAnswer: (PollAnswer) -> Unit,
 ) {
     Column(
@@ -144,7 +140,6 @@ private fun PollAnswers(
         answerItems.forEach {
             PollAnswerView(
                 answerItem = it,
-                answerColor = answersColor,
                 modifier = Modifier
                     .selectable(
                         selected = it.isSelected,

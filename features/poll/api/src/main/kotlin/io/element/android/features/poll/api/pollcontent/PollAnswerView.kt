@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -36,7 +35,7 @@ import io.element.android.libraries.designsystem.theme.components.LinearProgress
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.progressIndicatorTrackColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
-import io.element.android.libraries.designsystem.toCustomEnabledColor
+import io.element.android.libraries.designsystem.toEnabledColor
 import io.element.android.libraries.designsystem.utils.CommonDrawables
 import io.element.android.libraries.ui.strings.CommonPlurals
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -44,7 +43,6 @@ import io.element.android.libraries.ui.strings.CommonStrings
 @Composable
 internal fun PollAnswerView(
     answerItem: PollAnswerItem,
-    answerColor: Color = ElementTheme.colors.textPrimary,
     modifier: Modifier = Modifier,
 ) {
     val nbVotesText = pluralStringResource(
@@ -89,7 +87,7 @@ internal fun PollAnswerView(
                 .size(22.dp),
             tint = if (answerItem.isEnabled) {
                 if (answerItem.isSelected) {
-                    answerColor
+                    ElementTheme.colors.iconPrimary
                 } else {
                     ElementTheme.colors.iconSecondary
                 }
@@ -104,7 +102,6 @@ internal fun PollAnswerView(
                     modifier = Modifier.weight(1f),
                     text = answerItem.answer.text,
                     style = if (answerItem.isWinner) ElementTheme.zeroTypography.fontBodyLgMedium else ElementTheme.zeroTypography.fontBodyLgRegular,
-                    color = answerColor
                 )
                 if (answerItem.showVotes) {
                     Row(
@@ -121,7 +118,7 @@ internal fun PollAnswerView(
                             Text(
                                 text = nbVotesText,
                                 style = ElementTheme.zeroTypography.fontBodySmMedium,
-                                color = answerColor,
+                                color = ElementTheme.colors.textPrimary,
                             )
                         } else {
                             Text(
@@ -136,7 +133,7 @@ internal fun PollAnswerView(
             Spacer(modifier = Modifier.height(10.dp))
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
-                color = if (answerItem.isWinner) ElementTheme.colors.textSuccessPrimary else answerItem.isEnabled.toCustomEnabledColor(color = answerColor),
+                color = if (answerItem.isWinner) ElementTheme.colors.textSuccessPrimary else answerItem.isEnabled.toEnabledColor(),
                 progress = {
                     when {
                         answerItem.showVotes -> answerItem.percentage

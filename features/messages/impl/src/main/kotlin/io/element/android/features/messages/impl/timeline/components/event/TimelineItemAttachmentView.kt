@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -37,7 +36,6 @@ fun TimelineItemAttachmentView(
     filename: String,
     fileExtensionAndSize: String,
     caption: String?,
-    captionColor: Color,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit) = {},
@@ -56,7 +54,6 @@ fun TimelineItemAttachmentView(
             TimelineItemAttachmentCaptionView(
                 modifier = Modifier.padding(top = 4.dp),
                 caption = caption,
-                captionColor = captionColor,
                 onContentLayoutChange = onContentLayoutChange,
             )
         }
@@ -117,14 +114,13 @@ private fun TimelineItemAttachmentHeaderView(
 @Composable
 private fun TimelineItemAttachmentCaptionView(
     caption: String,
-    captionColor: Color,
     onContentLayoutChange: (ContentAvoidingLayoutData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Text(
         modifier = modifier,
         text = caption,
-        color = captionColor,
+        color = ElementTheme.colors.textPrimary,
         style = ElementTheme.typography.fontBodyLgRegular,
         onTextLayout = ContentAvoidingLayout.measureLastTextLine(
             onContentLayoutChange = onContentLayoutChange,
