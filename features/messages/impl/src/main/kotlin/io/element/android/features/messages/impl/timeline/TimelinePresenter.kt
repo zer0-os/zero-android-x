@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -92,6 +93,7 @@ class TimelinePresenter(
     private val featureFlagService: FeatureFlagService,
 ) : Presenter<TimelineState> {
     private val tag = "TimelinePresenter"
+
     @AssistedFactory
     interface Factory {
         fun create(
@@ -148,7 +150,7 @@ class TimelinePresenter(
             value = featureFlagService.isFeatureEnabled(FeatureFlags.Threads)
         }
 
-        fun handleEvents(event: TimelineEvents) {
+        fun handleEvent(event: TimelineEvents) {
             when (event) {
                 is TimelineEvents.LoadMore -> {
                     if (event.direction == Timeline.PaginationDirection.FORWARDS && timelineMode is Timeline.Mode.Thread) {
@@ -193,7 +195,7 @@ class TimelinePresenter(
                     }
                 }
                 is TimelineEvents.EditPoll -> {
-                    navigator.onEditPollClick(event.pollStartId)
+                    navigator.navigateToEditPoll(event.pollStartId)
                 }
                 is TimelineEvents.FocusOnEvent -> sessionCoroutineScope.launch {
                     focusRequestState.value = FocusRequestState.Requested(event.eventId, event.debounce)
@@ -218,10 +220,10 @@ class TimelinePresenter(
                 is TimelineEvents.NavigateToPredecessorOrSuccessorRoom -> {
                     // Navigate to the predecessor or successor room
                     val serverNames = calculateServerNamesForRoom(room)
-                    navigator.onNavigateToRoom(event.roomId, null, serverNames)
+                    navigator.navigateToRoom(event.roomId, null, serverNames)
                 }
                 is TimelineEvents.OpenThread -> {
-                    navigator.onOpenThread(
+                    navigator.navigateToThread(
                         threadRootId = event.threadRootEventId,
                         focusedEventId = event.focusedEvent,
                     )
@@ -303,7 +305,7 @@ class TimelinePresenter(
             resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
             displayThreadSummaries = displayThreadSummaries,
             linkPreviewMap = eventLinkPreviewMap,
-            eventSink = { handleEvents(it) }
+            eventSink = ::handleEvent,
         )
     }
 
@@ -328,7 +330,7 @@ class TimelinePresenter(
         if (timelineController.mainTimelineMode() is Timeline.Mode.Thread && threadId == null) {
             // We are in a thread timeline, and the event isn't part of a thread, we need to navigate back to the room
             focusRequestState.value = FocusRequestState.None
-            navigator.onNavigateToRoom(room.roomId, eventId, calculateServerNamesForRoom(room))
+            navigator.navigateToRoom(room.roomId, eventId, calculateServerNamesForRoom(room))
         } else {
             Timber.tag(tag).d("Focusing on event $eventId - thread $threadId")
             timelineController.focusOnEvent(eventId, threadId)
@@ -345,7 +347,7 @@ class TimelinePresenter(
                             } else {
                                 focusRequestState.value = FocusRequestState.Success(eventId = result.threadId.asEventId())
                                 // It's part of a thread we're not in, let's open it in another timeline
-                                navigator.onOpenThread(result.threadId, eventId)
+                                navigator.navigateToThread(result.threadId, eventId)
                             }
                         }
                     }
@@ -384,7 +386,7 @@ class TimelinePresenter(
         if (hasNewEvent) {
             val newMostRecentEvent = newMostRecentItem
             // Scroll to bottom if the new event is from me, even if sent from another device
-            val fromMe = newMostRecentEvent?.isMine == true
+            val fromMe = newMostRecentEvent.isMine == true
             newEventState.value = if (fromMe) {
                 NewEventState.FromMe
             } else {

@@ -95,6 +95,7 @@
   <string name="action_forgot_password">"Kas unustasid salasõna?"</string>
   <string name="action_forward">"Edasta"</string>
   <string name="action_go_back">"Tagasi eelmisesse vaatesse"</string>
+  <string name="action_go_to_roles_and_permissions">"Ava „Rollid ja õigused“"</string>
   <string name="action_go_to_settings">"Ava seadistused"</string>
   <string name="action_ignore">"Eira"</string>
   <string name="action_invite">"Kutsu"</string>
@@ -420,6 +421,7 @@ Kas sa oled kindel, et soovid jätkata?"</string>
   <string name="invite_friends_rich_title">"🔐️ Liitu minuga rakenduses %1$s"</string>
   <string name="invite_friends_text">"Hei, suhtle minuga %1$s võrgus: %2$s"</string>
   <string name="login_initial_device_name_android">"%1$s Android"</string>
+  <string name="notification_thread_in_room">"Jutulõng „%1$s“ jututoas"</string>
   <string name="preference_rageshake">"Veast teatamiseks raputa nutiseadet ägedalt"</string>
   <string name="screen_bug_report_a11y_screenshot">"Ekraanitõmmis"</string>
   <string name="screen_create_poll_option_accessibility_label">"%1$s: %2$s"</string>

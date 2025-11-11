@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -35,16 +36,19 @@ import io.element.android.features.knockrequests.api.list.KnockRequestsListEntry
 import io.element.android.features.messages.api.MessagesEntryPoint
 import io.element.android.features.poll.api.history.PollHistoryEntryPoint
 import io.element.android.features.reportroom.api.ReportRoomEntryPoint
+import io.element.android.features.rolesandpermissions.api.ChangeRoomMemberRolesEntryPoint
+import io.element.android.features.rolesandpermissions.api.ChangeRoomMemberRolesListType
+import io.element.android.features.rolesandpermissions.api.RolesAndPermissionsEntryPoint
 import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
 import io.element.android.features.roomdetails.impl.edit.RoomDetailsEditNode
 import io.element.android.features.roomdetails.impl.invite.RoomInviteMembersNode
 import io.element.android.features.roomdetails.impl.members.RoomMemberListNode
 import io.element.android.features.roomdetails.impl.notificationsettings.RoomNotificationSettingsNode
-import io.element.android.features.roomdetails.impl.rolesandpermissions.RolesAndPermissionsFlowNode
 import io.element.android.features.roomdetails.impl.securityandprivacy.SecurityAndPrivacyFlowNode
 import io.element.android.features.verifysession.api.OutgoingVerificationEntryPoint
 import io.element.android.libraries.architecture.BackstackWithOverlayBox
 import io.element.android.libraries.architecture.BaseFlowNode
+import io.element.android.libraries.architecture.callback
 import io.element.android.libraries.architecture.createNode
 import io.element.android.libraries.architecture.overlay.operation.hide
 import io.element.android.libraries.architecture.overlay.operation.show
@@ -84,6 +88,7 @@ class RoomDetailsFlowNode(
     private val outgoingVerificationEntryPoint: OutgoingVerificationEntryPoint,
     private val reportRoomEntryPoint: ReportRoomEntryPoint,
     private val changeRoomMemberRolesEntryPoint: ChangeRoomMemberRolesEntryPoint,
+    private val rolesAndPermissionsEntryPoint: RolesAndPermissionsEntryPoint,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
 ) : BaseFlowNode<RoomDetailsFlowNode.NavTarget>(
@@ -153,6 +158,8 @@ class RoomDetailsFlowNode(
         data object SelectNewOwnersWhenLeaving : NavTarget
     }
 
+    private val callback: RoomDetailsEntryPoint.Callback = callback()
+
     override fun onBuilt() {
         super.onBuilt()
         whenChildrenAttached {
@@ -161,10 +168,12 @@ class RoomDetailsFlowNode(
             changeRoomMemberRolesNode: ChangeRoomMemberRolesEntryPoint.NodeProxy,
             ->
             commonLifecycle.coroutineScope.launch {
-                changeRoomMemberRolesNode.waitForRoleChanged()
+                val isNewOwnerSelected = changeRoomMemberRolesNode.waitForCompletion()
                 withContext(NonCancellable) {
                     backstack.pop()
-                    roomDetailsNode.onNewOwnersSelected()
+                    if (isNewOwnerSelected) {
+                        roomDetailsNode.onNewOwnersSelected()
+                    }
                 }
             }
         }
@@ -174,55 +183,55 @@ class RoomDetailsFlowNode(
         return when (navTarget) {
             NavTarget.RoomDetails -> {
                 val roomDetailsCallback = object : RoomDetailsNode.Callback {
-                    override fun openRoomMemberList() {
+                    override fun navigateToRoomMemberList() {
                         backstack.push(NavTarget.RoomMemberList)
                     }
 
-                    override fun editRoomDetails() {
+                    override fun navigateToRoomDetailsEdit() {
                         backstack.push(NavTarget.RoomDetailsEdit)
                     }
 
-                    override fun openInviteMembers() {
+                    override fun navigateToInviteMembers() {
                         backstack.push(NavTarget.InviteMembers)
                     }
 
-                    override fun openRoomNotificationSettings() {
+                    override fun navigateToRoomNotificationSettings() {
                         backstack.push(NavTarget.RoomNotificationSettings(showUserDefinedSettingStyle = false))
                     }
 
-                    override fun openAvatarPreview(name: String, url: String) {
+                    override fun navigateToAvatarPreview(name: String, url: String) {
                         overlay.show(NavTarget.AvatarPreview(name, url))
                     }
 
-                    override fun openPollHistory() {
+                    override fun navigateToPollHistory() {
                         backstack.push(NavTarget.PollHistory)
                     }
 
-                    override fun openMediaGallery() {
+                    override fun navigateToMediaGallery() {
                         backstack.push(NavTarget.MediaGallery)
                     }
 
-                    override fun openAdminSettings() {
+                    override fun navigateToAdminSettings() {
                         backstack.push(NavTarget.AdminSettings)
                     }
 
-                    override fun openPinnedMessagesList() {
+                    override fun navigateToPinnedMessagesList() {
                         backstack.push(NavTarget.PinnedMessagesList)
                     }
 
-                    override fun openKnockRequestsList() {
+                    override fun navigateToKnockRequestsList() {
                         backstack.push(NavTarget.KnockRequestsList)
                     }
 
-                    override fun openSecurityAndPrivacy() {
+                    override fun navigateToSecurityAndPrivacy() {
                         backstack.push(NavTarget.SecurityAndPrivacy)
                     }
 
-                    override fun openDmUserProfile(userId: UserId, primaryZId: String?) {
+                    override fun navigateToRoomMemberDetails(userId: UserId, primaryZId: String?) {
                         backstack.push(NavTarget.RoomMemberDetails(userId, primaryZId))
                     }
 
-                    override fun onJoinCall() {
+                    override fun navigateToRoomCall() {
                         val inputs = CallType.RoomCall(
                             sessionId = room.sessionId,
                             roomId = room.roomId,
@@ -231,11 +240,11 @@ class RoomDetailsFlowNode(
                         elementCallEntryPoint.startCall(inputs)
                     }
 
-                    override fun openReportRoom() {
+                    override fun navigateToReportRoom() {
                         backstack.push(NavTarget.ReportRoom)
                     }
 
-                    override fun onSelectNewOwnersWhenLeaving() {
+                    override fun navigateToSelectNewOwnersWhenLeaving() {
                         backstack.push(NavTarget.SelectNewOwnersWhenLeaving)
                     }
                 }
@@ -244,11 +253,11 @@ class RoomDetailsFlowNode(
 
             NavTarget.RoomMemberList -> {
                 val roomMemberListCallback = object : RoomMemberListNode.Callback {
-                    override fun openRoomMemberDetails(roomMemberId: UserId, primaryZId: String?) {
+                    override fun navigateToRoomMemberDetails(roomMemberId: UserId, primaryZId: String?) {
                         backstack.push(NavTarget.RoomMemberDetails(roomMemberId, primaryZId))
                     }
 
-                    override fun openInviteMembers() {
+                    override fun navigateToInviteMembers() {
                         backstack.push(NavTarget.InviteMembers)
                     }
                 }
@@ -266,52 +275,49 @@ class RoomDetailsFlowNode(
             is NavTarget.RoomNotificationSettings -> {
                 val input = RoomNotificationSettingsNode.RoomNotificationSettingInput(navTarget.showUserDefinedSettingStyle)
                 val callback = object : RoomNotificationSettingsNode.Callback {
-                    override fun openGlobalNotificationSettings() {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenGlobalNotificationSettings() }
+                    override fun navigateToGlobalNotificationSettings() {
+                        callback.navigateToGlobalNotificationSettings()
                     }
                 }
                 createNode<RoomNotificationSettingsNode>(buildContext, listOf(input, callback))
             }
 
             is NavTarget.RoomMemberDetails -> {
-//                if (navTarget.primaryZId.isNullOrBlank()) {
-//                    val callback = object : UserProfileNodeHelper.Callback {
-//                        override fun openAvatarPreview(username: String, avatarUrl: String) {
-//                            overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
-//                        }
-//
-//                        override fun onStartDM(roomId: RoomId) {
-//                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId) }
-//                        }
-//
-//                        override fun onStartCall(dmRoomId: RoomId) {
-//                            elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
-//                        }
-//
-//                        override fun onVerifyUser(userId: UserId) {
-//                            backstack.push(NavTarget.VerifyUser(userId))
-//                        }
-//                    }
-//                    val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
-//                    createNode<RoomMemberDetailsNode>(buildContext, plugins)
-//                } else {
-                    feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
-                        .params(FeedUserProfileEntryPoint.Params(navTarget.roomMemberId, null))
-                        .callback(object : FeedUserProfileEntryPoint.Callback {
-                            override fun onUserFeedClick(feed: ZeroFeed) {
-                                backstack.push(NavTarget.FeedDetails(feed))
-                            }
+                /*val callback = object : UserProfileNodeHelper.Callback {
+                    override fun navigateToAvatarPreview(username: String, avatarUrl: String) {
+                        overlay.show(NavTarget.AvatarPreview(username, avatarUrl))
+                    }
 
-                            override fun onOpenDm(roomId: RoomId) {
-                                plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId, emptyList()) }
-                            }
+                    override fun navigateToRoom(roomId: RoomId) {
+                        callback.navigateToRoom(roomId, emptyList())
+                    }
 
-                            override fun openAvatarPreview(name: String, url: String) {
-                                overlay.show(NavTarget.AvatarPreview(name, url))
-                            }
-                        })
-                        .build()
-//                }
+                    override fun startCall(dmRoomId: RoomId) {
+                        elementCallEntryPoint.startCall(CallType.RoomCall(roomId = dmRoomId, sessionId = room.sessionId))
+                    }
+
+                    override fun startVerifyUserFlow(userId: UserId) {
+                        backstack.push(NavTarget.VerifyUser(userId))
+                    }
+                }
+                val plugins = listOf(RoomMemberDetailsNode.RoomMemberDetailsInput(navTarget.roomMemberId), callback)
+                createNode<RoomMemberDetailsNode>(buildContext, plugins)*/
+                feedUserProfileEntryPoint.nodeBuilder(this, buildContext)
+                    .params(FeedUserProfileEntryPoint.Params(navTarget.roomMemberId, null))
+                    .callback(object : FeedUserProfileEntryPoint.Callback {
+                        override fun onUserFeedClick(feed: ZeroFeed) {
+                            backstack.push(NavTarget.FeedDetails(feed))
+                        }
+
+                        override fun onOpenDm(roomId: RoomId) {
+                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId, emptyList()) }
+                        }
+
+                        override fun openAvatarPreview(name: String, url: String) {
+                            overlay.show(NavTarget.AvatarPreview(name, url))
+                        }
+                    })
+                    .build()
             }
             is NavTarget.FeedDetails -> {
                 feedDetailsEntryPoint.nodeBuilder(this, buildContext)
@@ -331,21 +337,24 @@ class RoomDetailsFlowNode(
                         overlay.hide()
                     }
 
-                    override fun onViewInTimeline(eventId: EventId) {
+                    override fun viewInTimeline(eventId: EventId) {
                         // Cannot happen
                     }
 
-                    override fun onForwardEvent(eventId: EventId) {
+                    override fun forwardEvent(eventId: EventId, fromPinnedEvents: Boolean) {
                         // Cannot happen
                     }
                 }
-                mediaViewerEntryPoint.nodeBuilder(this, buildContext)
-                    .avatar(
-                        navTarget.name,
-                        navTarget.avatarUrl,
-                    )
-                    .callback(callback)
-                    .build()
+                val params = mediaViewerEntryPoint.createParamsForAvatar(
+                    filename = navTarget.name,
+                    avatarUrl = navTarget.avatarUrl,
+                )
+                mediaViewerEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = params,
+                    callback = callback,
+                )
             }
             is NavTarget.PollHistory -> {
                 pollHistoryEntryPoint.createNode(this, buildContext)
@@ -356,53 +365,55 @@ class RoomDetailsFlowNode(
                         backstack.pop()
                     }
 
-                    override fun onViewInTimeline(eventId: EventId) {
+                    override fun viewInTimeline(eventId: EventId) {
                         val permalinkData = PermalinkData.RoomLink(
                             roomIdOrAlias = room.roomId.toRoomIdOrAlias(),
                             eventId = eventId,
                         )
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach {
-                            it.onPermalinkClick(permalinkData, pushToBackstack = false)
-                        }
+                        callback.handlePermalinkClick(permalinkData, pushToBackstack = false)
                     }
 
-                    override fun forwardEvent(eventId: EventId) {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.forwardEvent(eventId) }
+                    override fun forward(eventId: EventId, fromPinnedEvents: Boolean) {
+                        callback.startForwardEventFlow(eventId, fromPinnedEvents)
                     }
                 }
-                mediaGalleryEntryPoint.nodeBuilder(this, buildContext)
-                    .callback(callback)
-                    .build()
+                mediaGalleryEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    callback = callback,
+                )
             }
 
             is NavTarget.AdminSettings -> {
-                createNode<RolesAndPermissionsFlowNode>(buildContext)
+                rolesAndPermissionsEntryPoint.createNode(this, buildContext)
             }
             NavTarget.PinnedMessagesList -> {
                 val params = MessagesEntryPoint.Params(
                     MessagesEntryPoint.InitialTarget.PinnedMessages
                 )
                 val callback = object : MessagesEntryPoint.Callback {
-                    override fun onRoomDetailsClick() = Unit
+                    override fun navigateToRoomDetails() = Unit
 
-                    override fun onUserDataClick(userId: UserId, primaryZId: String?) = Unit
+                    override fun navigateToRoomMemberDetails(userId: UserId, primaryZId: String?) = Unit
 
-                    override fun onPermalinkClick(data: PermalinkData, pushToBackstack: Boolean) {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onPermalinkClick(data, pushToBackstack) }
+                    override fun handlePermalinkClick(data: PermalinkData, pushToBackstack: Boolean) {
+                        callback.handlePermalinkClick(data, pushToBackstack)
                     }
 
-                    override fun forwardEvent(eventId: EventId) {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.forwardEvent(eventId) }
+                    override fun forwardEvent(eventId: EventId, fromPinnedEvents: Boolean) {
+                        callback.startForwardEventFlow(eventId, fromPinnedEvents)
                     }
 
-                    override fun openRoom(roomId: RoomId) {
-                        plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId, emptyList()) }
+                    override fun navigateToRoom(roomId: RoomId) {
+                        callback.navigateToRoom(roomId, emptyList())
                     }
                 }
-                return messagesEntryPoint.nodeBuilder(this, buildContext)
-                    .params(params)
-                    .callback(callback)
-                    .build()
+                return messagesEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = params,
+                    callback = callback,
+                )
             }
             NavTarget.KnockRequestsList -> {
                 knockRequestsListEntryPoint.createNode(this, buildContext)
@@ -415,9 +426,11 @@ class RoomDetailsFlowNode(
                     showDeviceVerifiedScreen = true,
                     verificationRequest = VerificationRequest.Outgoing.User(userId = navTarget.userId)
                 )
-                outgoingVerificationEntryPoint.nodeBuilder(this, buildContext)
-                    .params(params)
-                    .callback(object : OutgoingVerificationEntryPoint.Callback {
+                outgoingVerificationEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = params,
+                    callback = object : OutgoingVerificationEntryPoint.Callback {
                         override fun onDone() {
                             backstack.pop()
                         }
@@ -426,21 +439,27 @@ class RoomDetailsFlowNode(
                             backstack.pop()
                         }
 
-                        override fun onLearnMoreAboutEncryption() {
+                        override fun navigateToLearnMoreAboutEncryption() {
                             learnMoreUrl.value = LearnMoreConfig.ENCRYPTION_URL
                         }
-                    })
-                    .build()
+                    },
+                )
             }
             is NavTarget.ReportRoom -> {
-                reportRoomEntryPoint.createNode(this, buildContext, room.roomId)
+                reportRoomEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    roomId = room.roomId,
+                )
             }
 
             is NavTarget.SelectNewOwnersWhenLeaving -> {
-                changeRoomMemberRolesEntryPoint.builder(this, buildContext)
-                    .room(room)
-                    .listType(ChangeRoomMemberRolesListType.SelectNewOwnersWhenLeaving)
-                    .build()
+                changeRoomMemberRolesEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    room = room,
+                    listType = ChangeRoomMemberRolesListType.SelectNewOwnersWhenLeaving,
+                )
             }
         }
     }

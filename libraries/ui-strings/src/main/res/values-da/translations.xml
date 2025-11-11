@@ -95,6 +95,7 @@
   <string name="action_forgot_password">"Har du glemt din adgangskode?"</string>
   <string name="action_forward">"Videresend"</string>
   <string name="action_go_back">"Gå tilbage"</string>
+  <string name="action_go_to_roles_and_permissions">"Gå til roller og rettigheder"</string>
   <string name="action_go_to_settings">"Gå til indstillinger"</string>
   <string name="action_ignore">"Ignorér"</string>
   <string name="action_invite">"Invitér"</string>
@@ -419,6 +420,7 @@ Er du sikker på, at du vil fortsætte?"</string>
   <string name="invite_friends_rich_title">"🔐️ Kom med mig til %1$s"</string>
   <string name="invite_friends_text">"Hej, lad os snakkes på %1$s: %2$s"</string>
   <string name="login_initial_device_name_android">"%1$s Android"</string>
+  <string name="notification_thread_in_room">"Tråd i %1$s"</string>
   <string name="preference_rageshake">"Ryst enheden i frustration for at anmelde en fejl"</string>
   <string name="screen_bug_report_a11y_screenshot">"Skærmbillede"</string>
   <string name="screen_create_poll_option_accessibility_label">"%1$s: %2$s"</string>

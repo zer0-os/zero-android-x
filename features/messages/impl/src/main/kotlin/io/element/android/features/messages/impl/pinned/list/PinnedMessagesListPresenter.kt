@@ -1,7 +1,8 @@
 /*
- * Copyright 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2024, 2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -26,7 +27,7 @@ import io.element.android.features.messages.impl.UserEventPermissions
 import io.element.android.features.messages.impl.actionlist.ActionListState
 import io.element.android.features.messages.impl.actionlist.model.TimelineItemAction
 import io.element.android.features.messages.impl.link.LinkState
-import io.element.android.features.messages.impl.pinned.PinnedEventsTimelineProvider
+import io.element.android.features.messages.impl.pinned.DefaultPinnedEventsTimelineProvider
 import io.element.android.features.messages.impl.timeline.TimelineRoomInfo
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactory
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactoryConfig
@@ -67,7 +68,7 @@ class PinnedMessagesListPresenter(
     @Assisted private val navigator: PinnedMessagesListNavigator,
     val room: JoinedRoom,
     timelineItemsFactoryCreator: TimelineItemsFactory.Creator,
-    private val timelineProvider: PinnedEventsTimelineProvider,
+    private val timelineProvider: DefaultPinnedEventsTimelineProvider,
     private val timelineProtectionPresenter: Presenter<TimelineProtectionState>,
     private val linkPresenter: Presenter<LinkState>,
     private val snackbarDispatcher: SnackbarDispatcher,
@@ -136,7 +137,7 @@ class PinnedMessagesListPresenter(
             }
         )
 
-        fun handleEvents(event: PinnedMessagesListEvents) {
+        fun handleEvent(event: PinnedMessagesListEvents) {
             when (event) {
                 is PinnedMessagesListEvents.HandleAction -> sessionCoroutineScope.handleTimelineAction(event.action, event.event)
             }
@@ -149,7 +150,7 @@ class PinnedMessagesListPresenter(
             displayThreadSummaries = displayThreadSummaries,
             userEventPermissions = userEventPermissions,
             timelineItems = pinnedMessageItems,
-            eventSink = ::handleEvents
+            eventSink = ::handleEvent,
         )
     }
 
@@ -159,18 +160,18 @@ class PinnedMessagesListPresenter(
     ) = launch {
         when (action) {
             TimelineItemAction.ViewSource -> {
-                navigator.onShowEventDebugInfoClick(targetEvent.eventId, targetEvent.debugInfo)
+                navigator.navigateToEventDebugInfo(targetEvent.eventId, targetEvent.debugInfo)
             }
             TimelineItemAction.Forward -> {
                 targetEvent.eventId?.let { eventId ->
-                    navigator.onForwardEventClick(eventId)
+                    navigator.forwardEvent(eventId)
                 }
             }
             TimelineItemAction.Unpin -> handleUnpinAction(targetEvent)
             TimelineItemAction.ViewInTimeline -> {
                 targetEvent.eventId?.let { eventId ->
                     analyticsService.captureInteraction(Interaction.Name.PinnedMessageListViewTimeline)
-                    navigator.onViewInTimelineClick(eventId)
+                    navigator.viewInTimeline(eventId)
                 }
             }
             else -> Unit

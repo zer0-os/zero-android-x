@@ -1,7 +1,8 @@
 /*
- * Copyright 2022-2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2022-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -1256,8 +1257,8 @@ class MessagesPresenterTest {
     fun `present - handle MarkAsFullyReadAndExit marks the room as fully read and navigates up`() = runTest {
         val markAsFullyReadRecorder = lambdaRecorder<RoomId, EventId, Unit> { _, _ -> }
         val markAsFullyReadUseCase = FakeMarkAsFullyRead(markAsFullyReadRecorder)
-        val onNavigateUpRecorder = lambdaRecorder<Unit> {}
-        val navigator = FakeMessagesNavigator(onNavigateUpLambda = onNavigateUpRecorder)
+        val closeLambda = lambdaRecorder<Unit> {}
+        val navigator = FakeMessagesNavigator(closeLambda = closeLambda)
 
         val presenter = createMessagesPresenter(
             timeline = FakeTimeline(getLatestEventIdResult = { Result.success(AN_EVENT_ID) }),
@@ -1271,7 +1272,7 @@ class MessagesPresenterTest {
             runCurrent()
 
             markAsFullyReadRecorder.assertions().isCalledOnce()
-            onNavigateUpRecorder.assertions().isCalledOnce()
+            closeLambda.assertions().isCalledOnce()
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -1280,8 +1281,8 @@ class MessagesPresenterTest {
     @Test
     fun `present - handle MarkAsFullyReadAndExit still navigates up if marking as read fails`() = runTest {
         val markAsFullyReadUseCase = FakeMarkAsFullyRead { _, _ -> error("boom") }
-        val onNavigateUpRecorder = lambdaRecorder<Unit> {}
-        val navigator = FakeMessagesNavigator(onNavigateUpLambda = onNavigateUpRecorder)
+        val closeLambda = lambdaRecorder<Unit> {}
+        val navigator = FakeMessagesNavigator(closeLambda = closeLambda)
 
         val presenter = createMessagesPresenter(
             timeline = FakeTimeline(getLatestEventIdResult = { Result.success(AN_EVENT_ID) }),
@@ -1294,7 +1295,7 @@ class MessagesPresenterTest {
 
             runCurrent()
 
-            onNavigateUpRecorder.assertions().isCalledOnce()
+            closeLambda.assertions().isCalledOnce()
 
             cancelAndIgnoreRemainingEvents()
         }

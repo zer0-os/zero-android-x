@@ -1,7 +1,8 @@
 /*
- * Copyright 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2024, 2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -30,7 +31,6 @@ import io.element.android.features.joinroom.api.JoinRoomEntryPoint
 import io.element.android.features.roomaliasesolver.api.RoomAliasResolverEntryPoint
 import io.element.android.features.roomaliasesolver.api.RoomAliasResolverEntryPoint.Params
 import io.element.android.features.roomdirectory.api.RoomDescription
-import io.element.android.features.space.api.SpaceEntryPoint
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
 import io.element.android.libraries.architecture.NodeInputs
@@ -70,7 +70,6 @@ class RoomFlowNode(
     private val joinRoomEntryPoint: JoinRoomEntryPoint,
     private val roomAliasResolverEntryPoint: RoomAliasResolverEntryPoint,
     private val membershipObserver: RoomMembershipObserver,
-    private val spaceEntryPoint: SpaceEntryPoint,
 ) : BaseFlowNode<RoomFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = NavTarget.Loading,
@@ -105,9 +104,6 @@ class RoomFlowNode(
 
         @Parcelize
         data class JoinedRoom(val roomId: RoomId) : NavTarget
-
-        @Parcelize
-        data class JoinedSpace(val spaceId: RoomId) : NavTarget
     }
 
     override fun onBuilt() {
@@ -180,10 +176,12 @@ class RoomFlowNode(
                     }
                 }
                 val params = Params(navTarget.roomAlias)
-                roomAliasResolverEntryPoint.nodeBuilder(this, buildContext)
-                    .callback(callback)
-                    .params(params)
-                    .build()
+                roomAliasResolverEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = params,
+                    callback = callback,
+                )
             }
             is NavTarget.JoinRoom -> {
                 val inputs = JoinRoomEntryPoint.Inputs(
@@ -193,7 +191,11 @@ class RoomFlowNode(
                     serverNames = navTarget.serverNames,
                     trigger = navTarget.trigger,
                 )
-                joinRoomEntryPoint.createNode(this, buildContext, inputs)
+                joinRoomEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    inputs = inputs,
+                )
             }
             is NavTarget.JoinedRoom -> {
                 val roomFlowNodeCallback = plugins<JoinedRoomLoadedFlowNode.Callback>()
@@ -202,13 +204,6 @@ class RoomFlowNode(
                     initialElement = inputs.initialElement
                 )
                 createNode<JoinedRoomFlowNode>(buildContext, plugins = listOf(inputs) + roomFlowNodeCallback)
-            }
-            is NavTarget.JoinedSpace -> {
-                val spaceCallback = plugins<SpaceEntryPoint.Callback>().single()
-                spaceEntryPoint.nodeBuilder(this, buildContext)
-                    .inputs(SpaceEntryPoint.Inputs(roomId = navTarget.spaceId))
-                    .callback(spaceCallback)
-                    .build()
             }
         }
     }

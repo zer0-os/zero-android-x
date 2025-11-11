@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -39,6 +40,7 @@ class NotificationMapper(
                     isDirect = item.roomInfo.isDirect,
                     activeMembersCount = item.roomInfo.joinedMembersCount.toInt(),
                 )
+                val timestamp = item.timestamp() ?: clock.epochMillis()
                 NotificationData(
                     sessionId = sessionId,
                     eventId = eventId,
@@ -53,8 +55,8 @@ class NotificationMapper(
                     isDm = isDm,
                     isEncrypted = item.roomInfo.isEncrypted.orFalse(),
                     isNoisy = item.isNoisy.orFalse(),
-                    timestamp = item.timestamp() ?: clock.epochMillis(),
-                    content = item.event.use { notificationContentMapper.map(it) }.getOrThrow(),
+                    timestamp = timestamp,
+                    content = notificationContentMapper.map(item.event).getOrThrow(),
                     hasMention = item.hasMention.orFalse(),
                 )
             }

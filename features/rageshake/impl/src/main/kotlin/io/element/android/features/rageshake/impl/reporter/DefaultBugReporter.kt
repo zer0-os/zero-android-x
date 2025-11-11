@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -165,7 +166,7 @@ class DefaultBugReporter(
                     }
                 }
                 val sessionData = sessionStore.getLatestSession()
-                val numberOfAccounts = sessionStore.getAllSessions().size
+                val numberOfAccounts = sessionStore.numberOfSessions()
                 val deviceId = sessionData?.deviceId ?: "undefined"
                 val userId = sessionData?.userId?.let { UserId(it) }
                 // build the multi part request

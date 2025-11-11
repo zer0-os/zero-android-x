@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -19,8 +20,10 @@ import com.bumble.appyx.testing.unit.common.helper.parentNodeTestHelper
 import com.google.common.truth.Truth.assertThat
 import io.element.android.appnav.di.RoomGraphFactory
 import io.element.android.appnav.room.RoomNavigationTarget
+import io.element.android.appnav.room.joined.FakeJoinedRoomLoadedFlowNodeCallback
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
 import io.element.android.features.forward.api.ForwardEntryPoint
+import io.element.android.features.forward.test.FakeForwardEntryPoint
 import io.element.android.features.messages.api.MessagesEntryPoint
 import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
 import io.element.android.features.space.api.SpaceEntryPoint
@@ -48,29 +51,20 @@ class JoinedRoomLoadedFlowNodeTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private class FakeMessagesEntryPoint : MessagesEntryPoint, MessagesEntryPoint.NodeBuilder {
-        var buildContext: BuildContext? = null
+    private class FakeMessagesEntryPoint : MessagesEntryPoint {
         var nodeId: String? = null
         var parameters: MessagesEntryPoint.Params? = null
         var callback: MessagesEntryPoint.Callback? = null
 
-        override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): MessagesEntryPoint.NodeBuilder {
-            this.buildContext = buildContext
-            return this
-        }
-
-        override fun params(params: MessagesEntryPoint.Params): MessagesEntryPoint.NodeBuilder {
+        override fun createNode(
+            parentNode: Node,
+            buildContext: BuildContext,
+            params: MessagesEntryPoint.Params,
+            callback: MessagesEntryPoint.Callback,
+        ): Node {
             parameters = params
-            return this
-        }
-
-        override fun callback(callback: MessagesEntryPoint.Callback): MessagesEntryPoint.NodeBuilder {
             this.callback = callback
-            return this
-        }
-
-        override fun build(): Node {
-            return node(buildContext!!) {}.also {
+            return node(buildContext) {}.also {
                 nodeId = it.id
             }
         }
@@ -85,54 +79,26 @@ class JoinedRoomLoadedFlowNodeTest {
     private class FakeRoomDetailsEntryPoint : RoomDetailsEntryPoint {
         var nodeId: String? = null
 
-        override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): RoomDetailsEntryPoint.NodeBuilder {
-            return object : RoomDetailsEntryPoint.NodeBuilder {
-                override fun params(params: RoomDetailsEntryPoint.Params): RoomDetailsEntryPoint.NodeBuilder {
-                    return this
-                }
-
-                override fun callback(callback: RoomDetailsEntryPoint.Callback): RoomDetailsEntryPoint.NodeBuilder {
-                    return this
-                }
-
-                override fun build(): Node {
-                    return node(buildContext) {}.also {
-                        nodeId = it.id
-                    }
-                }
-            }
+        override fun createNode(
+            parentNode: Node,
+            buildContext: BuildContext,
+            params: RoomDetailsEntryPoint.Params,
+            callback: RoomDetailsEntryPoint.Callback,
+        ) = node(buildContext) {}.also {
+            nodeId = it.id
         }
     }
 
     private class FakeSpaceEntryPoint : SpaceEntryPoint {
         var nodeId: String? = null
 
-        override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): SpaceEntryPoint.NodeBuilder {
-            return object : SpaceEntryPoint.NodeBuilder {
-                override fun inputs(inputs: SpaceEntryPoint.Inputs): SpaceEntryPoint.NodeBuilder {
-                    return this
-                }
-
-                override fun callback(callback: SpaceEntryPoint.Callback): SpaceEntryPoint.NodeBuilder {
-                    return this
-                }
-
-                override fun build(): Node {
-                    return node(buildContext) {}.also {
-                        nodeId = it.id
-                    }
-                }
-            }
-        }
-    }
-
-    private class FakeForwardEntryPoint : ForwardEntryPoint {
-        override fun nodeBuilder(parentNode: Node, buildContext: BuildContext): ForwardEntryPoint.NodeBuilder {
-            return object : ForwardEntryPoint.NodeBuilder {
-                override fun params(params: ForwardEntryPoint.Params) = this
-                override fun callback(callback: ForwardEntryPoint.Callback) = this
-                override fun build() = node(buildContext) {}
-            }
+        override fun createNode(
+            parentNode: Node,
+            buildContext: BuildContext,
+            inputs: SpaceEntryPoint.Inputs,
+            callback: SpaceEntryPoint.Callback,
+        ) = node(buildContext) {}.also {
+            nodeId = it.id
         }
     }
 
@@ -165,7 +131,7 @@ class JoinedRoomLoadedFlowNodeTest {
         val fakeMessagesEntryPoint = FakeMessagesEntryPoint()
         val inputs = JoinedRoomLoadedFlowNode.Inputs(room, RoomNavigationTarget.Root())
         val roomFlowNode = createJoinedRoomLoadedFlowNode(
-            plugins = listOf(inputs),
+            plugins = listOf(inputs, FakeJoinedRoomLoadedFlowNodeCallback()),
             messagesEntryPoint = fakeMessagesEntryPoint,
         )
         // WHEN
@@ -185,7 +151,7 @@ class JoinedRoomLoadedFlowNodeTest {
         val spaceEntryPoint = FakeSpaceEntryPoint()
         val inputs = JoinedRoomLoadedFlowNode.Inputs(room, RoomNavigationTarget.Root())
         val roomFlowNode = createJoinedRoomLoadedFlowNode(
-            plugins = listOf(inputs),
+            plugins = listOf(inputs, FakeJoinedRoomLoadedFlowNodeCallback()),
             spaceEntryPoint = spaceEntryPoint,
         )
         // WHEN
@@ -206,13 +172,13 @@ class JoinedRoomLoadedFlowNodeTest {
         val fakeRoomDetailsEntryPoint = FakeRoomDetailsEntryPoint()
         val inputs = JoinedRoomLoadedFlowNode.Inputs(room, RoomNavigationTarget.Root())
         val roomFlowNode = createJoinedRoomLoadedFlowNode(
-            plugins = listOf(inputs),
+            plugins = listOf(inputs, FakeJoinedRoomLoadedFlowNodeCallback()),
             messagesEntryPoint = fakeMessagesEntryPoint,
             roomDetailsEntryPoint = fakeRoomDetailsEntryPoint,
         )
         val roomFlowNodeTestHelper = roomFlowNode.parentNodeTestHelper()
         // WHEN
-        fakeMessagesEntryPoint.callback?.onRoomDetailsClick()
+        fakeMessagesEntryPoint.callback?.navigateToRoomDetails()
         // THEN
         roomFlowNodeTestHelper.assertChildHasLifecycle(JoinedRoomLoadedFlowNode.NavTarget.RoomDetails, Lifecycle.State.CREATED)
         val roomDetailsNode = roomFlowNode.childNode(JoinedRoomLoadedFlowNode.NavTarget.RoomDetails)!!
@@ -228,7 +194,7 @@ class JoinedRoomLoadedFlowNodeTest {
         val inputs = JoinedRoomLoadedFlowNode.Inputs(room, RoomNavigationTarget.Root())
         val activeRoomsHolder = ActiveRoomsHolder()
         val roomFlowNode = createJoinedRoomLoadedFlowNode(
-            plugins = listOf(inputs),
+            plugins = listOf(inputs, FakeJoinedRoomLoadedFlowNodeCallback()),
             messagesEntryPoint = fakeMessagesEntryPoint,
             roomDetailsEntryPoint = fakeRoomDetailsEntryPoint,
             activeRoomsHolder = activeRoomsHolder,
@@ -253,7 +219,7 @@ class JoinedRoomLoadedFlowNodeTest {
             addRoom(room)
         }
         val roomFlowNode = createJoinedRoomLoadedFlowNode(
-            plugins = listOf(inputs),
+            plugins = listOf(inputs, FakeJoinedRoomLoadedFlowNodeCallback()),
             messagesEntryPoint = fakeMessagesEntryPoint,
             roomDetailsEntryPoint = fakeRoomDetailsEntryPoint,
             activeRoomsHolder = activeRoomsHolder,

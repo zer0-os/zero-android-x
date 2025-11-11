@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -227,11 +228,11 @@ class RootFlowNode(
                     }
                 val inputs = LoggedInAppScopeFlowNode.Inputs(matrixClient)
                 val callback = object : LoggedInAppScopeFlowNode.Callback {
-                    override fun onOpenBugReport() {
+                    override fun navigateToBugReport() {
                         backstack.push(NavTarget.BugReport)
                     }
 
-                    override fun onAddAccount() {
+                    override fun navigateToAddAccount() {
                         backstack.push(NavTarget.NotLoggedInFlow(null))
                     }
                 }
@@ -239,7 +240,7 @@ class RootFlowNode(
             }
             is NavTarget.NotLoggedInFlow -> {
                 val callback = object : NotLoggedInFlowNode.Callback {
-                    override fun onOpenBugReport() {
+                    override fun navigateToBugReport() {
                         backstack.push(NavTarget.BugReport)
                     }
                 }
@@ -249,11 +250,13 @@ class RootFlowNode(
                 createNode<NotLoggedInFlowNode>(buildContext, plugins = listOf(params, callback))
             }
             is NavTarget.SignedOutFlow -> {
-                signedOutEntryPoint.nodeBuilder(this, buildContext).params(
-                    SignedOutEntryPoint.Params(
-                        sessionId = navTarget.sessionId
-                    )
-                ).build()
+                signedOutEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = SignedOutEntryPoint.Params(
+                        sessionId = navTarget.sessionId,
+                    ),
+                )
             }
             NavTarget.SplashScreen -> emptyNode(buildContext)
             NavTarget.BugReport -> {
@@ -262,11 +265,15 @@ class RootFlowNode(
                         backstack.pop()
                     }
                 }
-                bugReportEntryPoint.nodeBuilder(this, buildContext).callback(callback).build()
+                bugReportEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    callback = callback,
+                )
             }
             is NavTarget.AccountSelect -> {
                 val callback: AccountSelectEntryPoint.Callback = object : AccountSelectEntryPoint.Callback {
-                    override fun onSelectAccount(sessionId: SessionId) {
+                    override fun onAccountSelected(sessionId: SessionId) {
                         lifecycleScope.launch {
                             if (sessionId == navTarget.currentSessionId) {
                                 // Ensure that the account selection Node is removed from the backstack
@@ -287,7 +294,11 @@ class RootFlowNode(
                         backstack.pop()
                     }
                 }
-                accountSelectEntryPoint.nodeBuilder(this, buildContext).callback(callback).build()
+                accountSelectEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    callback = callback,
+                )
             }
         }
     }
@@ -339,7 +350,7 @@ class RootFlowNode(
         } else {
             // wait for the current session to be restored
             val loggedInFlowNode = attachSession(latestSessionId)
-            if (sessionStore.getAllSessions().size > 1) {
+            if (sessionStore.numberOfSessions() > 1) {
                 // Several accounts, let the user choose which one to use
                 backstack.push(
                     NavTarget.AccountSelect(
@@ -369,7 +380,7 @@ class RootFlowNode(
                 is PermalinkData.FallbackLink -> Unit
                 is PermalinkData.RoomEmailInviteLink -> Unit
                 else -> {
-                    if (sessionStore.getAllSessions().size > 1) {
+                    if (sessionStore.numberOfSessions() > 1) {
                         // Several accounts, let the user choose which one to use
                         backstack.push(
                             NavTarget.AccountSelect(

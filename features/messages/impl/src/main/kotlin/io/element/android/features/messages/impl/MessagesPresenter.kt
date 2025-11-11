@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -230,7 +231,7 @@ class MessagesPresenter(
             onPauseOrDispose {}
         }
 
-        fun handleEvents(event: MessagesEvents) {
+        fun handleEvent(event: MessagesEvents) {
             when (event) {
                 is MessagesEvents.HandleAction -> {
                     localCoroutineScope.handleTimelineAction(
@@ -260,7 +261,7 @@ class MessagesPresenter(
                     if (!markingAsReadAndExiting.getAndSet(true)) {
                         val latestEventId = room.liveTimeline.getLatestEventId().getOrElse {
                             Timber.w(it, "Failed to get latest event id to mark as fully read")
-                            navigator.onNavigateUp()
+                            navigator.close()
                             return@launch
                         }
                         latestEventId?.let { eventId ->
@@ -268,7 +269,7 @@ class MessagesPresenter(
                                 markAsFullyRead(room.roomId, eventId)
                             }
                         }
-                        navigator.onNavigateUp()
+                        navigator.close()
                         markingAsReadAndExiting.set(false)
                     }
                 }
@@ -302,8 +303,9 @@ class MessagesPresenter(
             pinnedMessagesBannerState = pinnedMessagesBannerState,
             dmUserVerificationState = dmUserVerificationState,
             roomMemberModerationState = roomMemberModerationState,
-            successorRoom = roomInfo.successorRoom
-        ) { handleEvents(it) }
+            successorRoom = roomInfo.successorRoom,
+            eventSink = ::handleEvent,
+        )
     }
 
     @Composable
@@ -366,7 +368,7 @@ class MessagesPresenter(
                         is TimelineItemThreadInfo.ThreadResponse -> targetEvent.threadInfo.threadRootId
                         is TimelineItemThreadInfo.ThreadRoot, null -> targetEvent.eventId?.toThreadId()
                     } ?: return@launch
-                    navigator.onOpenThread(threadId, null)
+                    navigator.navigateToThread(threadId, null)
                 } else {
                     handleActionReply(targetEvent, composerState, timelineProtectionState)
                 }
@@ -474,7 +476,7 @@ class MessagesPresenter(
         when (targetEvent.content) {
             is TimelineItemPollContent -> {
                 if (targetEvent.eventId == null) return
-                navigator.onEditPollClick(targetEvent.eventId)
+                navigator.navigateToEditPoll(targetEvent.eventId)
             }
             else -> {
                 val composerMode = MessageComposerMode.Edit(
@@ -539,17 +541,17 @@ class MessagesPresenter(
     }
 
     private fun handleShowDebugInfoAction(event: TimelineItem.Event) {
-        navigator.onShowEventDebugInfoClick(event.eventId, event.debugInfo)
+        navigator.navigateToEventDebugInfo(event.eventId, event.debugInfo)
     }
 
     private fun handleForwardAction(event: TimelineItem.Event) {
         if (event.eventId == null) return
-        navigator.onForwardEventClick(event.eventId)
+        navigator.forwardEvent(event.eventId)
     }
 
     private fun handleReportAction(event: TimelineItem.Event) {
         if (event.eventId == null) return
-        navigator.onReportContentClick(event.eventId, event.senderId)
+        navigator.navigateToReportMessage(event.eventId, event.senderId)
     }
 
     private fun handleEndPollAction(

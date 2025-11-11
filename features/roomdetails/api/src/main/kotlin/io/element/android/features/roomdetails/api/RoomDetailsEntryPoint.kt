@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -37,17 +38,16 @@ interface RoomDetailsEntryPoint : FeatureEntryPoint {
     data class Params(val initialElement: InitialTarget) : NodeInputs
 
     interface Callback : Plugin {
-        fun onOpenGlobalNotificationSettings()
-        fun onOpenRoom(roomId: RoomId, serverNames: List<String>)
-        fun onPermalinkClick(data: PermalinkData, pushToBackstack: Boolean)
-        fun forwardEvent(eventId: EventId)
+        fun navigateToGlobalNotificationSettings()
+        fun navigateToRoom(roomId: RoomId, serverNames: List<String>)
+        fun handlePermalinkClick(data: PermalinkData, pushToBackstack: Boolean)
+        fun startForwardEventFlow(eventId: EventId, fromPinnedEvents: Boolean)
     }
 
-    interface NodeBuilder {
-        fun params(params: Params): NodeBuilder
-        fun callback(callback: Callback): NodeBuilder
-        fun build(): Node
-    }
-
-    fun nodeBuilder(parentNode: Node, buildContext: BuildContext): NodeBuilder
+    fun createNode(
+        parentNode: Node,
+        buildContext: BuildContext,
+        params: Params,
+        callback: Callback,
+    ): Node
 }

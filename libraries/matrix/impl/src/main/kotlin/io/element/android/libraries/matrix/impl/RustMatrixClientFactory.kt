@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, 2024 New Vector Ltd.
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2023-2025 New Vector Ltd.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
  * Please see LICENSE files in the repository root for full details.
  */
 
@@ -35,6 +36,7 @@ import org.matrix.rustcomponents.sdk.RequestConfig
 import org.matrix.rustcomponents.sdk.Session
 import org.matrix.rustcomponents.sdk.SlidingSyncVersion
 import org.matrix.rustcomponents.sdk.SlidingSyncVersionBuilder
+import org.matrix.rustcomponents.sdk.SqliteStoreBuilder
 import org.matrix.rustcomponents.sdk.use
 import timber.log.Timber
 import uniffi.matrix_sdk_crypto.CollectStrategy
@@ -111,20 +113,13 @@ class RustMatrixClientFactory(
         slidingSyncType: ClientBuilderSlidingSync,
     ): ClientBuilder {
         return clientBuilderProvider.provide()
-            .requestConfig(
-                RequestConfig(
-                    retryLimit = null,
-                    timeout = 25000u,
-                    maxConcurrentRequests = null,
-                    maxRetryTime = null
-                )
-            )
-            .sessionPaths(
-                dataPath = sessionPaths.fileDirectory.absolutePath,
-                cachePath = sessionPaths.cacheDirectory.absolutePath,
+            .sqliteStore(
+                SqliteStoreBuilder(
+                    dataPath = sessionPaths.fileDirectory.absolutePath,
+                    cachePath = sessionPaths.cacheDirectory.absolutePath,
+                ).passphrase(passphrase)
             )
             .setSessionDelegate(sessionDelegate)
-            .sessionPassphrase(passphrase)
             .userAgent(userAgentProvider.provide())
             .addRootCertificates(userCertificatesProvider.provides())
             .autoEnableBackups(true)
@@ -150,7 +145,7 @@ class RustMatrixClientFactory(
             .threadsEnabled(featureFlagService.isFeatureEnabled(FeatureFlags.Threads), threadSubscriptions = false)
             .requestConfig(
                 RequestConfig(
-                    timeout = 30_000uL,
+                    timeout = 25_000uL,
                     retryLimit = 0u,
                     // Use default values for the rest
                     maxConcurrentRequests = null,

@@ -97,6 +97,7 @@
   <string name="action_forgot_password">"Zapomněli jste heslo?"</string>
   <string name="action_forward">"Přeposlat"</string>
   <string name="action_go_back">"Přejít zpět"</string>
+  <string name="action_go_to_roles_and_permissions">"Přejít na role a oprávnění"</string>
   <string name="action_go_to_settings">"Přejít do nastavení"</string>
   <string name="action_ignore">"Ignorovat"</string>
   <string name="action_invite">"Pozvat"</string>
@@ -178,7 +179,6 @@
   <string name="common_advanced_settings">"Pokročilá nastavení"</string>
   <string name="common_an_image">"obrázek"</string>
   <string name="common_analytics">"Analytika"</string>
-  <string name="common_android_notification_sync_notifications_foreground_service_title">"Načítání oznámení…"</string>
   <string name="common_android_shortcuts_remove_reason_left_room">"Opustili jste místnost"</string>
   <string name="common_android_shortcuts_remove_reason_session_logged_out">"Byli jste odhlášeni z relace"</string>
   <string name="common_appearance">"Vzhled"</string>
