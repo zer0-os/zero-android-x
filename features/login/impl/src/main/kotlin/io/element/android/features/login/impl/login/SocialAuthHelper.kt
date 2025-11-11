@@ -12,10 +12,11 @@ import android.content.Intent
 import android.net.Uri
 import dev.zacsweers.metro.Inject
 import androidx.core.net.toUri
+import io.element.android.support.zero.config.ZeroConfig
 
 @Inject
 class SocialAuthHelper {
-    private val redirectUri: String = "com.zero.android.messenger://oauth-callback"
+    private val redirectUri: String = "${ZeroConfig.APPLICATION_IDENTIFIER}://oauth-callback"
 
     fun loginWithX(activity: Activity) {
         val encodedRedirect = Uri.encode(redirectUri)
@@ -48,7 +49,7 @@ object SocialAuthResultHandler {
         val uri: Uri = intent.data ?: return
         val scheme = uri.scheme
         val host = uri.host
-        if (scheme == "com.zero.android.messenger" && host == "oauth-callback") {
+        if (scheme == ZeroConfig.APPLICATION_IDENTIFIER && host == "oauth-callback") {
             val token = uri.getQueryParameter("sessionEstablishmentToken")
             if (token != null) {
                 onTokenReceived(token)

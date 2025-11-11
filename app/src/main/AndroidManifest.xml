@@ -182,7 +182,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="com.zero.android.messenger"
+                    android:scheme="${applicationId}"
                     android:host="oauth-callback" />
             </intent-filter>
         </activity>

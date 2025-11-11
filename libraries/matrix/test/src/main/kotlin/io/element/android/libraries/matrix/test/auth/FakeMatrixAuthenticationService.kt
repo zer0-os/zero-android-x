@@ -9,6 +9,7 @@
 package io.element.android.libraries.matrix.test.auth
 
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.auth.AuthenticationChallenge
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.MatrixHomeServerDetails
 import io.element.android.libraries.matrix.api.auth.OidcDetails
@@ -142,6 +143,14 @@ class FakeMatrixAuthenticationService(
     }
 
     override suspend fun verifyOtp(email: String, code: String): Result<SessionId> {
+        return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
+    }
+
+    override suspend fun requestAuthChallenge(walletAddress: String): Result<AuthenticationChallenge> {
+        return loginError?.let { Result.failure(it) } ?: Result.success(AuthenticationChallenge("", ""))
+    }
+
+    override suspend fun requestAuthAuthorization(authChallenge: AuthenticationChallenge, web3Token: String): Result<SessionId> {
         return loginError?.let { Result.failure(it) } ?: Result.success(A_USER_ID)
     }
 }

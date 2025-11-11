@@ -11,6 +11,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
+import io.element.android.support.zero.config.ZeroConfig
 import java.io.File
 import java.io.FileOutputStream
 
@@ -52,7 +53,7 @@ fun ByteArray.toUri(context: Context, fileName: String): Uri {
     // Get content URI
     val uri: Uri = FileProvider.getUriForFile(
         context,
-        "com.zero.android.messenger.fileprovider",
+        "${ZeroConfig.APPLICATION_IDENTIFIER}.fileprovider",
         file
     )
     return uri

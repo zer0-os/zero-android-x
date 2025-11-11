@@ -79,4 +79,8 @@ interface MatrixAuthenticationService {
     suspend fun requestOtp(email: String): Result<Unit>
 
     suspend fun verifyOtp(email: String, code: String): Result<SessionId>
+
+    suspend fun requestAuthChallenge(walletAddress: String): Result<AuthenticationChallenge>
+
+    suspend fun requestAuthAuthorization(authChallenge: AuthenticationChallenge, web3Token: String): Result<SessionId>
 }

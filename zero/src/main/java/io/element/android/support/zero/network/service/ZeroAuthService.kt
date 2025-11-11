@@ -1,5 +1,6 @@
 package io.element.android.support.zero.network.service
 
+import io.element.android.support.zero.network.model.request.AuthenticationAuthorizationRequest
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
@@ -7,6 +8,7 @@ import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetPasswordRequest
 import io.element.android.support.zero.network.model.request.SendOtpRequest
 import io.element.android.support.zero.network.model.request.VerifyOtpRequest
+import io.element.android.support.zero.network.model.response.auth.ApiAuthenticationChallenge
 import io.element.android.support.zero.network.model.response.auth.ApiInviter
 import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.model.response.auth.ZeroNonce
@@ -15,6 +17,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ZeroAuthService {
     @POST(value = "api/v2/accounts/login")
@@ -59,5 +62,16 @@ interface ZeroAuthService {
     @POST(value = "api/otp/verify")
     suspend fun verifyOtp(
         @Body request: VerifyOtpRequest
+    ): ZeroAuthCredentials
+
+    @GET(value = "api/v2/authentication/challenge")
+    suspend fun requestAuthenticationChallenge(
+        @Query(value = "address") walletAddress: String,
+        @Query(value = "domain") applicationId: String,
+    ): ApiAuthenticationChallenge
+
+    @POST(value = "api/v2/authentication/authorize")
+    suspend fun requestAuthenticationAuthorization(
+        @Body request: AuthenticationAuthorizationRequest
     ): ZeroAuthCredentials
 }

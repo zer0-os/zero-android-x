@@ -8,9 +8,11 @@
 
 package io.element.android.appconfig
 
+import io.element.android.support.zero.config.ZeroConfig
+
 object PushConfig {
     /**
      * Note: pusher_app_id cannot exceed 64 chars.
      */
-    const val PUSHER_APP_ID: String = "com.zero.android.messenger"
+    const val PUSHER_APP_ID: String = ZeroConfig.APPLICATION_IDENTIFIER
 }

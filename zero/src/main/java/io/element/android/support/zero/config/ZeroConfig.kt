@@ -8,6 +8,7 @@ object ZeroConfig {
     const val ARWEAVE_BASE_URL = "https://of2ub4a2ai55lgpqj5z7so7j7v6uwjcruh6cdm3ojgnhqngahkwa.arweave.net/"
 
     const val ZSCAN_LIVE_URL = "https://zscan.live/"
+    const val APPLICATION_IDENTIFIER = "com.zero.android.messenger"
 }
 
 sealed class EnvironmentConfig(

@@ -15,13 +15,18 @@ object WalletConnectService {
     private const val WALLET_CONNECT_PERSONAL_SIGN_MESSAGE = "Sign with your wallet to log in to ZERO?"
     private const val WALLET_CONNECT_METHOD_ETH_PERSONAL_SIGN = "personal_sign"
 
+    fun getCurrentWalletAddress(): String? {
+        return AppKit.getAccount()?.address
+    }
+
     fun requestPersonalSign(
+        message: String = WALLET_CONNECT_PERSONAL_SIGN_MESSAGE,
         onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}
     ) {
         AppKit.getAccount()?.let { account ->
             val address = account.address
-            val params = getPersonalSignBody(WALLET_CONNECT_PERSONAL_SIGN_MESSAGE, address)
+            val params = getPersonalSignBody(message, address)
 
             AppKit.request(
                 request = Request(

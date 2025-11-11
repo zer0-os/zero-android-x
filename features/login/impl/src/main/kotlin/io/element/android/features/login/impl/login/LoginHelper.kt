@@ -24,6 +24,7 @@ import io.element.android.features.login.impl.walletconnect.WalletConnectService
 import io.element.android.features.login.impl.web.WebClientUrlForAuthenticationRetriever
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.runCatchingUpdatingState
+import io.element.android.libraries.matrix.api.auth.AuthenticationChallenge
 import io.element.android.libraries.matrix.api.auth.AuthenticationException
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.OidcPrompt
@@ -45,6 +46,7 @@ class LoginHelper(
     private val webClientUrlForAuthenticationRetriever: WebClientUrlForAuthenticationRetriever,
 ) {
     private val loginModeState: MutableState<AsyncData<LoginMode>> = mutableStateOf(AsyncData.Uninitialized)
+    private var authChallenge: AuthenticationChallenge? = null
 
     @Composable
     fun collectLoginMode(): State<AsyncData<LoginMode>> {
@@ -169,7 +171,12 @@ class LoginHelper(
     ) {
         when (model) {
             is Modal.Model.ApprovedSession -> {
-                WalletConnectService.requestPersonalSign()
+//                WalletConnectService.requestPersonalSign()
+                WalletConnectService.getCurrentWalletAddress()?.let { walletAddress ->
+                    coroutineScope.requestAuthChallenge(walletAddress)
+                } ?: run {
+                    loginModeState.value = AsyncData.Failure(Throwable("Couldn't get user wallet address"))
+                }
             }
             is Modal.Model.SessionRequestResponse -> {
                 when (model.result) {
@@ -196,16 +203,41 @@ class LoginHelper(
         homeserverUrl: String
     ) = launch {
         loginModeState.value = AsyncData.Loading(null)
-        val web3Token = "Web3 ${successResult.result}"
+        val web3Token = successResult.result
         authenticationService.setHomeserver(homeserverUrl)
             .onSuccess {
-                authenticationService.loginWithWeb3(web3Token)
+                /*authenticationService.loginWithWeb3(web3Token)
                     .onSuccess { sessionId ->
                         loginModeState.value = AsyncData.Uninitialized
                     }
                     .onFailure { failure ->
                         loginModeState.value = AsyncData.Failure(failure)
-                    }
+                    }*/
+                authChallenge?.let {
+                    authenticationService.requestAuthAuthorization(it, web3Token)
+                        .onSuccess { sessionId ->
+                            loginModeState.value = AsyncData.Uninitialized
+                        }
+                        .onFailure { failure ->
+                            loginModeState.value = AsyncData.Failure(failure)
+                        }
+                } ?: run {
+                    loginModeState.value = AsyncData.Failure(Throwable("Couldn't get auth challenge"))
+                }
+            }
+            .onFailure { failure ->
+                loginModeState.value = AsyncData.Failure(failure)
+            }
+    }
+
+    private fun CoroutineScope.requestAuthChallenge(
+        walletAddress: String
+    ) = launch {
+        loginModeState.value = AsyncData.Loading(null)
+        authenticationService.requestAuthChallenge(walletAddress)
+            .onSuccess { authChallenge ->
+                this@LoginHelper.authChallenge = authChallenge
+                WalletConnectService.requestPersonalSign(message = authChallenge.message)
             }
             .onFailure { failure ->
                 loginModeState.value = AsyncData.Failure(failure)

@@ -2,10 +2,12 @@ package io.element.android.support.zero.data.repository
 
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.support.zero.common.extension.channelFlowWithAwait
+import io.element.android.support.zero.config.ZeroConfig
 import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.delegate.DataCleaner
 import io.element.android.support.zero.data.delegate.Preferences
 import io.element.android.support.zero.data.model.AuthSSOToken
+import io.element.android.support.zero.network.model.request.AuthenticationAuthorizationRequest
 import io.element.android.support.zero.network.model.request.AuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.CreateAndAuthoriseUserRequest
 import io.element.android.support.zero.network.model.request.FinaliseCreateAccountRequest
@@ -13,6 +15,7 @@ import io.element.android.support.zero.network.model.request.LinkZeroUserRequest
 import io.element.android.support.zero.network.model.request.ResetPasswordRequest
 import io.element.android.support.zero.network.model.request.SendOtpRequest
 import io.element.android.support.zero.network.model.request.VerifyOtpRequest
+import io.element.android.support.zero.network.model.response.auth.ApiAuthenticationChallenge
 import io.element.android.support.zero.network.model.response.auth.ZeroAuthCredentials
 import io.element.android.support.zero.network.service.ZeroAuthService
 import io.element.android.support.zero.network.service.ZeroUserService
@@ -119,6 +122,22 @@ class AuthRepositoryImpl(
         val ssoToken = proceedLoginFlow(credentials)
         trySend(ssoToken)
     }
+
+    override suspend fun requestAuthChallenge(walletAddress: String): ApiAuthenticationChallenge {
+        return zeroAuthService.requestAuthenticationChallenge(walletAddress, ZeroConfig.APPLICATION_IDENTIFIER)
+    }
+
+    override suspend fun requestAuthAuthorization(authChallenge: ApiAuthenticationChallenge, walletToken: String) =
+        channelFlowWithAwait {
+            val credentials = zeroAuthService.requestAuthenticationAuthorization(
+                request = AuthenticationAuthorizationRequest(
+                    message = authChallenge.message,
+                    signature = walletToken
+                )
+            )
+            val ssoToken = proceedLoginFlow(credentials)
+            trySend(ssoToken)
+        }
 
     private suspend fun <T> runSafeCall(run: suspend () -> T) =
         try {

@@ -15,6 +15,7 @@ import io.element.android.libraries.core.coroutine.CoroutineDispatchers
 import io.element.android.libraries.core.extensions.mapFailure
 import io.element.android.libraries.core.extensions.runCatchingExceptions
 import io.element.android.libraries.matrix.api.MatrixClient
+import io.element.android.libraries.matrix.api.auth.AuthenticationChallenge
 import io.element.android.libraries.matrix.api.auth.AuthenticationException
 import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.MatrixHomeServerDetails
@@ -40,6 +41,8 @@ import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
+import io.element.android.support.zero.data.conversion.toApi
+import io.element.android.support.zero.data.conversion.toModel
 import io.element.android.support.zero.data.model.AuthSSOToken
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
 import kotlinx.coroutines.CancellationException
@@ -416,7 +419,7 @@ class RustMatrixAuthenticationService(
         }
 
     override suspend fun createZeroAccountAndAuthorise(email: String, password: String, inviteCode: String): Result<SessionId> {
-        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sing-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
         return executeZeroAuthFlow(
             fromCreateAccountFlow = true,
             executeCall = {
@@ -436,24 +439,40 @@ class RustMatrixAuthenticationService(
     }
 
     override suspend fun requestResetPassword(email: String): Result<Unit> {
-        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot proceed with zero, check instantiation")
         return runCatching {
             authRepository.resetPasswordRequest(email)
         }
     }
 
     override suspend fun requestOtp(email: String): Result<Unit> {
-        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
         return runCatching {
             authRepository.requestOTP(email)
         }
     }
 
     override suspend fun verifyOtp(email: String, code: String): Result<SessionId> {
-        val authRepository = zeroCoreRepository?.auth ?: error("Cannot sign-up with zero, check instantiation")
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
         return executeZeroAuthFlow(
             executeCall = {
                 authRepository.verifyOTP(email, code)
+            }
+        )
+    }
+
+    override suspend fun requestAuthChallenge(walletAddress: String): Result<AuthenticationChallenge> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
+        return runCatching {
+            authRepository.requestAuthChallenge(walletAddress).toModel()
+        }
+    }
+
+    override suspend fun requestAuthAuthorization(authChallenge: AuthenticationChallenge, web3Token: String): Result<SessionId> {
+        val authRepository = zeroCoreRepository?.auth ?: error("Cannot login with zero, check instantiation")
+        return executeZeroAuthFlow(
+            executeCall = {
+                authRepository.requestAuthAuthorization(authChallenge.toApi(), web3Token)
             }
         )
     }
