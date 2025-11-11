@@ -120,11 +120,12 @@ class RustMatrixAuthenticationService(
         return passphrase
     }
 
-    override suspend fun setHomeserver(homeserver: String): Result<Unit> =
+    override suspend fun setHomeserver(homeserver: String): Result<MatrixHomeServerDetails> =
         withContext(coroutineDispatchers.io) {
-            if (currentClient != null) {
+            val currentHomeServer = currentClient
+            if (currentHomeServer != null) {
                 // homeserver is already set
-                Result.success(Unit)
+                Result.success(currentHomeServer.homeserverLoginDetails().map())
             } else {
                 val emptySessionPath = rotateSessionPath()
                 runCatchingExceptions {
@@ -133,7 +134,7 @@ class RustMatrixAuthenticationService(
                     }
 
                     currentClient = client
-                    //client.homeserverLoginDetails().map()
+                    client.homeserverLoginDetails().map()
                 }.onFailure {
                     clear()
                 }.mapFailure { failure ->

@@ -86,7 +86,7 @@ fun ChooseSelfVerificationModeView(
             )
         }
     }*/
-    if (state.canEnterRecoveryKey) {
+    if (state.buttonsState.dataOrNull()?.canEnterRecoveryKey == true) {
         ZeroVerifySelfSessionView(
             onSkipVerification = onSkipVerification,
             onEnterRecoveryKey = onUseRecoveryKey,

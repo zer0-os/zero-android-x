@@ -154,13 +154,13 @@ fun TimelineItemVideoView(
             } else {
                 content.formattedCaption ?: SpannedString(content.caption)
             }
-            val textColor = if (isMyMessage && !isRoomEncrypted) {
+            /*val textColor = if (isMyMessage && !isRoomEncrypted) {
                 Color.Black
             } else {
                 ElementTheme.colors.textPrimary
-            }
+            }*/
             CompositionLocalProvider(
-                LocalContentColor provides textColor,
+                LocalContentColor provides ElementTheme.colors.textPrimary,
                 LocalTextStyle provides ElementTheme.zeroTypography.fontBodyLgRegular,
             ) {
                 val aspectRatio = content.aspectRatio ?: DEFAULT_ASPECT_RATIO

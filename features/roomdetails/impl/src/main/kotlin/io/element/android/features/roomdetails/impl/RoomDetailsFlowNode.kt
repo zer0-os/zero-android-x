@@ -17,7 +17,6 @@ import androidx.lifecycle.coroutineScope
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
-import com.bumble.appyx.core.plugin.plugins
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
@@ -28,8 +27,6 @@ import io.element.android.annotations.ContributesNode
 import io.element.android.appconfig.LearnMoreConfig
 import io.element.android.features.call.api.CallType
 import io.element.android.features.call.api.ElementCallEntryPoint
-import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesEntryPoint
-import io.element.android.features.changeroommemberroes.api.ChangeRoomMemberRolesListType
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
 import io.element.android.features.feeduserprofile.api.FeedUserProfileEntryPoint
 import io.element.android.features.knockrequests.api.list.KnockRequestsListEntryPoint
@@ -310,7 +307,7 @@ class RoomDetailsFlowNode(
                         }
 
                         override fun onOpenDm(roomId: RoomId) {
-                            plugins<RoomDetailsEntryPoint.Callback>().forEach { it.onOpenRoom(roomId, emptyList()) }
+                            callback.navigateToRoom(roomId, emptyList())
                         }
 
                         override fun openAvatarPreview(name: String, url: String) {

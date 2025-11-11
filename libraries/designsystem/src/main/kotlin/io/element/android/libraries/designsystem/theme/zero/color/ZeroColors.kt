@@ -6,6 +6,7 @@ import io.element.android.compound.tokens.generated.SemanticColors
 internal val zeroAccentColor = Color(0xFF01F4CB)
 internal val zeroDialogBackground = Color(0xFF1F1B22)
 internal val zeroChatBubbleOutgoing = Color(0xFF400999)
+internal val zeroChatBubbleOutgoingSecondary = Color(0xFF2B2B2B)
 internal val zeroChatBubbleIncoming = Color(0xFF111213)
 internal val zeroMentionSecondary = Color(0xFF3D5AFE)
 
@@ -34,7 +35,7 @@ val SemanticColors.zeroChatBubbleOutgoingColor
     get() = zeroChatBubbleOutgoing
 
 val SemanticColors.zeroChatBubbleOutgoingSecondaryColor
-    get() = zeroAccentColor
+    get() = zeroChatBubbleOutgoingSecondary
 
 val SemanticColors.zeroChatBubbleIncomingColor
     get() = zeroChatBubbleIncoming

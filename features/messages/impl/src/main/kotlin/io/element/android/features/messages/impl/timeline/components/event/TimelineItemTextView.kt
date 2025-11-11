@@ -53,13 +53,13 @@ fun TimelineItemTextView(
         emojiOnly -> ElementTheme.zeroTypography.fontHeadingXlRegular
         else -> ElementTheme.zeroTypography.fontBodyLgRegular
     }
-    val textColor = if (isMyMessage && !isRoomEncrypted) {
+    /*val textColor = if (isMyMessage && !isRoomEncrypted) {
         Color.Black
     } else {
         ElementTheme.colors.textPrimary
-    }
+    }*/
     CompositionLocalProvider(
-        LocalContentColor provides textColor,
+        LocalContentColor provides ElementTheme.colors.textPrimary,
         LocalTextStyle provides textStyle
     ) {
         val text = getTextWithResolvedMentions(content)

@@ -636,19 +636,21 @@ class LoggedInFlowNode(
                         overlay.hide()
                     }
 
-                    override fun onViewInTimeline(eventId: EventId) {
+                    override fun viewInTimeline(eventId: EventId) {
                         // Cannot happen
                     }
 
-                    override fun onForwardEvent(eventId: EventId) {}
+                    override fun forwardEvent(eventId: EventId, fromPinnedEvents: Boolean) {
+                        // Cannot happen
+                    }
                 }
-                mediaViewerEntryPoint.nodeBuilder(this, buildContext)
-                    .avatar(
-                        navTarget.name,
-                        navTarget.avatarUrl,
-                    )
-                    .callback(callback)
-                    .build()
+                val params = mediaViewerEntryPoint.createParamsForAvatar(navTarget.name, navTarget.avatarUrl)
+                mediaViewerEntryPoint.createNode(
+                    parentNode = this,
+                    buildContext = buildContext,
+                    params = params,
+                    callback = callback
+                )
             }
             NavTarget.SendWalletToken -> {
                 walletTransactionsEntryPoint.nodeBuilder(this, buildContext)

@@ -80,15 +80,15 @@ class MentionSpanTheme(val currentUserId: UserId) {
     @Suppress("ComposableNaming")
     @Composable
     fun updateStyles(isRoomEncrypted: Boolean = true) {
-        val (mentionColor, mentionBgColor) = if (isRoomEncrypted) {
-            (ElementTheme.colors.zeroMentionPrimaryColor to ElementTheme.colors.zeroMentionPrimaryColor.copy(alpha = 0.1f))
-        } else {
-            (ElementTheme.colors.zeroMentionSecondaryColor to ElementTheme.colors.zeroMentionSecondaryColor.copy(alpha = 0.1f))
-        }
-        currentUserTextColor = mentionColor.toArgb()
-        currentUserBackgroundColor = mentionBgColor.toArgb()
-        otherTextColor = mentionColor.toArgb()
-        otherBackgroundColor = mentionBgColor.toArgb()
+//        val (mentionColor, mentionBgColor) = if (isRoomEncrypted) {
+//            (ElementTheme.colors.zeroMentionPrimaryColor to ElementTheme.colors.zeroMentionPrimaryColor.copy(alpha = 0.1f))
+//        } else {
+//            (ElementTheme.colors.zeroMentionSecondaryColor to ElementTheme.colors.zeroMentionSecondaryColor.copy(alpha = 0.1f))
+//        }
+        currentUserTextColor = ElementTheme.colors.zeroMentionPrimaryColor.toArgb()
+        currentUserBackgroundColor = ElementTheme.colors.zeroMentionPrimaryColor.copy(alpha = 0.1f).toArgb()
+        otherTextColor = ElementTheme.colors.zeroMentionPrimaryColor.toArgb()
+        otherBackgroundColor = ElementTheme.colors.zeroMentionPrimaryColor.copy(alpha = 0.1f).toArgb()
 
         typeface.value = ElementTheme.zeroTypography.fontBodyLgMedium.rememberTypeface().value
         val density = LocalDensity.current
