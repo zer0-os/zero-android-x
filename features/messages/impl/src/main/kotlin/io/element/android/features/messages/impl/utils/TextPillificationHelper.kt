@@ -61,7 +61,12 @@ class DefaultTextPillificationHelper(
             if (!text.canPillify(match.start, match.end)) continue
             when (match.type) {
                 MatrixPatternType.USER_ID -> {
-                    val userId = UserId(match.value)
+                    val userId = if (match.value.endsWith(".")) {
+                        UserId(match.value.dropLast(1))
+                    } else {
+                        UserId(match.value)
+                    }
+
                     val mentionSpan = mentionSpanProvider.createUserMentionSpan(userId)
                     text.replace(match.start, match.end, "@ ")
                     text.setSpan(mentionSpan, match.start, match.start + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
