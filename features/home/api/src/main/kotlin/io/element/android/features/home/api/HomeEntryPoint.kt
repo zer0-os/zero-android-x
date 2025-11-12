@@ -11,6 +11,7 @@ package io.element.android.features.home.api
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
+import io.element.android.features.roomdirectory.api.RoomDescription
 import io.element.android.libraries.architecture.FeatureEntryPoint
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
@@ -25,6 +26,8 @@ interface HomeEntryPoint : FeatureEntryPoint {
 
     interface Callback : Plugin {
         fun navigateToRoom(roomId: RoomId)
+
+        fun navigateToPublicRoom(roomDescription: RoomDescription)
         fun navigateToCreateRoom()
         fun navigateToSettings()
         fun navigateToSetUpRecovery()

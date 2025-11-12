@@ -52,6 +52,7 @@ dependencies {
     implementation(projects.features.logout.api)
     implementation(projects.features.leaveroom.api)
     implementation(projects.features.rageshake.api)
+    implementation(projects.features.roomdirectory.impl)
     implementation(projects.services.analytics.api)
     implementation(projects.zero)
     implementation(libs.androidx.datastore.preferences)

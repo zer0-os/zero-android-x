@@ -356,6 +356,16 @@ class LoggedInFlowNode(
                         backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                     }
 
+                    override fun navigateToPublicRoom(roomDescription: RoomDescription) {
+                        backstack.push(
+                            NavTarget.Room(
+                                roomIdOrAlias = roomDescription.roomId.toRoomIdOrAlias(),
+                                roomDescription = roomDescription,
+                                trigger = JoinedRoom.Trigger.RoomDirectory,
+                            )
+                        )
+                    }
+
                     override fun navigateToSettings() {
                         backstack.push(NavTarget.Settings())
                     }

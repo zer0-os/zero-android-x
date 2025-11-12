@@ -33,6 +33,7 @@ import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.home.impl.wallet.WalletEvents
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
@@ -65,6 +66,7 @@ class HomePresenter(
     private val channelListPresenter: Presenter<ChannelListState>,
     private val feedListPresenter: Presenter<FeedListState>,
     private val walletPresenter: Presenter<WalletContentState>,
+    private val roomDirectoryPresenter: Presenter<RoomDirectoryState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val featureFlagService: FeatureFlagService,
@@ -92,6 +94,7 @@ class HomePresenter(
         val channelListState = channelListPresenter.present()
         val feedListState = feedListPresenter.present()
         val walletContentState = walletPresenter.present()
+        val roomDirectoryState = roomDirectoryPresenter.present()
 
         val isSpaceFeatureEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
@@ -190,13 +193,14 @@ class HomePresenter(
             roomListState = roomListState,
             channelListState = channelListState,
             feedListState = feedListState,
+            walletContentState = walletContentState.copy(claimableRewards = claimableUserRewards.value),
+            roomDirectoryState = roomDirectoryState,
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,
             isSpaceFeatureEnabled = isSpaceFeatureEnabled,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
-            walletContentState = walletContentState.copy(claimableRewards = claimableUserRewards.value),
             showClaimRewardsSheet = showClaimRewardsSheet.value,
             claimRewardActionState = claimRewardsActionState.value,
             eventSink = ::handleEvent,

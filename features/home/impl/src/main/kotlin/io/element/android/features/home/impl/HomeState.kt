@@ -15,6 +15,7 @@ import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.matrix.api.core.RoomId
@@ -39,13 +40,14 @@ data class HomeState(
     val roomListState: RoomListState,
     val channelListState: ChannelListState,
     val feedListState: FeedListState,
+    val walletContentState: WalletContentState,
+    val roomDirectoryState: RoomDirectoryState,
     val snackbarMessage: SnackbarMessage?,
     val canReportBug: Boolean,
     val directLogoutState: DirectLogoutState,
     val isSpaceFeatureEnabled: Boolean,
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
-    val walletContentState: WalletContentState,
     val showClaimRewardsSheet: Boolean,
     val claimRewardActionState: AsyncAction<String> = AsyncAction.Uninitialized,
     val eventSink: (HomeEvents) -> Unit,

@@ -39,6 +39,7 @@ dependencies {
     implementation(projects.services.analytics.api)
     implementation(projects.libraries.preferences.api)
     implementation(projects.appconfig)
+    implementation(projects.zero)
 
     testCommonDependencies(libs, true)
     testImplementation(projects.features.invite.test)

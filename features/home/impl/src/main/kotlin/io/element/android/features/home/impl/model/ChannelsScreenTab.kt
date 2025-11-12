@@ -10,6 +10,7 @@ package io.element.android.features.home.impl.model
 enum class ChannelsScreenTab(
     val title: String,
 ) {
+    EXPLORE("Explore"),
     CHANNELS("Channels"),
     GATED("Gated"),
     MUTED("Muted"),

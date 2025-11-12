@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -97,24 +99,28 @@ private fun RoomDirectoryTopBar(
 }
 
 @Composable
-private fun RoomDirectoryContent(
+fun RoomDirectoryContent(
     state: RoomDirectoryState,
     onResultClick: (RoomDescription) -> Unit,
+    shouldShowSearchField: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        SearchTextField(
-            query = state.query,
-            onQueryChange = { state.eventSink(RoomDirectoryEvents.Search(it)) },
-            placeholder = stringResource(id = CommonStrings.action_search),
-            modifier = Modifier.fillMaxWidth(),
-        )
+        if (shouldShowSearchField) {
+            SearchTextField(
+                query = state.query,
+                onQueryChange = { state.eventSink(RoomDirectoryEvents.Search(it)) },
+                placeholder = stringResource(id = CommonStrings.action_search),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
         RoomDirectoryRoomList(
             roomDescriptions = state.roomDescriptions,
             displayLoadMoreIndicator = state.displayLoadMoreIndicator,
             displayEmptyState = state.displayEmptyState,
             onResultClick = onResultClick,
             onReachedLoadMore = { state.eventSink(RoomDirectoryEvents.LoadMore) },
+            shouldShowSubTitle = shouldShowSearchField
         )
     }
 }
@@ -126,6 +132,7 @@ private fun RoomDirectoryRoomList(
     displayEmptyState: Boolean,
     onResultClick: (RoomDescription) -> Unit,
     onReachedLoadMore: () -> Unit,
+    shouldShowSubTitle: Boolean,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
@@ -135,6 +142,7 @@ private fun RoomDirectoryRoomList(
                 onClick = {
                     onResultClick(roomDescription)
                 },
+                shouldShowSubTitle = shouldShowSubTitle
             )
         }
         if (displayEmptyState) {
@@ -153,6 +161,11 @@ private fun RoomDirectoryRoomList(
                 LaunchedEffect(onReachedLoadMore) {
                     onReachedLoadMore()
                 }
+            }
+        }
+        if (!shouldShowSubTitle) {
+            item {
+                Spacer(Modifier.size(100.dp))
             }
         }
     }
@@ -230,6 +243,7 @@ private fun SearchTextField(
 private fun RoomDirectoryRoomRow(
     roomDescription: RoomDescription,
     onClick: () -> Unit,
+    shouldShowSubTitle: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -242,6 +256,7 @@ private fun RoomDirectoryRoomRow(
                 start = 16.dp,
             )
             .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Avatar(
             avatarData = roomDescription.avatarData(AvatarSize.RoomDirectoryItem),
@@ -260,13 +275,15 @@ private fun RoomDirectoryRoomRow(
                 color = ElementTheme.colors.textPrimary,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = roomDescription.computedDescription,
-                maxLines = 1,
-                style = ElementTheme.zeroTypography.fontBodyMdRegular,
-                color = ElementTheme.colors.textSecondary,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (shouldShowSubTitle) {
+                Text(
+                    text = roomDescription.computedDescription,
+                    maxLines = 1,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
+                    color = ElementTheme.colors.textSecondary,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

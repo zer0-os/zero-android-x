@@ -179,6 +179,7 @@ class HomeFlowNode(
             HomeView(
                 homeState = state,
                 onRoomClick = callback::navigateToRoom,
+                onPublicRoomClick = callback::navigateToPublicRoom,
                 onSettingsClick = callback::navigateToSettings,
                 onCreateRoomClick = callback::navigateToCreateRoom,
                 onSetUpRecoveryClick = callback::navigateToSetUpRecovery,

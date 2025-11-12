@@ -35,6 +35,10 @@ import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomListSkeletonView
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
+import io.element.android.features.roomdirectory.api.RoomDescription
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryContent
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
+import io.element.android.features.roomdirectory.impl.root.aRoomDirectoryState
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
@@ -44,9 +48,11 @@ fun HomeChannelListContentView(
     selectedChannelContentTab: ChannelsScreenTab,
     channelsContentState: ChannelListContentState,
     roomListState: RoomListState,
+    roomDirectoryState: RoomDirectoryState,
     eventSink: (ChannelListEvents) -> Unit,
     roomEventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -56,6 +62,17 @@ fun HomeChannelListContentView(
             onTabSelected = onChannelTabSelected
         )
         when (selectedChannelContentTab) {
+            ChannelsScreenTab.EXPLORE -> {
+                Box {
+                    RoomDirectoryContent(
+                        state = roomDirectoryState,
+                        onResultClick = { roomDescription ->
+                            onPublicRoomClick(roomDescription)
+                        },
+                        shouldShowSearchField = false
+                    )
+                }
+            }
             ChannelsScreenTab.CHANNELS,
             ChannelsScreenTab.MUTED -> {
                 Box {
@@ -220,7 +237,9 @@ internal fun HomeChannelListContentViewPreview(
         selectedChannelContentTab = ChannelsScreenTab.CHANNELS,
         channelsContentState = state.contentState,
         roomListState = aHomeState().roomListState,
+        roomDirectoryState = aRoomDirectoryState(),
         onRoomClick = {},
+        onPublicRoomClick = {},
         eventSink = {},
         onChannelTabSelected = {},
         roomEventSink = {}

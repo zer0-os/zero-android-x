@@ -58,7 +58,6 @@ import io.element.android.libraries.designsystem.components.avatar.Avatar
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.components.button.BackButton
-import io.element.android.libraries.designsystem.components.button.SuperButton
 import io.element.android.libraries.designsystem.components.dialogs.ConfirmationDialog
 import io.element.android.libraries.designsystem.components.dialogs.RetryDialog
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -81,6 +80,7 @@ import io.element.android.libraries.matrix.ui.components.SpaceInfoRow
 import io.element.android.libraries.matrix.ui.components.SpaceMembersView
 import io.element.android.libraries.matrix.ui.model.InviteSender
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.support.zero.common.ui.ZeroPrimaryButton
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -249,7 +249,12 @@ private fun JoinRoomFooter(
                 }
             }
             JoinAuthorisationStatus.CanJoin -> {
-                SuperButton(
+                ZeroPrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.screen_join_room_join_action),
+                    onClick = onJoinRoom
+                )
+                /*SuperButton(
                     onClick = onJoinRoom,
                     modifier = Modifier.fillMaxWidth(),
                     buttonSize = ButtonSize.Large,
@@ -257,10 +262,15 @@ private fun JoinRoomFooter(
                     Text(
                         text = stringResource(R.string.screen_join_room_join_action),
                     )
-                }
+                }*/
             }
             JoinAuthorisationStatus.CanKnock -> {
-                SuperButton(
+                ZeroPrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.screen_join_room_knock_action),
+                    onClick = onKnockRoom
+                )
+                /*SuperButton(
                     onClick = onKnockRoom,
                     modifier = Modifier.fillMaxWidth(),
                     buttonSize = ButtonSize.Large,
@@ -268,7 +278,7 @@ private fun JoinRoomFooter(
                     Text(
                         text = stringResource(R.string.screen_join_room_knock_action),
                     )
-                }
+                }*/
             }
             JoinAuthorisationStatus.IsKnocked -> {
                 OutlinedButton(
@@ -356,7 +366,7 @@ private fun JoinRestrictedFooter(
             type = AnnouncementType.Informative(),
         )
         Spacer(Modifier.height(24.dp))
-        SuperButton(
+        /*SuperButton(
             onClick = onJoinRoom,
             modifier = Modifier.fillMaxWidth(),
             buttonSize = ButtonSize.Large,
@@ -364,7 +374,12 @@ private fun JoinRestrictedFooter(
             Text(
                 text = stringResource(R.string.screen_join_room_join_action),
             )
-        }
+        }*/
+        ZeroPrimaryButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(R.string.screen_join_room_join_action),
+            onClick = onJoinRoom
+        )
     }
 }
 

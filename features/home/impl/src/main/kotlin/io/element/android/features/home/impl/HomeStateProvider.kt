@@ -24,6 +24,8 @@ import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.home.impl.wallet.aWalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.logout.api.direct.aDirectLogoutState
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
+import io.element.android.features.roomdirectory.impl.root.aRoomDirectoryState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
 import io.element.android.libraries.matrix.api.core.UserId
@@ -69,10 +71,11 @@ internal fun aHomeState(
     roomListState: RoomListState = aRoomListState(),
     channelListState: ChannelListState = aChannelListState(),
     feedListState: FeedListState = aFeedListState(),
+    walletContentState: WalletContentState = aWalletContentState(),
+    roomDirectoryState: RoomDirectoryState = aRoomDirectoryState(),
     canReportBug: Boolean = true,
     isSpaceFeatureEnabled: Boolean = false,
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
-    walletContentState: WalletContentState = aWalletContentState(),
     eventSink: (HomeEvents) -> Unit = {}
 ) = HomeState(
     currentUserAndNeighbors = currentUserAndNeighbors.toImmutableList(),
@@ -84,12 +87,13 @@ internal fun aHomeState(
     roomListState = roomListState,
     channelListState = channelListState,
     feedListState = feedListState,
+    walletContentState = walletContentState,
+    roomDirectoryState = roomDirectoryState,
     snackbarMessage = snackbarMessage,
     canReportBug = canReportBug,
     directLogoutState = directLogoutState,
     homeSpacesState = homeSpacesState,
     isSpaceFeatureEnabled = isSpaceFeatureEnabled,
-    walletContentState = walletContentState,
     showClaimRewardsSheet = false,
     eventSink = eventSink,
 )

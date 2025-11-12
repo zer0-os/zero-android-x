@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -61,6 +62,7 @@ import io.element.android.features.home.impl.search.RoomListSearchView
 import io.element.android.features.home.impl.wallet.HomeWalletContent
 import io.element.android.features.home.impl.wallet.WalletEvents
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
+import io.element.android.features.roomdirectory.api.RoomDescription
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.components.ProgressDialog
@@ -84,6 +86,7 @@ import io.element.android.support.zero.common.ui.component.feed.FeedMediaPreview
 fun HomeView(
     homeState: HomeState,
     onRoomClick: (RoomId) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onSettingsClick: () -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
@@ -164,6 +167,7 @@ fun HomeView(
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
+                onPublicRoomClick = onPublicRoomClick,
                 onOpenSettings = { if (firstThrottler.canHandle()) onSettingsClick() },
                 onCreateRoomClick = { if (firstThrottler.canHandle()) onCreateRoomClick() },
                 onSearchUserClick = { if (firstThrottler.canHandle()) onSearchUserClick() },
@@ -223,6 +227,7 @@ private fun HomeScaffold(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomId) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onOpenSettings: () -> Unit,
     onCreateRoomClick: () -> Unit,
     onSearchUserClick: () -> Unit,
@@ -296,6 +301,7 @@ private fun HomeScaffold(
                     onSetUpRecoveryClick = onSetUpRecoveryClick,
                     onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                     onRoomClick = ::onRoomClick,
+                    onPublicRoomClick = onPublicRoomClick,
                     onCreateRoomClick = onCreateRoomClick,
                     onFeedClick = onFeedClick,
                     onFeedUserClick = onFeedUserClick,
@@ -315,7 +321,7 @@ private fun HomeScaffold(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
+                .padding(bottom = 20.dp)
         ) {
             // Floating Action button
             if (state.shouldDisplayActions(selectedHomeNavigationTab)) {
@@ -323,6 +329,7 @@ private fun HomeScaffold(
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(horizontal = 16.dp),
+                    shape = CircleShape,
                     onClick = {
                         when {
                             selectedHomeNavigationTab == HomeScreenTab.CHAT -> onCreateRoomClick()
@@ -411,6 +418,7 @@ internal fun HomeScreenContent(
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onCreateRoomClick: () -> Unit,
     onFeedClick: (ZeroFeed) -> Unit,
     onFeedUserClick: (FeedUserProfileView) -> Unit,
@@ -444,9 +452,11 @@ internal fun HomeScreenContent(
                 selectedChannelContentTab = selectedChannelContentTab,
                 channelsContentState = state.channelListState.contentState,
                 roomListState = state.roomListState,
+                roomDirectoryState = state.roomDirectoryState,
                 eventSink = state.channelListState.eventSink,
                 roomEventSink = state.roomListState.eventSink,
                 onRoomClick = onRoomClick,
+                onPublicRoomClick = onPublicRoomClick,
                 onChannelTabSelected = onChannelsContentTabSelected,
                 modifier = modifier
             )
@@ -491,6 +501,7 @@ internal fun HomeViewPreview(@PreviewParameter(HomeStateProvider::class) state: 
     HomeView(
         homeState = state,
         onRoomClick = {},
+        onPublicRoomClick = {},
         onSettingsClick = {},
         onSetUpRecoveryClick = {},
         onConfirmRecoveryKeyClick = {},
@@ -515,6 +526,7 @@ internal fun HomeViewA11yPreview() = ElementPreview {
     HomeView(
         homeState = aHomeState(),
         onRoomClick = {},
+        onPublicRoomClick = {},
         onSettingsClick = {},
         onSetUpRecoveryClick = {},
         onConfirmRecoveryKeyClick = {},
