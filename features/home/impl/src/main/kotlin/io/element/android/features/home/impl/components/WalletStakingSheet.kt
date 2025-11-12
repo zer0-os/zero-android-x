@@ -79,7 +79,7 @@ fun WalletStakingSheet(
     modifier: Modifier = Modifier,
     selectedPool: SelectedStakePool,
     actionState: AsyncAction<String>,
-    eventSink: (HomeEvents.HomeWalletEvents) -> Unit
+    eventSink: (HomeEvents.WalletEvents) -> Unit
 ) {
     val stakeTokenName = selectedPool.stakeTokenInfo.name.uppercase()
     val transactionAmount = remember { mutableStateOf("0") }
@@ -112,7 +112,7 @@ fun WalletStakingSheet(
                     transactionAmount = transactionAmount.value,
                     isSuccess = true,
                     onDismiss = {
-                        eventSink(HomeEvents.DismissStakingSheet)
+                        eventSink(HomeEvents.WalletEvents.DismissStakingSheet)
                     }
                 )
             }
@@ -124,7 +124,7 @@ fun WalletStakingSheet(
                     isSuccess = false,
                     error = actionState.error.message,
                     onDismiss = {
-                        eventSink(HomeEvents.DismissStakingSheet)
+                        eventSink(HomeEvents.WalletEvents.DismissStakingSheet)
                     }
                 )
             }
@@ -139,9 +139,9 @@ fun WalletStakingSheet(
                             onConfirmTransaction = { amount ->
                                 transactionAmount.value = amount
                                 if (isStaking) {
-                                    eventSink(HomeEvents.StakeAmount(amount))
+                                    eventSink(HomeEvents.WalletEvents.StakeAmount(amount))
                                 } else {
-                                    eventSink(HomeEvents.UnstakeAmount(amount))
+                                    eventSink(HomeEvents.WalletEvents.UnstakeAmount(amount))
                                 }
                             }
                         )
@@ -152,7 +152,7 @@ fun WalletStakingSheet(
                             onStake = { isUserStaking.value = true },
                             onUnstake = { isUserStaking.value = false },
                             onClaimRewards = {
-                                eventSink(HomeEvents.ClaimStakingRewards)
+                                eventSink(HomeEvents.WalletEvents.ClaimStakingRewards)
                             }
                         )
                     }

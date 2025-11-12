@@ -44,7 +44,7 @@ fun HomeChannelListContentView(
     selectedChannelContentTab: ChannelsScreenTab,
     channelsContentState: ChannelListContentState,
     roomListState: RoomListState,
-    eventSink: (HomeEvents) -> Unit,
+    eventSink: (HomeEvents.ChannelEvents) -> Unit,
     roomEventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onChannelTabSelected: (ChannelsScreenTab) -> Unit,
@@ -124,7 +124,7 @@ private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun ChannelsViewList(
     state: ChannelListContentState.Channels,
-    eventSink: (HomeEvents) -> Unit,
+    eventSink: (HomeEvents.ChannelEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -139,7 +139,7 @@ private fun ChannelsViewList(
             HomeChannelRow(
                 channel = channel,
                 onChannelClick = {
-                    eventSink(HomeEvents.OpenChannel(channel))
+                    eventSink(HomeEvents.ChannelEvents.OpenChannel(channel))
                 }
             )
             if (index != state.channels.lastIndex) {

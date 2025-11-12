@@ -73,7 +73,7 @@ fun HomeWalletContent(
             walletBalance = state.userWalletBalance,
             showWalletBalance = state.showWalletBalance,
             onToggleWalletBalance = {
-                state.eventSink(HomeEvents.ToggleWalletBalance)
+                state.eventSink(HomeEvents.WalletEvents.ToggleWalletBalance)
             }
         )
         Row(modifier = Modifier
@@ -104,7 +104,7 @@ fun HomeWalletContent(
         var refreshing by remember(state) { mutableStateOf(false) }
         val pullRefreshState = rememberPullRefreshState(refreshing, {
             refreshing = true
-            state.eventSink(HomeEvents.RefreshWallet)
+            state.eventSink(HomeEvents.WalletEvents.RefreshWallet)
             Handler(Looper.getMainLooper()).postDelayed({
                 refreshing = false
             }, 1_500)

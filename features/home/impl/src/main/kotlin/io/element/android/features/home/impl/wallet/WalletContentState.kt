@@ -40,7 +40,7 @@ data class WalletContentState(
     val showStakingSheet: Boolean,
     val walletStakeActionState: AsyncAction<String> = AsyncAction.Uninitialized,
 
-    val eventSink: (HomeEvents.HomeWalletEvents) -> Unit,
+    val eventSink: (HomeEvents.WalletEvents) -> Unit,
 ) {
     val userWalletBalance: String
         get() = if (showWalletBalance) {

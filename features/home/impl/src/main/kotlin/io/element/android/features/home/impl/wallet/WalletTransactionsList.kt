@@ -81,11 +81,11 @@ fun WalletTransactionsList(
                     hasNextPage = state.transactionsPaginationParams != null,
                     onLoadMoreTransactions = {
                         state.eventSink(
-                            HomeEvents.LoadMoreTransactions(contentState.transactions)
+                            HomeEvents.WalletEvents.LoadMoreTransactions(contentState.transactions)
                         )
                     },
                     onTransactionTapped = { transaction ->
-                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction.hash, transaction.token.chainId))
+                        state.eventSink(HomeEvents.WalletEvents.ViewWalletTransaction(transaction.hash, transaction.token.chainId))
                     })
             }
         }

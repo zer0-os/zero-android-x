@@ -247,60 +247,6 @@ class HomePresenter(
                         }, 3_000)
                     }
                 }
-                HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
-                is HomeEvents.OpenChannel -> coroutineState.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
-                HomeEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
-                is HomeEvents.LoadMoreFeeds -> {
-                    _allFeeds.apply {
-                        clear()
-                        addAll(event.currentFeeds)
-                    }
-                    coroutineState.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
-                }
-                is HomeEvents.RefreshFeeds -> coroutineState.forceRefreshHomeFeeds(event.followingFeeds)
-                is HomeEvents.LoadMoreMyFeeds -> {
-                    _myFeeds.apply {
-                        clear()
-                        addAll(event.currentFeeds)
-                    }
-                    coroutineState.loadMoreMyFeeds(event.currentFeeds.size)
-                }
-                HomeEvents.RefreshMyFeeds -> coroutineState.forceRefreshMyFeeds()
-                is HomeEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, genericActionState)
-                is HomeEvents.LoadFeedMedia -> {
-                    coroutineState.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
-                }
-                HomeEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
-                is HomeEvents.LoadMoreTokens -> {
-                    matrixUser.walletAddress?.let { address ->
-                        coroutineState.loadMoreWalletTokens(
-                            walletAddress = address,
-                            currentList = event.currentTokens,
-                            walletTokensListState = walletTokensListState,
-                            tokenPaginationParams = walletTokenPaginationParams,
-                            meowPrice = meowPrice,
-                            userWalletBalance = userWalletBalance
-                        )
-                    }
-                }
-                is HomeEvents.LoadMoreTransactions -> {
-                    matrixUser.walletAddress?.let { address ->
-                        coroutineState.loadMoreWalletTransactions(
-                            walletAddress = address,
-                            currentList = event.currentTransactions,
-                            walletTransactionsListState = walletTransactionsListState,
-                            transactionPaginationParams = walletTransactionsPaginationParams
-                        )
-                    }
-                }
-                is HomeEvents.ViewWalletTransaction -> {
-                    coroutineState.loadWalletTransaction(
-                        event.transactionId, event.chainId, walletTransactionUrlState, genericActionState
-                    )
-                }
-                HomeEvents.OnWalletTransactionViewed ->
-                    walletTransactionUrlState.value = AsyncAction.Uninitialized
-                HomeEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
                 HomeEvents.ClaimRewards -> {
                     claimableUserRewards.value = userRewards.value
                     coroutineState.claimUserRewards(
@@ -313,63 +259,133 @@ class HomePresenter(
                         }
                     )
                 }
-                HomeEvents.RefreshWalletBalance -> {
-                    matrixUser.walletAddress?.let { address ->
-                        val currentList = (walletTokensListState.value as? WalletTokensListState.Tokens)
-                            ?.tokens ?: emptyList()
-                        coroutineState.loadMoreWalletTokens(
-                            walletAddress = address,
-                            currentList = currentList,
-                            walletTokensListState = walletTokensListState,
-                            tokenPaginationParams = walletTokenPaginationParams,
-                            meowPrice = meowPrice,
-                            userWalletBalance = userWalletBalance
-                        )
+                HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
+                is HomeEvents.ChannelEvents -> {
+                    when (event) {
+                        is HomeEvents.ChannelEvents.OpenChannel -> coroutineState.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
+                        HomeEvents.ChannelEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
                     }
                 }
-                is HomeEvents.StakePoolSelected -> {
-                    coroutineState.fetchPoolData(
-                        pool = event.pool,
-                        selectedStakePoolState = selectedStakePool,
-                        genericActionState = genericActionState,
-                        showWalletStakingSheetState = showWalletStakingSheet
-                    )
-                }
-                is HomeEvents.StakeAmount -> {
-                    selectedStakePool.value?.let {
-                        coroutineState.stakeAmount(it, event.amount, walletStakeActionState) {
-                            matrixUser.walletAddress?.let { address -> fetchStakeData(address, false) }
-                        }
-                    }
-                }
-                is HomeEvents.UnstakeAmount -> {
-                    selectedStakePool.value?.let {
-                        coroutineState.unstakeAmount(it, event.amount, walletStakeActionState) {
-                            matrixUser.walletAddress?.let { address -> fetchStakeData(address, false) }
-                        }
-                    }
-                }
-                HomeEvents.DismissStakingSheet -> {
-                    showWalletStakingSheet.value = false
-                    walletStakeActionState.value = AsyncAction.Uninitialized
-                    selectedStakePool.value = null
-                    client.userProfile.value.walletAddress?.let { walletAddress ->
-                        fetchWalletData(walletAddress)
-                    }
-                }
-                HomeEvents.ClaimStakingRewards -> {
-                    selectedStakePool.value?.poolInfo?.let { pool ->
-                        coroutineState.claimStakingRewards(
-                            pool = pool,
-                            genericActionState = genericActionState,
-                            onDone = {
-                                matrixUser.walletAddress?.let { address -> fetchStakeData(address, true) }
+                is HomeEvents.FeedEvents -> {
+                    when (event) {
+                        is HomeEvents.FeedEvents.LoadMoreFeeds -> {
+                            _allFeeds.apply {
+                                clear()
+                                addAll(event.currentFeeds)
                             }
-                        )
+                            coroutineState.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
+                        }
+                        is HomeEvents.FeedEvents.RefreshFeeds -> coroutineState.forceRefreshHomeFeeds(event.followingFeeds)
+                        is HomeEvents.FeedEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, genericActionState)
+                        is HomeEvents.FeedEvents.LoadFeedMedia -> {
+                            coroutineState.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
+                        }
+                        HomeEvents.FeedEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
                     }
                 }
-                HomeEvents.RefreshWallet -> client.userProfile.value.walletAddress?.let { walletAddress ->
-                    fetchWalletData(walletAddress)
+                is HomeEvents.ProfileEvents -> {
+                    when (event) {
+                        is HomeEvents.ProfileEvents.LoadMoreMyFeeds -> {
+                            _myFeeds.apply {
+                                clear()
+                                addAll(event.currentFeeds)
+                            }
+                            coroutineState.loadMoreMyFeeds(event.currentFeeds.size)
+                        }
+                        HomeEvents.ProfileEvents.RefreshMyFeeds -> coroutineState.forceRefreshMyFeeds()
+                    }
+                }
+                is HomeEvents.WalletEvents -> {
+                    when (event) {
+                        is HomeEvents.WalletEvents.LoadMoreTokens -> {
+                            matrixUser.walletAddress?.let { address ->
+                                coroutineState.loadMoreWalletTokens(
+                                    walletAddress = address,
+                                    currentList = event.currentTokens,
+                                    walletTokensListState = walletTokensListState,
+                                    tokenPaginationParams = walletTokenPaginationParams,
+                                    meowPrice = meowPrice,
+                                    userWalletBalance = userWalletBalance
+                                )
+                            }
+                        }
+                        is HomeEvents.WalletEvents.LoadMoreTransactions -> {
+                            matrixUser.walletAddress?.let { address ->
+                                coroutineState.loadMoreWalletTransactions(
+                                    walletAddress = address,
+                                    currentList = event.currentTransactions,
+                                    walletTransactionsListState = walletTransactionsListState,
+                                    transactionPaginationParams = walletTransactionsPaginationParams
+                                )
+                            }
+                        }
+                        is HomeEvents.WalletEvents.ViewWalletTransaction -> {
+                            coroutineState.loadWalletTransaction(
+                                event.transactionId, event.chainId, walletTransactionUrlState, genericActionState
+                            )
+                        }
+                        HomeEvents.WalletEvents.OnWalletTransactionViewed ->
+                            walletTransactionUrlState.value = AsyncAction.Uninitialized
+                        HomeEvents.WalletEvents.ToggleWalletBalance -> showWalletBalance.value = !showWalletBalance.value
+                        HomeEvents.WalletEvents.RefreshWalletBalance -> {
+                            matrixUser.walletAddress?.let { address ->
+                                val currentList = (walletTokensListState.value as? WalletTokensListState.Tokens)
+                                    ?.tokens ?: emptyList()
+                                coroutineState.loadMoreWalletTokens(
+                                    walletAddress = address,
+                                    currentList = currentList,
+                                    walletTokensListState = walletTokensListState,
+                                    tokenPaginationParams = walletTokenPaginationParams,
+                                    meowPrice = meowPrice,
+                                    userWalletBalance = userWalletBalance
+                                )
+                            }
+                        }
+                        is HomeEvents.WalletEvents.StakePoolSelected -> {
+                            coroutineState.fetchPoolData(
+                                pool = event.pool,
+                                selectedStakePoolState = selectedStakePool,
+                                genericActionState = genericActionState,
+                                showWalletStakingSheetState = showWalletStakingSheet
+                            )
+                        }
+                        is HomeEvents.WalletEvents.StakeAmount -> {
+                            selectedStakePool.value?.let {
+                                coroutineState.stakeAmount(it, event.amount, walletStakeActionState) {
+                                    matrixUser.walletAddress?.let { address -> fetchStakeData(address, false) }
+                                }
+                            }
+                        }
+                        is HomeEvents.WalletEvents.UnstakeAmount -> {
+                            selectedStakePool.value?.let {
+                                coroutineState.unstakeAmount(it, event.amount, walletStakeActionState) {
+                                    matrixUser.walletAddress?.let { address -> fetchStakeData(address, false) }
+                                }
+                            }
+                        }
+                        HomeEvents.WalletEvents.DismissStakingSheet -> {
+                            showWalletStakingSheet.value = false
+                            walletStakeActionState.value = AsyncAction.Uninitialized
+                            selectedStakePool.value = null
+                            client.userProfile.value.walletAddress?.let { walletAddress ->
+                                fetchWalletData(walletAddress)
+                            }
+                        }
+                        HomeEvents.WalletEvents.ClaimStakingRewards -> {
+                            selectedStakePool.value?.poolInfo?.let { pool ->
+                                coroutineState.claimStakingRewards(
+                                    pool = pool,
+                                    genericActionState = genericActionState,
+                                    onDone = {
+                                        matrixUser.walletAddress?.let { address -> fetchStakeData(address, true) }
+                                    }
+                                )
+                            }
+                        }
+                        HomeEvents.WalletEvents.RefreshWallet -> client.userProfile.value.walletAddress?.let { walletAddress ->
+                            fetchWalletData(walletAddress)
+                        }
+                    }
                 }
                 is HomeEvents.SwitchToAccount -> coroutineState.launch {
                     sessionStore.setLatestSession(event.sessionId.value)

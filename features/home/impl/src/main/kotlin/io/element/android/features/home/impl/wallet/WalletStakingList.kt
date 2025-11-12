@@ -67,7 +67,7 @@ fun WalletStakingList(
             StakePoolCell(
                 pool = it,
                 onClick = {
-                    state.eventSink(HomeEvents.StakePoolSelected(it))
+                    state.eventSink(HomeEvents.WalletEvents.StakePoolSelected(it))
                 }
             )
         }

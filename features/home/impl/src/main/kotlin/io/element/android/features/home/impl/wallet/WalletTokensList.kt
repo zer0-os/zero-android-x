@@ -87,7 +87,7 @@ fun WalletTokensList(
                     hasNextPage = state.tokensPaginationParams != null,
                     onLoadMoreTokens = {
                         state.eventSink(
-                            HomeEvents.LoadMoreTokens(contentState.tokens)
+                            HomeEvents.WalletEvents.LoadMoreTokens(contentState.tokens)
                         )
                     })
             }

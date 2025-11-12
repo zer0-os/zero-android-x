@@ -54,7 +54,7 @@ fun HomeFeedListContentView(
     contentState: FeedListContentState,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (HomeEvents) -> Unit,
+    eventSink: (HomeEvents.FeedEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -66,7 +66,7 @@ fun HomeFeedListContentView(
         FeedsScreenTabView(
             onTabSelected = { tab ->
                 selectedFeedTab.value = tab
-                eventSink(HomeEvents.RefreshFeeds(
+                eventSink(HomeEvents.FeedEvents.RefreshFeeds(
                     followingFeeds = tab == FeedsScreenTab.FOLLOWING
                 ))
             }
@@ -121,7 +121,7 @@ private fun FeedsViewList(
     state: FeedListContentState.Feeds,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (HomeEvents) -> Unit,
+    eventSink: (HomeEvents.FeedEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -135,7 +135,7 @@ private fun FeedsViewList(
     val lazyListState = rememberLazyListState()
     val pullRefreshState = rememberPullRefreshState(refreshing, {
         refreshing = true
-        eventSink(HomeEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
+        eventSink(HomeEvents.FeedEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
         }, 1_500)
@@ -152,7 +152,7 @@ private fun FeedsViewList(
     LaunchedEffect(shouldLoadMoreFeed) {
         if (shouldLoadMoreFeed && !isLoadingMoreItems) {
             isLoadingMoreItems = true
-            eventSink(HomeEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
+            eventSink(HomeEvents.FeedEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
         }
     }
 
@@ -183,10 +183,10 @@ private fun FeedsViewList(
                         onFeedUserClick(feed.userProfile)
                     },
                     onAddMeowToFeed = { meowCount ->
-                        eventSink(HomeEvents.AddMeowToFeed(feed, meowCount))
+                        eventSink(HomeEvents.FeedEvents.AddMeowToFeed(feed, meowCount))
                     },
                     onMediaTapped = { mediaId ->
-                        eventSink(HomeEvents.LoadFeedMedia(mediaId))
+                        eventSink(HomeEvents.FeedEvents.LoadFeedMedia(mediaId))
                     }
                 )
                 if (index != state.feeds.lastIndex) {

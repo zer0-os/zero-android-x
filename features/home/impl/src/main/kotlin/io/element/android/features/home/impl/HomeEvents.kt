@@ -22,34 +22,38 @@ sealed interface HomeEvents {
     data object ClaimRewards : HomeEvents
     data object HideError : HomeEvents
 
-    sealed interface HomeChannelEvents : HomeEvents
-    data class OpenChannel(val channel: HomeScreenChannel) : HomeChannelEvents
-    data object ChannelRoomOpened : HomeChannelEvents
+    sealed interface ChannelEvents: HomeEvents {
+        data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
+        data object ChannelRoomOpened : ChannelEvents
+    }
 
-    sealed interface HomeFeedEvents: HomeEvents
-    data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean): HomeFeedEvents
-    data class RefreshFeeds(val followingFeeds: Boolean): HomeFeedEvents
-    data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int): HomeFeedEvents
-    data class LoadFeedMedia(val mediaId: String): HomeFeedEvents
-    data object DismissFeedMedia: HomeFeedEvents
+    sealed interface FeedEvents: HomeEvents {
+        data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean) : FeedEvents
+        data class RefreshFeeds(val followingFeeds: Boolean) : FeedEvents
+        data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int) : FeedEvents
+        data class LoadFeedMedia(val mediaId: String) : FeedEvents
+        data object DismissFeedMedia : FeedEvents
+    }
 
-    sealed interface HomeProfileEvents: HomeEvents
-    data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>): HomeProfileEvents
-    data object RefreshMyFeeds: HomeProfileEvents
+    sealed interface ProfileEvents: HomeEvents {
+        data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>) : ProfileEvents
+        data object RefreshMyFeeds : ProfileEvents
+    }
 
-    sealed interface HomeWalletEvents: HomeEvents
-    data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>): HomeWalletEvents
-    data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>): HomeWalletEvents
-    data class ViewWalletTransaction(val transactionId: String, val chainId: Long? = null): HomeWalletEvents
-    data object OnWalletTransactionViewed: HomeWalletEvents
-    data object ToggleWalletBalance: HomeWalletEvents
-    data object RefreshWalletBalance: HomeWalletEvents
-    data class StakePoolSelected(val pool: HomeStakePool): HomeWalletEvents
-    data class StakeAmount(val amount: String): HomeWalletEvents
-    data class UnstakeAmount(val amount: String): HomeWalletEvents
-    data object DismissStakingSheet: HomeWalletEvents
-    data object ClaimStakingRewards: HomeWalletEvents
-    data object RefreshWallet: HomeWalletEvents
+    sealed interface WalletEvents: HomeEvents {
+        data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>) : WalletEvents
+        data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>) : WalletEvents
+        data class ViewWalletTransaction(val transactionId: String, val chainId: Long? = null) : WalletEvents
+        data object OnWalletTransactionViewed : WalletEvents
+        data object ToggleWalletBalance : WalletEvents
+        data object RefreshWalletBalance : WalletEvents
+        data class StakePoolSelected(val pool: HomeStakePool) : WalletEvents
+        data class StakeAmount(val amount: String) : WalletEvents
+        data class UnstakeAmount(val amount: String) : WalletEvents
+        data object DismissStakingSheet : WalletEvents
+        data object ClaimStakingRewards : WalletEvents
+        data object RefreshWallet : WalletEvents
+    }
 
     data class SwitchToAccount(val sessionId: SessionId) : HomeEvents
 }

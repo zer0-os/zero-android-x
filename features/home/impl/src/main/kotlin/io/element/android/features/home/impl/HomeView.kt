@@ -110,12 +110,12 @@ fun HomeView(
         derivedStateOf { homeState.walletContentState.walletTransactionUrlState }
     }
     resolvedChannelRoomId?.let {
-        homeState.eventSink(HomeEvents.ChannelRoomOpened)
+        homeState.eventSink(HomeEvents.ChannelEvents.ChannelRoomOpened)
         onRoomClick(it)
     }
     walletTransactionUrl.dataOrNull()?.let {
         context.openExternalUri(it)
-        homeState.eventSink(HomeEvents.OnWalletTransactionViewed)
+        homeState.eventSink(HomeEvents.WalletEvents.OnWalletTransactionViewed)
     }
 
     val selectedHomeNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
@@ -189,7 +189,7 @@ fun HomeView(
                 selectedHomeNavigationTab = selectedHomeNavigationTab.value,
                 selectedChannelContentTab = selectedChannelsTab.value,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
-                onChannelClick = { homeState.eventSink(HomeEvents.OpenChannel(it)) },
+                onChannelClick = { homeState.eventSink(HomeEvents.ChannelEvents.OpenChannel(it)) },
                 modifier = contentModifier
                     .statusBarsPadding()
                     .fillMaxSize()
@@ -339,7 +339,7 @@ private fun HomeScaffold(
 
     if (showFeedMediaPreview) {
         FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
-            state.eventSink(HomeEvents.DismissFeedMedia)
+            state.eventSink(HomeEvents.FeedEvents.DismissFeedMedia)
         })
     }
 
@@ -356,13 +356,13 @@ private fun HomeScaffold(
                     actionState = state.claimRewardActionState,
                     meowPrice = state.walletContentState.meowPrice,
                     onViewTransaction = { transaction ->
-                        state.eventSink(HomeEvents.ViewWalletTransaction(transaction))
+                        state.eventSink(HomeEvents.WalletEvents.ViewWalletTransaction(transaction))
                     },
                     onClaimRewards = {
                         state.eventSink(HomeEvents.ClaimRewards)
                     },
                     onRewardsClaimed = {
-                        state.eventSink(HomeEvents.RefreshWalletBalance)
+                        state.eventSink(HomeEvents.WalletEvents.RefreshWalletBalance)
                     }
                 )
             }
@@ -374,7 +374,7 @@ private fun HomeScaffold(
         state.walletContentState.selectedPool != null
     ) {
         ModalBottomSheet(
-            onDismissRequest = { state.eventSink(HomeEvents.DismissStakingSheet) },
+            onDismissRequest = { state.eventSink(HomeEvents.WalletEvents.DismissStakingSheet) },
             sheetState = walletStakeSheetState,
             content = {
                 WalletStakingSheet(
