@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.atomic.atoms.PlaceholderAtom
@@ -52,11 +51,11 @@ import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
-import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isTransactionReceived
 import io.element.android.support.zero.common.ui.WalletChainIcon
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 
 @Composable
 fun WalletTransactionsList(
@@ -81,11 +80,11 @@ fun WalletTransactionsList(
                     hasNextPage = state.transactionsPaginationParams != null,
                     onLoadMoreTransactions = {
                         state.eventSink(
-                            HomeEvents.WalletEvents.LoadMoreTransactions(contentState.transactions)
+                            WalletEvents.LoadMoreTransactions(contentState.transactions)
                         )
                     },
                     onTransactionTapped = { transaction ->
-                        state.eventSink(HomeEvents.WalletEvents.ViewWalletTransaction(transaction.hash, transaction.token.chainId))
+                        state.eventSink(WalletEvents.ViewWalletTransaction(transaction.hash, transaction.token.chainId))
                     })
             }
         }

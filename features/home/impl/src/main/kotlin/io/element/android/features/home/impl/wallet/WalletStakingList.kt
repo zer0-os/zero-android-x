@@ -30,14 +30,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.libraries.designsystem.R
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Text
-import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.support.zero.common.ui.WalletChainIcon
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 
 @Composable
 fun WalletStakingList(
@@ -67,7 +66,7 @@ fun WalletStakingList(
             StakePoolCell(
                 pool = it,
                 onClick = {
-                    state.eventSink(HomeEvents.WalletEvents.StakePoolSelected(it))
+                    state.eventSink(WalletEvents.StakePoolSelected(it))
                 }
             )
         }

@@ -59,6 +59,7 @@ import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
 import io.element.android.features.home.impl.wallet.HomeWalletContent
+import io.element.android.features.home.impl.wallet.WalletEvents
 import io.element.android.features.networkmonitor.api.ui.ConnectivityIndicatorContainer
 import io.element.android.libraries.androidutils.throttler.FirstThrottler
 import io.element.android.libraries.architecture.AsyncAction
@@ -117,7 +118,7 @@ fun HomeView(
     }
     walletTransactionUrl.dataOrNull()?.let {
         context.openExternalUri(it)
-        homeState.eventSink(HomeEvents.WalletEvents.OnWalletTransactionViewed)
+        homeState.walletContentState.eventSink(WalletEvents.OnWalletTransactionViewed)
     }
 
     val selectedHomeNavigationTab = rememberSaveable { mutableStateOf(HomeScreenTab.CHAT) }
@@ -358,13 +359,13 @@ private fun HomeScaffold(
                     actionState = state.claimRewardActionState,
                     meowPrice = state.walletContentState.meowPrice,
                     onViewTransaction = { transaction ->
-                        state.eventSink(HomeEvents.WalletEvents.ViewWalletTransaction(transaction))
+                        state.walletContentState.eventSink(WalletEvents.ViewWalletTransaction(transaction))
                     },
                     onClaimRewards = {
                         state.eventSink(HomeEvents.ClaimRewards)
                     },
                     onRewardsClaimed = {
-                        state.eventSink(HomeEvents.WalletEvents.RefreshWalletBalance)
+                        state.walletContentState.eventSink(WalletEvents.RefreshWalletBalance)
                     }
                 )
             }
@@ -376,7 +377,7 @@ private fun HomeScaffold(
         state.walletContentState.selectedPool != null
     ) {
         ModalBottomSheet(
-            onDismissRequest = { state.eventSink(HomeEvents.WalletEvents.DismissStakingSheet) },
+            onDismissRequest = { state.walletContentState.eventSink(WalletEvents.DismissStakingSheet) },
             sheetState = walletStakeSheetState,
             content = {
                 WalletStakingSheet(
@@ -479,19 +480,6 @@ internal fun HomeScreenContent(
                 onReceiveWalletToken = onReceiveWalletToken
             )
         }
-        /*HomeScreenTab.PROFILE -> {
-            HomeFeedListContentView(
-                contentState = state.myFeedsContentState,
-                feedMediaMap = state.feedMediaMap,
-                feedLinkMetaDataMap = state.feedLinkMetaDataMap,
-                eventSink = state.eventSink,
-                zeroUserRewards = state.userRewards,
-                isProfileFeedList = true,
-                onFeedClick = onFeedClick,
-                onFeedUserClick = onFeedUserClick,
-                modifier = modifier
-            )
-        }*/
     }
 }
 

@@ -8,7 +8,6 @@
 package io.element.android.features.home.impl.wallet
 
 import androidx.compose.runtime.Immutable
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.libraries.architecture.AsyncAction
@@ -40,7 +39,7 @@ data class WalletContentState(
     val showStakingSheet: Boolean,
     val walletStakeActionState: AsyncAction<String> = AsyncAction.Uninitialized,
 
-    val eventSink: (HomeEvents.WalletEvents) -> Unit,
+    val eventSink: (WalletEvents) -> Unit,
 ) {
     val userWalletBalance: String
         get() = if (showWalletBalance) {

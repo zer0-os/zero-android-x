@@ -44,7 +44,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.WalletContentTab
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
@@ -73,7 +72,7 @@ fun HomeWalletContent(
             walletBalance = state.userWalletBalance,
             showWalletBalance = state.showWalletBalance,
             onToggleWalletBalance = {
-                state.eventSink(HomeEvents.WalletEvents.ToggleWalletBalance)
+                state.eventSink(WalletEvents.ToggleWalletBalance)
             }
         )
         Row(modifier = Modifier
@@ -104,7 +103,7 @@ fun HomeWalletContent(
         var refreshing by remember(state) { mutableStateOf(false) }
         val pullRefreshState = rememberPullRefreshState(refreshing, {
             refreshing = true
-            state.eventSink(HomeEvents.WalletEvents.RefreshWallet)
+            state.eventSink(WalletEvents.RefreshWallet)
             Handler(Looper.getMainLooper()).postDelayed({
                 refreshing = false
             }, 1_500)

@@ -42,7 +42,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import io.element.android.libraries.designsystem.R
@@ -54,7 +53,6 @@ import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.placeholderBackground
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
-import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.libraries.matrix.api.zero.wallet.isClaimableToken
@@ -62,6 +60,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.meowPriceFormatted
 import io.element.android.libraries.matrix.api.zero.wallet.tokenPriceFormatted
 import io.element.android.support.zero.common.extension.roundTo
 import io.element.android.support.zero.common.ui.WalletChainIcon
+import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import kotlin.math.abs
 
 @Composable
@@ -87,7 +86,7 @@ fun WalletTokensList(
                     hasNextPage = state.tokensPaginationParams != null,
                     onLoadMoreTokens = {
                         state.eventSink(
-                            HomeEvents.WalletEvents.LoadMoreTokens(contentState.tokens)
+                            WalletEvents.LoadMoreTokens(contentState.tokens)
                         )
                     })
             }

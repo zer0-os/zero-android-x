@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.model.SelectedStakePool
+import io.element.android.features.home.impl.wallet.WalletEvents
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import io.element.android.libraries.core.extensions.toLocalizedString
@@ -79,7 +79,7 @@ fun WalletStakingSheet(
     modifier: Modifier = Modifier,
     selectedPool: SelectedStakePool,
     actionState: AsyncAction<String>,
-    eventSink: (HomeEvents.WalletEvents) -> Unit
+    eventSink: (WalletEvents) -> Unit
 ) {
     val stakeTokenName = selectedPool.stakeTokenInfo.name.uppercase()
     val transactionAmount = remember { mutableStateOf("0") }
@@ -112,7 +112,7 @@ fun WalletStakingSheet(
                     transactionAmount = transactionAmount.value,
                     isSuccess = true,
                     onDismiss = {
-                        eventSink(HomeEvents.WalletEvents.DismissStakingSheet)
+                        eventSink(WalletEvents.DismissStakingSheet)
                     }
                 )
             }
@@ -124,7 +124,7 @@ fun WalletStakingSheet(
                     isSuccess = false,
                     error = actionState.error.message,
                     onDismiss = {
-                        eventSink(HomeEvents.WalletEvents.DismissStakingSheet)
+                        eventSink(WalletEvents.DismissStakingSheet)
                     }
                 )
             }
@@ -139,9 +139,9 @@ fun WalletStakingSheet(
                             onConfirmTransaction = { amount ->
                                 transactionAmount.value = amount
                                 if (isStaking) {
-                                    eventSink(HomeEvents.WalletEvents.StakeAmount(amount))
+                                    eventSink(WalletEvents.StakeAmount(amount))
                                 } else {
-                                    eventSink(HomeEvents.WalletEvents.UnstakeAmount(amount))
+                                    eventSink(WalletEvents.UnstakeAmount(amount))
                                 }
                             }
                         )
@@ -152,7 +152,7 @@ fun WalletStakingSheet(
                             onStake = { isUserStaking.value = true },
                             onUnstake = { isUserStaking.value = false },
                             onClaimRewards = {
-                                eventSink(HomeEvents.WalletEvents.ClaimStakingRewards)
+                                eventSink(WalletEvents.ClaimStakingRewards)
                             }
                         )
                     }
