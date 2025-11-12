@@ -12,12 +12,32 @@ import io.element.android.support.zero.R
 
 enum class HomeScreenTab(
     val title: String,
-    @DrawableRes val icon: Int
+    @DrawableRes val icon: Int,
+    @DrawableRes val selectedIcon: Int
 ) {
-    CHAT("Chat", R.drawable.home_tab_chat_icon),
-    CHANNEL("Channels", R.drawable.home_tab_channel_icon),
-    FEED("Feed", R.drawable.home_tab_feed_icon),
-    NOTIFICATION("Notifications", R.drawable.home_tab_notification_icon),
-    WALLET("Wallet", R.drawable.home_tab_wallet_icon),
-//    PROFILE("Profile", R.drawable.home_tab_profile_icon),
+    CHAT(
+        "Chat",
+        R.drawable.home_tab_chat_icon,
+        R.drawable.home_tab_chat_icon_filled
+    ),
+    CHANNEL(
+        "Channels",
+        R.drawable.home_tab_channel_icon,
+        R.drawable.home_tab_channel_icon
+    ),
+    FEED(
+        "Feed",
+        R.drawable.home_tab_feed_icon,
+        R.drawable.home_tab_feed_icon
+    ),
+    NOTIFICATION(
+        "Notifications",
+        R.drawable.home_tab_notification_icon,
+        R.drawable.home_tab_notification_icon_filled
+    ),
+    WALLET(
+        "Wallet",
+        R.drawable.home_tab_wallet_icon,
+        R.drawable.home_tab_wallet_icon_filled
+    ),
 }

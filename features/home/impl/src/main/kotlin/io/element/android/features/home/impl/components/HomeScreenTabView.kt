@@ -54,7 +54,7 @@ fun ZeroStyledNavigationTabView(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(40.dp),
         colors = CardDefaults
             .cardColors()
             .copy(containerColor = Color(0xFF1A1B1F)),
@@ -70,7 +70,11 @@ fun ZeroStyledNavigationTabView(
                 val isSelected = selectedNavigationTab == tab
                 IconButton(onClick = { onTabSelected(tab) }) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(tab.icon),
+                        imageVector = if (isSelected) {
+                            ImageVector.vectorResource(tab.selectedIcon)
+                        } else {
+                            ImageVector.vectorResource(tab.icon)
+                        },
                         contentDescription = tab.title,
                         tint = if (isSelected) {
                             ElementTheme.colors.zeroBrandColor

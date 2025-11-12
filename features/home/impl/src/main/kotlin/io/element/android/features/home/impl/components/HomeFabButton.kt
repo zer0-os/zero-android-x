@@ -10,6 +10,7 @@ package io.element.android.features.home.impl.components
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
@@ -23,11 +24,12 @@ import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 @Composable
 fun HomeFabButton(
     modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(12.dp),
     onClick: () -> Unit = {}
 ) {
     FloatingActionButton(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        shape = shape,
         containerColor = ElementTheme.colors.zeroBrandColor,
         onClick = onClick
     ) {
