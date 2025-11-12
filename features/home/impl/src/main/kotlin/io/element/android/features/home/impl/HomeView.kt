@@ -45,6 +45,7 @@ import io.element.android.features.home.impl.components.HomeScreenTabView
 import io.element.android.features.home.impl.components.HomeScreenTopBar
 import io.element.android.features.home.impl.components.WalletReceiveTokenSheet
 import io.element.android.features.home.impl.components.WalletStakingSheet
+import io.element.android.features.home.impl.feed.FeedListEvents
 import io.element.android.features.home.impl.feed.HomeFeedListContentView
 import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.features.home.impl.model.HomeScreenTab
@@ -243,8 +244,8 @@ private fun HomeScaffold(
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
     val roomListState: RoomListState = state.roomListState
 
-    val showFeedMediaPreview by remember(state.feedMediaPreviewState) {
-        mutableStateOf(state.feedMediaPreviewState != AsyncAction.Uninitialized)
+    val showFeedMediaPreview by remember(state.feedListState.feedMediaPreviewState) {
+        mutableStateOf(state.feedListState.feedMediaPreviewState != AsyncAction.Uninitialized)
     }
 
     val claimRewardsSheetState = rememberModalBottomSheetState()
@@ -339,8 +340,8 @@ private fun HomeScaffold(
     }
 
     if (showFeedMediaPreview) {
-        FeedMediaPreview(state.feedMediaPreviewState, onDismiss = {
-            state.eventSink(HomeEvents.FeedEvents.DismissFeedMedia)
+        FeedMediaPreview(state.feedListState.feedMediaPreviewState, onDismiss = {
+            state.feedListState.eventSink(FeedListEvents.DismissFeedMedia)
         })
     }
 
@@ -451,10 +452,10 @@ internal fun HomeScreenContent(
         }
         HomeScreenTab.FEED -> {
             HomeFeedListContentView(
-                contentState = state.allFeedsContentState,
-                feedMediaMap = state.feedMediaMap,
-                feedLinkMetaDataMap = state.feedLinkMetaDataMap,
-                eventSink = state.eventSink,
+                contentState = state.feedListState.contentState,
+                feedMediaMap = state.feedListState.feedMediaMap,
+                feedLinkMetaDataMap = state.feedListState.feedLinkMetaDataMap,
+                eventSink = state.feedListState.eventSink,
                 zeroUserRewards = state.userRewards,
                 loggedInUserId = state.matrixUser.userId,
                 onFeedClick = onFeedClick,

@@ -8,18 +8,33 @@
 package io.element.android.features.home.impl.feed
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import io.element.android.libraries.architecture.AsyncAction
+import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.collections.immutable.toPersistentList
 
-open class FeedListContentStateProvider : PreviewParameterProvider<FeedListContentState> {
-    override val values: Sequence<FeedListContentState>
+open class FeedListStateProvider : PreviewParameterProvider<FeedListState> {
+    override val values: Sequence<FeedListState>
         get() = sequenceOf(
-            aFeedListContentState(placeholderFeeds()),
-            aPlaceholderFeedListContentState(),
-            aSkeletonFeedListContentState(),
-            anEmptyFeedListContentState()
+            aFeedListState(),
+            aFeedListState(contentState = aFeedListContentState(placeholderFeeds())),
+            aFeedListState(contentState = aSkeletonFeedListContentState()),
+            aFeedListState(contentState = anEmptyFeedListContentState())
         )
 }
+
+internal fun aFeedListState(
+    feedMediaMap: Map<String, FeedMedia> = emptyMap(),
+    feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
+    contentState: FeedListContentState = aPlaceholderFeedListContentState()
+) = FeedListState(
+    contentState = contentState,
+    feedMediaMap = feedMediaMap,
+    feedLinkMetaDataMap = feedLinkMetaDataMap,
+    feedMediaPreviewState = AsyncAction.Uninitialized,
+    eventSink = {}
+)
 
 private fun placeholderFeeds(): List<ZeroFeed> {
     val list = mutableListOf<ZeroFeed>()

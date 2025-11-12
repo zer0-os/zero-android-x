@@ -9,7 +9,7 @@
 package io.element.android.features.home.impl
 
 import io.element.android.features.home.impl.channel.ChannelListState
-import io.element.android.features.home.impl.feed.FeedListContentState
+import io.element.android.features.home.impl.feed.FeedListState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.spaces.HomeSpacesState
@@ -35,20 +35,16 @@ data class HomeState(
     val hasNetworkConnection: Boolean,
     val genericActionState: AsyncAction<Unit>,
     val currentHomeNavigationBarItem: HomeNavigationBarItem,
+    val homeSpacesState: HomeSpacesState,
     val roomListState: RoomListState,
     val channelListState: ChannelListState,
-    val allFeedsContentState: FeedListContentState,
-    val myFeedsContentState: FeedListContentState,
-    val feedMediaMap: Map<String, FeedMedia>,
-    val feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    val homeSpacesState: HomeSpacesState,
+    val feedListState: FeedListState,
     val snackbarMessage: SnackbarMessage?,
     val canReportBug: Boolean,
     val directLogoutState: DirectLogoutState,
     val isSpaceFeatureEnabled: Boolean,
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
-    val feedMediaPreviewState: AsyncAction<FeedMedia> = AsyncAction.Uninitialized,
     val walletContentState: WalletContentState,
     val showClaimRewardsSheet: Boolean,
     val claimRewardActionState: AsyncAction<String> = AsyncAction.Uninitialized,

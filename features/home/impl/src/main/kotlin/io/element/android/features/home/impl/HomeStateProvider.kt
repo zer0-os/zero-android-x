@@ -11,9 +11,8 @@ package io.element.android.features.home.impl
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.element.android.features.home.impl.channel.ChannelListState
 import io.element.android.features.home.impl.channel.aChannelListState
-import io.element.android.features.home.impl.channel.aPlaceholderChannelListContentState
-import io.element.android.features.home.impl.feed.FeedListContentState
-import io.element.android.features.home.impl.feed.aPlaceholderFeedListContentState
+import io.element.android.features.home.impl.feed.FeedListState
+import io.element.android.features.home.impl.feed.aFeedListState
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.roomlist.RoomListStateProvider
 import io.element.android.features.home.impl.roomlist.aRoomListState
@@ -27,11 +26,8 @@ import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.logout.api.direct.aDirectLogoutState
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarMessage
-import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.user.MatrixUser
-import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
-import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.ui.strings.CommonStrings
 import kotlinx.collections.immutable.toImmutableList
 
@@ -69,14 +65,10 @@ internal fun aHomeState(
     genericActionState: AsyncAction<Unit> = AsyncAction.Uninitialized,
     snackbarMessage: SnackbarMessage? = null,
     currentHomeNavigationBarItem: HomeNavigationBarItem = HomeNavigationBarItem.Chats,
+    homeSpacesState: HomeSpacesState = aHomeSpacesState(),
     roomListState: RoomListState = aRoomListState(),
     channelListState: ChannelListState = aChannelListState(),
-    allFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
-    myFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
-    feedMediaMap: Map<String, FeedMedia> = emptyMap(),
-    feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
-    resolvedChannelRoom: RoomId? = null,
-    homeSpacesState: HomeSpacesState = aHomeSpacesState(),
+    feedListState: FeedListState = aFeedListState(),
     canReportBug: Boolean = true,
     isSpaceFeatureEnabled: Boolean = false,
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
@@ -91,10 +83,7 @@ internal fun aHomeState(
     currentHomeNavigationBarItem = currentHomeNavigationBarItem,
     roomListState = roomListState,
     channelListState = channelListState,
-    allFeedsContentState = allFeedsContentState,
-    myFeedsContentState = myFeedsContentState,
-    feedMediaMap = feedMediaMap,
-    feedLinkMetaDataMap = feedLinkMetaDataMap,
+    feedListState = feedListState,
     snackbarMessage = snackbarMessage,
     canReportBug = canReportBug,
     directLogoutState = directLogoutState,

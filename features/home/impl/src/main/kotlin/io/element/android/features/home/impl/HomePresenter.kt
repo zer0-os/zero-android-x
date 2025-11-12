@@ -19,19 +19,16 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Inject
 import io.element.android.features.announcement.api.Announcement
 import io.element.android.features.announcement.api.AnnouncementService
 import io.element.android.features.home.impl.channel.ChannelListState
-import io.element.android.features.home.impl.feed.FeedListContentState
+import io.element.android.features.home.impl.feed.FeedListState
 import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.features.home.impl.roomlist.RoomListState
@@ -42,7 +39,6 @@ import io.element.android.features.home.impl.wallet.WalletTransactionsListState
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.AsyncAction
-import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.extensions.toLocalizedDoubleOrZero
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
@@ -54,9 +50,6 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
-import io.element.android.libraries.matrix.api.zero.feed.FeedMedia
-import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
-import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
@@ -78,15 +71,12 @@ import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
 import io.element.android.support.zero.common.state.StateBus
-import io.element.android.support.zero.common.util.FeedItemMediaCache
-import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
 import io.element.android.support.zero.common.util.wallet.WalletChainsUtil
 import io.element.android.support.zero.common.util.wallet.ZeroStakingUtil
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -98,26 +88,22 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-private const val HOME_FEED_PAGE_SIZE = 15
-
 @Inject
 class HomePresenter(
     private val client: MatrixClient,
     private val syncService: SyncService,
     private val snackbarDispatcher: SnackbarDispatcher,
     private val indicatorService: IndicatorService,
+    private val homeSpacesPresenter: Presenter<HomeSpacesState>,
     private val roomListPresenter: Presenter<RoomListState>,
     private val channelListPresenter: Presenter<ChannelListState>,
-    private val homeSpacesPresenter: Presenter<HomeSpacesState>,
+    private val feedListPresenter: Presenter<FeedListState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
     private val featureFlagService: FeatureFlagService,
     private val sessionStore: SessionStore,
     private val announcementService: AnnouncementService,
 ) : Presenter<HomeState> {
-
-    private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
-    private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
 
     private val currentUserWithNeighborsBuilder = CurrentUserWithNeighborsBuilder()
 
@@ -134,9 +120,11 @@ class HomePresenter(
         }.collectAsState(initial = persistentListOf(matrixUser))
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug by remember { rageshakeFeatureAvailability.isAvailable() }.collectAsState(false)
+        val homeSpacesState = homeSpacesPresenter.present()
         val roomListState = roomListPresenter.present()
         val channelListState = channelListPresenter.present()
-        val homeSpacesState = homeSpacesPresenter.present()
+        val feedListState = feedListPresenter.present()
+
         val isSpaceFeatureEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
         }.collectAsState(initial = false)
@@ -156,9 +144,6 @@ class HomePresenter(
         val walletTransactionUrlState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
-
-        val feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>> =
-            remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val showWalletBalance = remember { mutableStateOf(true) }
         val userWalletBalance = remember { mutableDoubleStateOf(0.0) }
@@ -250,35 +235,6 @@ class HomePresenter(
                     )
                 }
                 HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
-                is HomeEvents.FeedEvents -> {
-                    when (event) {
-                        is HomeEvents.FeedEvents.LoadMoreFeeds -> {
-                            _allFeeds.apply {
-                                clear()
-                                addAll(event.currentFeeds)
-                            }
-                            coroutineState.loadMoreHomeFeeds(event.followingFeeds, event.currentFeeds.size)
-                        }
-                        is HomeEvents.FeedEvents.RefreshFeeds -> coroutineState.forceRefreshHomeFeeds(event.followingFeeds)
-                        is HomeEvents.FeedEvents.AddMeowToFeed -> GlobalScope.addMeowToFeed(event.feed, event.meowCount, genericActionState)
-                        is HomeEvents.FeedEvents.LoadFeedMedia -> {
-                            coroutineState.loadFeedMediaPreview(event.mediaId, feedMediaPreviewActionState)
-                        }
-                        HomeEvents.FeedEvents.DismissFeedMedia -> feedMediaPreviewActionState.value = AsyncAction.Uninitialized
-                    }
-                }
-                is HomeEvents.ProfileEvents -> {
-                    when (event) {
-                        is HomeEvents.ProfileEvents.LoadMoreMyFeeds -> {
-                            _myFeeds.apply {
-                                clear()
-                                addAll(event.currentFeeds)
-                            }
-                            coroutineState.loadMoreMyFeeds(event.currentFeeds.size)
-                        }
-                        HomeEvents.ProfileEvents.RefreshMyFeeds -> coroutineState.forceRefreshMyFeeds()
-                    }
-                }
                 is HomeEvents.WalletEvents -> {
                     when (event) {
                         is HomeEvents.WalletEvents.LoadMoreTokens -> {
@@ -385,30 +341,6 @@ class HomePresenter(
         }
         val snackbarMessage by snackbarDispatcher.collectSnackbarMessageAsState()
 
-        val allFeedsContentState = allFeedsListContentState()
-        val myFeedsContentState = allMyFeedsListContentState()
-
-        /*val feedMediaMap = rememberSaveable(
-            saver = mapSaver(
-                save = { it.toMap() },
-                restore = {
-                    mutableStateMapOf<String, FeedMedia>().apply {
-                        putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
-                    }
-                }
-            )
-        ) { mutableStateMapOf() }*/
-        val feedMediaMap = remember { mutableStateMapOf<String, FeedMedia>() }
-        val feedLinkMetaDataMap = remember { mutableStateMapOf<String, ZeroLinkPreview>() }
-
-        LaunchedEffect(Unit) {
-            feedMediaMap.putAll(FeedItemMediaCache.getCachedFeedItemMediaMap())
-            feedLinkMetaDataMap.putAll(FeedItemMediaCache.getCachedFeedItemLinkMetaDataMap())
-        }
-        val allCombinedFeeds = extractFeedsToFetchData(allFeedsContentState, myFeedsContentState)
-        fetchFeedMediaIfRequired(allCombinedFeeds, feedMediaMap)
-        fetchLinksMetaDataIfRequired(allCombinedFeeds, feedLinkMetaDataMap)
-
         return HomeState(
             currentUserAndNeighbors = currentUserAndNeighbors,
             matrixUser = matrixUser,
@@ -416,20 +348,16 @@ class HomePresenter(
             hasNetworkConnection = isOnline,
             genericActionState = genericActionState.value,
             currentHomeNavigationBarItem = currentHomeNavigationBarItem,
+            homeSpacesState = homeSpacesState,
             roomListState = roomListState,
             channelListState = channelListState,
-            allFeedsContentState = allFeedsContentState,
-            myFeedsContentState = myFeedsContentState,
-            feedMediaMap = feedMediaMap,
-            feedLinkMetaDataMap = feedLinkMetaDataMap,
-            homeSpacesState = homeSpacesState,
+            feedListState = feedListState,
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,
             isSpaceFeatureEnabled = isSpaceFeatureEnabled,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
-            feedMediaPreviewState = feedMediaPreviewActionState.value,
             walletContentState = WalletContentState(
                 userName = matrixUser.displayName ?: "",
                 showWalletBalance = showWalletBalance.value,
@@ -459,181 +387,7 @@ class HomePresenter(
             safeAsync { client.checkZeroThirdWebWallet() },
             // Fetch user rewards
             safeAsync { client.getUserRewards(shouldCheckRewardsIntimation = true) },
-            // Fetch all home feeds
-            safeAsync { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
-            // Fetch all my feeds
-            //safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
-    }
-
-    @Composable
-    private fun allFeedsListContentState(): FeedListContentState {
-        val homeFeedsState by produceState(initialValue = AsyncData.Loading()) {
-            client.allFeeds.collect {
-                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
-                    addAll(_allFeeds)
-                    addAll(it)
-                }.distinctBy { it.id }
-                value = AsyncData.Success(feeds)
-            }
-        }
-        val showEmpty by remember {
-            derivedStateOf {
-                (homeFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
-            }
-        }
-        val showSkeleton by remember {
-            derivedStateOf {
-                homeFeedsState is AsyncData.Loading
-            }
-        }
-        return when {
-            showEmpty -> FeedListContentState.Empty
-            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
-            else -> {
-                val mappedAllFeeds = homeFeedsState.dataOrNull()
-                    .orEmpty()
-                    .toPersistentList()
-                FeedListContentState.Feeds(mappedAllFeeds)
-            }
-        }
-    }
-
-    @Composable
-    private fun allMyFeedsListContentState(): FeedListContentState {
-        val myFeedsState by produceState(initialValue = AsyncData.Loading()) {
-            client.allMyFeeds.collect {
-                val feeds: List<ZeroFeed> = mutableListOf<ZeroFeed>().apply {
-                    addAll(_myFeeds)
-                    addAll(it)
-                }.distinctBy { it.id }
-                value = AsyncData.Success(feeds)
-            }
-        }
-        val showEmpty by remember {
-            derivedStateOf {
-                (myFeedsState as? AsyncData.Success)?.data?.isEmpty() == true
-            }
-        }
-        val showSkeleton by remember {
-            derivedStateOf {
-                myFeedsState is AsyncData.Loading
-            }
-        }
-        return when {
-            showEmpty -> FeedListContentState.Empty
-            showSkeleton -> FeedListContentState.Skeleton(HOME_FEED_PAGE_SIZE)
-            else -> {
-                val mappedMyFeeds = myFeedsState.dataOrNull()
-                    .orEmpty()
-                    .toPersistentList()
-                FeedListContentState.Feeds(mappedMyFeeds)
-            }
-        }
-    }
-
-    private fun CoroutineScope.loadMoreHomeFeeds(followingFeedsOnly: Boolean, skip: Int) = launch {
-        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = skip)
-    }
-
-    private fun CoroutineScope.forceRefreshHomeFeeds(followingFeedsOnly: Boolean) = launch {
-        _allFeeds.clear()
-        client.fetchAllFeeds(followingFeeds = followingFeedsOnly, limit = HOME_FEED_PAGE_SIZE, skip = 0)
-    }
-
-    private fun CoroutineScope.loadMoreMyFeeds(skip: Int) = launch {
-        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = skip)
-    }
-
-    private fun CoroutineScope.forceRefreshMyFeeds() = launch {
-        _myFeeds.clear()
-        client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0)
-    }
-
-    private fun CoroutineScope.addMeowToFeed(feed: ZeroFeed, meowCount: Int, genericActionState: MutableState<AsyncAction<Unit>>) = launch {
-        client.addMeowToFeed(feed, meowCount)
-            .onFailure {
-                genericActionState.value = AsyncAction.Failure(it)
-            }
-    }
-
-    private fun extractFeedsToFetchData(
-        allFeedsContentState: FeedListContentState,
-        myFeedsContentState: FeedListContentState,
-    ): List<ZeroFeed> {
-        val allFeeds = (allFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
-        val myFeeds = (myFeedsContentState as? FeedListContentState.Feeds)?.feeds ?: emptyList()
-        val feeds = mutableListOf<ZeroFeed>().apply {
-            addAll(allFeeds)
-            addAll(myFeeds)
-        }.distinctBy { it.id }.toList()
-        return feeds
-    }
-
-    private fun fetchFeedMediaIfRequired(
-        feeds: List<ZeroFeed>,
-        feedMediaMap: SnapshotStateMap<String, FeedMedia>
-    ) {
-        withIOScope {
-            coroutineScope {
-                val feedsToFetch = feeds.mapNotNull { feed ->
-                    val mediaId = feed.media?.id ?: return@mapNotNull null
-                    if (feedMediaMap.contains(feed.id) || FeedItemMediaCache.containsMedia(feed.id)) return@mapNotNull null
-                    else feed
-                }
-                val results = feedsToFetch.map { feed ->
-                    async { feed.id to client.fetchFeedMedia(feed.media!!.id) }
-                }.awaitAll()
-                results.forEach { (feedId, media) ->
-                    media.getOrNull()?.let { feedMedia ->
-                        FeedItemMediaCache.addFeedMedia(feedId, feedMedia)
-                        feedMediaMap[feedId] = feedMedia
-                    }
-                }
-            }
-        }
-    }
-
-    private fun fetchLinksMetaDataIfRequired(
-        feeds: List<ZeroFeed>,
-        feedLinkMetaDataMap: SnapshotStateMap<String, ZeroLinkPreview>
-    ) {
-        withIOScope {
-            coroutineScope {
-                val feedsToFetch = feeds.mapNotNull { feed ->
-                    val availableYoutubeUrl = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text) ?: return@mapNotNull null
-                    if (feedLinkMetaDataMap.contains(feed.id) || FeedItemMediaCache.containsUrlMetaData(feed.id)) return@mapNotNull null
-                    else feed
-                }
-                val results = feedsToFetch.map { feed ->
-                    val url = YoutubeLinkHelperUtil.extractFirstAvailableYoutubeUrl(feed.text)!!
-                    async { feed.id to client.fetchUrlMetaData(url) }
-                }.awaitAll()
-                results.forEach { (feedId, urlMetaData) ->
-                    urlMetaData.getOrNull()?.let { metaData ->
-                        FeedItemMediaCache.addLinkMetaData(feedId, metaData)
-                        feedLinkMetaDataMap[feedId] = metaData
-                    }
-                }
-            }
-        }
-    }
-
-    private fun CoroutineScope.loadFeedMediaPreview(
-        mediaId: String, feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>>
-    ) = launch {
-        feedMediaPreviewActionState.value = AsyncAction.Loading
-        client.fetchFeedMedia(mediaId, isPreview = false)
-            .onSuccess { media ->
-                media?.let {
-                    feedMediaPreviewActionState.value = AsyncAction.Success(it)
-                } ?: run {
-                    feedMediaPreviewActionState.value = AsyncAction.Failure(Throwable("Media not found."))
-                }
-            }
-            .onFailure { failure ->
-                feedMediaPreviewActionState.value = AsyncAction.Failure(failure)
-            }
     }
 
     private fun CoroutineScope.fetchWalletData(

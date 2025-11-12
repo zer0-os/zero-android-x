@@ -9,7 +9,6 @@ package io.element.android.features.home.impl.feed
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.features.home.impl.model.FeedsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -54,7 +52,7 @@ fun HomeFeedListContentView(
     contentState: FeedListContentState,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (HomeEvents.FeedEvents) -> Unit,
+    eventSink: (FeedListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -66,9 +64,11 @@ fun HomeFeedListContentView(
         FeedsScreenTabView(
             onTabSelected = { tab ->
                 selectedFeedTab.value = tab
-                eventSink(HomeEvents.FeedEvents.RefreshFeeds(
-                    followingFeeds = tab == FeedsScreenTab.FOLLOWING
-                ))
+                eventSink(
+                    FeedListEvents.RefreshFeeds(
+                        followingFeeds = tab == FeedsScreenTab.FOLLOWING
+                    )
+                )
             }
         )
         Box {
@@ -121,7 +121,7 @@ private fun FeedsViewList(
     state: FeedListContentState.Feeds,
     feedMediaMap: Map<String, FeedMedia>,
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    eventSink: (HomeEvents.FeedEvents) -> Unit,
+    eventSink: (FeedListEvents) -> Unit,
     zeroUserRewards: ZeroUserRewards,
     loggedInUserId: UserId,
     onFeedClick: (ZeroFeed) -> Unit,
@@ -135,7 +135,7 @@ private fun FeedsViewList(
     val lazyListState = rememberLazyListState()
     val pullRefreshState = rememberPullRefreshState(refreshing, {
         refreshing = true
-        eventSink(HomeEvents.FeedEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
+        eventSink(FeedListEvents.RefreshFeeds(isFollowingFeedsTabSelected()))
         Handler(Looper.getMainLooper()).postDelayed({
             refreshing = false
         }, 1_500)
@@ -152,7 +152,7 @@ private fun FeedsViewList(
     LaunchedEffect(shouldLoadMoreFeed) {
         if (shouldLoadMoreFeed && !isLoadingMoreItems) {
             isLoadingMoreItems = true
-            eventSink(HomeEvents.FeedEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
+            eventSink(FeedListEvents.LoadMoreFeeds(state.feeds, isFollowingFeedsTabSelected()))
         }
     }
 
@@ -176,17 +176,19 @@ private fun FeedsViewList(
                     feed = feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData),
                     zeroUserRewards = zeroUserRewards,
                     isMyOwnFeed = feed.userId == loggedInUserId.extractedDisplayName,
-                    onFeedClick = { onFeedClick(
-                        feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData)
-                    ) },
+                    onFeedClick = {
+                        onFeedClick(
+                            feed.copy(media = feedMedia, linkMetaData = feedLinkMetaData)
+                        )
+                    },
                     onFeedUserClick = {
                         onFeedUserClick(feed.userProfile)
                     },
                     onAddMeowToFeed = { meowCount ->
-                        eventSink(HomeEvents.FeedEvents.AddMeowToFeed(feed, meowCount))
+                        eventSink(FeedListEvents.AddMeowToFeed(feed, meowCount))
                     },
                     onMediaTapped = { mediaId ->
-                        eventSink(HomeEvents.FeedEvents.LoadFeedMedia(mediaId))
+                        eventSink(FeedListEvents.LoadFeedMedia(mediaId))
                     }
                 )
                 if (index != state.feeds.lastIndex) {
@@ -208,11 +210,11 @@ private fun FeedsViewList(
 
 @PreviewsDayNight
 @Composable
-internal fun HomeFeedListContentViewPreview(@PreviewParameter(FeedListContentStateProvider::class) state: FeedListContentState) = ElementPreview {
+internal fun HomeFeedListContentViewPreview(@PreviewParameter(FeedListStateProvider::class) state: FeedListState) = ElementPreview {
     HomeFeedListContentView(
-        contentState = state,
-        feedMediaMap = emptyMap(),
-        feedLinkMetaDataMap = emptyMap(),
+        contentState = state.contentState,
+        feedMediaMap = state.feedMediaMap,
+        feedLinkMetaDataMap = state.feedLinkMetaDataMap,
         zeroUserRewards = ZeroUserRewards.empty(),
         loggedInUserId = UserId(""),
         eventSink = {},

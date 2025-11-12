@@ -22,19 +22,6 @@ sealed interface HomeEvents {
     data object ClaimRewards : HomeEvents
     data object HideError : HomeEvents
 
-    sealed interface FeedEvents: HomeEvents {
-        data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean) : FeedEvents
-        data class RefreshFeeds(val followingFeeds: Boolean) : FeedEvents
-        data class AddMeowToFeed(val feed: ZeroFeed, val meowCount: Int) : FeedEvents
-        data class LoadFeedMedia(val mediaId: String) : FeedEvents
-        data object DismissFeedMedia : FeedEvents
-    }
-
-    sealed interface ProfileEvents: HomeEvents {
-        data class LoadMoreMyFeeds(val currentFeeds: List<ZeroFeed>) : ProfileEvents
-        data object RefreshMyFeeds : ProfileEvents
-    }
-
     sealed interface WalletEvents: HomeEvents {
         data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>) : WalletEvents
         data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>) : WalletEvents
