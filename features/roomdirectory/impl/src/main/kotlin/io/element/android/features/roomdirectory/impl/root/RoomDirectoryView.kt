@@ -31,9 +31,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -283,6 +285,23 @@ private fun RoomDirectoryRoomRow(
                     color = ElementTheme.colors.textSecondary,
                     overflow = TextOverflow.Ellipsis,
                 )
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        imageVector = ImageVector.vectorResource(io.element.android.libraries.designsystem.R.drawable.ic_members),
+                        contentDescription = null,
+                        tint = ElementTheme.colors.iconSecondary
+                    )
+                    Text(
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        text = roomDescription.numberOfMembers.toString(),
+                        maxLines = 1,
+                        style = ElementTheme.zeroTypography.fontBodyMdRegular,
+                        color = ElementTheme.colors.textSecondary,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }

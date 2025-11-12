@@ -190,12 +190,14 @@ fun HomeView(
             RoomListSearchView(
                 state = roomListState.searchState,
                 channelsListState = homeState.channelListState.contentState,
+                roomDirectoryState = homeState.roomDirectoryState,
                 eventSink = roomListState.eventSink,
                 roomMappedUserProStatus = roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
                 selectedHomeNavigationTab = selectedHomeNavigationTab.value,
                 selectedChannelContentTab = selectedChannelsTab.value,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
+                onPublicRoomClick = { if (firstThrottler.canHandle()) onPublicRoomClick(it) },
                 onChannelClick = { homeState.channelListState.eventSink(ChannelListEvents.OpenChannel(it)) },
                 modifier = contentModifier
                     .statusBarsPadding()

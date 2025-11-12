@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.channel.aChannelListState
 import io.element.android.features.home.impl.contentType
 import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.features.home.impl.model.HomeScreenChannel
@@ -50,6 +51,10 @@ import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.toRoomSummary
 import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
+import io.element.android.features.roomdirectory.api.RoomDescription
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryEvents
+import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
+import io.element.android.features.roomdirectory.impl.root.aRoomDirectoryState
 import io.element.android.libraries.designsystem.components.button.BackButton
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
@@ -65,12 +70,14 @@ import io.element.android.libraries.ui.strings.CommonStrings
 internal fun RoomListSearchView(
     state: RoomListSearchState,
     channelsListState: ChannelListContentState,
+    roomDirectoryState: RoomDirectoryState,
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     selectedHomeNavigationTab: HomeScreenTab,
     selectedChannelContentTab: ChannelsScreenTab,
     eventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomId) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelClick: (HomeScreenChannel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,11 +94,13 @@ internal fun RoomListSearchView(
             RoomListSearchContent(
                 state = state,
                 channelsListState = channelsListState,
+                roomDirectoryState = roomDirectoryState,
                 roomMappedUserProStatus = roomMappedUserProStatus,
                 hideInvitesAvatars = hideInvitesAvatars,
                 selectedHomeNavigationTab = selectedHomeNavigationTab,
                 selectedChannelContentTab = selectedChannelContentTab,
                 onRoomClick = onRoomClick,
+                onPublicRoomClick = onPublicRoomClick,
                 onChannelClick = onChannelClick,
                 eventSink = eventSink,
             )
@@ -104,12 +113,14 @@ internal fun RoomListSearchView(
 private fun RoomListSearchContent(
     state: RoomListSearchState,
     channelsListState: ChannelListContentState,
+    roomDirectoryState: RoomDirectoryState,
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     selectedHomeNavigationTab: HomeScreenTab,
     selectedChannelContentTab: ChannelsScreenTab,
     eventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomId) -> Unit,
+    onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelClick: (HomeScreenChannel) -> Unit,
 ) {
     val borderColor = MaterialTheme.colorScheme.tertiary
@@ -119,17 +130,22 @@ private fun RoomListSearchContent(
     }
 
     fun onRoomClick(room: RoomListRoomSummary) {
-        if (room.isAChannel) {
-            val channelsList = if (state.query.isNotBlank()) {
-                ((channelsListState as? ChannelListContentState.Channels)
-                    ?.channels ?: emptyList())
-            } else {
-                emptyList()
+        when {
+            room.isDiscoverable -> {
+                roomDirectoryState.roomDescriptions.firstOrNull { it.roomId == room.roomId }
+                    ?.let(onPublicRoomClick)
             }
-            channelsList.firstOrNull { it.channelFullName == room.id }
-                ?.let(onChannelClick)
-        } else {
-            onRoomClick(room.roomId)
+            room.isAChannel -> {
+                val channelsList = if (state.query.isNotBlank()) {
+                    ((channelsListState as? ChannelListContentState.Channels)
+                        ?.channels ?: emptyList())
+                } else {
+                    emptyList()
+                }
+                channelsList.firstOrNull { it.channelFullName == room.id }
+                    ?.let(onChannelClick)
+            }
+            else -> onRoomClick(room.roomId)
         }
     }
     Scaffold(
@@ -164,6 +180,7 @@ private fun RoomListSearchContent(
                         onValueChange = {
                             value = it
                             state.eventSink(RoomListSearchEvents.QueryChanged(it.text))
+                            roomDirectoryState.eventSink(RoomDirectoryEvents.Search(it.text))
                         },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -179,6 +196,7 @@ private fun RoomListSearchContent(
                                 IconButton(onClick = {
                                     value = TextFieldValue("")
                                     state.eventSink(RoomListSearchEvents.ClearQuery)
+                                    roomDirectoryState.eventSink(RoomDirectoryEvents.Search(""))
                                 }) {
                                     Icon(
                                         imageVector = CompoundIcons.Close(),
@@ -215,13 +233,22 @@ private fun RoomListSearchContent(
                 }
                     .filter { it.displayTitle.contains(state.query, true) }
                     .map { it.toRoomSummary()  }
+                val publicRoomsList = if (state.query.isNotBlank()) {
+                    roomDirectoryState.roomDescriptions
+                } else {
+                    emptyList()
+                }
+                    .map { it.toRoomSummary() }
                 val roomResults = state.results
                     .filter { !it.isAChannel }
                     .toMutableList()
                     .apply {
                         // add channel search results as well
                         addAll(channelsList)
+                        // add public rooms search results as well
+                        addAll(publicRoomsList)
                     }
+                    .distinctBy { it.roomId }
                 items(
                     items = roomResults,
                     contentType = { room -> room.contentType() },
@@ -291,12 +318,14 @@ private fun RoomListSearchContent(
 internal fun RoomListSearchContentPreview(@PreviewParameter(RoomListSearchStateProvider::class) state: RoomListSearchState) = ElementPreview {
     RoomListSearchContent(
         state = state,
-        channelsListState = ChannelListContentState.Empty,
+        channelsListState = aChannelListState().contentState,
+        roomDirectoryState = aRoomDirectoryState(),
         roomMappedUserProStatus = emptyMap(),
         hideInvitesAvatars = false,
         selectedHomeNavigationTab = HomeScreenTab.CHAT,
         selectedChannelContentTab = ChannelsScreenTab.CHANNELS,
         onRoomClick = {},
+        onPublicRoomClick = {},
         onChannelClick = {},
         eventSink = {},
     )
