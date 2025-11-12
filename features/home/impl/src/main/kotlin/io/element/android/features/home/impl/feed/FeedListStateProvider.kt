@@ -29,6 +29,7 @@ internal fun aFeedListState(
     feedLinkMetaDataMap: Map<String, ZeroLinkPreview> = emptyMap(),
     contentState: FeedListContentState = aPlaceholderFeedListContentState()
 ) = FeedListState(
+    genericActionState = AsyncAction.Uninitialized,
     contentState = contentState,
     feedMediaMap = feedMediaMap,
     feedLinkMetaDataMap = feedLinkMetaDataMap,

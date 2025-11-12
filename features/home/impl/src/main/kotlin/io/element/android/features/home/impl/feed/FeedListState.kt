@@ -15,6 +15,8 @@ import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import kotlinx.collections.immutable.ImmutableList
 
 data class FeedListState(
+    val genericActionState: AsyncAction<Unit>,
+
     val contentState: FeedListContentState,
     val feedMediaMap: Map<String, FeedMedia>,
     val feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,

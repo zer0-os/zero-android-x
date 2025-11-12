@@ -9,6 +9,7 @@ package io.element.android.features.home.impl.channel
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.core.RoomId
 import kotlinx.collections.immutable.toPersistentList
 
@@ -25,6 +26,7 @@ internal fun aChannelListState(
     resolvedChannelRoom: RoomId? = null,
     channelListContentState: ChannelListContentState = aPlaceholderChannelListContentState()
 ) = ChannelListState(
+    genericActionState = AsyncAction.Uninitialized,
     resolvedChannelRoom = resolvedChannelRoom,
     contentState = channelListContentState,
     eventSink = {}

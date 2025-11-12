@@ -110,8 +110,24 @@ class HomePresenter(
         val showClaimRewardsSheet = StateBus.claimRewardsStateObservable.collectAsState(initial = false)
         val claimRewardsActionState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
-        val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        val baseGenericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
+        // Derived value (computed from child presenters)
+        val derivedBaseState by remember(channelListState, feedListState, walletContentState) {
+            derivedStateOf {
+                val states = listOf(channelListState.genericActionState, feedListState.genericActionState, walletContentState.genericActionState)
+                when {
+                    states.any { it is AsyncAction.Loading } -> AsyncAction.Loading
+                    states.any { it is AsyncAction.Failure } -> states.first { it is AsyncAction.Failure }
+                    states.all { it is AsyncAction.Success } -> AsyncAction.Success(Unit)
+                    else -> AsyncAction.Uninitialized
+                }
+            }
+        }
 
+        // Keep base in sync with derived automatically
+        LaunchedEffect(derivedBaseState) {
+            baseGenericActionState.value = derivedBaseState
+        }
         LaunchedEffect(Unit) {
             // Force a refresh of the profile
             client.getUserProfile(true)
@@ -148,7 +164,7 @@ class HomePresenter(
                         refreshWallet = { walletContentState.eventSink(WalletEvents.RefreshWallet) }
                     )
                 }
-                HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
+                HomeEvents.HideError -> baseGenericActionState.value = AsyncAction.Uninitialized
                 is HomeEvents.SwitchToAccount -> coroutineState.launch {
                     sessionStore.setLatestSession(event.sessionId.value)
                 }
@@ -168,7 +184,7 @@ class HomePresenter(
             matrixUser = matrixUser,
             showAvatarIndicator = showAvatarIndicator,
             hasNetworkConnection = isOnline,
-            genericActionState = genericActionState.value,
+            genericActionState = baseGenericActionState.value,
             currentHomeNavigationBarItem = currentHomeNavigationBarItem,
             homeSpacesState = homeSpacesState,
             roomListState = roomListState,

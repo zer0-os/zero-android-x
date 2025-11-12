@@ -9,12 +9,16 @@ package io.element.android.features.home.impl.channel
 
 import androidx.compose.runtime.Immutable
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.core.RoomId
 import kotlinx.collections.immutable.ImmutableList
 
 data class ChannelListState(
+    val genericActionState: AsyncAction<Unit>,
+
     val resolvedChannelRoom: RoomId?,
     val contentState: ChannelListContentState,
+
     val eventSink: (ChannelListEvents) -> Unit
 )
 

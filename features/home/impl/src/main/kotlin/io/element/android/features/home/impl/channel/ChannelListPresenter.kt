@@ -66,6 +66,7 @@ class ChannelListPresenter(
         )
 
         return ChannelListState(
+            genericActionState = genericActionState.value,
             resolvedChannelRoom = resolvedChannelRoomId.value,
             contentState = channelListContentState(),
             eventSink = ::handleEvent

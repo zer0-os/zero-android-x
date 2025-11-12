@@ -216,6 +216,7 @@ class WalletPresenter(
         }
 
         return WalletContentState(
+            genericActionState = genericActionState.value,
             userName = matrixUser.displayName ?: "",
             showWalletBalance = showWalletBalance.value,
             walletBalance = userWalletBalance.doubleValue,

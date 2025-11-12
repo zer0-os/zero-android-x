@@ -21,6 +21,8 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
 data class WalletContentState(
+    val genericActionState: AsyncAction<Unit>,
+
     val userName: String,
     val showWalletBalance: Boolean,
     private val walletBalance: Double,

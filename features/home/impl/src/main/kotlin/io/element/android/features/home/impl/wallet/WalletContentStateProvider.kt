@@ -26,6 +26,7 @@ internal fun aWalletContentState(
     tokensListState: WalletTokensListState = WalletTokensListState.Empty,
     transactionsListState: WalletTransactionsListState = WalletTransactionsListState.Empty,
 ) = WalletContentState(
+    genericActionState = AsyncAction.Uninitialized,
     userName = "Jade David",
     showWalletBalance = showWalletBalance,
     walletBalance = 0.0,

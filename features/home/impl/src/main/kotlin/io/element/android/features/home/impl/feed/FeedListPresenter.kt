@@ -100,6 +100,7 @@ class FeedListPresenter(
         fetchLinksMetaDataIfRequired(allCombinedFeeds, feedLinkMetaDataMap)
 
         return FeedListState(
+            genericActionState = genericActionState.value,
             contentState = allFeedsContentState,
             feedMediaMap = feedMediaMap,
             feedLinkMetaDataMap = feedLinkMetaDataMap,
