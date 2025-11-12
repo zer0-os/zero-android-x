@@ -22,11 +22,6 @@ sealed interface HomeEvents {
     data object ClaimRewards : HomeEvents
     data object HideError : HomeEvents
 
-    sealed interface ChannelEvents: HomeEvents {
-        data class OpenChannel(val channel: HomeScreenChannel) : ChannelEvents
-        data object ChannelRoomOpened : ChannelEvents
-    }
-
     sealed interface FeedEvents: HomeEvents {
         data class LoadMoreFeeds(val currentFeeds: List<ZeroFeed>, val followingFeeds: Boolean) : FeedEvents
         data class RefreshFeeds(val followingFeeds: Boolean) : FeedEvents

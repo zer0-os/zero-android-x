@@ -30,12 +30,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import dev.zacsweers.metro.Inject
 import io.element.android.features.announcement.api.Announcement
 import io.element.android.features.announcement.api.AnnouncementService
-import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.channel.ChannelListState
 import io.element.android.features.home.impl.feed.FeedListContentState
-import io.element.android.features.home.impl.model.HomeScreenChannel
 import io.element.android.features.home.impl.model.HomeStakePool
 import io.element.android.features.home.impl.model.SelectedStakePool
-import io.element.android.features.home.impl.model.channelId
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
@@ -53,10 +51,6 @@ import io.element.android.libraries.featureflag.api.FeatureFlagService
 import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.indicator.api.IndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
-import io.element.android.libraries.matrix.api.core.RoomAlias
-import io.element.android.libraries.matrix.api.core.RoomId
-import io.element.android.libraries.matrix.api.core.toRoomIdOrAlias
-import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.api.sync.SyncService
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.user.walletAddress
@@ -83,7 +77,6 @@ import io.element.android.libraries.matrix.api.zero.wallet.tokenPrice
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.extension.withIOScope
-import io.element.android.support.zero.common.extension.withScope
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.FeedItemMediaCache
 import io.element.android.support.zero.common.util.YoutubeLinkHelperUtil
@@ -100,12 +93,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.jvm.optionals.getOrNull
 
 private const val HOME_FEED_PAGE_SIZE = 15
 
@@ -116,6 +107,7 @@ class HomePresenter(
     private val snackbarDispatcher: SnackbarDispatcher,
     private val indicatorService: IndicatorService,
     private val roomListPresenter: Presenter<RoomListState>,
+    private val channelListPresenter: Presenter<ChannelListState>,
     private val homeSpacesPresenter: Presenter<HomeSpacesState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
@@ -123,8 +115,6 @@ class HomePresenter(
     private val sessionStore: SessionStore,
     private val announcementService: AnnouncementService,
 ) : Presenter<HomeState> {
-
-    private val channelRoomMap: MutableMap<String, RoomSummary> = mutableMapOf()
 
     private val _allFeeds: MutableList<ZeroFeed> = mutableListOf()
     private val _myFeeds: MutableList<ZeroFeed> = mutableListOf()
@@ -145,6 +135,7 @@ class HomePresenter(
         val isOnline by syncService.isOnline.collectAsState()
         val canReportBug by remember { rageshakeFeatureAvailability.isAvailable() }.collectAsState(false)
         val roomListState = roomListPresenter.present()
+        val channelListState = channelListPresenter.present()
         val homeSpacesState = homeSpacesPresenter.present()
         val isSpaceFeatureEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
@@ -165,7 +156,6 @@ class HomePresenter(
         val walletTransactionUrlState: MutableState<AsyncAction<String>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
         val genericActionState: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
-        val resolvedChannelRoomId: MutableState<RoomId?> = remember { mutableStateOf(null) }
 
         val feedMediaPreviewActionState: MutableState<AsyncAction<FeedMedia>> =
             remember { mutableStateOf(AsyncAction.Uninitialized) }
@@ -260,12 +250,6 @@ class HomePresenter(
                     )
                 }
                 HomeEvents.HideError -> genericActionState.value = AsyncAction.Uninitialized
-                is HomeEvents.ChannelEvents -> {
-                    when (event) {
-                        is HomeEvents.ChannelEvents.OpenChannel -> coroutineState.openChannel(event.channel, resolvedChannelRoomId, genericActionState)
-                        HomeEvents.ChannelEvents.ChannelRoomOpened -> resolvedChannelRoomId.value = null
-                    }
-                }
                 is HomeEvents.FeedEvents -> {
                     when (event) {
                         is HomeEvents.FeedEvents.LoadMoreFeeds -> {
@@ -401,11 +385,6 @@ class HomePresenter(
         }
         val snackbarMessage by snackbarDispatcher.collectSnackbarMessageAsState()
 
-        val channelContentState = channelListContentState()
-        createChannelRoomMap(
-            (channelContentState as? ChannelListContentState.Channels)?.channels.orEmpty()
-        )
-
         val allFeedsContentState = allFeedsListContentState()
         val myFeedsContentState = allMyFeedsListContentState()
 
@@ -438,12 +417,11 @@ class HomePresenter(
             genericActionState = genericActionState.value,
             currentHomeNavigationBarItem = currentHomeNavigationBarItem,
             roomListState = roomListState,
-            channelContentState = channelContentState,
+            channelListState = channelListState,
             allFeedsContentState = allFeedsContentState,
             myFeedsContentState = myFeedsContentState,
             feedMediaMap = feedMediaMap,
             feedLinkMetaDataMap = feedLinkMetaDataMap,
-            resolvedChannelRoom = resolvedChannelRoomId.value,
             homeSpacesState = homeSpacesState,
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
@@ -481,45 +459,11 @@ class HomePresenter(
             safeAsync { client.checkZeroThirdWebWallet() },
             // Fetch user rewards
             safeAsync { client.getUserRewards(shouldCheckRewardsIntimation = true) },
-            // Fetch home channels
-            safeAsync { client.getUserZIds() },
             // Fetch all home feeds
             safeAsync { client.fetchAllFeeds(followingFeeds = true, limit = HOME_FEED_PAGE_SIZE, skip = 0) },
             // Fetch all my feeds
             //safeAsync { client.fetchAllMyFeeds(limit = HOME_FEED_PAGE_SIZE, skip = 0) },
         )
-    }
-
-    @Composable
-    private fun channelListContentState(): ChannelListContentState {
-        val homeChannelsState by produceState(initialValue = AsyncData.Loading()) {
-            client.userZIds.collect {
-                value = AsyncData.Success(it)
-            }
-        }
-        val showEmpty by remember {
-            derivedStateOf {
-                (homeChannelsState as? AsyncData.Success)?.data?.isEmpty() == true
-            }
-        }
-        val showSkeleton by remember {
-            derivedStateOf {
-                homeChannelsState is AsyncData.Loading
-            }
-        }
-        return when {
-            showEmpty -> ChannelListContentState.Empty
-            showSkeleton -> ChannelListContentState.Skeleton(20)
-            else -> {
-                val mappedChannels = homeChannelsState.dataOrNull()
-                    .orEmpty()
-                    .sorted()
-                    .map { HomeScreenChannel(channelFullName = it) }
-                    .distinctBy { it.channelId() }
-                    .toPersistentList()
-                ChannelListContentState.Channels(mappedChannels)
-            }
-        }
     }
 
     @Composable
@@ -585,53 +529,6 @@ class HomePresenter(
                     .toPersistentList()
                 FeedListContentState.Feeds(mappedMyFeeds)
             }
-        }
-    }
-
-    private fun createChannelRoomMap(channels: List<HomeScreenChannel>) = withScope(Dispatchers.IO) {
-        for (channel in channels) {
-            channel.channelId()?.let { channelId ->
-                val roomSummary = client.getRoomSummaryFlow(RoomAlias(channelId).toRoomIdOrAlias())
-                    .firstOrNull()
-                    ?.getOrNull()
-                roomSummary?.let { summary ->
-                    channel.notificationsCount = summary.info.numUnreadMessages.toInt()
-                    channelRoomMap.put(channelId, summary)
-                }
-            }
-        }
-    }
-
-    private fun CoroutineScope.openChannel(
-        channel: HomeScreenChannel,
-        resolvedChannelRoomId: MutableState<RoomId?>,
-        genericActionState: MutableState<AsyncAction<Unit>>
-    ) = launch {
-        genericActionState.value = AsyncAction.Uninitialized
-        val channelId = channel.channelId() ?: return@launch
-        channelRoomMap[channelId]?.let { roomSummary ->
-            resolvedChannelRoomId.value = roomSummary.roomId
-            return@launch
-        }
-        genericActionState.value = AsyncAction.Loading
-        val channelRoomId = client.resolveRoomAlias(RoomAlias(channelId))
-            .getOrNull()?.getOrNull()?.roomId
-        if (channelRoomId != null) {
-            resolvedChannelRoomId.value = channelRoomId
-            genericActionState.value = AsyncAction.Success(Unit)
-        } else {
-            client.joinZeroChannel(channelId)
-                .onSuccess { roomId ->
-                    roomId?.let {
-                        genericActionState.value = AsyncAction.Success(Unit)
-                        resolvedChannelRoomId.value = RoomId(roomId)
-                    } ?: run {
-                        genericActionState.value = AsyncAction.Failure(Throwable("RoomId not found"))
-                    }
-                }
-                .onFailure { failure ->
-                    genericActionState.value = AsyncAction.Failure(failure)
-                }
         }
     }
 

@@ -22,8 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import io.element.android.features.home.impl.HomeEvents
 import io.element.android.features.home.impl.aHomeState
 import io.element.android.features.home.impl.components.HomeTabContentEmptyView
 import io.element.android.features.home.impl.contentType
@@ -44,7 +44,7 @@ fun HomeChannelListContentView(
     selectedChannelContentTab: ChannelsScreenTab,
     channelsContentState: ChannelListContentState,
     roomListState: RoomListState,
-    eventSink: (HomeEvents.ChannelEvents) -> Unit,
+    eventSink: (ChannelListEvents) -> Unit,
     roomEventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onChannelTabSelected: (ChannelsScreenTab) -> Unit,
@@ -124,7 +124,7 @@ private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun ChannelsViewList(
     state: ChannelListContentState.Channels,
-    eventSink: (HomeEvents.ChannelEvents) -> Unit,
+    eventSink: (ChannelListEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -139,7 +139,7 @@ private fun ChannelsViewList(
             HomeChannelRow(
                 channel = channel,
                 onChannelClick = {
-                    eventSink(HomeEvents.ChannelEvents.OpenChannel(channel))
+                    eventSink(ChannelListEvents.OpenChannel(channel))
                 }
             )
             if (index != state.channels.lastIndex) {
@@ -213,10 +213,12 @@ private fun ChannelTabRoomsViewList(
 
 @PreviewsDayNight
 @Composable
-internal fun HomeChannelListContentViewPreview() = ElementPreview {
+internal fun HomeChannelListContentViewPreview(
+    @PreviewParameter(ChannelListStateProvider::class) state: ChannelListState,
+) = ElementPreview {
     HomeChannelListContentView(
         selectedChannelContentTab = ChannelsScreenTab.CHANNELS,
-        channelsContentState = aHomeState().channelContentState,
+        channelsContentState = state.contentState,
         roomListState = aHomeState().roomListState,
         onRoomClick = {},
         eventSink = {},

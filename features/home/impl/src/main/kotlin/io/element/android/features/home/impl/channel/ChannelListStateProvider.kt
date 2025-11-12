@@ -9,17 +9,26 @@ package io.element.android.features.home.impl.channel
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.element.android.features.home.impl.model.HomeScreenChannel
+import io.element.android.libraries.matrix.api.core.RoomId
 import kotlinx.collections.immutable.toPersistentList
 
-open class ChannelListContentStateProvider : PreviewParameterProvider<ChannelListContentState> {
-    override val values: Sequence<ChannelListContentState>
+open class ChannelListStateProvider : PreviewParameterProvider<ChannelListState> {
+    override val values: Sequence<ChannelListState>
         get() = sequenceOf(
-            aChannelListContentState(emptyList()),
-            aPlaceholderChannelListContentState(),
-            aSkeletonChannelListContentState(),
-            anEmptyChannelListContentState()
+            aChannelListState(),
+            aChannelListState(channelListContentState = aSkeletonChannelListContentState()),
+            aChannelListState(channelListContentState = anEmptyChannelListContentState())
         )
 }
+
+internal fun aChannelListState(
+    resolvedChannelRoom: RoomId? = null,
+    channelListContentState: ChannelListContentState = aPlaceholderChannelListContentState()
+) = ChannelListState(
+    resolvedChannelRoom = resolvedChannelRoom,
+    contentState = channelListContentState,
+    eventSink = {}
+)
 
 private fun placeholderChannels(): List<HomeScreenChannel> {
     val list = mutableListOf<HomeScreenChannel>()

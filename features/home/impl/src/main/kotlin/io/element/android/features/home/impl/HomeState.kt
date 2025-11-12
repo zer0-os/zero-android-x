@@ -8,7 +8,7 @@
 
 package io.element.android.features.home.impl
 
-import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.channel.ChannelListState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.roomlist.RoomListState
@@ -36,12 +36,11 @@ data class HomeState(
     val genericActionState: AsyncAction<Unit>,
     val currentHomeNavigationBarItem: HomeNavigationBarItem,
     val roomListState: RoomListState,
-    val channelContentState: ChannelListContentState,
+    val channelListState: ChannelListState,
     val allFeedsContentState: FeedListContentState,
     val myFeedsContentState: FeedListContentState,
     val feedMediaMap: Map<String, FeedMedia>,
     val feedLinkMetaDataMap: Map<String, ZeroLinkPreview>,
-    val resolvedChannelRoom: RoomId?,
     val homeSpacesState: HomeSpacesState,
     val snackbarMessage: SnackbarMessage?,
     val canReportBug: Boolean,

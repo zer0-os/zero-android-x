@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
+import io.element.android.features.home.impl.channel.ChannelListEvents
 import io.element.android.features.home.impl.channel.HomeChannelListContentView
 import io.element.android.features.home.impl.components.ClaimRewardsSheet
 import io.element.android.features.home.impl.components.HomeFabButton
@@ -103,14 +104,14 @@ fun HomeView(
     val context = LocalContext.current
     val firstThrottler = remember { FirstThrottler(300, coroutineScope) }
 
-    val resolvedChannelRoomId by remember(homeState.resolvedChannelRoom) {
-        derivedStateOf { homeState.resolvedChannelRoom }
+    val resolvedChannelRoomId by remember(homeState.channelListState.resolvedChannelRoom) {
+        derivedStateOf { homeState.channelListState.resolvedChannelRoom }
     }
     val walletTransactionUrl by remember(homeState.walletContentState.walletTransactionUrlState) {
         derivedStateOf { homeState.walletContentState.walletTransactionUrlState }
     }
     resolvedChannelRoomId?.let {
-        homeState.eventSink(HomeEvents.ChannelEvents.ChannelRoomOpened)
+        homeState.channelListState.eventSink(ChannelListEvents.ChannelRoomOpened)
         onRoomClick(it)
     }
     walletTransactionUrl.dataOrNull()?.let {
@@ -182,14 +183,14 @@ fun HomeView(
             // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
                 state = roomListState.searchState,
-                channelsListState = homeState.channelContentState,
+                channelsListState = homeState.channelListState.contentState,
                 eventSink = roomListState.eventSink,
                 roomMappedUserProStatus = roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
                 selectedHomeNavigationTab = selectedHomeNavigationTab.value,
                 selectedChannelContentTab = selectedChannelsTab.value,
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
-                onChannelClick = { homeState.eventSink(HomeEvents.ChannelEvents.OpenChannel(it)) },
+                onChannelClick = { homeState.channelListState.eventSink(ChannelListEvents.OpenChannel(it)) },
                 modifier = contentModifier
                     .statusBarsPadding()
                     .fillMaxSize()
@@ -439,9 +440,9 @@ internal fun HomeScreenContent(
         HomeScreenTab.CHANNEL -> {
             HomeChannelListContentView(
                 selectedChannelContentTab = selectedChannelContentTab,
-                channelsContentState = state.channelContentState,
+                channelsContentState = state.channelListState.contentState,
                 roomListState = state.roomListState,
-                eventSink = state.eventSink,
+                eventSink = state.channelListState.eventSink,
                 roomEventSink = state.roomListState.eventSink,
                 onRoomClick = onRoomClick,
                 onChannelTabSelected = onChannelsContentTabSelected,

@@ -9,7 +9,8 @@
 package io.element.android.features.home.impl
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import io.element.android.features.home.impl.channel.ChannelListContentState
+import io.element.android.features.home.impl.channel.ChannelListState
+import io.element.android.features.home.impl.channel.aChannelListState
 import io.element.android.features.home.impl.channel.aPlaceholderChannelListContentState
 import io.element.android.features.home.impl.feed.FeedListContentState
 import io.element.android.features.home.impl.feed.aPlaceholderFeedListContentState
@@ -69,7 +70,7 @@ internal fun aHomeState(
     snackbarMessage: SnackbarMessage? = null,
     currentHomeNavigationBarItem: HomeNavigationBarItem = HomeNavigationBarItem.Chats,
     roomListState: RoomListState = aRoomListState(),
-    channelContentState: ChannelListContentState = aPlaceholderChannelListContentState(),
+    channelListState: ChannelListState = aChannelListState(),
     allFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
     myFeedsContentState: FeedListContentState = aPlaceholderFeedListContentState(),
     feedMediaMap: Map<String, FeedMedia> = emptyMap(),
@@ -89,12 +90,11 @@ internal fun aHomeState(
     genericActionState = genericActionState,
     currentHomeNavigationBarItem = currentHomeNavigationBarItem,
     roomListState = roomListState,
-    channelContentState = channelContentState,
+    channelListState = channelListState,
     allFeedsContentState = allFeedsContentState,
     myFeedsContentState = myFeedsContentState,
     feedMediaMap = feedMediaMap,
     feedLinkMetaDataMap = feedLinkMetaDataMap,
-    resolvedChannelRoom = resolvedChannelRoom,
     snackbarMessage = snackbarMessage,
     canReportBug = canReportBug,
     directLogoutState = directLogoutState,
