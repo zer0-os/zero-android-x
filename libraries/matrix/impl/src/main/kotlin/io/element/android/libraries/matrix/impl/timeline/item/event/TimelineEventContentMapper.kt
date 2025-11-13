@@ -256,6 +256,8 @@ private fun RustOtherState.map(): OtherState {
         is RustOtherState.RoomTopic -> OtherState.RoomTopic(topic)
         RustOtherState.SpaceChild -> OtherState.SpaceChild
         RustOtherState.SpaceParent -> OtherState.SpaceParent
+        is RustOtherState.RoomCreate -> OtherState.RoomCreate
+        is RustOtherState.RoomHistoryVisibility -> OtherState.RoomHistoryVisibility
     }
 }
 
