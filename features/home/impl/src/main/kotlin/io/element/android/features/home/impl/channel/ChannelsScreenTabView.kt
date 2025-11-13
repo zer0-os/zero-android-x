@@ -30,7 +30,7 @@ fun ChannelsScreenTabView(
     selectedTab: ChannelsScreenTab = ChannelsScreenTab.CHANNELS,
     onTabSelected: (ChannelsScreenTab) -> Unit = {}
 ) {
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(selectedTab.ordinal) }
+    var selectedTabIndex by rememberSaveable(selectedTab) { mutableIntStateOf(selectedTab.ordinal) }
 
     TabRow(
         selectedTabIndex = selectedTabIndex,

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -56,6 +57,8 @@ fun HomeChannelListContentView(
     onChannelTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hasOnceShiftedToExploreTab = remember { mutableStateOf(false) }
+
     Column(modifier = modifier) {
         ChannelsScreenTabView(
             selectedTab = selectedChannelContentTab,
@@ -85,7 +88,11 @@ fun HomeChannelListContentView(
                             )
                         }
                         is RoomListContentState.Empty -> {
-                            HomeTabContentEmptyView(modifier = modifier, text = "No chats")
+                            HomeTabContentEmptyView(modifier = modifier, text = "No channels")
+                            if (!hasOnceShiftedToExploreTab.value) {
+                                hasOnceShiftedToExploreTab.value = true
+                                onChannelTabSelected(ChannelsScreenTab.EXPLORE)
+                            }
                         }
                         is RoomListContentState.Rooms -> {
                             ChannelTabRoomsViewList(
@@ -94,7 +101,14 @@ fun HomeChannelListContentView(
                                 hideInvitesAvatars = roomListState.hideInvitesAvatars,
                                 selectedTab = selectedChannelContentTab,
                                 eventSink = roomEventSink,
-                                onRoomClick = onRoomClick
+                                onRoomClick = onRoomClick,
+                                onEmptyList = {
+                                    HomeTabContentEmptyView(modifier = modifier, text = "No channels")
+                                    if (!hasOnceShiftedToExploreTab.value) {
+                                        hasOnceShiftedToExploreTab.value = true
+                                        onChannelTabSelected(ChannelsScreenTab.EXPLORE)
+                                    }
+                                }
                             )
                         }
                     }
@@ -109,7 +123,7 @@ fun HomeChannelListContentView(
                             )
                         }
                         is ChannelListContentState.Empty -> {
-                            HomeTabContentEmptyView(modifier = modifier, text = "No channels yet")
+                            HomeTabContentEmptyView(modifier = modifier, text = "No channels")
                         }
                         is ChannelListContentState.Channels -> {
                             ChannelsViewList(
@@ -177,6 +191,7 @@ private fun ChannelTabRoomsViewList(
     selectedTab: ChannelsScreenTab,
     eventSink: (RoomListEvents) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
+    onEmptyList: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
@@ -192,38 +207,44 @@ private fun ChannelTabRoomsViewList(
     LaunchedEffect(visibleRange) {
         updatedEventSink(RoomListEvents.UpdateVisibleRange(visibleRange))
     }
-    LazyColumn(
-        state = lazyListState,
-        modifier = modifier,
-        contentPadding = PaddingValues(0.dp),
-    ) {
-        val roomsList = state.summaries
-        val filteredRoomsList = when (selectedTab) {
-            ChannelsScreenTab.CHANNELS -> roomsList.filter { it.isSecondary }
-            ChannelsScreenTab.MUTED -> roomsList.filter { it.isMuted }
-            else -> roomsList.filter { it.isPrimary }
-        }
-        // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
-        // is moved to the top of the list.
-        itemsIndexed(
-            items = filteredRoomsList,
-            contentType = { _, room -> room.contentType() },
-        ) { index, room ->
-            RoomSummaryRow(
-                room = room,
-                showProBadgeWithRoom = roomMappedUserProStatus.getOrDefault(room.id, false),
-                hideInviteAvatars = hideInvitesAvatars,
-                isInviteSeen = room.displayType == RoomSummaryDisplayType.INVITE &&
-                    state.seenRoomInvites.contains(room.roomId),
-                onClick = onRoomClick,
-                eventSink = eventSink,
-            )
-            if (index != state.summaries.lastIndex) {
-                HorizontalDivider()
+
+    val roomsList = state.summaries
+    val filteredRoomsList = when (selectedTab) {
+        ChannelsScreenTab.CHANNELS -> roomsList.filter { it.isSecondary }
+        ChannelsScreenTab.MUTED -> roomsList.filter { it.isMuted }
+        else -> roomsList.filter { it.isPrimary }
+    }
+
+    if (filteredRoomsList.isEmpty()) {
+        onEmptyList()
+    } else {
+        LazyColumn(
+            state = lazyListState,
+            modifier = modifier,
+            contentPadding = PaddingValues(0.dp),
+        ) {
+            // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
+            // is moved to the top of the list.
+            itemsIndexed(
+                items = filteredRoomsList,
+                contentType = { _, room -> room.contentType() },
+            ) { index, room ->
+                RoomSummaryRow(
+                    room = room,
+                    showProBadgeWithRoom = roomMappedUserProStatus.getOrDefault(room.id, false),
+                    hideInviteAvatars = hideInvitesAvatars,
+                    isInviteSeen = room.displayType == RoomSummaryDisplayType.INVITE &&
+                        state.seenRoomInvites.contains(room.roomId),
+                    onClick = onRoomClick,
+                    eventSink = eventSink,
+                )
+                if (index != state.summaries.lastIndex) {
+                    HorizontalDivider()
+                }
             }
-        }
-        item {
-            Spacer(Modifier.size(100.dp))
+            item {
+                Spacer(Modifier.size(100.dp))
+            }
         }
     }
 }
