@@ -12,7 +12,6 @@ import android.app.Notification
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.drawable.Icon
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -96,6 +95,10 @@ interface NotificationCreator {
         @ColorInt color: Int,
     ): Notification
 
+    fun createUnregistrationNotification(
+        notificationAccountParams: NotificationAccountParams,
+    ): Notification
+
     companion object {
         /**
          * Creates a tag for a message notification given its [roomId] and optional [threadId].
@@ -147,14 +150,21 @@ class DefaultNotificationCreator(
         } else {
             notificationChannels.getChannelIdForMessage(noisy = roomInfo.shouldBing)
         }
+        // A category allows groups of notifications to be ranked and filtered – per user or system settings.
+        // For example, alarm notifications should display before promo notifications, or message from known contact
+        // that can be displayed in not disturb mode if white listed (the later will need compat28.x)
+        // If any of the events are of rtc notification type it means a missed call, set the category to the right value
+        val category = if (containsMissedCall) {
+            NotificationCompat.CATEGORY_MISSED_CALL
+        } else {
+            NotificationCompat.CATEGORY_MESSAGE
+        }
         val builder = if (existingNotification != null) {
             NotificationCompat.Builder(context, existingNotification)
+                // Clear existing actions
+                .clearActions()
         } else {
             NotificationCompat.Builder(context, channelId)
-                // A category allows groups of notifications to be ranked and filtered – per user or system settings.
-                // For example, alarm notifications should display before promo notifications, or message from known contact
-                // that can be displayed in not disturb mode if white listed (the later will need compat28.x)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 // ID of the corresponding shortcut, for conversation features under API 30+
                 // Must match those created in the ShortcutInfoCompat.Builder()
                 // for the notification to appear as a "Conversation":
@@ -170,7 +180,6 @@ class DefaultNotificationCreator(
                 // Remove notification after opening it or using an action
                 .setAutoCancel(true)
         }
-
         val messagingStyle = existingNotification?.let {
             MessagingStyle.extractMessagingStyleFromNotification(it)
         } ?: createMessagingStyleFromCurrentUser(
@@ -180,53 +189,34 @@ class DefaultNotificationCreator(
             isThread = threadId != null,
             roomIsGroup = !roomInfo.isDm,
         )
-
         messagingStyle.addMessagesFromEvents(events, imageLoader)
-
         return builder
+            .setCategory(category)
             .setNumber(events.size)
             .setOnlyAlertOnce(roomInfo.isUpdated)
             .setWhen(lastMessageTimestamp)
             // MESSAGING_STYLE sets title and content for API 16 and above devices.
             .setStyle(messagingStyle)
             .configureWith(notificationAccountParams)
-            // Sets priority for 25 and below. For 26 and above, 'priority' is deprecated for
-            // 'importance' which is set in the NotificationChannel. The integers representing
-            // 'priority' are different from 'importance', so make sure you don't mix them.
+            // Mark room/thread as read
+            .addAction(markAsReadActionFactory.create(roomInfo, threadId))
+            .setContentIntent(openIntent)
+            .setLargeIcon(largeIcon)
+            .setDeleteIntent(pendingIntentFactory.createDismissRoomPendingIntent(roomInfo.sessionId, roomInfo.roomId))
             .apply {
+                // Sets priority for 25 and below. For 26 and above, 'priority' is deprecated for
+                // 'importance' which is set in the NotificationChannel. The integers representing
+                // 'priority' are different from 'importance', so make sure you don't mix them.
                 if (roomInfo.shouldBing) {
-                    // Compat
                     priority = NotificationCompat.PRIORITY_DEFAULT
-                    /*
-                    vectorPreferences.getNotificationRingTone()?.let {
-                        setSound(it)
-                    }
-                     */
                     setLights(notificationAccountParams.color, 500, 500)
                 } else {
                     priority = NotificationCompat.PRIORITY_LOW
                 }
-                // Clear existing actions since we might be updating an existing notification
-                clearActions()
-                // Add actions and notification intents
-                // Mark room/thread as read
-                addAction(markAsReadActionFactory.create(roomInfo, threadId))
                 // Quick reply
                 if (!roomInfo.hasSmartReplyError) {
                     val latestEventId = events.lastOrNull()?.eventId
                     addAction(quickReplyActionFactory.create(roomInfo, latestEventId, threadId))
-                }
-                if (openIntent != null) {
-                    setContentIntent(openIntent)
-                }
-                if (largeIcon != null) {
-                    setLargeIcon(Icon.createWithBitmap(largeIcon))
-                }
-                setDeleteIntent(pendingIntentFactory.createDismissRoomPendingIntent(roomInfo.sessionId, roomInfo.roomId))
-
-                // If any of the events are of rtc notification type it means a missed call, set the category to the right value
-                if (events.any { it.type == EventType.RTC_NOTIFICATION }) {
-                    setCategory(NotificationCompat.CATEGORY_MISSED_CALL)
                 }
             }
             .setTicker(tickerText)
@@ -244,32 +234,26 @@ class DefaultNotificationCreator(
             .setContentText(inviteNotifiableEvent.description.annotateForDebug(6))
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
             .configureWith(notificationAccountParams)
+            .addAction(rejectInvitationActionFactory.create(inviteNotifiableEvent))
+            .addAction(acceptInvitationActionFactory.create(inviteNotifiableEvent))
+            // Build the pending intent for when the notification is clicked
+            .setContentIntent(pendingIntentFactory.createOpenRoomPendingIntent(inviteNotifiableEvent.sessionId, inviteNotifiableEvent.roomId, null))
             .apply {
-                addAction(rejectInvitationActionFactory.create(inviteNotifiableEvent))
-                addAction(acceptInvitationActionFactory.create(inviteNotifiableEvent))
-                // Build the pending intent for when the notification is clicked
-                setContentIntent(pendingIntentFactory.createOpenRoomPendingIntent(inviteNotifiableEvent.sessionId, inviteNotifiableEvent.roomId, null))
-
                 if (inviteNotifiableEvent.noisy) {
                     // Compat
                     priority = NotificationCompat.PRIORITY_DEFAULT
-                    /*
-                    vectorPreferences.getNotificationRingTone()?.let {
-                        setSound(it)
-                    }
-                     */
                     setLights(notificationAccountParams.color, 500, 500)
                 } else {
                     priority = NotificationCompat.PRIORITY_LOW
                 }
-                setDeleteIntent(
-                    pendingIntentFactory.createDismissInvitePendingIntent(
-                        inviteNotifiableEvent.sessionId,
-                        inviteNotifiableEvent.roomId,
-                    )
-                )
-                setAutoCancel(true)
             }
+            .setDeleteIntent(
+                pendingIntentFactory.createDismissInvitePendingIntent(
+                    inviteNotifiableEvent.sessionId,
+                    inviteNotifiableEvent.roomId,
+                )
+            )
+            .setAutoCancel(true)
             .build()
     }
 
@@ -290,11 +274,6 @@ class DefaultNotificationCreator(
                 if (simpleNotifiableEvent.noisy) {
                     // Compat
                     priority = NotificationCompat.PRIORITY_DEFAULT
-                    /*
-                    vectorPreferences.getNotificationRingTone()?.let {
-                        setSound(it)
-                    }
-                     */
                     setLights(notificationAccountParams.color, 500, 500)
                 } else {
                     priority = NotificationCompat.PRIORITY_LOW
@@ -353,11 +332,6 @@ class DefaultNotificationCreator(
                 if (noisy) {
                     // Compat
                     priority = NotificationCompat.PRIORITY_DEFAULT
-                    /*
-                    vectorPreferences.getNotificationRingTone()?.let {
-                        setSound(it)
-                    }
-                     */
                     setLights(notificationAccountParams.color, 500, 500)
                 } else {
                     // compat
@@ -384,6 +358,25 @@ class DefaultNotificationCreator(
             .setAutoCancel(true)
             .setContentIntent(intent)
             .setDeleteIntent(intent)
+            .build()
+    }
+
+    override fun createUnregistrationNotification(
+        notificationAccountParams: NotificationAccountParams,
+    ): Notification {
+        val userId = notificationAccountParams.user.userId
+        val text = stringProvider.getString(R.string.notification_error_unified_push_unregistered_android)
+        return NotificationCompat.Builder(context, notificationChannels.getChannelIdForTest())
+            .setSubText(userId.value)
+            // The text is long and can be truncated so use BigTextStyle.
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setContentTitle(stringProvider.getString(CommonStrings.dialog_title_warning))
+            .setContentText(text)
+            .configureWith(notificationAccountParams)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntentFactory.createOpenSessionPendingIntent(userId))
             .build()
     }
 
@@ -488,7 +481,7 @@ class DefaultNotificationCreator(
                 .build()
         ).also {
             it.conversationTitle = if (isThread) {
-                stringProvider.getString(CommonStrings.notification_thread_in_room, roomName)
+                stringProvider.getString(R.string.notification_thread_in_room, roomName)
             } else {
                 roomName
             }

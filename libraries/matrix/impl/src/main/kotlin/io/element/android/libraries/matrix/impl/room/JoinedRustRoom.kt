@@ -61,13 +61,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import org.matrix.rustcomponents.sdk.DateDividerMode
 import org.matrix.rustcomponents.sdk.IdentityStatusChangeListener
@@ -104,8 +107,6 @@ class JoinedRustRoom(
     // Create a dispatcher for all room methods...
     private val roomDispatcher = coroutineDispatchers.io.limitedParallelism(32)
     private val innerRoom = baseRoom.innerRoom
-
-    override val syncUpdateFlow = MutableStateFlow(0L)
 
     override val roomTypingMembersFlow: Flow<List<UserId>> = mxCallbackFlow {
         val initial = emptyList<UserId>()
@@ -149,14 +150,27 @@ class JoinedRustRoom(
 
     override val roomNotificationSettingsStateFlow = MutableStateFlow<RoomNotificationSettingsState>(RoomNotificationSettingsState.Unknown)
 
-    override val liveTimeline = liveInnerTimeline.map(mode = Timeline.Mode.Live) {
-        syncUpdateFlow.value = systemClock.epochMillis()
-    }
+    override val liveTimeline = liveInnerTimeline.map(mode = Timeline.Mode.Live)
+
+    override val syncUpdateFlow = flow {
+        var counter = 0L
+        liveTimeline.onSyncedEventReceived.collect {
+            emit(++counter)
+        }
+    }.stateIn(
+        scope = roomCoroutineScope,
+        started = WhileSubscribed(),
+        initialValue = 0L,
+    )
 
     private val _directZeroUser = MutableStateFlow<ZeroUser?>(null)
     override val directZeroUser: StateFlow<ZeroUser?> = _directZeroUser
 
     init {
+        subscribeToRoomMembersChange()
+    }
+
+    private fun subscribeToRoomMembersChange() {
         val powerLevelChanges = roomInfoFlow.map { it.roomPowerLevels }.distinctUntilChanged()
         val membershipChanges = liveTimeline.membershipChangeEventReceived.onStart { emit(Unit) }
         combine(membershipChanges, powerLevelChanges) { _, _ -> }
@@ -501,7 +515,6 @@ class JoinedRustRoom(
 
     private fun InnerTimeline.map(
         mode: Timeline.Mode,
-        onNewSyncedEvent: () -> Unit = {},
     ): Timeline {
         val timelineCoroutineScope = roomCoroutineScope.childScope(coroutineDispatchers.main, "TimelineScope-$roomId-$this")
         return RustTimeline(
@@ -512,7 +525,6 @@ class JoinedRustRoom(
             coroutineScope = timelineCoroutineScope,
             dispatcher = roomDispatcher,
             roomContentForwarder = roomContentForwarder,
-            onNewSyncedEvent = onNewSyncedEvent,
             zeroConversationRepository = zeroConversationRepository
         )
     }
