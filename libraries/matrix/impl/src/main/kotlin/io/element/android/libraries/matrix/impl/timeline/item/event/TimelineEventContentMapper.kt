@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.timeline.item.event.UnknownConten
 import io.element.android.libraries.matrix.api.timeline.item.event.UtdCause
 import io.element.android.libraries.matrix.impl.media.map
 import io.element.android.libraries.matrix.impl.poll.map
+import io.element.android.libraries.matrix.impl.room.join.map
 import io.element.android.support.zero.data.model.helper.EventMessageContent
 import io.element.android.support.zero.datastore.converter.AppJson.decodeJson
 import kotlinx.collections.immutable.toImmutableList
@@ -246,7 +247,7 @@ private fun RustOtherState.map(): OtherState {
         RustOtherState.RoomEncryption -> OtherState.RoomEncryption
         RustOtherState.RoomGuestAccess -> OtherState.RoomGuestAccess
         RustOtherState.RoomHistoryVisibility -> OtherState.RoomHistoryVisibility
-        RustOtherState.RoomJoinRules -> OtherState.RoomJoinRules
+        is RustOtherState.RoomJoinRules -> OtherState.RoomJoinRules(joinRule?.map())
         is RustOtherState.RoomName -> OtherState.RoomName(name)
         is RustOtherState.RoomPinnedEvents -> OtherState.RoomPinnedEvents(change.map())
         is RustOtherState.RoomPowerLevels -> OtherState.RoomUserPowerLevels(users, previous)

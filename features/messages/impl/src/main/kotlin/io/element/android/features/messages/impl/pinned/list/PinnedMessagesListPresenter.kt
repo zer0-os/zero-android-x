@@ -23,6 +23,7 @@ import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import im.vector.app.features.analytics.plan.Interaction
 import im.vector.app.features.analytics.plan.PinUnpinAction
+import io.element.android.features.messages.api.timeline.HtmlConverterProvider
 import io.element.android.features.messages.impl.UserEventPermissions
 import io.element.android.features.messages.impl.actionlist.ActionListState
 import io.element.android.features.messages.impl.actionlist.model.TimelineItemAction
@@ -77,6 +78,7 @@ class PinnedMessagesListPresenter(
     private val sessionCoroutineScope: CoroutineScope,
     private val analyticsService: AnalyticsService,
     private val featureFlagService: FeatureFlagService,
+    private val htmlConverterProvider: HtmlConverterProvider,
 ) : Presenter<PinnedMessagesListState> {
     @AssistedFactory
     interface Factory {
@@ -95,6 +97,7 @@ class PinnedMessagesListPresenter(
 
     @Composable
     override fun present(): PinnedMessagesListState {
+        htmlConverterProvider.Update()
         val isDm by room.isDmAsState()
         val isEncrypted by room.isEncryptedAsState()
 

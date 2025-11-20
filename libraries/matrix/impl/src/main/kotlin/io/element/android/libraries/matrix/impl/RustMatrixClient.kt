@@ -107,6 +107,7 @@ import io.element.android.libraries.matrix.impl.util.cancelAndDestroy
 import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
 import io.element.android.support.zero.common.state.StateBus
@@ -178,6 +179,7 @@ class RustMatrixClient(
     clock: SystemClock,
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val featureFlagService: FeatureFlagService,
+    private val analyticsService: AnalyticsService,
     val zeroCoreRepository: ZeroCoreRepository?
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
@@ -227,6 +229,7 @@ class RustMatrixClient(
         roomListFactory = RoomListFactory(
             innerRoomListService = innerRoomListService,
             sessionCoroutineScope = sessionCoroutineScope,
+            analyticsService = analyticsService,
         ),
         roomSyncSubscriber = roomSyncSubscriber,
     )
@@ -261,6 +264,7 @@ class RustMatrixClient(
         roomMembershipObserver = roomMembershipObserver,
         roomInfoMapper = roomInfoMapper,
         featureFlagService = featureFlagService,
+        analyticsService = analyticsService,
         zeroCoreRepository = zeroCoreRepository
     )
 

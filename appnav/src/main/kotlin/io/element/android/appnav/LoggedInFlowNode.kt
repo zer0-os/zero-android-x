@@ -100,6 +100,8 @@ import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.push.api.notifications.conversations.NotificationConversationService
 import io.element.android.libraries.ui.common.nodes.emptyNode
+import io.element.android.services.analytics.api.AnalyticsLongRunningTransaction
+import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.appnavstate.api.AppNavigationStateService
 import io.element.android.support.zero.common.state.StateBus
 import io.element.android.support.zero.common.util.UserState
@@ -154,6 +156,7 @@ class LoggedInFlowNode(
     private val walletTransactionsEntryPoint: WalletTransactionsEntryPoint,
     private val searchUserEntryPoint: SearchUserEntryPoint,
     snackbarDispatcher: SnackbarDispatcher,
+    private val analyticsService: AnalyticsService,
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = NavTarget.Placeholder,
@@ -229,6 +232,8 @@ class LoggedInFlowNode(
                     networkMonitor.connectivity.first { networkStatus -> networkStatus == NetworkStatus.Connected }
                     matrixClient.getMaxFileUploadSize()
                 }
+
+                analyticsService.startLongRunningTransaction(AnalyticsLongRunningTransaction.FirstRoomsDisplayed)
 
                 ftueService.state
                     .onEach { ftueState ->

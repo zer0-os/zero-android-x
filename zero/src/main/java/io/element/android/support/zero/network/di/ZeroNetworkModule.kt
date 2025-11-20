@@ -20,11 +20,6 @@ object NetworkModule {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-
-    @Provides
-    @SingleIn(AppScope::class)
     fun provideRetrofit(
         authInterceptor: AuthInterceptor,
         loggingInterceptor: HttpLoggingInterceptor
