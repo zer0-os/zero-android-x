@@ -585,7 +585,7 @@ class LoggedInFlowNode(
                     params = ShareEntryPoint.Params(intent = navTarget.intent),
                     callback = object : ShareEntryPoint.Callback {
                         override fun onDone(roomIds: List<RoomId>) {
-                            navigateUp()
+                            backstack.pop()
                             roomIds.singleOrNull()?.let { roomId ->
                                 backstack.push(NavTarget.Room(roomId.toRoomIdOrAlias()))
                             }
