@@ -53,6 +53,7 @@ data class RoomDetailsState(
     val isRoomAChannel: Boolean,
     val isDeadRoom: Boolean,
     val loggedInUser: UserId,
+    val roomVersion: String?,
     val eventSink: (RoomDetailsEvent) -> Unit
 ) {
     val roomBadges = buildList {

@@ -14,6 +14,7 @@ sealed interface EditUserProfileEvents {
     data class HandleAvatarAction(val action: AvatarAction) : EditUserProfileEvents
     data class UpdateDisplayName(val name: String) : EditUserProfileEvents
     data class UpdatePrimaryZId(val zid: String) : EditUserProfileEvents
+    data object Exit : EditUserProfileEvents
     data object Save : EditUserProfileEvents
-    data object CancelSaveChanges : EditUserProfileEvents
+    data object CloseDialog : EditUserProfileEvents
 }

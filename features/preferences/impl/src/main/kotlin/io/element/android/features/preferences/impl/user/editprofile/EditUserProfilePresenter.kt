@@ -46,6 +46,7 @@ import timber.log.Timber
 @AssistedInject
 class EditUserProfilePresenter(
     @Assisted private val matrixUser: MatrixUser,
+    @Assisted private val navigator: EditUserProfileNavigator,
     private val matrixClient: MatrixClient,
     private val mediaPickerProvider: PickerProvider,
     private val mediaPreProcessor: MediaPreProcessor,
@@ -58,7 +59,10 @@ class EditUserProfilePresenter(
 
     @AssistedFactory
     interface Factory {
-        fun create(matrixUser: MatrixUser): EditUserProfilePresenter
+        fun create(
+            matrixUser: MatrixUser,
+            navigator: EditUserProfileNavigator,
+        ): EditUserProfilePresenter
     }
 
     @Composable
@@ -109,6 +113,14 @@ class EditUserProfilePresenter(
 
         val saveAction: MutableState<AsyncAction<Unit>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
         val localCoroutineScope = rememberCoroutineScope()
+
+        val canSave = remember(userDisplayName, userAvatarUri) {
+            val hasProfileChanged = hasDisplayNameChanged(userDisplayName, matrixUser) ||
+                hasAvatarUrlChanged(userAvatarUri, matrixUser) ||
+                hasPrimaryZIdChanged(userPrimaryZId, matrixUser)
+            !userDisplayName.isNullOrBlank() && hasProfileChanged
+        }
+
         fun handleEvent(event: EditUserProfileEvents) {
             when (event) {
                 is EditUserProfileEvents.Save -> localCoroutineScope.saveChanges(
@@ -133,18 +145,31 @@ class EditUserProfilePresenter(
                         }
                     }
                 }
-
                 is EditUserProfileEvents.UpdateDisplayName -> userDisplayName = event.name
                 is EditUserProfileEvents.UpdatePrimaryZId -> userPrimaryZId = event.zid
-                EditUserProfileEvents.CancelSaveChanges -> saveAction.value = AsyncAction.Uninitialized
+                EditUserProfileEvents.Exit -> {
+                    when (saveAction.value) {
+                        is AsyncAction.Confirming -> {
+                            // Close the dialog right now
+                            saveAction.value = AsyncAction.Uninitialized
+                            navigator.close()
+                        }
+                        AsyncAction.Loading -> Unit
+                        is AsyncAction.Failure,
+                        is AsyncAction.Success -> {
+                            // Should not happen
+                        }
+                        AsyncAction.Uninitialized -> {
+                            if (canSave) {
+                                saveAction.value = AsyncAction.ConfirmingCancellation
+                            } else {
+                                navigator.close()
+                            }
+                        }
+                    }
+                }
+                EditUserProfileEvents.CloseDialog -> saveAction.value = AsyncAction.Uninitialized
             }
-        }
-
-        val canSave = remember(userDisplayName, userAvatarUri, userPrimaryZId) {
-            val hasProfileChanged = hasDisplayNameChanged(userDisplayName, matrixUser) ||
-                hasAvatarUrlChanged(userAvatarUri, matrixUser) ||
-                hasPrimaryZIdChanged(userPrimaryZId, matrixUser)
-            !userDisplayName.isNullOrBlank() && hasProfileChanged
         }
 
         return EditUserProfileState(

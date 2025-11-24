@@ -154,6 +154,7 @@ fun aRoomDetailsState(
     isRoomAChannel = isRoomAChannel,
     isDeadRoom = isDeadRoom,
     loggedInUser = UserId("@daniel:domain.com"),
+    roomVersion = "12",
     eventSink = eventSink,
 )
 

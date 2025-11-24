@@ -221,6 +221,7 @@ class RoomDetailsPresenter(
             isRoomAChannel = room.isRoomAChannel(),
             isDeadRoom = roomInfo.isDeadRoom,
             loggedInUser = client.sessionId,
+            roomVersion = roomInfo.roomVersion,
             eventSink = ::handleEvent,
         )
     }

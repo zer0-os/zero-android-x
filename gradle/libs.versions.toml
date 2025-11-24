@@ -13,7 +13,7 @@ firebaseAppDistribution = "5.2.0"
 
 # AndroidX
 core = "1.17.0"
-datastore = "1.1.7"
+datastore = "1.2.0"
 constraintlayout = "2.2.1"
 constraintlayout_compose = "1.1.1"
 lifecycle = "2.9.2"
@@ -214,7 +214,7 @@ sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqlcipher_android = "net.zetetic:sqlcipher-android:4.11.0"
 #sqlcipher = "net.zetetic:sqlcipher-android:4.11.0"
-sqlite = "androidx.sqlite:sqlite-ktx:2.6.1"
+sqlite = "androidx.sqlite:sqlite-ktx:2.6.2"
 unifiedpush = "org.unifiedpush.android:connector:3.1.2"
 vanniktech_blurhash = "com.vanniktech:blurhash:0.3.0"
 telephoto_zoomableimage = { module = "me.saket.telephoto:zoomable-image-coil3", version.ref = "telephoto" }
