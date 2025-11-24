@@ -33,6 +33,7 @@ import io.element.android.libraries.matrix.api.timeline.item.event.StickerConten
 import io.element.android.libraries.matrix.api.timeline.item.event.UnableToDecryptContent
 import io.element.android.libraries.matrix.api.timeline.item.event.UnknownContent
 import io.element.android.libraries.matrix.api.timeline.item.event.getDisambiguatedDisplayName
+import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 
 @Inject
 class TimelineItemContentFactory(
@@ -46,6 +47,7 @@ class TimelineItemContentFactory(
     private val stateFactory: TimelineItemContentStateFactory,
     private val failedToParseMessageFactory: TimelineItemContentFailedToParseMessageFactory,
     private val failedToParseStateFactory: TimelineItemContentFailedToParseStateFactory,
+    private val roomMemberProfilesCache: RoomMemberProfilesCache,
     private val sessionId: SessionId,
 ) {
     suspend fun create(eventTimelineItem: EventTimelineItem): TimelineItemEventContent {
@@ -66,11 +68,12 @@ class TimelineItemContentFactory(
         senderProfile: ProfileTimelineDetails,
     ): TimelineItemEventContent {
         val isOutgoing = sessionId == sender
+        val cachedSenderDisplayName = roomMemberProfilesCache.getDisplayName(sender)
         return when (itemContent) {
             is FailedToParseMessageLikeContent -> failedToParseMessageFactory.create(itemContent)
             is FailedToParseStateContent -> failedToParseStateFactory.create(itemContent)
             is MessageContent -> {
-                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender)
+                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender, cachedSenderDisplayName)
                 messageFactory.create(
                     content = itemContent,
                     senderDisambiguatedDisplayName = senderDisambiguatedDisplayName,
@@ -78,17 +81,17 @@ class TimelineItemContentFactory(
                 )
             }
             is ProfileChangeContent -> {
-                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender)
+                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender, cachedSenderDisplayName)
                 profileChangeFactory.create(itemContent, isOutgoing, sender, senderDisambiguatedDisplayName)
             }
             is RedactedContent -> redactedMessageFactory.create(itemContent)
             is RoomMembershipContent -> {
-                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender)
+                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender, cachedSenderDisplayName)
                 roomMembershipFactory.create(itemContent, isOutgoing, sender, senderDisambiguatedDisplayName)
             }
             is LegacyCallInviteContent -> TimelineItemLegacyCallInviteContent
             is StateContent -> {
-                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender)
+                val senderDisambiguatedDisplayName = senderProfile.getDisambiguatedDisplayName(sender, cachedSenderDisplayName)
                 stateFactory.create(itemContent, isOutgoing, sender, senderDisambiguatedDisplayName)
             }
             is StickerContent -> stickerFactory.create(itemContent)

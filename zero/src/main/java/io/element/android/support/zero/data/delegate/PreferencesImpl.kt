@@ -39,6 +39,8 @@ class PreferencesImpl(private val appPreferences: AppPreferences) :
 
     override fun getCachedUser(id: String): ApiUser? = appPreferences.getCachedUser(id)
 
+    override fun getCachedUserFromZeroId(id: String): ApiUser? = appPreferences.getCachedUserFromZeroId(id)
+
     override fun getCachedUsers(ids: List<String>): List<ApiUser> = appPreferences.getCachedUsers(ids)
 
     override suspend fun cacheUser(user: ApiUser) {

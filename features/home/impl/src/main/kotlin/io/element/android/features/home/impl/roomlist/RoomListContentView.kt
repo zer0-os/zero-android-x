@@ -63,6 +63,7 @@ fun RoomListContentView(
     filtersState: RoomListFiltersState,
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
+    shouldShowInActiveChatsTab: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
@@ -104,12 +105,14 @@ fun RoomListContentView(
                 val selectedChatTab = rememberSaveable { mutableStateOf(ChatScreenTab.ALL) }
                 RoomListScreenTabView(
                     selectedTab = selectedChatTab.value,
+                    shouldShowInactiveChatsTab = shouldShowInActiveChatsTab,
                     onTabSelected = { tab ->
                         selectedChatTab.value = tab
                         when (tab) {
                             ChatScreenTab.ALL -> filtersState.clearFilters()
                             ChatScreenTab.UNREAD -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Rooms))
                             ChatScreenTab.FAVORITE -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Favourites))
+                            ChatScreenTab.INACTIVE -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Inactive))
                         }
                     }
                 )
@@ -221,6 +224,7 @@ private fun RoomsView(
             state = state,
             roomMappedUserProStatus = roomMappedUserProStatus,
             hideInvitesAvatars = hideInvitesAvatars,
+            isAnyFilterActive = filtersState.hasAnyFilterSelected,
             eventSink = eventSink,
             onSetUpRecoveryClick = onSetUpRecoveryClick,
             onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
@@ -237,6 +241,7 @@ private fun RoomsViewList(
     state: RoomListContentState.Rooms,
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
+    isAnyFilterActive: Boolean,
     eventSink: (RoomListEvents) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
@@ -296,8 +301,13 @@ private fun RoomsViewList(
 
         // Note: do not use a key for the LazyColumn, or the scroll will not behave as expected if a room
         // is moved to the top of the list.
+        val filteredSummaries = if (isAnyFilterActive) {
+            state.summaries.filter { it.isPrimary}
+        } else {
+            state.summaries.filter { it.isPrimary && !it.isDeadRoom }
+        }
         itemsIndexed(
-            items = state.summaries.filter { it.isPrimary },
+            items = filteredSummaries,
             contentType = { _, room -> room.contentType() },
         ) { index, room ->
             RoomSummaryRow(
@@ -346,6 +356,7 @@ internal fun RoomListContentViewPreview(@PreviewParameter(RoomListContentStatePr
         ),
         roomMappedUserProStatus = emptyMap(),
         hideInvitesAvatars = false,
+        shouldShowInActiveChatsTab = false,
         eventSink = {},
         onSetUpRecoveryClick = {},
         onConfirmRecoveryKeyClick = {},

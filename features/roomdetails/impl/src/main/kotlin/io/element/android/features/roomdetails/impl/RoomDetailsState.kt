@@ -51,6 +51,7 @@ data class RoomDetailsState(
     val isTombstoned: Boolean,
     val showDebugInfo: Boolean,
     val isRoomAChannel: Boolean,
+    val isDeadRoom: Boolean,
     val loggedInUser: UserId,
     val eventSink: (RoomDetailsEvent) -> Unit
 ) {
@@ -67,10 +68,16 @@ data class RoomDetailsState(
 
     fun canLeaveRoom(): Boolean {
         val user = heroes.firstOrNull { it.userId == loggedInUser }
-        return user?.let {
-            val isUserAdmin = (it.role == RoomMember.Role.Admin || it.role is RoomMember.Role.Owner)
-            !isUserAdmin
-        } ?: true
+        return when {
+            roomType is RoomDetailsType.Dm -> true
+            isDeadRoom -> true
+            else -> {
+                user?.let {
+                    val isUserAdmin = (it.role == RoomMember.Role.Admin || it.role is RoomMember.Role.Owner)
+                    !isUserAdmin
+                } ?: true
+            }
+        }
     }
 }
 

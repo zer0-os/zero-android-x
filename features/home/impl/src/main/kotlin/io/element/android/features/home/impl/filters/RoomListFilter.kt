@@ -19,6 +19,7 @@ enum class RoomListFilter(val stringResource: Int) {
     //People(R.string.screen_roomlist_filter_people),
     Rooms(R.string.screen_roomlist_filter_rooms),
     Channels(R.string.screen_roomlist_filter_channels),
+    Inactive(R.string.screen_roomlist_filter_inactive),
     Favourites(R.string.screen_roomlist_filter_favourites),
     Invites(R.string.screen_roomlist_filter_invites);
 
@@ -30,5 +31,6 @@ enum class RoomListFilter(val stringResource: Int) {
             //Unread -> setOf(Invites)
             Favourites -> setOf(Channels, Invites)
             Invites -> setOf(Rooms, Channels, Favourites)
+            Inactive -> setOf(Rooms, Channels, Favourites)
         }
 }

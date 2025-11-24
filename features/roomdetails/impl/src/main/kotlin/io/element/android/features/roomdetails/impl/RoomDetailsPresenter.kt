@@ -35,15 +35,19 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.encryption.identity.IdentityState
 import io.element.android.libraries.matrix.api.notificationsettings.NotificationSettingsService
 import io.element.android.libraries.matrix.api.room.JoinedRoom
+import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.RoomMembersState
 import io.element.android.libraries.matrix.api.room.StateEventType
+import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
+import io.element.android.libraries.matrix.api.room.isDeadRoom
 import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.room.powerlevels.canInvite
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendState
 import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
 import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
+import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.room.canHandleKnockRequestsAsState
 import io.element.android.libraries.matrix.ui.room.getCurrentRoomMember
 import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
@@ -73,6 +77,7 @@ class RoomDetailsPresenter(
     private val analyticsService: AnalyticsService,
     private val clipboardHelper: ClipboardHelper,
     private val appPreferencesStore: AppPreferencesStore,
+    private val roomMemberProfilesCache: RoomMemberProfilesCache,
 ) : Presenter<RoomDetailsState> {
     @Composable
     override fun present(): RoomDetailsState {
@@ -86,7 +91,7 @@ class RoomDetailsPresenter(
 
         val directZeroMember = room.directZeroUser.collectAsState()
 
-        val roomName by remember { derivedStateOf { roomInfo.name?.trim().orEmpty() } }
+        val roomName by remember { derivedStateOf { getRoomDisplayName(roomInfo) } }
         val roomTopic by remember { derivedStateOf { roomInfo.topic } }
         val roomSubTitle: String? by remember { derivedStateOf { directZeroMember.value?.zIdOrWalletAddressDisplay } }
         val isFavorite by remember { derivedStateOf { roomInfo.isFavorite } }
@@ -214,6 +219,7 @@ class RoomDetailsPresenter(
             isTombstoned = roomInfo.successorRoom != null,
             showDebugInfo = isDeveloperModeEnabled,
             isRoomAChannel = room.isRoomAChannel(),
+            isDeadRoom = roomInfo.isDeadRoom,
             loggedInUser = client.sessionId,
             eventSink = ::handleEvent,
         )
@@ -262,5 +268,16 @@ class RoomDetailsPresenter(
             .onSuccess {
                 analyticsService.captureInteraction(Interaction.Name.MobileRoomFavouriteToggle)
             }
+    }
+
+    private fun getRoomDisplayName(roomInfo: RoomInfo): String {
+        return if (roomInfo.isDeadRoom) {
+            roomInfo.getDeadRoomUserId()?.let { deadRoomUserId ->
+                val username = roomMemberProfilesCache.getDisplayNameFromUserZeroId(deadRoomUserId)
+                username?.let { "Empty Room (was $username)" }
+            } ?: "Empty Room"
+        } else {
+            roomInfo.name.orEmpty()
+        }
     }
 }

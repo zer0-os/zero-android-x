@@ -28,6 +28,7 @@ import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypog
 @Composable
 fun RoomListScreenTabView(
     selectedTab: ChatScreenTab = ChatScreenTab.ALL,
+    shouldShowInactiveChatsTab: Boolean = false,
     onTabSelected: (ChatScreenTab) -> Unit = {}
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(selectedTab.ordinal) }
@@ -42,7 +43,12 @@ fun RoomListScreenTabView(
         },
         divider = { }
     ) {
-        ChatScreenTab.entries.forEachIndexed { index, tab ->
+        val tabEntries = if (shouldShowInactiveChatsTab) {
+            ChatScreenTab.entries
+        } else {
+            ChatScreenTab.entries.dropLast(1)
+        }
+        tabEntries.forEachIndexed { index, tab ->
             Tab(
                 text = {
                     Text(

@@ -176,6 +176,11 @@ class RoomListPresenter(
 
         val canReportRoom by produceState(false) { value = client.canReportRoom() }
 
+        val shouldShowInactiveChatsTab = remember { mutableStateOf(false) }
+        if (!filtersState.hasAnyFilterSelected) {
+            shouldShowInactiveChatsTab.value = contentState.shouldShowInActiveChatsTab()
+        }
+
         return RoomListState(
             contextMenu = contextMenu.value,
             declineInviteMenu = declineInviteMenu.value,
@@ -187,6 +192,7 @@ class RoomListPresenter(
             acceptDeclineInviteState = acceptDeclineInviteState,
             hideInvitesAvatars = hideInvitesAvatar,
             canReportRoom = canReportRoom,
+            shouldShowInactiveChatsTab = shouldShowInactiveChatsTab.value,
             eventSink = ::handleEvent,
         )
     }

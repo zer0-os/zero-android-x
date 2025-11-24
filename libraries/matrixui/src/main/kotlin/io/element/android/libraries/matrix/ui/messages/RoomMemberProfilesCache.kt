@@ -11,6 +11,7 @@ package io.element.android.libraries.matrix.ui.messages
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.element.android.libraries.di.RoomScope
+import io.element.android.libraries.di.SessionScope
 import io.element.android.libraries.matrix.api.core.UserId
 import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.support.zero.data.delegate.Preferences
@@ -19,8 +20,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.runningFold
 
-@SingleIn(RoomScope::class)
-class RoomMemberProfilesCache @Inject constructor(
+@SingleIn(SessionScope::class)
+@Inject
+class RoomMemberProfilesCache (
     private val preferences: Preferences
 ) {
     private val cache = MutableStateFlow(mapOf<UserId, RoomMember>())
@@ -33,5 +35,9 @@ class RoomMemberProfilesCache @Inject constructor(
     fun getDisplayName(userId: UserId): String? {
         return cache.value[userId]?.disambiguatedDisplayName
             ?: preferences.getCachedUser(userId.value)?.name
+    }
+
+    fun getDisplayNameFromUserZeroId(userId: String): String? {
+        return preferences.getCachedUserFromZeroId(userId)?.name
     }
 }

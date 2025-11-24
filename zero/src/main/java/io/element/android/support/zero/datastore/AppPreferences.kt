@@ -72,6 +72,11 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
             getAllCachedUsers().firstOrNull { it.matrixId == id }
         }
 
+    fun getCachedUserFromZeroId(id: String): ApiUser? =
+        runBlockingWithTimeOut {
+            getAllCachedUsers().firstOrNull { it.id == id }
+        }
+
     fun getCachedUsers(ids: List<String>): List<ApiUser> =
         runBlockingWithTimeOut {
             getAllCachedUsers().filter { it.matrixId in ids }

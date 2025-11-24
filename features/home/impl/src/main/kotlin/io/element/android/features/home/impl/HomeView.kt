@@ -441,6 +441,7 @@ internal fun HomeScreenContent(
                 filtersState = state.roomListState.filtersState,
                 roomMappedUserProStatus = state.roomListState.roomMappedUserProStatus,
                 hideInvitesAvatars = state.roomListState.hideInvitesAvatars,
+                shouldShowInActiveChatsTab = state.roomListState.shouldShowInactiveChatsTab,
                 eventSink = state.roomListState.eventSink,
                 onSetUpRecoveryClick = onSetUpRecoveryClick,
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,

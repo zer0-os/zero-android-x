@@ -120,6 +120,7 @@ fun aRoomDetailsState(
     isTombstoned: Boolean = false,
     showDebugInfo: Boolean = false,
     isRoomAChannel: Boolean = false,
+    isDeadRoom: Boolean = false,
     eventSink: (RoomDetailsEvent) -> Unit = {},
 ) = RoomDetailsState(
     roomId = roomId,
@@ -151,6 +152,7 @@ fun aRoomDetailsState(
     isTombstoned = isTombstoned,
     showDebugInfo = showDebugInfo,
     isRoomAChannel = isRoomAChannel,
+    isDeadRoom = isDeadRoom,
     loggedInUser = UserId("@daniel:domain.com"),
     eventSink = eventSink,
 )

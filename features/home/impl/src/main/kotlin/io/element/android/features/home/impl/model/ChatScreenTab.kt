@@ -13,4 +13,5 @@ enum class ChatScreenTab(
     ALL("All"),
     UNREAD("Unread"),
     FAVORITE("Favourite"),
+    INACTIVE("Inactive"),
 }

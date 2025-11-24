@@ -91,3 +91,11 @@ data class RoomInfo(
         }
     }
 }
+
+val RoomInfo.isDeadRoom: Boolean
+    get() = !(isPublic ?: false) && joinedMembersCount <= 1 && activeMembersCount <= 1
+
+fun RoomInfo.getDeadRoomUserId(): String? {
+    val pattern = Regex("(?<=was\\s)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+    return name?.let { pattern.find(it)?.value }
+}

@@ -27,6 +27,8 @@ interface Preferences {
 
     fun getCachedUser(id: String): ApiUser?
 
+    fun getCachedUserFromZeroId(id: String): ApiUser?
+
     fun getCachedUsers(ids: List<String>): List<ApiUser>
 
     suspend fun cacheUser(user: ApiUser)

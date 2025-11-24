@@ -56,6 +56,7 @@ class RoomListFiltersPresenter(
                             //RoomListFilter.People -> MatrixRoomListFilter.Category.People
                             //RoomListFilter.Unread -> MatrixRoomListFilter.Unread
                             RoomListFilter.Channels -> MatrixRoomListFilter.NormalizedMatchRoomName(ZERO_CHANNEL_PREFIX)
+                            RoomListFilter.Inactive -> MatrixRoomListFilter.NormalizedMatchRoomName("Empty Room (was")
                             RoomListFilter.Favourites -> MatrixRoomListFilter.Favorite
                             RoomListFilter.Invites -> MatrixRoomListFilter.Invite
                         }

@@ -77,6 +77,8 @@ import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.MessageEventType
 import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.RoomMembersState
+import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
+import io.element.android.libraries.matrix.api.room.isDeadRoom
 import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.room.powerlevels.canPinUnpin
 import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOther
@@ -84,6 +86,7 @@ import io.element.android.libraries.matrix.api.room.powerlevels.canRedactOwn
 import io.element.android.libraries.matrix.api.room.powerlevels.canSendMessage
 import io.element.android.libraries.matrix.api.timeline.item.event.EventOrTransactionId
 import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
+import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.messages.reply.map
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
@@ -127,6 +130,7 @@ class MessagesPresenter(
     private val featureFlagService: FeatureFlagService,
     private val addRecentEmoji: AddRecentEmoji,
     private val markAsFullyRead: MarkAsFullyRead,
+    private val roomMemberProfilesCache: RoomMemberProfilesCache,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : Presenter<MessagesState> {
     @AssistedFactory
@@ -278,7 +282,7 @@ class MessagesPresenter(
 
         return MessagesState(
             roomId = room.roomId,
-            roomName = roomInfo.name,
+            roomName = getRoomDisplayName(roomInfo),
             roomAvatar = roomAvatar,
             roomSubTitle = roomSubTitle,
             heroes = heroes,
@@ -592,6 +596,17 @@ class MessagesPresenter(
         clipboardHelper.copyPlainText(content)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             snackbarDispatcher.post(SnackbarMessage(CommonStrings.common_copied_to_clipboard))
+        }
+    }
+
+    private fun getRoomDisplayName(roomInfo: RoomInfo): String {
+        return if (roomInfo.isDeadRoom) {
+            roomInfo.getDeadRoomUserId()?.let { deadRoomUserId ->
+                val username = roomMemberProfilesCache.getDisplayNameFromUserZeroId(deadRoomUserId)
+                username?.let { "Empty Room (was $username)" }
+            } ?: "Empty Room"
+        } else {
+            roomInfo.name.orEmpty()
         }
     }
 }

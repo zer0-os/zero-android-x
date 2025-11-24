@@ -17,15 +17,21 @@ import io.element.android.libraries.dateformatter.api.DateFormatterMode
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.eventformatter.api.RoomLastMessageFormatter
 import io.element.android.libraries.matrix.api.room.CurrentUserMembership
+import io.element.android.libraries.matrix.api.room.RoomInfo
+import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
+import io.element.android.libraries.matrix.api.room.isDeadRoom
 import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
+import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.model.getAvatarData
 import io.element.android.libraries.matrix.ui.model.toInviteSender
 import kotlinx.collections.immutable.toImmutableList
+import kotlin.text.orEmpty
 
 @Inject
 class RoomListRoomSummaryFactory(
     private val dateFormatter: DateFormatter,
+    private val roomMemberProfilesCache: RoomMemberProfilesCache,
     private val roomLastMessageFormatter: RoomLastMessageFormatter,
 ) {
     fun create(roomSummary: RoomSummary): RoomListRoomSummary {
@@ -34,7 +40,7 @@ class RoomListRoomSummaryFactory(
         return RoomListRoomSummary(
             id = roomSummary.roomId.value,
             roomId = roomSummary.roomId,
-            name = roomInfo.name,
+            name = getRoomDisplayName(roomInfo),
             numberOfUnreadMessages = roomInfo.numUnreadMessages,
             numberOfUnreadMentions = roomInfo.numUnreadMentions,
             numberOfUnreadNotifications = roomInfo.numUnreadNotifications,
@@ -71,7 +77,20 @@ class RoomListRoomSummaryFactory(
             }.toImmutableList(),
             isTombstoned = roomInfo.successorRoom != null,
             isSpace = roomInfo.isSpace,
-            isEncrypted = roomInfo.isEncrypted ?: false
+            isEncrypted = roomInfo.isEncrypted ?: false,
+            isDeadRoom = roomInfo.isDeadRoom,
+            deadRoomUserId = roomInfo.getDeadRoomUserId()
         )
+    }
+
+    private fun getRoomDisplayName(roomInfo: RoomInfo): String {
+        return if (roomInfo.isDeadRoom) {
+            roomInfo.getDeadRoomUserId()?.let { deadRoomUserId ->
+                val username = roomMemberProfilesCache.getDisplayNameFromUserZeroId(deadRoomUserId)
+                username?.let { "Empty Room (was $username)" }
+            } ?: "Empty Room"
+        } else {
+            roomInfo.name.orEmpty()
+        }
     }
 }

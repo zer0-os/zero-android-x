@@ -34,14 +34,14 @@ sealed interface ProfileTimelineDetails {
  * If the display name is ambiguous, the user ID is appended in parentheses.
  * Otherwise, the display name is returned.
  */
-fun ProfileTimelineDetails.getDisambiguatedDisplayName(userId: UserId): String {
+fun ProfileTimelineDetails.getDisambiguatedDisplayName(userId: UserId, cachedName: String? = null): String {
     return when (this) {
         is ProfileTimelineDetails.Ready -> when {
-            displayName == null -> userId.value
+            displayName == null -> cachedName ?: userId.value
             displayNameAmbiguous -> "$displayName ($userId)"
             else -> displayName
         }
-        else -> userId.value
+        else -> cachedName ?: userId.value
     }
 }
 

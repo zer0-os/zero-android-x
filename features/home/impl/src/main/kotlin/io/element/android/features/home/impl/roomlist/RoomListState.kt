@@ -34,6 +34,7 @@ data class RoomListState(
     val acceptDeclineInviteState: AcceptDeclineInviteState,
     val hideInvitesAvatars: Boolean,
     val canReportRoom: Boolean,
+    val shouldShowInactiveChatsTab: Boolean,
     val eventSink: (RoomListEvents) -> Unit,
 ) {
     private val displayFilters = contentState is RoomListContentState.Rooms
@@ -93,4 +94,12 @@ fun RoomListContentState.withoutInvitedRooms(): RoomListContentState {
         }
     }
     return contentState
+}
+
+fun RoomListContentState.shouldShowInActiveChatsTab(): Boolean {
+    return when (this) {
+        is RoomListContentState.Skeleton,
+        is RoomListContentState.Empty -> false
+        is RoomListContentState.Rooms -> this.summaries.any { it.isDeadRoom }
+    }
 }
