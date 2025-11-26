@@ -324,15 +324,6 @@ fun StakeUnstakeAmountView(
     val isAmountValid: () -> Boolean = {
         val maxAmount = if (isUserStaking) pool.totalAvailableTokenBalance else pool.myStakedTokens
         val amount = transactionAmount.value.toLocalizedDoubleOrZero()
-        ZeroLogService.logEvent(
-            eventName = "WALLET",
-            category = "STAKE_UNSTAKE",
-            parameters = mapOf(
-                "maxAmount" to maxAmount,
-                "userAmount" to amount,
-                "isUserStaking" to isUserStaking,
-                "isAmountValid" to (amount > 0 && amount <= maxAmount)
-            ))
         amount > 0 && amount <= maxAmount
     }
 

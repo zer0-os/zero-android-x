@@ -51,19 +51,9 @@ object RewardsUtil {
             val delimiter = mCredits.length - decimals
             if (delimiter < 0) return 0.0
 
-            val prefixPart = mCredits.substring(0, delimiter)
+            val prefixPart = mCredits.take(delimiter)
             val suffixPart = mCredits.drop(delimiter).take(3) // take 3 decimals
             val value = "$prefixPart.$suffixPart"
-            ZeroLogService.logEvent(
-                eventName = "RewardsUtil",
-                category = "parseCredits",
-                parameters = mapOf(
-                    "credits" to credits,
-                    "decimals" to decimals,
-                    "value" to (value.toDoubleOrNull() ?: 0.0),
-                    "locale" to Locale.getDefault().toString()
-                )
-            )
             value.toDoubleOrNull() ?: 0.0
         } catch (e: Exception) {
             ZeroLogService.logEvent(

@@ -76,6 +76,7 @@ import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.libraries.ui.utils.time.isTalkbackActive
+import io.element.android.support.zero.network.service.ZeroLogService
 import io.element.android.wysiwyg.link.Link
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -147,6 +148,7 @@ fun TimelineView(
 
     // Animate alpha when timeline is first displayed, to avoid flashes or glitching when viewing rooms
     AnimatedVisibility(visible = true, enter = fadeIn()) {
+        ZeroLogService.logEvent("TimelineView.kt", "Showing List inside Animated Visibility")
         Box(modifier) {
             LazyColumn(
                 modifier = Modifier
@@ -157,6 +159,9 @@ fun TimelineView(
                 reverseLayout = useReverseLayout,
                 contentPadding = PaddingValues(top = 64.dp, bottom = 8.dp),
             ) {
+                ZeroLogService.logEvent("TimelineView.kt", "Showing messages", parameters = mapOf(
+                    "timelineItems_count" to state.timelineItems.size
+                ))
                 items(
                     items = state.timelineItems,
                     contentType = { timelineItem -> timelineItem.contentType() },
