@@ -242,10 +242,6 @@ class RustEncryptionService(
         }
     }
 
-    override suspend fun isUserVerified(userId: UserId): Result<Boolean> = runCatchingExceptions {
-        getUserIdentityInternal(userId).isVerified()
-    }
-
     override suspend fun pinUserIdentity(userId: UserId): Result<Unit> = runCatchingExceptions {
         getUserIdentityInternal(userId).pin()
     }
@@ -254,8 +250,8 @@ class RustEncryptionService(
         getUserIdentityInternal(userId).withdrawVerification()
     }
 
-    override suspend fun getUserIdentity(userId: UserId): Result<IdentityState?> = runCatchingExceptions {
-        val identity = getUserIdentityInternal(userId)
+    override suspend fun getUserIdentity(userId: UserId, fallbackToServer: Boolean): Result<IdentityState?> = runCatchingExceptions {
+        val identity = getUserIdentityInternal(userId, fallbackToServer)
         val isVerified = identity.isVerified()
         when {
             identity.hasVerificationViolation() -> IdentityState.VerificationViolation
@@ -265,10 +261,10 @@ class RustEncryptionService(
         }
     }
 
-    suspend fun getUserIdentityInternal(userId: UserId): UserIdentity {
+    private suspend fun getUserIdentityInternal(userId: UserId, fallbackToServer: Boolean = true): UserIdentity {
         return service.userIdentity(
             userId = userId.value,
-            // requestFromHomeserverIfNeeded = true,
+            fallbackToServer = fallbackToServer,
         ) ?: error("User identity not found")
     }
 

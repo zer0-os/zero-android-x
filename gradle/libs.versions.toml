@@ -36,7 +36,7 @@ accompanist = "0.37.3"
 
 # Test
 test_core = "1.7.0"
-roborazzi = "1.51.0"
+roborazzi = "1.52.0"
 
 # Jetbrain
 datetime = "0.7.1"
@@ -56,7 +56,7 @@ haze = "1.6.10"
 dependencyAnalysis = "3.5.0"
 
 # DI
-metro = "0.7.6"
+metro = "0.7.7"
 
 # Auto service
 autoservice = "1.1.1"
@@ -180,7 +180,7 @@ test_truth = "com.google.truth:truth:1.4.5"
 test_parameter_injector = "com.google.testparameterinjector:test-parameter-injector:1.19"
 test_robolectric = "org.robolectric:robolectric:4.16"
 test_appyx_junit = { module = "com.bumble.appyx:testing-junit4", version.ref = "appyx" }
-test_composable_preview_scanner = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.7.1"
+test_composable_preview_scanner = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.7.2"
 test_detekt_api = { module = "io.gitlab.arturbosch.detekt:detekt-api", version.ref = "detekt" }
 test_detekt_test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref = "detekt" }
 
@@ -190,7 +190,7 @@ test_detekt_test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version
 # https://github.com/matrix-org/matrix-rust-components-kotlin/commits/main/sdk/sdk-android/src/main/kotlin/org/matrix/rustcomponents/sdk/matrix_sdk_ffi.kt
 # All new features should not be implemented in the pull request that upgrades the version, developers should
 # only fix API breaks and may add some TODOs.
-matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.11.19"
+matrix_sdk = "org.matrix.rustcomponents:sdk-android:25.11.24"
 
 # Others
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
@@ -232,12 +232,12 @@ color_picker = "io.mhssn:colorpicker:1.0.0"
 
 # Analytics
 posthog = "com.posthog:posthog-android:3.26.0"
-sentry = "io.sentry:sentry-android:8.26.0"
+sentry = "io.sentry:sentry-android:8.27.1"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.29.2"
 
 # Emojibase
-matrix_emojibase_bindings = "io.element.android:emojibase-bindings:1.4.3"
+matrix_emojibase_bindings = "io.element.android:emojibase-bindings:1.5.0"
 sigpwned_emoji4j = "com.sigpwned:emoji4j-core:16.0.0"
 
 # Di
@@ -284,7 +284,7 @@ roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 firebaseAppDistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 knit = { id = "org.jetbrains.kotlinx.knit", version = "0.5.0" }
-sonarqube = "org.sonarqube:7.0.1.6134"
+sonarqube = "org.sonarqube:7.1.0.6387"
 licensee = "app.cash.licensee:1.14.1"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 gms_google_services = { id = "com.google.gms.google-services", version = "4.4.4" }
