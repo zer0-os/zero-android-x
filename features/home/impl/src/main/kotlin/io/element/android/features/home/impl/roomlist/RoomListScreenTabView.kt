@@ -7,6 +7,7 @@
 
 package io.element.android.features.home.impl.roomlist
 
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.home.impl.model.ChatScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -33,7 +35,7 @@ fun RoomListScreenTabView(
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(selectedTab.ordinal) }
 
-    TabRow(
+    ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
@@ -41,6 +43,7 @@ fun RoomListScreenTabView(
                 color = ElementTheme.colors.zeroBrandColor
             )
         },
+        edgePadding = 0.dp,
         divider = { }
     ) {
         val tabEntries = if (shouldShowInactiveChatsTab) {

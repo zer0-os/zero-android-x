@@ -7,6 +7,7 @@
 
 package io.element.android.features.home.impl.channel
 
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.libraries.designsystem.preview.ElementPreview
@@ -32,7 +34,7 @@ fun ChannelsScreenTabView(
 ) {
     var selectedTabIndex by rememberSaveable(selectedTab) { mutableIntStateOf(selectedTab.ordinal) }
 
-    TabRow(
+    ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
@@ -40,6 +42,7 @@ fun ChannelsScreenTabView(
                 color = ElementTheme.colors.zeroBrandColor
             )
         },
+        edgePadding = 0.dp,
         divider = { }
     ) {
         ChannelsScreenTab.entries.forEachIndexed { index, tab ->
