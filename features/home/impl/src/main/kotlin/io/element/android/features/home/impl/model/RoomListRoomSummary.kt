@@ -33,7 +33,7 @@ data class RoomListRoomSummary(
     val numberOfUnreadNotifications: Long,
     val isMarkedUnread: Boolean,
     val timestamp: String?,
-    val lastMessage: CharSequence?,
+    val latestEvent: CharSequence?,
     val avatarData: AvatarData,
     val userDefinedNotificationMode: RoomNotificationMode?,
     val hasRoomCall: Boolean,
@@ -87,7 +87,6 @@ fun RoomDescription.toRoomSummary() = RoomListRoomSummary(
     numberOfUnreadNotifications = 0,
     isMarkedUnread = false,
     timestamp = null,
-    lastMessage = null,
     avatarData = this.avatarData(AvatarSize.RoomListItem),
     userDefinedNotificationMode = null,
     hasRoomCall = false,
@@ -101,5 +100,8 @@ fun RoomDescription.toRoomSummary() = RoomListRoomSummary(
     isTombstoned = false,
     isSpace = false,
     isEncrypted = false,
-    isDiscoverable = true
+    isDiscoverable = true,
+    latestEvent = null,
+    isDeadRoom = false,
+    deadRoomUserId = null
 )

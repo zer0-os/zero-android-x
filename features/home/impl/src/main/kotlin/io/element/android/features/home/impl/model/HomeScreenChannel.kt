@@ -52,7 +52,6 @@ fun HomeScreenChannel.toRoomSummary() = RoomListRoomSummary(
     numberOfUnreadNotifications = 0,
     isMarkedUnread = false,
     timestamp = null,
-    lastMessage = null,
     avatarData = AvatarData(id = channelFullName, name = displayTitle, url = null, size = AvatarSize.RoomListItem),
     userDefinedNotificationMode = null,
     hasRoomCall = false,
@@ -65,5 +64,9 @@ fun HomeScreenChannel.toRoomSummary() = RoomListRoomSummary(
     heroes = persistentListOf(),
     isTombstoned = false,
     isSpace = false,
-    isEncrypted = false
+    isEncrypted = false,
+    latestEvent = null,
+    isDiscoverable = false,
+    isDeadRoom = false,
+    deadRoomUserId = null
 )

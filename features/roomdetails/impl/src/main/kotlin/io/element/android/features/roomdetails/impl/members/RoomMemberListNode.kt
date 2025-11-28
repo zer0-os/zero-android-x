@@ -9,6 +9,8 @@
 package io.element.android.features.roomdetails.impl.members
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.bumble.appyx.core.lifecycle.subscribe
@@ -22,6 +24,7 @@ import io.element.android.annotations.ContributesNode
 import io.element.android.features.roommembermoderation.api.ModerationAction
 import io.element.android.features.roommembermoderation.api.RoomMemberModerationEvents
 import io.element.android.features.roommembermoderation.api.RoomMemberModerationRenderer
+import io.element.android.libraries.architecture.appyx.launchMolecule
 import io.element.android.libraries.architecture.callback
 import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.core.UserId
@@ -45,6 +48,7 @@ class RoomMemberListNode(
     }
 
     private val callback: Callback = callback()
+    private val stateFlow = launchMolecule { presenter.present() }
 
     init {
         lifecycle.subscribe(
@@ -68,7 +72,7 @@ class RoomMemberListNode(
 
     @Composable
     override fun View(modifier: Modifier) {
-        val state = presenter.present()
+        val state by stateFlow.collectAsState()
         RoomMemberListView(
             state = state,
             modifier = modifier,
