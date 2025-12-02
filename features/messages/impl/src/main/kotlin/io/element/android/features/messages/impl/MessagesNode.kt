@@ -70,7 +70,9 @@ import io.element.android.libraries.matrix.api.timeline.item.TimelineItemDebugIn
 import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.libraries.mediaplayer.api.MediaPlayer
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.services.analytics.api.AnalyticsLongRunningTransaction.LoadMessagesUi
 import io.element.android.services.analytics.api.AnalyticsService
+import io.element.android.services.analytics.api.finishLongRunningTransaction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -137,6 +139,9 @@ class MessagesNode(
         lifecycle.subscribe(
             onCreate = {
                 sessionCoroutineScope.launch { analyticsService.capture(room.toAnalyticsViewRoom()) }
+            },
+            onResume = {
+                analyticsService.finishLongRunningTransaction(LoadMessagesUi)
             },
             onDestroy = {
                 mediaPlayer.close()
