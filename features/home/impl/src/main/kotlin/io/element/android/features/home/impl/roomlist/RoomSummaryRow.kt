@@ -41,6 +41,7 @@ import androidx.compose.ui.zIndex
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.R
+import io.element.android.features.home.impl.model.LatestEvent
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomListRoomSummaryProvider
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
@@ -123,6 +124,7 @@ internal fun RoomSummaryRow(
                 ) {
                     NameAndTimestampRow(
                         name = room.name,
+                        latestEvent = room.latestEvent,
                         timestamp = room.timestamp,
                         showProBadgeWithRoom = showProBadgeWithRoom,
                         isHighlighted = room.isHighlighted
@@ -140,6 +142,7 @@ internal fun RoomSummaryRow(
                 ) {
                     NameAndTimestampRow(
                         name = room.name,
+                        latestEvent = room.latestEvent,
                         timestamp = null,
                         showProBadgeWithRoom = showProBadgeWithRoom,
                         isHighlighted = room.isHighlighted
@@ -216,6 +219,7 @@ private fun RoomSummaryScaffoldRow(
 @Composable
 private fun NameAndTimestampRow(
     name: String?,
+    latestEvent: LatestEvent,
     timestamp: String?,
     showProBadgeWithRoom: Boolean,
     isHighlighted: Boolean,
@@ -295,21 +299,41 @@ private fun MessagePreviewAndIndicatorRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = spacedBy(28.dp)
     ) {
-        val messagePreview = if (room.isTombstoned) {
-            stringResource(R.string.screen_roomlist_tombstoned_room_description)
+        if (room.isTombstoned) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.screen_roomlist_tombstoned_room_description),
+                color = ElementTheme.colors.roomListRoomMessage,
+                style = ElementTheme.typography.fontBodyMdRegular,
+                minLines = 2,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
         } else {
-            room.latestEvent.orEmpty()
+            if (room.latestEvent is LatestEvent.Error) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(CommonStrings.common_message_failed_to_send),
+                    color = ElementTheme.colors.textCriticalPrimary,
+                    style = ElementTheme.typography.fontBodyMdRegular,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            } else {
+                val messagePreview = room.latestEvent.content()
+                val annotatedMessagePreview = messagePreview as? AnnotatedString ?: AnnotatedString(text = messagePreview.orEmpty().toString())
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = annotatedMessagePreview,
+                    color = ElementTheme.colors.roomListRoomMessage,
+                    style = ElementTheme.zeroTypography.fontBodyMdRegular,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        val annotatedMessagePreview = messagePreview as? AnnotatedString ?: AnnotatedString(text = messagePreview.toString())
-        Text(
-            modifier = Modifier.weight(1f),
-            text = annotatedMessagePreview,
-            color = ElementTheme.colors.roomListRoomMessage,
-            style = ElementTheme.zeroTypography.fontBodyMdRegular,
-            minLines = 2,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
 
         // Call and unread
         Row(

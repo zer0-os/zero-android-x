@@ -9,6 +9,7 @@
 package io.element.android.features.home.impl.datasource
 
 import dev.zacsweers.metro.Inject
+import io.element.android.features.home.impl.model.LatestEvent
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.libraries.core.extensions.orEmpty
@@ -21,6 +22,7 @@ import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
 import io.element.android.libraries.matrix.api.room.isDeadRoom
 import io.element.android.libraries.matrix.api.room.isDm
+import io.element.android.libraries.matrix.api.roomlist.LatestEventValue
 import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
 import io.element.android.libraries.matrix.ui.model.getAvatarData
@@ -50,7 +52,7 @@ class RoomListRoomSummaryFactory(
                 mode = DateFormatterMode.TimeOrDate,
                 useRelative = true,
             ),
-            latestEvent = roomLatestEventFormatter.format(roomSummary.latestEvent, roomInfo.isDm).orEmpty(),
+            latestEvent = computeLatestEvent(roomSummary.latestEvent, roomInfo.isDm),
             avatarData = avatarData,
             userDefinedNotificationMode = roomInfo.userDefinedNotificationMode,
             hasRoomCall = roomInfo.hasRoomCall,
@@ -89,6 +91,30 @@ class RoomListRoomSummaryFactory(
             } ?: "Empty Room"
         } else {
             roomInfo.name.orEmpty()
+        }
+    }
+
+    private fun computeLatestEvent(latestEvent: LatestEventValue, dm: Boolean): LatestEvent {
+        return when (latestEvent) {
+            is LatestEventValue.None -> {
+                LatestEvent.None
+            }
+            is LatestEventValue.Local -> {
+                if (latestEvent.isSending) {
+                    val content = roomLatestEventFormatter.format(latestEvent, dm).orEmpty()
+                    LatestEvent.Sending(
+                        content = content,
+                    )
+                } else {
+                    LatestEvent.Error
+                }
+            }
+            is LatestEventValue.Remote -> {
+                val content = roomLatestEventFormatter.format(latestEvent, dm).orEmpty()
+                LatestEvent.Synced(
+                    content = content,
+                )
+            }
         }
     }
 }
