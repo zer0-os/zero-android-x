@@ -21,6 +21,7 @@ import io.element.android.libraries.matrix.api.timeline.item.event.ProfileDetail
 import io.element.android.libraries.matrix.api.timeline.item.event.ReactionSender
 import io.element.android.libraries.matrix.api.timeline.item.event.Receipt
 import io.element.android.libraries.matrix.api.timeline.item.event.TimelineItemEventOrigin
+import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.impl.core.RustSendHandle
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -65,15 +66,15 @@ class EventTimelineItemMapper(
     }
 }
 
-fun RustProfileDetails.map(): ProfileDetails {
+fun RustProfileDetails.map(cachedUser: ZeroUser? = null): ProfileDetails {
     return when (this) {
         RustProfileDetails.Pending -> ProfileDetails.Pending
         RustProfileDetails.Unavailable -> ProfileDetails.Unavailable
         is RustProfileDetails.Error -> ProfileDetails.Error(message)
         is RustProfileDetails.Ready -> ProfileDetails.Ready(
-            displayName = displayName,
+            displayName = displayName ?: cachedUser?.name,
             displayNameAmbiguous = displayNameAmbiguous,
-            avatarUrl = avatarUrl
+            avatarUrl = avatarUrl ?: cachedUser?.avatarUrl
         )
     }
 }

@@ -18,4 +18,6 @@ interface UserRepository {
         avatarUrl: String? = null,
         profileZId: String? = null
     )
+
+    fun getUserFromCache(matrixId: String): ZeroUser?
 }

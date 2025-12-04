@@ -98,6 +98,10 @@ class UserRepositoryImpl(
         }
     }
 
+    override fun getUserFromCache(matrixId: String): ZeroUser? {
+        return preferences.getCachedUser(matrixId)?.toModel()
+    }
+
     private suspend fun <T> runSafeCall(run: suspend () -> T) =
         try {
             run()

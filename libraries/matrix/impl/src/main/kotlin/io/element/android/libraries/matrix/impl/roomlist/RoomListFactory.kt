@@ -15,6 +15,7 @@ import io.element.android.libraries.matrix.api.roomlist.RoomSummary
 import io.element.android.services.analytics.api.AnalyticsLongRunningTransaction
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.analytics.api.finishLongRunningTransaction
+import io.element.android.support.zero.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +41,9 @@ internal class RoomListFactory(
     private val innerRoomListService: RoomListService,
     private val sessionCoroutineScope: CoroutineScope,
     private val analyticsService: AnalyticsService,
+    private val zeroUserRepository: UserRepository?,
 ) {
-    private val roomSummaryFactory: RoomSummaryFactory = RoomSummaryFactory()
+    private val roomSummaryFactory: RoomSummaryFactory = RoomSummaryFactory(zeroUserRepository = zeroUserRepository)
 
     /**
      * Creates a room list that can be used to load more rooms and filter them dynamically.

@@ -230,6 +230,7 @@ class RustMatrixClient(
             innerRoomListService = innerRoomListService,
             sessionCoroutineScope = sessionCoroutineScope,
             analyticsService = analyticsService,
+            zeroUserRepository = zeroCoreRepository?.user
         ),
         roomSyncSubscriber = roomSyncSubscriber,
     )
