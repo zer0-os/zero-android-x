@@ -75,7 +75,7 @@ internal fun VoiceMessageRecording(
             modifier = Modifier
                 .height(26.dp)
                 .weight(1f),
-            levels = levels
+            levels = levels,
         )
     }
 }

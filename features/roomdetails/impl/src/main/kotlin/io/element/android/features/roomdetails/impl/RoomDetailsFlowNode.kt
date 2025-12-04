@@ -37,10 +37,10 @@ import io.element.android.features.rolesandpermissions.api.ChangeRoomMemberRoles
 import io.element.android.features.rolesandpermissions.api.ChangeRoomMemberRolesListType
 import io.element.android.features.rolesandpermissions.api.RolesAndPermissionsEntryPoint
 import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
-import io.element.android.features.roomdetails.impl.edit.RoomDetailsEditNode
 import io.element.android.features.roomdetails.impl.invite.RoomInviteMembersNode
 import io.element.android.features.roomdetails.impl.members.RoomMemberListNode
 import io.element.android.features.roomdetails.impl.notificationsettings.RoomNotificationSettingsNode
+import io.element.android.features.roomdetailsedit.api.RoomDetailsEditEntryPoint
 import io.element.android.features.securityandprivacy.api.SecurityAndPrivacyEntryPoint
 import io.element.android.features.verifysession.api.OutgoingVerificationEntryPoint
 import io.element.android.libraries.architecture.BackstackWithOverlayBox
@@ -87,6 +87,7 @@ class RoomDetailsFlowNode(
     private val changeRoomMemberRolesEntryPoint: ChangeRoomMemberRolesEntryPoint,
     private val rolesAndPermissionsEntryPoint: RolesAndPermissionsEntryPoint,
     private val securityAndPrivacyEntryPoint: SecurityAndPrivacyEntryPoint,
+    private val roomDetailsEditEntryPoint: RoomDetailsEditEntryPoint,
     private val feedDetailsEntryPoint: FeedDetailsEntryPoint,
     private val feedUserProfileEntryPoint: FeedUserProfileEntryPoint,
 ) : BaseFlowNode<RoomDetailsFlowNode.NavTarget>(
@@ -263,7 +264,7 @@ class RoomDetailsFlowNode(
             }
 
             NavTarget.RoomDetailsEdit -> {
-                createNode<RoomDetailsEditNode>(buildContext)
+                roomDetailsEditEntryPoint.createNode(this, buildContext)
             }
 
             NavTarget.InviteMembers -> {
