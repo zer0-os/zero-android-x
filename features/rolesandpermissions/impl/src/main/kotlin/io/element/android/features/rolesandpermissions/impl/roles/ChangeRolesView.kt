@@ -173,8 +173,9 @@ fun ChangeRolesView(
                 when (confirming) {
                     is AsyncAction.ConfirmingCancellation -> {
                         SaveChangesDialog(
-                            onSubmitClick = { state.eventSink(ChangeRolesEvent.Exit) },
-                            onDismiss = { state.eventSink(ChangeRolesEvent.CloseDialog) }
+                            onSaveClick = { state.eventSink(ChangeRolesEvent.Save) },
+                            onDiscardClick = { state.eventSink(ChangeRolesEvent.Exit) },
+                            onDismiss = { state.eventSink(ChangeRolesEvent.CloseDialog) },
                         )
                     }
                     is ConfirmingModifyingOwners -> {

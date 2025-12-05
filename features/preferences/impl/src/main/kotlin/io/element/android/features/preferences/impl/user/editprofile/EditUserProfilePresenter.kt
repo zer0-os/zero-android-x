@@ -121,16 +121,16 @@ class EditUserProfilePresenter(
             !userDisplayName.isNullOrBlank() && hasProfileChanged
         }
 
-        fun handleEvent(event: EditUserProfileEvents) {
+        fun handleEvent(event: EditUserProfileEvent) {
             when (event) {
-                is EditUserProfileEvents.Save -> localCoroutineScope.saveChanges(
+                is EditUserProfileEvent.Save -> localCoroutineScope.saveChanges(
                     name = userDisplayName,
                     avatarUri = userAvatarUri?.toUri(),
                     primaryZId = userPrimaryZId,
                     currentUser = matrixUser,
                     action = saveAction,
                 )
-                is EditUserProfileEvents.HandleAvatarAction -> {
+                is EditUserProfileEvent.HandleAvatarAction -> {
                     when (event.action) {
                         AvatarAction.ChoosePhoto -> galleryImagePicker.launch()
                         AvatarAction.TakePhoto -> if (cameraPermissionState.permissionGranted) {
@@ -145,9 +145,9 @@ class EditUserProfilePresenter(
                         }
                     }
                 }
-                is EditUserProfileEvents.UpdateDisplayName -> userDisplayName = event.name
-                is EditUserProfileEvents.UpdatePrimaryZId -> userPrimaryZId = event.zid
-                EditUserProfileEvents.Exit -> {
+                is EditUserProfileEvent.UpdateDisplayName -> userDisplayName = event.name
+                is EditUserProfileEvent.UpdatePrimaryZId -> userPrimaryZId = event.zid
+                EditUserProfileEvent.Exit -> {
                     when (saveAction.value) {
                         is AsyncAction.Confirming -> {
                             // Close the dialog right now
@@ -168,7 +168,7 @@ class EditUserProfilePresenter(
                         }
                     }
                 }
-                EditUserProfileEvents.CloseDialog -> saveAction.value = AsyncAction.Uninitialized
+                EditUserProfileEvent.CloseDialog -> saveAction.value = AsyncAction.Uninitialized
             }
         }
 
