@@ -10,6 +10,9 @@ package io.element.android.features.ftue.impl.sessionverification.choosemode
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,15 +21,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import io.element.android.compound.theme.ElementTheme
+import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.ftue.impl.R
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.atomic.molecules.ButtonColumnMolecule
+import io.element.android.libraries.designsystem.atomic.molecules.IconTitleSubtitleMolecule
+import io.element.android.libraries.designsystem.atomic.pages.HeaderFooterPage
+import io.element.android.libraries.designsystem.components.BigIcon
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
 import io.element.android.libraries.designsystem.theme.components.OutlinedButton
+import io.element.android.libraries.designsystem.theme.components.Text
+import io.element.android.libraries.designsystem.theme.components.TextButton
+import io.element.android.libraries.designsystem.theme.components.TopAppBar
 import io.element.android.libraries.ui.strings.CommonStrings
-import io.element.android.support.zero.screens.verifysession.ZeroVerifySelfSessionView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +53,7 @@ fun ChooseSelfVerificationModeView(
     BackHandler {
         activity?.finish()
     }
-    /*HeaderFooterPage(
+    HeaderFooterPage(
         modifier = modifier,
         topBar = {
             TopAppBar(
@@ -85,15 +95,6 @@ fun ChooseSelfVerificationModeView(
                 style = ElementTheme.typography.fontBodyLgMedium
             )
         }
-    }*/
-    if (state.buttonsState.dataOrNull()?.canEnterRecoveryKey == true) {
-        ZeroVerifySelfSessionView(
-            onSkipVerification = onSkipVerification,
-            onEnterRecoveryKey = onUseRecoveryKey,
-            onResetRecoveryKey = onResetKey
-        )
-    } else {
-        onSkipVerification()
     }
 }
 

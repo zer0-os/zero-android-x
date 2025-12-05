@@ -254,6 +254,7 @@ private fun SenderRow(
         )
         Column(
             modifier = Modifier.padding(start = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -277,13 +278,13 @@ private fun SenderRow(
                     style = ElementTheme.zeroTypography.fontBodySmRegular,
                 )
             }
-            Text(
+            /*Text(
                 text = userId,
                 color = ElementTheme.colors.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = ElementTheme.zeroTypography.fontBodySmRegular,
-            )
+            )*/
         }
     }
 }
