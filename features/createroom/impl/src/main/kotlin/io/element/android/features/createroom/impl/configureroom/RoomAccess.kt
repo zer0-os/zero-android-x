@@ -15,9 +15,9 @@ enum class RoomAccess {
     Knocking
 }
 
-fun RoomAccess.toJoinRule(): JoinRule? {
+fun RoomAccess.toJoinRule(isVisibleInPublicRooms: Boolean): JoinRule? {
     return when (this) {
-        RoomAccess.Anyone -> null
+        RoomAccess.Anyone -> if (isVisibleInPublicRooms) null else JoinRule.Invite
         RoomAccess.Knocking -> JoinRule.Knock
     }
 }

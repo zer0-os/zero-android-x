@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.createroom.impl.R
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -59,6 +60,7 @@ import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
 import io.element.android.libraries.matrix.ui.components.UnsavedAvatar
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.libraries.ui.strings.CommonStrings
+import io.element.android.services.analyticsproviders.api.trackers.captureInteraction
 
 @Composable
 fun ConfigureRoomView(
@@ -140,6 +142,19 @@ fun ConfigureRoomView(
                 )
                 Spacer(Modifier)
             }*/
+            if (state.config.roomVisibility is RoomVisibilityState.Public) {
+                ListItem(
+                    headlineContent = {
+                        Text(text = "Visible in public rooms listing")
+                    },
+                    trailingContent = ListItemContent.Switch(
+                        checked = state.visibleInPublicRooms,
+                    ),
+                    onClick = {
+                        state.eventSink(ConfigureRoomEvents.VisibleInPublicRooms(!state.visibleInPublicRooms))
+                    }
+                )
+            }
         }
     }
 

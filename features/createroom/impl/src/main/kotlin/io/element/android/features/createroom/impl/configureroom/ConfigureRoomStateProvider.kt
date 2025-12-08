@@ -98,5 +98,6 @@ fun aConfigureRoomState(
     cameraPermissionState = cameraPermissionState,
     homeserverName = homeserverName,
     roomAddressValidity = roomAddressValidity,
+    visibleInPublicRooms = false,
     eventSink = eventSink,
 )

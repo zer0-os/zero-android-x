@@ -47,6 +47,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Optional
 import kotlin.jvm.optionals.getOrDefault
 
 @Inject
@@ -66,6 +67,8 @@ class ConfigureRoomPresenter(
 
     @Composable
     override fun present(): ConfigureRoomState {
+        val matrixUser by matrixClient.userProfile.collectAsState()
+
         val cameraPermissionState = cameraPermissionPresenter.present()
         val createRoomConfig by dataStore.getCreateRoomConfigFlow().collectAsState(CreateRoomConfig())
         val homeserverName = remember { matrixClient.userIdServerName() }
@@ -75,6 +78,7 @@ class ConfigureRoomPresenter(
         val roomAddressValidity = remember {
             mutableStateOf<RoomAddressValidity>(RoomAddressValidity.Unknown)
         }
+        val isVisibleInPublicRooms = remember { mutableStateOf(false) }
 
         val cameraPhotoPicker = mediaPickerProvider.registerCameraPhotoPicker(
             onResult = { uri -> if (uri != null) dataStore.setAvatarUri(uri = uri, cached = true) },
@@ -112,9 +116,9 @@ class ConfigureRoomPresenter(
         val localCoroutineScope = rememberCoroutineScope()
         val createRoomAction: MutableState<AsyncAction<RoomId>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
-        fun createRoom(config: CreateRoomConfig) {
+        fun createRoom(config: CreateRoomConfig, isVisibleInPublicRooms: Boolean) {
             createRoomAction.value = AsyncAction.Uninitialized
-            localCoroutineScope.createRoom(config, createRoomAction)
+            localCoroutineScope.createRoom(config, isVisibleInPublicRooms, createRoomAction)
         }
 
         fun handleEvent(event: ConfigureRoomEvents) {
@@ -124,7 +128,7 @@ class ConfigureRoomPresenter(
                 is ConfigureRoomEvents.RoomVisibilityChanged -> dataStore.setRoomVisibility(event.visibilityItem)
                 is ConfigureRoomEvents.RoomAccessChanged -> dataStore.setRoomAccess(event.roomAccess)
                 is ConfigureRoomEvents.RoomAddressChanged -> dataStore.setRoomAddress(event.roomAddress)
-                is ConfigureRoomEvents.CreateRoom -> createRoom(createRoomConfig)
+                is ConfigureRoomEvents.CreateRoom -> createRoom(createRoomConfig, isVisibleInPublicRooms.value)
                 is ConfigureRoomEvents.HandleAvatarAction -> {
                     when (event.action) {
                         AvatarAction.ChoosePhoto -> galleryImagePicker.launch()
@@ -137,6 +141,7 @@ class ConfigureRoomPresenter(
                         AvatarAction.Remove -> dataStore.setAvatarUri(uri = null)
                     }
                 }
+                is ConfigureRoomEvents.VisibleInPublicRooms -> isVisibleInPublicRooms.value = event.visible
 
                 ConfigureRoomEvents.CancelCreateRoom -> createRoomAction.value = AsyncAction.Uninitialized
             }
@@ -150,12 +155,14 @@ class ConfigureRoomPresenter(
             cameraPermissionState = cameraPermissionState,
             homeserverName = homeserverName,
             roomAddressValidity = roomAddressValidity.value,
+            visibleInPublicRooms = isVisibleInPublicRooms.value,
             eventSink = ::handleEvent,
         )
     }
 
     private fun CoroutineScope.createRoom(
         config: CreateRoomConfig,
+        isVisibleInPublicRooms: Boolean,
         createRoomAction: MutableState<AsyncAction<RoomId>>
     ) = launch {
         suspend {
@@ -167,11 +174,11 @@ class ConfigureRoomPresenter(
                     isEncrypted = false,
                     isDirect = false,
                     visibility = RoomVisibility.Public,
-                    joinRuleOverride = config.roomVisibility.roomAccess.toJoinRule(),
+                    joinRuleOverride = config.roomVisibility.roomAccess.toJoinRule(isVisibleInPublicRooms),
                     preset = RoomPreset.PUBLIC_CHAT,
                     invite = config.invites.map { it.userId },
                     avatar = avatarUrl,
-                    roomAliasName = config.roomVisibility.roomAddress()
+                    roomAliasName = if (isVisibleInPublicRooms) config.roomVisibility.roomAddress() else Optional.empty()
                 )
             } else {
                 CreateRoomParameters(

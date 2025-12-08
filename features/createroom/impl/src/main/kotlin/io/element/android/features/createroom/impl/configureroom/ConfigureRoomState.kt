@@ -23,6 +23,7 @@ data class ConfigureRoomState(
     val cameraPermissionState: PermissionsState,
     val roomAddressValidity: RoomAddressValidity,
     val homeserverName: String,
+    val visibleInPublicRooms: Boolean,
     val eventSink: (ConfigureRoomEvents) -> Unit
 ) {
     val isValid: Boolean = config.roomName?.isNotEmpty() == true &&

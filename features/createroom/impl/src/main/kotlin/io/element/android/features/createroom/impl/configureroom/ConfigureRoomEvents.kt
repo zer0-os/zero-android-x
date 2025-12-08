@@ -18,5 +18,6 @@ sealed interface ConfigureRoomEvents {
     data class RoomAddressChanged(val roomAddress: String) : ConfigureRoomEvents
     data object CreateRoom : ConfigureRoomEvents
     data class HandleAvatarAction(val action: AvatarAction) : ConfigureRoomEvents
+    data class VisibleInPublicRooms(val visible: Boolean) : ConfigureRoomEvents
     data object CancelCreateRoom : ConfigureRoomEvents
 }
