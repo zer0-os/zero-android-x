@@ -21,6 +21,7 @@ import io.element.android.libraries.matrix.api.auth.MatrixAuthenticationService
 import io.element.android.libraries.matrix.api.auth.MatrixHomeServerDetails
 import io.element.android.libraries.matrix.api.auth.OidcDetails
 import io.element.android.libraries.matrix.api.auth.OidcPrompt
+import io.element.android.libraries.matrix.api.auth.SessionRestorationException
 import io.element.android.libraries.matrix.api.auth.external.ExternalSession
 import io.element.android.libraries.matrix.api.auth.qrlogin.MatrixQrCodeLoginData
 import io.element.android.libraries.matrix.api.auth.qrlogin.QrCodeLoginStep
@@ -105,10 +106,10 @@ class RustMatrixAuthenticationService(
                     StateBus.onUserStateChanged(UserState.AUTHORIZED)
                     rustMatrixClientFactory.create(sessionData)
                 } else {
-                    error("Token is not valid")
+                    throw SessionRestorationException.InvalidToken()
                 }
             } else {
-                error("No session to restore with id $sessionId")
+                throw SessionRestorationException.MissingSession(sessionId)
             }
         }.mapFailure { failure ->
             failure.mapClientException()

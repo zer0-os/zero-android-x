@@ -333,8 +333,8 @@ private fun HomeScaffold(
                         .padding(horizontal = 16.dp),
                     shape = CircleShape,
                     onClick = {
-                        when {
-                            selectedHomeNavigationTab == HomeScreenTab.CHAT -> onCreateRoomClick()
+                        when (selectedHomeNavigationTab) {
+                            HomeScreenTab.CHAT, HomeScreenTab.CHANNEL -> onCreateRoomClick()
                             else -> onCreateFeedClick()
                         }
                     }

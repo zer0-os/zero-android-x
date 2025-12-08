@@ -35,6 +35,7 @@ import io.element.android.libraries.designsystem.theme.components.SearchBar
 import io.element.android.libraries.designsystem.theme.components.SearchBarResultState
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.matrix.api.user.MatrixUser
+import io.element.android.libraries.matrix.api.user.primaryZIdOrWalletAddress
 import io.element.android.libraries.matrix.ui.components.CheckableUserRow
 import io.element.android.libraries.matrix.ui.components.CheckableUserRowData
 import io.element.android.libraries.matrix.ui.components.SelectedUsersRowList
@@ -179,9 +180,9 @@ private fun InvitePeopleSearchBar(
                                 invitableUser.isAlreadyJoined -> stringResource(R.string.screen_invite_users_already_a_member)
                                 invitableUser.isAlreadyInvited -> stringResource(R.string.screen_invite_users_already_invited)
                                 // Otherwise show the ID, unless that's already used for their name
-                                invitableUser.matrixUser.displayName.isNullOrEmpty()
-                                    .not() -> invitableUser.matrixUser.userId.value
-                                else -> null
+//                                invitableUser.matrixUser.displayName.isNullOrEmpty()
+//                                    .not() -> invitableUser.matrixUser.userId.value
+                                else -> invitableUser.matrixUser.primaryZIdOrWalletAddress
                             },
                             showProSubscriberBadge = invitableUser.matrixUser.isZeroProSubscriber
                         )
