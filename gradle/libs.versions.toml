@@ -18,7 +18,7 @@ constraintlayout_compose = "1.1.1"
 lifecycle = "2.9.2"
 activity = "1.11.0"
 media3 = "1.8.0"
-camera = "1.5.1"
+camera = "1.5.2"
 work = "2.11.0"
 
 # Firebase
@@ -44,7 +44,7 @@ serialization_json = "1.9.0"
 #other
 coil = "3.3.0"
 # Rollback to 1.0.4, 1.0.5 has this issue: https://github.com/airbnb/Showkase/issues/420
-showkase = "1.0.4"
+showkase = "1.0.5"
 appyx = "1.7.1"
 sqldelight = "2.2.1"
 wysiwyg = "2.40.0"
@@ -55,7 +55,7 @@ haze = "1.6.10"
 dependencyAnalysis = "3.5.1"
 
 # DI
-metro = "0.8.1"
+metro = "0.8.2"
 
 # Auto service
 autoservice = "1.1.1"
@@ -172,7 +172,7 @@ test_corektx = { module = "androidx.test:core-ktx", version.ref = "test_core" }
 test_arch_core = "androidx.arch.core:core-testing:2.2.0"
 test_junit = "junit:junit:4.13.2"
 test_runner = "androidx.test:runner:1.7.0"
-test_mockk = "io.mockk:mockk:1.14.6"
+test_mockk = "io.mockk:mockk:1.14.7"
 test_konsist = "com.lemonappdev:konsist:0.17.3"
 test_turbine = "app.cash.turbine:turbine:1.2.1"
 test_truth = "com.google.truth:truth:1.4.5"
@@ -231,7 +231,7 @@ color_picker = "io.mhssn:colorpicker:1.0.0"
 
 # Analytics
 posthog = "com.posthog:posthog-android:3.26.0"
-sentry = "io.sentry:sentry-android:8.27.1"
+sentry = "io.sentry:sentry-android:8.28.0"
 # main branch can be tested replacing the version with main-SNAPSHOT
 matrix_analytics_events = "com.github.matrix-org:matrix-analytics-events:0.29.2"
 
