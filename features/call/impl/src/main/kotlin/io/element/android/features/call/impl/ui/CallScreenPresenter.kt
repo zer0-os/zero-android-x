@@ -151,7 +151,7 @@ class CallScreenPresenter(
 
             LaunchedEffect(Unit) {
                 // Wait for the call to be joined, if it takes too long, we display an error
-                delay(10.seconds)
+                delay(20.seconds)
 
                 if (!isWidgetLoaded) {
                     Timber.w("The call took too long to load. Displaying an error before exiting.")

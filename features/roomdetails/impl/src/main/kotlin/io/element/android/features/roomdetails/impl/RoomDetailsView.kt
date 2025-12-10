@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import im.vector.app.features.analytics.plan.Interaction
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
+import io.element.android.features.roomcall.api.hasPermissionToJoin
 import io.element.android.features.userprofile.api.UserProfileVerificationState
 import io.element.android.libraries.androidutils.system.copyToClipboard
 import io.element.android.libraries.architecture.coverage.ExcludeFromCoverage
@@ -388,14 +389,14 @@ private fun MainActionsSection(
                 )
             }
         }
-        /*if (state.roomCallState.hasPermissionToJoin()) {
+        if (state.roomCallState.hasPermissionToJoin()) {
             // TODO Improve the view depending on all the cases here?
             MainActionButton(
                 title = stringResource(CommonStrings.action_call),
                 imageVector = CompoundIcons.VideoCall(),
                 onClick = onCall,
             )
-        }*/
+        }
         if (state.roomType is RoomDetailsType.Room) {
             if (state.canInvite) {
                 MainActionButton(
