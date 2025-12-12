@@ -162,6 +162,7 @@ class WalletPresenter(
                     }
                 }
                 is WalletEvents.StakePoolSelected -> {
+                    selectedStakePool.value = null
                     coroutineState.fetchPoolData(
                         pool = event.pool,
                         selectedStakePoolState = selectedStakePool,
@@ -483,14 +484,27 @@ class WalletPresenter(
         }
         if (stakeTokenInfo != null && stakeTokenBalance != null && rewardsTokenInfo != null && rewardsTokenBalance != null) {
             genericActionState.value = AsyncAction.Success(Unit)
-            selectedStakePoolState.value = SelectedStakePool(
-                poolInfo = pool,
-                stakeTokenInfo = stakeTokenInfo,
-                stakeTokenBalance = stakeTokenBalance,
-                rewardsTokenInfo = rewardsTokenInfo,
-                rewardsTokenBalance = rewardsTokenBalance
-            )
-            showWalletStakingSheetState.value = true
+            val selectedStakePoolId = selectedStakePoolState.value?.poolInfo?.poolAddress
+            if (selectedStakePoolId != null) {
+                if (pool.poolAddress == selectedStakePoolId) {
+                    selectedStakePoolState.value = SelectedStakePool(
+                        poolInfo = pool,
+                        stakeTokenInfo = stakeTokenInfo,
+                        stakeTokenBalance = stakeTokenBalance,
+                        rewardsTokenInfo = rewardsTokenInfo,
+                        rewardsTokenBalance = rewardsTokenBalance
+                    )
+                }
+            } else {
+                selectedStakePoolState.value = SelectedStakePool(
+                    poolInfo = pool,
+                    stakeTokenInfo = stakeTokenInfo,
+                    stakeTokenBalance = stakeTokenBalance,
+                    rewardsTokenInfo = rewardsTokenInfo,
+                    rewardsTokenBalance = rewardsTokenBalance
+                )
+                showWalletStakingSheetState.value = true
+            }
         } else {
             genericActionState.value = AsyncAction.Failure(Throwable("Failed to fetch pool data. Required values are missing"))
         }
