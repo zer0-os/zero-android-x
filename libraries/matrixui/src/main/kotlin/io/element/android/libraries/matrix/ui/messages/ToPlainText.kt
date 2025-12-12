@@ -28,6 +28,20 @@ fun TextMessageType.toPlainText(
 //) = formatted?.toPlainText(permalinkParser) ?: body
 ) = simplyFormattedBody()
 
+fun TextMessageType.simplified(): TextMessageType {
+    val text = body
+
+    val simplifiedContentRegex = Regex(
+        pattern = """^> <@[0-9a-fA-F-]{36}:[^>]+>.*?\n\n(.*)""",
+        options = setOf(RegexOption.DOT_MATCHES_ALL)
+    )
+    val match = simplifiedContentRegex.find(text)
+    return TextMessageType(
+        body = match?.groupValues?.get(1) ?: text,
+        formatted = formatted
+    )
+}
+
 /**
  * Converts the HTML string in [FormattedBody.body] to a plain text representation by parsing it and removing all formatting.
  * If the message is not formatted or the format is not [MessageFormat.HTML] we return `null`.
