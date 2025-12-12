@@ -28,6 +28,7 @@ import io.element.android.libraries.matrix.impl.util.anonymizedTokens
 import io.element.android.libraries.network.useragent.UserAgentProvider
 import io.element.android.libraries.sessionstorage.api.SessionData
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.libraries.workmanager.api.WorkManagerScheduler
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.data.repository.ZeroCoreRepository
@@ -65,6 +66,7 @@ class RustMatrixClientFactory(
     private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val clientBuilderProvider: ClientBuilderProvider,
     private val sqliteStoreBuilderProvider: SqliteStoreBuilderProvider,
+    private val workManagerScheduler: WorkManagerScheduler,
     private val networkMonitor: NetworkMonitor,
     private val zeroCoreRepository: ZeroCoreRepository?,
 ) {
@@ -120,6 +122,7 @@ class RustMatrixClientFactory(
             timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
             featureFlagService = featureFlagService,
             analyticsService = analyticsService,
+            workManagerScheduler = workManagerScheduler,
             networkMonitor = networkMonitor,
             zeroCoreRepository = zeroCoreRepository,
         ).also {

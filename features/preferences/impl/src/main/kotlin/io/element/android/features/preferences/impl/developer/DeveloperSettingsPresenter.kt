@@ -30,6 +30,7 @@ import io.element.android.features.preferences.impl.developer.tracing.toLogLevel
 import io.element.android.features.preferences.impl.model.EnabledFeature
 import io.element.android.features.preferences.impl.tasks.ClearCacheUseCase
 import io.element.android.features.preferences.impl.tasks.ComputeCacheSizeUseCase
+import io.element.android.features.preferences.impl.tasks.VacuumStoresUseCase
 import io.element.android.features.preferences.impl.tasks.DeleteAccountUseCase
 import io.element.android.features.rageshake.api.preferences.RageshakePreferencesState
 import io.element.android.libraries.architecture.AsyncAction
@@ -65,6 +66,7 @@ class DeveloperSettingsPresenter(
     private val logoutUseCase: LogoutUseCase,
     private val buildMeta: BuildMeta,
     private val enterpriseService: EnterpriseService,
+    private val vacuumStoresUseCase: VacuumStoresUseCase,
 ) : Presenter<DeveloperSettingsState> {
     @Composable
     override fun present(): DeveloperSettingsState {
@@ -158,6 +160,9 @@ class DeveloperSettingsPresenter(
                 }
                 is DeveloperSettingsEvents.SetShowColorPicker -> {
                     showColorPicker = event.show
+                }
+                DeveloperSettingsEvents.VacuumStores -> coroutineScope.launch {
+                    vacuumStoresUseCase()
                 }
                 DeveloperSettingsEvents.DeleteUserAccount -> {
                     coroutineScope.deleteAccount(isDeleteAccountInProgress)

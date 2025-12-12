@@ -106,7 +106,10 @@ import io.element.android.libraries.matrix.impl.util.SessionPathsProvider
 import io.element.android.libraries.matrix.impl.util.cancelAndDestroy
 import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
 import io.element.android.libraries.matrix.impl.verification.RustSessionVerificationService
+import io.element.android.libraries.matrix.impl.workmanager.PerformDatabaseVacuumWorkManagerRequest
 import io.element.android.libraries.sessionstorage.api.SessionStore
+import io.element.android.libraries.workmanager.api.WorkManagerRequestType
+import io.element.android.libraries.workmanager.api.WorkManagerScheduler
 import io.element.android.services.analytics.api.AnalyticsService
 import io.element.android.services.toolbox.api.systemclock.SystemClock
 import io.element.android.support.zero.common.extension.withSameScope
@@ -180,6 +183,7 @@ class RustMatrixClient(
     timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
     private val featureFlagService: FeatureFlagService,
     private val analyticsService: AnalyticsService,
+    private val workManagerScheduler: WorkManagerScheduler,
     val zeroCoreRepository: ZeroCoreRepository?
 ) : MatrixClient {
     override val sessionId: UserId = UserId(innerClient.userId())
@@ -335,6 +339,9 @@ class RustMatrixClient(
             // Force a refresh of the profile
             getUserProfile(forceRefresh = true)
         }
+
+        // Schedule regular database vacuuming to ensure DB performance remains optimal
+        scheduleDatabaseVacuum()
     }
 
     override fun userIdServerName(): String {
@@ -883,6 +890,13 @@ class RustMatrixClient(
         }
     }
 
+    override suspend fun performDatabaseVacuum(): Result<Unit> = withContext(sessionDispatcher) {
+        runCatchingExceptions {
+            Timber.d("Performing database vacuuming for session $sessionId...")
+            innerClient.optimizeStores()
+        }
+    }
+
     private suspend fun getCacheSize(
         includeCryptoDb: Boolean = false,
     ): Long = withContext(sessionDispatcher) {
@@ -906,6 +920,15 @@ class RustMatrixClient(
     private suspend fun deleteSessionDirectory() = withContext(sessionDispatcher) {
         // Delete all the files for this session
         sessionPathsProvider.provides(sessionId)?.deleteRecursively()
+    }
+
+    private fun scheduleDatabaseVacuum() {
+        // If there's already a periodic work request, do not schedule another one
+        if (workManagerScheduler.hasPendingWork(sessionId, WorkManagerRequestType.DB_VACUUM)) return
+
+        Timber.i("Scheduling periodic database vacuuming for session $sessionId")
+        val request = PerformDatabaseVacuumWorkManagerRequest(sessionId)
+        workManagerScheduler.submit(request)
     }
 
     //region ZERO

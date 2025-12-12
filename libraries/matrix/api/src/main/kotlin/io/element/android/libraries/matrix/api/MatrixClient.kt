@@ -237,6 +237,8 @@ interface MatrixClient {
      */
     suspend fun markRoomAsFullyRead(roomId: RoomId, eventId: EventId): Result<Unit>
 
+    suspend fun performDatabaseVacuum(): Result<Unit>
+
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
 

@@ -23,6 +23,7 @@ import io.element.android.libraries.matrix.test.A_USER_NAME
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.libraries.sessionstorage.test.InMemorySessionStore
 import io.element.android.libraries.sessionstorage.test.aSessionData
+import io.element.android.libraries.workmanager.test.FakeWorkManagerScheduler
 import io.element.android.services.analytics.test.FakeAnalyticsService
 import io.element.android.services.toolbox.test.systemclock.FakeSystemClock
 import io.element.android.tests.testutils.lambda.lambdaRecorder
@@ -117,6 +118,7 @@ class RustMatrixClientTest {
         timelineEventTypeFilterFactory = FakeTimelineEventTypeFilterFactory(),
         featureFlagService = FakeFeatureFlagService(),
         analyticsService = FakeAnalyticsService(),
+        workManagerScheduler = FakeWorkManagerScheduler(submitLambda = {}),
         zeroCoreRepository = null
     )
 }

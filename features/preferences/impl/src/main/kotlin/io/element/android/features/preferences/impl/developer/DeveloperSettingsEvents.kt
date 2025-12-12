@@ -21,5 +21,6 @@ sealed interface DeveloperSettingsEvents {
     data class SetShowColorPicker(val show: Boolean) : DeveloperSettingsEvents
     data class ChangeBrandColor(val color: Color?) : DeveloperSettingsEvents
     data object ClearCache : DeveloperSettingsEvents
+    data object VacuumStores : DeveloperSettingsEvents
     data object DeleteUserAccount: DeveloperSettingsEvents
 }

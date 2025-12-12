@@ -35,6 +35,7 @@ dependencies {
     implementation(projects.libraries.featureflag.api)
     implementation(projects.libraries.network)
     implementation(projects.libraries.preferences.api)
+    implementation(projects.libraries.workmanager.api)
     implementation(projects.services.analytics.api)
     implementation(projects.services.toolbox.api)
     api(projects.libraries.matrix.api)
@@ -52,6 +53,7 @@ dependencies {
     testImplementation(projects.libraries.preferences.test)
     testImplementation(projects.libraries.previewutils)
     testImplementation(projects.libraries.sessionStorage.test)
+    testImplementation(projects.libraries.workmanager.test)
     testImplementation(projects.services.analytics.test)
     testImplementation(projects.services.toolbox.test)
 }

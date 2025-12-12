@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
-import dev.zacsweers.metro.Inject
 import io.element.android.libraries.androidutils.file.TemporaryUriDeleter
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
@@ -31,7 +30,7 @@ import io.element.android.libraries.matrix.ui.media.AvatarAction
 import io.element.android.libraries.mediapickers.api.PickerProvider
 import io.element.android.libraries.mediaupload.api.MediaOptimizationConfigProvider
 import io.element.android.libraries.mediaupload.api.MediaPreProcessor
-import io.element.android.libraries.permissions.api.PermissionsEvents
+import io.element.android.libraries.permissions.api.PermissionsEvent
 import io.element.android.libraries.permissions.api.PermissionsPresenter
 import io.element.android.support.zero.common.util.ValidationUtil
 import io.element.android.support.zero.common.util.ZeroCreateAccountInviteHolder
@@ -118,7 +117,7 @@ class CompleteProfilePresenter constructor(
                             cameraPhotoPicker.launch()
                         } else {
                             pendingPermissionRequest = true
-                            cameraPermissionState.eventSink(PermissionsEvents.RequestPermissions)
+                            cameraPermissionState.eventSink(PermissionsEvent.RequestPermissions)
                         }
                         AvatarAction.Remove -> {
                             temporaryUriDeleter.delete(userAvatarUri)

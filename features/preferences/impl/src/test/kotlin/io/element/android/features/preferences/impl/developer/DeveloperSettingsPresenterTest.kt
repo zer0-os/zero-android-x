@@ -20,6 +20,7 @@ import io.element.android.features.logout.test.FakeLogoutUseCase
 import io.element.android.features.preferences.impl.developer.tracing.LogLevelItem
 import io.element.android.features.preferences.impl.tasks.FakeClearCacheUseCase
 import io.element.android.features.preferences.impl.tasks.FakeComputeCacheSizeUseCase
+import io.element.android.features.preferences.impl.tasks.VacuumStoresUseCase
 import io.element.android.features.preferences.impl.tasks.FakeDeleteAccountUseCase
 import io.element.android.features.rageshake.api.preferences.aRageshakePreferencesState
 import io.element.android.libraries.architecture.AsyncAction
@@ -216,6 +217,23 @@ class DeveloperSettingsPresenterTest {
         }
     }
 
+    @Test
+    fun `present - VacuumStores action invokes the VacuumStoresUseCase`() = runTest {
+        var vacuumCalled = false
+        val presenter = createDeveloperSettingsPresenter(
+            vacuumStoresUseCase = VacuumStoresUseCase {
+                vacuumCalled = true
+            }
+        )
+        presenter.test {
+            val state = awaitItem()
+            assertThat(vacuumCalled).isFalse()
+            state.eventSink(DeveloperSettingsEvents.VacuumStores)
+            skipItems(1)
+            assertThat(vacuumCalled).isTrue()
+        }
+    }
+
     private fun createDeveloperSettingsPresenter(
         sessionId: SessionId = A_SESSION_ID,
         featureFlagService: FakeFeatureFlagService = FakeFeatureFlagService(
@@ -235,7 +253,8 @@ class DeveloperSettingsPresenterTest {
         buildMeta: BuildMeta = aBuildMeta(),
         enterpriseService: EnterpriseService = FakeEnterpriseService(),
         logoutUserUseCase: LogoutUseCase = FakeLogoutUseCase(),
-        deleteAccountUserCase: FakeDeleteAccountUseCase = FakeDeleteAccountUseCase()
+        deleteAccountUserCase: FakeDeleteAccountUseCase = FakeDeleteAccountUseCase(),
+        vacuumStoresUseCase: VacuumStoresUseCase = VacuumStoresUseCase {},
     ): DeveloperSettingsPresenter {
         return DeveloperSettingsPresenter(
             sessionId = sessionId,
@@ -246,6 +265,7 @@ class DeveloperSettingsPresenterTest {
             appPreferencesStore = preferencesStore,
             buildMeta = buildMeta,
             enterpriseService = enterpriseService,
+            vacuumStoresUseCase = vacuumStoresUseCase,
             logoutUseCase = logoutUserUseCase,
             deleteAccountUseCase = deleteAccountUserCase
         )
