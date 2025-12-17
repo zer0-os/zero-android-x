@@ -10,6 +10,7 @@ package io.element.android.features.roomdetails.impl
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -18,11 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import dev.zacsweers.metro.Inject
 import im.vector.app.features.analytics.plan.Interaction
+import io.element.android.features.knockrequests.api.knockRequestPermissions
 import io.element.android.features.leaveroom.api.LeaveRoomEvent
 import io.element.android.features.leaveroom.api.LeaveRoomState
 import io.element.android.features.roomcall.api.RoomCallState
 import io.element.android.features.roomdetails.impl.members.details.RoomMemberDetailsPresenter
-import io.element.android.features.securityandprivacy.api.securityAndPrivacyPermissionsAsState
+import io.element.android.features.roomdetailsedit.api.RoomDetailsEditPermissions
+import io.element.android.features.roomdetailsedit.api.roomDetailsEditPermissions
+import io.element.android.features.securityandprivacy.api.securityAndPrivacyPermissions
 import io.element.android.libraries.androidutils.clipboard.ClipboardHelper
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.core.coroutine.CoroutineDispatchers
@@ -37,22 +41,18 @@ import io.element.android.libraries.matrix.api.notificationsettings.Notification
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.RoomMember
-import io.element.android.libraries.matrix.api.room.RoomMembersState
-import io.element.android.libraries.matrix.api.room.StateEventType
 import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
 import io.element.android.libraries.matrix.api.room.isDeadRoom
+import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.room.join.JoinRule
-import io.element.android.libraries.matrix.api.room.powerlevels.canInvite
-import io.element.android.libraries.matrix.api.room.powerlevels.canSendState
+import io.element.android.libraries.matrix.api.room.powerlevels.canEditRolesAndPermissions
+import io.element.android.libraries.matrix.api.room.powerlevels.permissionsAsState
 import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
 import io.element.android.libraries.matrix.api.zero.user.zIdOrWalletAddressDisplay
 import io.element.android.libraries.matrix.ui.messages.RoomMemberProfilesCache
-import io.element.android.libraries.matrix.ui.room.canHandleKnockRequestsAsState
 import io.element.android.libraries.matrix.ui.room.getCurrentRoomMember
 import io.element.android.libraries.matrix.ui.room.getDirectRoomMember
-import io.element.android.libraries.matrix.ui.room.isDmAsState
-import io.element.android.libraries.matrix.ui.room.isOwnUserAdmin
 import io.element.android.libraries.matrix.ui.room.roomMemberIdentityStateChange
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.ui.strings.CommonStrings
@@ -85,8 +85,6 @@ class RoomDetailsPresenter(
         val leaveRoomState = leaveRoomPresenter.present()
         val roomInfo by room.roomInfoFlow.collectAsState()
         val roomMembers by room.membersStateFlow.collectAsState()
-        val isUserAdmin = room.isOwnUserAdmin()
-        val syncUpdateFlow = room.syncUpdateFlow.collectAsState()
         val roomAvatar by remember { derivedStateOf { roomInfo.avatarUrl } }
 
         val directZeroMember = room.directZeroUser.collectAsState()
@@ -104,15 +102,11 @@ class RoomDetailsPresenter(
             observeNotificationSettings()
         }
 
+        val isDm = roomInfo.isDm
         val membersState by room.membersStateFlow.collectAsState()
-        val canInvite by getCanInvite(membersState)
-
+        val permissions by getPermissions()
         val canonicalAlias by remember { derivedStateOf { roomInfo.canonicalAlias } }
         val isEncrypted by remember { derivedStateOf { roomInfo.isEncrypted == true } }
-        val isDm by room.isDmAsState()
-        val canEditName by getCanSendState(membersState, StateEventType.ROOM_NAME)
-        val canEditAvatar by getCanSendState(membersState, StateEventType.ROOM_AVATAR)
-        val canEditTopic by getCanSendState(membersState, StateEventType.ROOM_TOPIC)
         val dmMember by room.getDirectRoomMember(membersState)
         val currentMember by room.getCurrentRoomMember(membersState)
         val roomMemberDetailsPresenter = roomMemberDetailsPresenter(dmMember)
@@ -120,16 +114,15 @@ class RoomDetailsPresenter(
         val roomCallState = roomCallStatePresenter.present()
         val joinedMemberCount by remember { derivedStateOf { roomInfo.joinedMembersCount } }
 
-        val topicState = remember(canEditTopic, roomTopic, roomType) {
+        val topicState = remember(permissions.editDetailsPermissions.canEditTopic, roomTopic, roomType) {
             val topic = roomTopic
             when {
                 !topic.isNullOrBlank() -> RoomTopicState.ExistingTopic(topic)
-                canEditTopic && roomType is RoomDetailsType.Room -> RoomTopicState.CanAddTopic
+                permissions.editDetailsPermissions.canEditTopic && roomType is RoomDetailsType.Room -> RoomTopicState.CanAddTopic
                 else -> RoomTopicState.Hidden
             }
         }
 
-        val canHandleKnockRequests by room.canHandleKnockRequestsAsState(syncUpdateFlow.value)
         val isKnockRequestsEnabled by remember {
             featureFlagService.isFeatureEnabledFlow(FeatureFlags.Knock)
         }.collectAsState(false)
@@ -137,7 +130,7 @@ class RoomDetailsPresenter(
             room.knockRequestsFlow.collect { value = it.size }
         }
         val canShowKnockRequests by remember {
-            derivedStateOf { isKnockRequestsEnabled && canHandleKnockRequests && joinRule == JoinRule.Knock }
+            derivedStateOf { isKnockRequestsEnabled && permissions.canManageKnockRequests && joinRule == JoinRule.Knock }
         }
         val isDeveloperModeEnabled by remember {
             appPreferencesStore.isDeveloperModeEnabledFlow()
@@ -173,13 +166,6 @@ class RoomDetailsPresenter(
 
         val roomMemberDetailsState = roomMemberDetailsPresenter?.present()
 
-        val securityAndPrivacyPermissions = room.securityAndPrivacyPermissionsAsState(syncUpdateFlow.value)
-        val canShowSecurityAndPrivacy by remember {
-            derivedStateOf {
-                roomType is RoomDetailsType.Room && securityAndPrivacyPermissions.value.hasAny
-            }
-        }
-
         val hasMemberVerificationViolations by produceState(false) {
             room.roomMemberIdentityStateChange(waitForEncryption = true)
                 .onEach { identities -> value = identities.any { it.identityState == IdentityState.VerificationViolation } }
@@ -197,15 +183,15 @@ class RoomDetailsPresenter(
             roomSubTitle = roomSubTitle,
             memberCount = joinedMemberCount,
             isEncrypted = isEncrypted,
-            canInvite = canInvite,
-            canEdit = (canEditAvatar || canEditName || canEditTopic) && roomType == RoomDetailsType.Room,
+            canInvite = permissions.canInvite,
+            canEdit = roomType == RoomDetailsType.Room && permissions.editDetailsPermissions.hasAny,
             roomCallState = roomCallState,
             roomType = roomType,
             roomMemberDetailsState = roomMemberDetailsState,
             leaveRoomState = leaveRoomState,
             roomNotificationSettings = roomNotificationSettingsState.roomNotificationSettings(),
             isFavorite = isFavorite,
-            displayRolesAndPermissionsSettings = !isDm && isUserAdmin,
+            displayRolesAndPermissionsSettings = !isDm && permissions.canEditRolesAndPermissions,
             isPublic = joinRule == JoinRule.Public,
             heroes = roomMembers.roomMembers().orEmpty().toImmutableList(),
 //            heroes = roomInfo.heroes.toImmutableList(),
@@ -213,7 +199,7 @@ class RoomDetailsPresenter(
             snackbarMessage = snackbarMessage,
             canShowKnockRequests = canShowKnockRequests,
             knockRequestsCount = knockRequestsCount,
-            canShowSecurityAndPrivacy = canShowSecurityAndPrivacy,
+            canShowSecurityAndPrivacy = !isDm && permissions.canEditSecurityAndPrivacy,
             hasMemberVerificationViolations = hasMemberVerificationViolations,
             canReportRoom = canReportRoom,
             isTombstoned = roomInfo.successorRoom != null,
@@ -248,14 +234,25 @@ class RoomDetailsPresenter(
         }
     }
 
-    @Composable
-    private fun getCanInvite(membersState: RoomMembersState) = produceState(false, membersState) {
-        value = room.canInvite().getOrElse { false }
-    }
+    private data class Permissions(
+        val canInvite: Boolean = false,
+        val editDetailsPermissions: RoomDetailsEditPermissions = RoomDetailsEditPermissions.DEFAULT,
+        val canManageKnockRequests: Boolean = false,
+        val canEditRolesAndPermissions: Boolean = false,
+        val canEditSecurityAndPrivacy: Boolean = false,
+    )
 
     @Composable
-    private fun getCanSendState(membersState: RoomMembersState, type: StateEventType) = produceState(false, membersState) {
-        value = room.canSendState(type).getOrElse { false }
+    private fun getPermissions(): State<Permissions> {
+        return room.permissionsAsState(Permissions()) { perms ->
+            Permissions(
+                canInvite = perms.canOwnUserInvite(),
+                editDetailsPermissions = perms.roomDetailsEditPermissions(),
+                canManageKnockRequests = perms.knockRequestPermissions().hasAny,
+                canEditRolesAndPermissions = perms.canEditRolesAndPermissions(),
+                canEditSecurityAndPrivacy = perms.securityAndPrivacyPermissions().hasAny,
+            )
+        }
     }
 
     private fun CoroutineScope.observeNotificationSettings() {
