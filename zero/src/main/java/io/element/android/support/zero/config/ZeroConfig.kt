@@ -22,7 +22,7 @@ sealed class EnvironmentConfig(
 
     data object Development : EnvironmentConfig(
         appName = "ZERO Dev",
-        matrixHomeServerUrl = "https://zero-synapse-development-db365bf96189.herokuapp.com",
+        matrixHomeServerUrl = "https://synapse-dev.zero.tech",
         matrixPushGateway = "https://zos-push-gateway-development-6477b312dabd.herokuapp.com/_matrix/push/v1/notify",
         zosUrl = "https://zos-api-development-fb2c513ffa60.herokuapp.com/",
         walletConnectKey = BuildConfig.WALLET_CONNECT_PROJECT_ID
@@ -30,7 +30,7 @@ sealed class EnvironmentConfig(
 
     data object Production : EnvironmentConfig(
         appName = "ZERO",
-        matrixHomeServerUrl = "https://zos-home-2-e24b9412096f.herokuapp.com",
+        matrixHomeServerUrl = "https://synapse.zero.tech",
         matrixPushGateway = "https://zos-push-gateway-c101e2f4da49.herokuapp.com/_matrix/push/v1/notify",
         zosUrl = "https://zosapi.zero.tech/",
         walletConnectKey = BuildConfig.WALLET_CONNECT_PROJECT_ID
