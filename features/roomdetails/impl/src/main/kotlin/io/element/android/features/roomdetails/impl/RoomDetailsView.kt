@@ -796,6 +796,7 @@ private fun DebugInfoSection(
 ) {
     val context = LocalContext.current
     PreferenceCategory(showTopDivider = true) {
+        val toastMessage = stringResource(CommonStrings.common_copied_to_clipboard)
         ListItem(
             headlineContent = {
                 Text("Internal room ID")
@@ -811,8 +812,8 @@ private fun DebugInfoSection(
             trailingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Copy())),
             onClick = {
                 context.copyToClipboard(
-                    roomId.value,
-                    context.getString(CommonStrings.common_copied_to_clipboard)
+                    text = roomId.value,
+                    toastMessage = toastMessage,
                 )
             },
         )

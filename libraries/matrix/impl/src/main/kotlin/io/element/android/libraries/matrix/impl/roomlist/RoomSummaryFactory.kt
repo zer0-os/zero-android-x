@@ -17,6 +17,7 @@ import io.element.android.libraries.matrix.impl.timeline.item.event.map
 import io.element.android.support.zero.data.repository.UserRepository
 import org.matrix.rustcomponents.sdk.Room
 import org.matrix.rustcomponents.sdk.use
+import uniffi.matrix_sdk_ui.LatestEventValueLocalState
 import org.matrix.rustcomponents.sdk.LatestEventValue as RustLatestEventValue
 
 class RoomSummaryFactory(
@@ -29,15 +30,29 @@ class RoomSummaryFactory(
         val latestEvent = room.latestEvent().use { event ->
             when (event) {
                 is RustLatestEventValue.None -> LatestEventValue.None
-                is RustLatestEventValue.Local -> {
-                    val cachedUserProfile = zeroUserRepository?.getUserFromCache(event.sender)
-                    LatestEventValue.Local(
-                        timestamp = event.timestamp.toLong(),
-                        content = contentMapper.map(event.content),
-                        isSending = event.isSending,
-                        senderId = UserId(event.sender),
-                        senderProfile = event.profile.map(cachedUser = cachedUserProfile),
-                    )
+                is RustLatestEventValue.Local -> when (event.state) {
+                    LatestEventValueLocalState.IS_SENDING,
+                    LatestEventValueLocalState.CANNOT_BE_SENT -> {
+                        val cachedUserProfile = zeroUserRepository?.getUserFromCache(event.sender)
+                        LatestEventValue.Local(
+                            timestamp = event.timestamp.toLong(),
+                            content = contentMapper.map(event.content),
+                            isSending = event.state == LatestEventValueLocalState.IS_SENDING,
+                            senderId = UserId(event.sender),
+                            senderProfile = event.profile.map(cachedUser = cachedUserProfile),
+                        )
+                    }
+                    // This is the same as a remote event, we just haven't received the local -> remote update yet
+                    LatestEventValueLocalState.HAS_BEEN_SENT -> {
+                        val cachedUserProfile = zeroUserRepository?.getUserFromCache(event.sender)
+                        LatestEventValue.Remote(
+                            timestamp = event.timestamp.toLong(),
+                            content = contentMapper.map(event.content),
+                            senderId = UserId(event.sender),
+                            senderProfile = event.profile.map(cachedUser = cachedUserProfile),
+                            isOwn = true,
+                        )
+                    }
                 }
                 is RustLatestEventValue.Remote -> {
                     val cachedUserProfile = zeroUserRepository?.getUserFromCache(event.sender)

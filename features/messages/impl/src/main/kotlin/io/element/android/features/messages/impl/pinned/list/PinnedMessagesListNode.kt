@@ -15,6 +15,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.plugin.Plugin
@@ -101,6 +102,7 @@ class PinnedMessagesListNode(
             LocalTimelineItemPresenterFactories provides timelineItemPresenterFactories,
         ) {
             val context = LocalContext.current
+            val toastMessage = stringResource(CommonStrings.common_copied_to_clipboard)
             val view = LocalView.current
             val state = presenter.present()
             PinnedMessagesListView(
@@ -114,8 +116,8 @@ class PinnedMessagesListNode(
                         HapticFeedbackConstants.LONG_PRESS
                     )
                     context.copyToClipboard(
-                        it.url,
-                        context.getString(CommonStrings.common_copied_to_clipboard)
+                        text = it.url,
+                        toastMessage = toastMessage,
                     )
                 },
                 modifier = modifier
