@@ -12,6 +12,7 @@ package io.element.android.libraries.matrix.impl
 
 import com.google.common.truth.Truth.assertThat
 import io.element.android.features.networkmonitor.api.NetworkMonitor
+import io.element.android.libraries.core.data.bytes
 import io.element.android.libraries.featureflag.test.FakeFeatureFlagService
 import io.element.android.libraries.matrix.impl.fixtures.fakes.FakeFfiClient
 import io.element.android.libraries.matrix.impl.fixtures.fakes.FakeFfiSyncService
@@ -35,6 +36,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.matrix.rustcomponents.sdk.Client
+import org.matrix.rustcomponents.sdk.StoreSizes
 import org.matrix.rustcomponents.sdk.UserProfile
 import java.io.File
 
@@ -97,6 +99,20 @@ class RustMatrixClientTest {
                 value(AN_AVATAR_URL),
             )
         client.destroy()
+    }
+
+    @Test
+    fun `getDatabaseSizes returns the database sizes`() = runTest {
+        val client = createRustMatrixClient(
+            client = FakeFfiClient(getStoreSizesResult = { StoreSizes(null, 10uL, 11uL, 12uL) })
+        )
+
+        client.getDatabaseSizes().getOrThrow().run {
+            assertThat(cryptoStore).isNull()
+            assertThat(stateStore).isEqualTo(10.bytes)
+            assertThat(eventCacheStore).isEqualTo(11.bytes)
+            assertThat(mediaStore).isEqualTo(12.bytes)
+        }
     }
 
     private fun TestScope.createRustMatrixClient(

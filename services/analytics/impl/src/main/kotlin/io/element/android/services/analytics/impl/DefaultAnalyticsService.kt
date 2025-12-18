@@ -149,6 +149,18 @@ class DefaultAnalyticsService(
         }
     }
 
+    override fun addExtraData(key: String, value: String) {
+        if (userConsent.get()) {
+            analyticsProviders.onEach { it.addExtraData(key, value) }
+        }
+    }
+
+    override fun addIndexableData(key: String, value: String) {
+        if (userConsent.get()) {
+            analyticsProviders.onEach { it.addIndexableData(key, value) }
+        }
+    }
+
     override fun startTransaction(name: String, operation: String?): AnalyticsTransaction {
         return if (userConsent.get()) {
             analyticsProviders.firstNotNullOfOrNull { it.startTransaction(name, operation) }
