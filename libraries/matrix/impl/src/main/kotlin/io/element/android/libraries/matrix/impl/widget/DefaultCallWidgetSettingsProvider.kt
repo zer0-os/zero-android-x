@@ -50,7 +50,7 @@ class DefaultCallWidgetSettingsProvider(
             // TODO remove this once we have the next EC version
             preload = false,
             // TODO remove this once we have the next EC version
-            skipLobby = null,
+            skipLobby = true,
             intent = when {
                 direct && hasActiveCall -> CallIntent.JOIN_EXISTING_DM
                 hasActiveCall -> CallIntent.JOIN_EXISTING

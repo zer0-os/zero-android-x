@@ -19,6 +19,7 @@ import androidx.core.app.Person
 import dev.zacsweers.metro.Inject
 import io.element.android.appconfig.ElementCallConfig
 import io.element.android.features.call.api.CallType
+import io.element.android.features.call.impl.R
 import io.element.android.features.call.impl.receivers.DeclineCallBroadcastReceiver
 import io.element.android.features.call.impl.ui.IncomingCallActivity
 import io.element.android.features.call.impl.utils.IntentProvider
@@ -124,7 +125,7 @@ class RingingCallNotificationCreator(
         )
 
         return NotificationCompat.Builder(context, notificationChannelId)
-            .setSmallIcon(CommonDrawables.ic_notification)
+            .setSmallIcon(R.drawable.ic_notification_zero_small)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, declineIntent, answerIntent).setIsVideo(true))
