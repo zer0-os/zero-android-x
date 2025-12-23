@@ -71,6 +71,9 @@
 -keep class io.element.android.x.di.** { *; }
 -keepclasseswithmembernames,allowoptimization,allowshrinking class io.element.android.** { *; }
 
+# Keep Metro classes
+-keep class dev.zacsweers.metro.** { *; }
+
 # Needed for Web3-WalletConnect
 -keepnames class com.fasterxml.jackson.** { *; }
 -dontwarn com.fasterxml.jackson.databind.**

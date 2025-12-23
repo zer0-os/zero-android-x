@@ -45,7 +45,6 @@ fun PreferenceSlide(
         leadingContent = preferenceIcon(
             icon = icon,
             iconResourceId = iconResourceId,
-            enabled = enabled,
             showIconAreaIfNoIcon = showIconAreaIfNoIcon,
         ),
         headlineContent = {
