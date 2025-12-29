@@ -66,7 +66,7 @@ internal fun SimpleAlertDialogContent(
         content = {
             Text(
                 text = content,
-                style = ElementTheme.materialTypography.bodyMedium,
+                style = ElementTheme.typography.fontBodyMdRegular,
             )
         },
         submitText = submitText,

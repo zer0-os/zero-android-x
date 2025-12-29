@@ -235,10 +235,6 @@ private fun DefaultRoomListTopBar(
         MaterialTheme(
             colorScheme = ElementTheme.materialColors,
             shapes = MaterialTheme.shapes,
-            typography = ElementTheme.materialTypography.copy(
-                headlineSmall = expandedTitleTextStyle,
-                titleLarge = collapsedTitleTextStyle
-            ),
         ) {
             Column {
                 MediumTopAppBar(
