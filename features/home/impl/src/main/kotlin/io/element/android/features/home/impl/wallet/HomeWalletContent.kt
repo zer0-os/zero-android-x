@@ -152,7 +152,7 @@ private fun ZeroWalletCard(
 
                 Spacer(Modifier.size(SPACING_2X.dp))
 
-                IconButton(
+                /*IconButton(
                     onClick = onToggleWalletBalance,
                     modifier = Modifier.size(16.dp)
                 ) {
@@ -165,7 +165,7 @@ private fun ZeroWalletCard(
                         contentDescription = null,
                         tint = ElementTheme.colors.textSecondary
                     )
-                }
+                }*/
             }
             Text(
                 text = walletBalance,

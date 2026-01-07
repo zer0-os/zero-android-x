@@ -38,8 +38,6 @@ import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.designsystem.utils.snackbar.SnackbarDispatcher
 import io.element.android.libraries.designsystem.utils.snackbar.collectSnackbarMessageAsState
-import io.element.android.libraries.featureflag.api.FeatureFlagService
-import io.element.android.libraries.featureflag.api.FeatureFlags
 import io.element.android.libraries.indicator.api.IndicatorService
 import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.sync.SyncService
@@ -69,7 +67,6 @@ class HomePresenter(
     private val roomDirectoryPresenter: Presenter<RoomDirectoryState>,
     private val logoutPresenter: Presenter<DirectLogoutState>,
     private val rageshakeFeatureAvailability: RageshakeFeatureAvailability,
-    private val featureFlagService: FeatureFlagService,
     private val sessionStore: SessionStore,
     private val announcementService: AnnouncementService,
 ) : Presenter<HomeState> {
@@ -96,9 +93,6 @@ class HomePresenter(
         val walletContentState = walletPresenter.present()
         val roomDirectoryState = roomDirectoryPresenter.present()
 
-        val isSpaceFeatureEnabled by remember {
-            featureFlagService.isFeatureEnabledFlow(FeatureFlags.Space)
-        }.collectAsState(initial = false)
         var currentHomeNavigationBarItemOrdinal by rememberSaveable { mutableIntStateOf(HomeNavigationBarItem.Chats.ordinal) }
         val currentHomeNavigationBarItem by remember {
             derivedStateOf {
@@ -198,7 +192,6 @@ class HomePresenter(
             snackbarMessage = snackbarMessage,
             canReportBug = canReportBug,
             directLogoutState = directLogoutState,
-            isSpaceFeatureEnabled = isSpaceFeatureEnabled,
             shouldShowNewRewardsIntimation = shouldShowRoomIntimation && shouldShowNewRewardsIntimation.value,
             userRewards = userRewards.value,
             showClaimRewardsSheet = showClaimRewardsSheet.value,

@@ -45,7 +45,6 @@ data class HomeState(
     val snackbarMessage: SnackbarMessage?,
     val canReportBug: Boolean,
     val directLogoutState: DirectLogoutState,
-    val isSpaceFeatureEnabled: Boolean,
     val shouldShowNewRewardsIntimation: Boolean = true,
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
     val showClaimRewardsSheet: Boolean,
@@ -64,6 +63,6 @@ data class HomeState(
             selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.CHANNEL, HomeScreenTab.FEED)
     }
 
-//    val showNavigationBar = isSpaceFeatureEnabled && homeSpacesState.spaceRooms.isNotEmpty()
+//    val showNavigationBar = homeSpacesState.spaceRooms.isNotEmpty()
     val showNavigationBar = false
 }

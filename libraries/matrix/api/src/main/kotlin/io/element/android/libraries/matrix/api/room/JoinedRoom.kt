@@ -187,4 +187,9 @@ interface JoinedRoom : BaseRoom {
     fun isRoomAChannel(): Boolean
 
     suspend fun getUrlLinkPreview(url: String): Result<ZeroLinkPreview?>
+
+    /**
+     * Subscribe to a [Flow] of [SendQueueUpdate] related to this room.
+     */
+    fun subscribeToSendQueueUpdates(): Flow<SendQueueUpdate>
 }
