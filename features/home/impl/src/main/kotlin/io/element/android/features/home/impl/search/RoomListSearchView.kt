@@ -18,17 +18,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
@@ -136,7 +133,7 @@ private fun RoomListSearchContent(
                     ?.let(onPublicRoomClick)
             }
             room.isAChannel -> {
-                val channelsList = if (state.query.isNotBlank()) {
+                val channelsList = if (state.query.text.isNotBlank()) {
                     ((channelsListState as? ChannelListContentState.Channels)
                         ?.channels ?: emptyList())
                 } else {
@@ -161,27 +158,14 @@ private fun RoomListSearchContent(
                 },
                 navigationIcon = { BackButton(onClick = ::onBackButtonClick) },
                 title = {
-                    // TODO replace `state.query` with TextFieldState when it's available for M3 TextField
                     // The stateSaver will keep the selection state when returning to this UI
-                    var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                        mutableStateOf(TextFieldValue(state.query, TextRange(state.query.length)))
-                    }
-
                     val focusRequester = remember { FocusRequester() }
                     FilledTextField(
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester),
-                        placeholder = {
-                            Text(text = stringResource(CommonStrings.action_search))
-                        },
-                        value = value,
-                        singleLine = true,
-                        onValueChange = {
-                            value = it
-                            state.eventSink(RoomListSearchEvents.QueryChanged(it.text))
-                            roomDirectoryState.eventSink(RoomDirectoryEvents.Search(it.text))
-                        },
+                        state = state.query,
+                        lineLimits = TextFieldLineLimits.SingleLine,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -191,20 +175,18 @@ private fun RoomListSearchContent(
                             disabledIndicatorColor = Color.Transparent,
                             errorIndicatorColor = Color.Transparent,
                         ),
-                        trailingIcon = {
-                            if (value.text.isNotEmpty()) {
-                                IconButton(onClick = {
-                                    value = TextFieldValue("")
-                                    state.eventSink(RoomListSearchEvents.ClearQuery)
-                                    roomDirectoryState.eventSink(RoomDirectoryEvents.Search(""))
-                                }) {
+                        trailingIcon = if (state.query.text.isNotEmpty()) {
+                            @Composable {
+                                IconButton(onClick = { state.eventSink(RoomListSearchEvents.ClearQuery) }) {
                                     Icon(
                                         imageVector = CompoundIcons.Close(),
                                         contentDescription = stringResource(CommonStrings.action_cancel)
                                     )
                                 }
                             }
-                        }
+                        } else {
+                            null
+                        },
                     )
 
                     LaunchedEffect(Unit) {
@@ -225,15 +207,15 @@ private fun RoomListSearchContent(
             LazyColumn(
                 modifier = Modifier.weight(1f),
             ) {
-                val channelsList = if (state.query.isNotBlank()) {
+                val channelsList = if (state.query.text.isNotBlank()) {
                     ((channelsListState as? ChannelListContentState.Channels)
                         ?.channels ?: emptyList())
                 } else {
                     emptyList()
                 }
-                    .filter { it.displayTitle.contains(state.query, true) }
+                    .filter { it.displayTitle.contains(state.query.text, true) }
                     .map { it.toRoomSummary()  }
-                val publicRoomsList = if (state.query.isNotBlank()) {
+                val publicRoomsList = if (state.query.text.isNotBlank()) {
                     roomDirectoryState.roomDescriptions
                 } else {
                     emptyList()
