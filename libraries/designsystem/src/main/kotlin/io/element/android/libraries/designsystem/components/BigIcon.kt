@@ -34,7 +34,6 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
-import io.element.android.libraries.designsystem.theme.components.CircularProgressIndicator
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha10
@@ -84,11 +83,6 @@ object BigIcon {
          * A success style with a tinted background.
          */
         data object SuccessSolid : Style
-
-        /**
-         * A loading style with the default background color.
-         */
-        data object Loading : Style
     }
 
     /**
@@ -112,7 +106,6 @@ object BigIcon {
             Style.Success -> Color.Transparent
             Style.AlertSolid -> ElementTheme.colors.bgCriticalSubtle
             Style.SuccessSolid -> ElementTheme.colors.zeroBrandColorAlpha10
-            Style.Loading -> ElementTheme.colors.bgSubtleSecondary
         }
         Box(
             modifier = modifier
@@ -121,52 +114,39 @@ object BigIcon {
                 .background(backgroundColor),
             contentAlignment = Alignment.Center,
         ) {
-            if (style is Style.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(27.dp),
-                    color = ElementTheme.colors.iconSecondary,
-                    trackColor = Color.Transparent,
-                    strokeWidth = 3.dp,
-                )
-            } else {
-                val icon = when (style) {
-                    is Style.Default -> style.vectorIcon
-                    Style.Alert,
-                    Style.AlertSolid -> CompoundIcons.ErrorSolid()
-                    Style.Success,
-                    Style.SuccessSolid -> CompoundIcons.CheckCircleSolid()
-                    Style.Loading -> error("This should never be reached")
-                }
-                val contentDescription = when (style) {
-                    is Style.Default -> style.contentDescription
-                    Style.Alert,
-                    Style.AlertSolid -> stringResource(CommonStrings.common_error)
-                    Style.Success,
-                    Style.SuccessSolid -> stringResource(CommonStrings.common_success)
-                    Style.Loading -> error("This should never be reached")
-                }
-                val iconTint = when (style) {
-                    is Style.Default -> if (style.useCriticalTint) {
-                        ElementTheme.colors.iconCriticalPrimary
-                    } else if (style.usePrimaryTint) {
-                        ElementTheme.colors.iconPrimary
-                    } else {
-                        ElementTheme.colors.iconSecondary
-                    }
-                    Style.Alert,
-                    Style.AlertSolid -> ElementTheme.colors.iconCriticalPrimary
-                    Style.Success,
-                    Style.SuccessSolid -> ElementTheme.colors.zeroBrandColor
-                    Style.Loading -> error("This should never be reached")
-                }
-
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    tint = iconTint,
-                    imageVector = icon,
-                    contentDescription = contentDescription
-                )
+            val icon = when (style) {
+                is Style.Default -> style.vectorIcon
+                Style.Alert,
+                Style.AlertSolid -> CompoundIcons.ErrorSolid()
+                Style.Success,
+                Style.SuccessSolid -> CompoundIcons.CheckCircleSolid()
             }
+            val contentDescription = when (style) {
+                is Style.Default -> style.contentDescription
+                Style.Alert,
+                Style.AlertSolid -> stringResource(CommonStrings.common_error)
+                Style.Success,
+                Style.SuccessSolid -> stringResource(CommonStrings.common_success)
+            }
+            val iconTint = when (style) {
+                is Style.Default -> if (style.useCriticalTint) {
+                    ElementTheme.colors.iconCriticalPrimary
+                } else if (style.usePrimaryTint) {
+                    ElementTheme.colors.iconPrimary
+                } else {
+                    ElementTheme.colors.iconSecondary
+                }
+                Style.Alert,
+                Style.AlertSolid -> ElementTheme.colors.iconCriticalPrimary
+                Style.Success,
+                Style.SuccessSolid -> ElementTheme.colors.zeroBrandColor
+            }
+            Icon(
+                modifier = Modifier.size(32.dp),
+                tint = iconTint,
+                imageVector = icon,
+                contentDescription = contentDescription
+            )
         }
     }
 }
@@ -201,6 +181,5 @@ internal class BigIconStyleProvider : PreviewParameterProvider<BigIcon.Style> {
             BigIcon.Style.Default(Icons.Filled.CatchingPokemon, useCriticalTint = true),
             BigIcon.Style.Success,
             BigIcon.Style.SuccessSolid,
-            BigIcon.Style.Loading,
         )
 }

@@ -88,7 +88,7 @@ internal fun IncomingCallScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(R.string.screen_incoming_call_subtitle_android),
+                text = "Incoming ZERO Call",
                 style = ElementTheme.zeroTypography.fontBodyLgRegular,
                 color = ElementTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
