@@ -89,7 +89,7 @@ class RingingCallNotificationCreator(
             .setImportant(true)
             .build()
 
-        val answerIntent = IntentProvider.getPendingIntent(context, CallType.RoomCall(sessionId, roomId))
+        val answerIntent = IntentProvider.getPendingIntent(context, CallType.RoomCall(sessionId, roomId, true))
         val notificationData = CallNotificationData(
             sessionId = sessionId,
             roomId = roomId,
@@ -128,7 +128,7 @@ class RingingCallNotificationCreator(
             .setSmallIcon(R.drawable.ic_notification_zero_small)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, declineIntent, answerIntent).setIsVideo(true))
+            .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, declineIntent, answerIntent).setIsVideo(false))
             .addPerson(caller)
             .setAutoCancel(true)
             .setWhen(timestamp)

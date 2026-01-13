@@ -75,7 +75,7 @@ class UserProfileNode(
             goBack = this::navigateUp,
             onShareUser = ::onShareUser,
             onOpenDm = ::onStartDM,
-            onStartCall = callback::startCall,
+            onStartCall = { roomId -> callback.startCall(roomId, true) },
             openAvatarPreview = callback::navigateToAvatarPreview,
             onVerifyClick = callback::startVerifyUserFlow,
         )

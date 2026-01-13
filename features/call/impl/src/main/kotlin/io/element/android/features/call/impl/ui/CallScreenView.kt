@@ -131,6 +131,7 @@ internal fun CallScreenView(
                         onInvalidAudioDeviceAdded = { invalidAudioDeviceReason = it },
                     )
                     state.eventSink(CallScreenEvents.SetupMessageChannels(interceptor))
+                    webViewAudioManager?.setIsAudioCall(state.isAudioCall)
                     val pipController = WebViewPipController(webView)
                     pipState.eventSink(PictureInPictureEvents.SetPipController(pipController))
                 },

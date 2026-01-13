@@ -13,6 +13,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
+data class MediaStateData(
+    @SerialName("audio_enabled") val audioEnabled: Boolean? = null,
+    @SerialName("video_enabled") val videoEnabled: Boolean? = null,
+)
+
+@Serializable
 data class WidgetMessage(
     @SerialName("api") val direction: Direction,
     @SerialName("widgetId") val widgetId: String,
@@ -45,5 +51,8 @@ data class WidgetMessage(
 
         @SerialName("content_loaded")
         ContentLoaded,
+
+        @SerialName("io.element.device_mute")
+        MediaState,
     }
 }

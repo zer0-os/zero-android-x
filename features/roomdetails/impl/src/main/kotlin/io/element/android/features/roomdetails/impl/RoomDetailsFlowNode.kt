@@ -230,10 +230,11 @@ class RoomDetailsFlowNode(
                         backstack.push(NavTarget.RoomMemberDetails(userId, primaryZId))
                     }
 
-                    override fun navigateToRoomCall() {
+                    override fun navigateToRoomCall(isAudioCall: Boolean) {
                         val inputs = CallType.RoomCall(
                             sessionId = room.sessionId,
                             roomId = room.roomId,
+                            isAudioCall = isAudioCall,
                         )
                         analyticsService.captureInteraction(Interaction.Name.MobileRoomCallButton)
                         elementCallEntryPoint.startCall(inputs)

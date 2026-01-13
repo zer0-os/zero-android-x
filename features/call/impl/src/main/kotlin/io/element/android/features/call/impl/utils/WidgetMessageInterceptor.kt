@@ -13,4 +13,5 @@ import kotlinx.coroutines.flow.Flow
 interface WidgetMessageInterceptor {
     val interceptedMessages: Flow<String>
     fun sendMessage(message: String)
+    fun evaluateJavaScript(script: String)
 }

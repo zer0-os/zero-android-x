@@ -76,10 +76,10 @@ class WebViewAudioManager(
         // Wired audio devices
         AudioDeviceInfo.TYPE_WIRED_HEADSET,
         AudioDeviceInfo.TYPE_WIRED_HEADPHONES,
-        // The built-in speaker of the device
-        AudioDeviceInfo.TYPE_BUILTIN_SPEAKER,
         // The built-in earpiece of the device
         AudioDeviceInfo.TYPE_BUILTIN_EARPIECE,
+        // The built-in speaker of the device
+        AudioDeviceInfo.TYPE_BUILTIN_SPEAKER,
     )
 
     private val audioManager = webView.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -98,6 +98,8 @@ class WebViewAudioManager(
      * Used to ensure that only one coroutine can access the proximity sensor wake lock at a time, preventing re-acquiring or re-releasing it.
      */
     private val proximitySensorMutex = Mutex()
+
+    private var hasInitiatedAudioCall: Boolean = false
 
     /**
      * This listener tracks the current communication device and updates the WebView when it changes.
@@ -322,17 +324,28 @@ class WebViewAudioManager(
         })
     }
 
+    fun setIsAudioCall(isAudioCall: Boolean) {
+        hasInitiatedAudioCall = isAudioCall
+    }
+
     /**
-     * Selects the default audio device based on the available devices.
+     * Selects the default audio device based on the available devices and call type.
+     *
+     * For audio calls, the default is earpiece. For video calls, the default is speaker.
      *
      * @param availableDevices The list of available audio devices to select from. If not provided, it will use the current list of audio devices.
      */
     private fun selectDefaultAudioDevice(availableDevices: List<AudioDeviceInfo> = listAudioDevices()) {
         val selectedDevice = availableDevices
             .minByOrNull {
-                wantedDeviceTypes.indexOf(it.type).let { index ->
+                val index = wantedDeviceTypes.indexOf(it.type)
+                when {
                     // If the device type is not in the wantedDeviceTypes list, we give it a low priority
-                    if (index == -1) Int.MAX_VALUE else index
+                    index == -1 -> Int.MAX_VALUE
+                    // For video calls, prefer speaker over earpiece
+                    !hasInitiatedAudioCall && it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> index - 2
+                    // For audio calls, prefer earpiece over speaker (default order)
+                    else -> index
                 }
             }
 

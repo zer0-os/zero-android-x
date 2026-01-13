@@ -393,7 +393,7 @@ private fun MainActionsSection(
             // TODO Improve the view depending on all the cases here?
             MainActionButton(
                 title = stringResource(CommonStrings.action_call),
-                imageVector = CompoundIcons.VideoCall(),
+                imageVector = CompoundIcons.VoiceCall(),
                 onClick = onCall,
             )
         }

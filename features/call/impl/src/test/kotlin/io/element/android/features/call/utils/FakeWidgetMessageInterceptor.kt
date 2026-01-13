@@ -13,11 +13,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 class FakeWidgetMessageInterceptor : WidgetMessageInterceptor {
     val sentMessages = mutableListOf<String>()
+    val evaluatedScripts = mutableListOf<String>()
 
     override val interceptedMessages = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     override fun sendMessage(message: String) {
         sentMessages += message
+    }
+
+    override fun evaluateJavaScript(script: String) {
+        evaluatedScripts += script
     }
 
     fun givenInterceptedMessage(message: String) {

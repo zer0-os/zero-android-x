@@ -10,10 +10,8 @@ package io.element.android.features.messages.impl.timeline.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
@@ -36,7 +34,7 @@ import io.element.android.libraries.ui.strings.CommonStrings
 @Composable
 internal fun CallMenuItem(
     roomCallState: RoomCallState,
-    onJoinCallClick: () -> Unit,
+    onJoinCallClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (roomCallState) {
@@ -44,16 +42,25 @@ internal fun CallMenuItem(
             Box(modifier)
         }
         is RoomCallState.StandBy -> {
-            StandByCallMenuItem(
-                roomCallState = roomCallState,
-                onJoinCallClick = onJoinCallClick,
-                modifier = modifier,
-            )
+            Row {
+                StandByCallMenuItem(
+                    roomCallState = roomCallState,
+                    audioCallButton = true,
+                    onJoinCallClick = onJoinCallClick,
+                    modifier = modifier,
+                )
+                StandByCallMenuItem(
+                    roomCallState = roomCallState,
+                    audioCallButton = false,
+                    onJoinCallClick = onJoinCallClick,
+                    modifier = modifier,
+                )
+            }
         }
         is RoomCallState.OnGoing -> {
             OnGoingCallMenuItem(
                 roomCallState = roomCallState,
-                onJoinCallClick = onJoinCallClick,
+                onJoinCallClick = { onJoinCallClick(true) },
                 modifier = modifier,
             )
         }
@@ -63,18 +70,26 @@ internal fun CallMenuItem(
 @Composable
 private fun StandByCallMenuItem(
     roomCallState: RoomCallState.StandBy,
-    onJoinCallClick: () -> Unit,
+    audioCallButton: Boolean,
+    onJoinCallClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
         modifier = modifier,
-        onClick = onJoinCallClick,
+        onClick = { onJoinCallClick(audioCallButton) },
         enabled = roomCallState.canStartCall,
     ) {
-        Icon(
-            imageVector = CompoundIcons.VideoCallSolid(),
-            contentDescription = stringResource(CommonStrings.a11y_start_call),
-        )
+        if (audioCallButton) {
+            Icon(
+                imageVector = CompoundIcons.VoiceCallSolid(),
+                contentDescription = stringResource(CommonStrings.a11y_start_call),
+            )
+        } else {
+            Icon(
+                imageVector = CompoundIcons.VideoCallSolid(),
+                contentDescription = stringResource(CommonStrings.a11y_start_call),
+            )
+        }
     }
 }
 
@@ -95,17 +110,18 @@ private fun OnGoingCallMenuItem(
             modifier = modifier.heightIn(min = 36.dp),
             enabled = roomCallState.canJoinCall,
         ) {
-            Icon(
+            /*Icon(
                 modifier = Modifier.size(20.dp),
                 imageVector = CompoundIcons.VideoCallSolid(),
                 contentDescription = null
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))*/
             Text(
-                text = stringResource(CommonStrings.action_join),
+//                text = stringResource(CommonStrings.action_join),
+                text = "Join Call",
                 style = ElementTheme.zeroTypography.fontBodyMdMedium
             )
-            Spacer(Modifier.width(8.dp))
+//            Spacer(Modifier.width(8.dp))
         }
     } else {
         // Else user is already in the call, hide the button.

@@ -59,7 +59,7 @@ class RoomDetailsNode(
         fun navigateToKnockRequestsList()
         fun navigateToSecurityAndPrivacy()
         fun navigateToRoomMemberDetails(userId: UserId, primaryZId: String?)
-        fun navigateToRoomCall()
+        fun navigateToRoomCall(isAudioCall: Boolean)
         fun navigateToReportRoom()
         fun navigateToSelectNewOwnersWhenLeaving()
     }
@@ -128,7 +128,9 @@ class RoomDetailsNode(
             openPollHistory = callback::navigateToPollHistory,
             openMediaGallery = callback::navigateToMediaGallery,
             openAdminSettings = callback::navigateToAdminSettings,
-            onJoinCallClick = callback::navigateToRoomCall,
+            onJoinCallClick = {
+                callback.navigateToRoomCall(true)
+            },
             onPinnedMessagesClick = callback::navigateToPinnedMessagesList,
             onKnockRequestsClick = callback::navigateToKnockRequestsList,
             onSecurityAndPrivacyClick = callback::navigateToSecurityAndPrivacy,

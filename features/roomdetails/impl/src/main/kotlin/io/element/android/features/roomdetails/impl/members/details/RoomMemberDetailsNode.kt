@@ -67,8 +67,8 @@ class RoomMemberDetailsNode(
             callback.navigateToRoom(roomId)
         }
 
-        fun onStartCall(roomId: RoomId) {
-            callback.startCall(roomId)
+        fun onStartCall(roomId: RoomId, isAudioCall: Boolean) {
+            callback.startCall(roomId, isAudioCall = isAudioCall)
         }
 
         val state = presenter.present()
@@ -79,7 +79,7 @@ class RoomMemberDetailsNode(
             goBack = this::navigateUp,
             onShareUser = ::onShareUser,
             onOpenDm = ::navigateToRoom,
-            onStartCall = ::onStartCall,
+            onStartCall = { roomId -> onStartCall(roomId, true) },
             openAvatarPreview = callback::navigateToAvatarPreview,
             onVerifyClick = callback::startVerifyUserFlow,
         )

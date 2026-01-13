@@ -70,7 +70,7 @@ fun MessagesViewTopBar(
     roomCallState: RoomCallState,
     dmUserIdentityState: IdentityState?,
     onRoomDetailsClick: () -> Unit,
-    onJoinCallClick: () -> Unit,
+    onJoinCallClick: (Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
     TopAppBar(

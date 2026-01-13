@@ -27,7 +27,8 @@ fun JoinButton(
     CompositionLocalProvider(LocalContentColor provides ElementTheme.colors.textActionAccent) {
         TextButton(
             modifier = modifier,
-            text = stringResource(CommonStrings.action_join),
+//            text = stringResource(CommonStrings.action_join),
+            text = "Join Call",
             onClick = onClick,
             size = ButtonSize.LargeLowPadding,
             showProgress = showProgress,

@@ -83,8 +83,8 @@ class UserProfileFlowNode(
                         callback.navigateToRoom(roomId)
                     }
 
-                    override fun startCall(dmRoomId: RoomId) {
-                        elementCallEntryPoint.startCall(CallType.RoomCall(sessionId = sessionId, roomId = dmRoomId))
+                    override fun startCall(dmRoomId: RoomId, isAudioCall: Boolean) {
+                        elementCallEntryPoint.startCall(CallType.RoomCall(sessionId = sessionId, roomId = dmRoomId, isAudioCall = isAudioCall))
                     }
 
                     override fun startVerifyUserFlow(userId: UserId) {

@@ -24,6 +24,7 @@ import dev.zacsweers.metro.AssistedInject
 import im.vector.app.features.analytics.plan.MobileScreen
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.call.api.CallType
+import io.element.android.features.call.impl.data.MediaStateData
 import io.element.android.features.call.impl.data.WidgetMessage
 import io.element.android.features.call.impl.utils.ActiveCallManager
 import io.element.android.features.call.impl.utils.CallWidgetProvider
@@ -46,6 +47,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import timber.log.Timber
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
@@ -126,6 +129,15 @@ class CallScreenPresenter(
 
                 driver.run()
             }
+
+            if ((callType as? CallType.RoomCall)?.isAudioCall == true) {
+                messageInterceptor.value?.let { msgInterceptor ->
+                    LaunchedEffect(Unit) {
+                        delay(1000)
+                        setVideoEnabled(false, driver.id, msgInterceptor)
+                    }
+                }
+            }
         }
 
         messageInterceptor.value?.let { interceptor ->
@@ -202,6 +214,7 @@ class CallScreenPresenter(
             userAgent = userAgent,
             isCallActive = isWidgetLoaded,
             isInWidgetMode = isInWidgetMode,
+            isAudioCall = ((callType as? CallType.RoomCall)?.isAudioCall == true),
             eventSink = ::handleEvent,
         )
     }
@@ -272,6 +285,23 @@ class CallScreenPresenter(
             data = null,
         )
         messageInterceptor.sendMessage(widgetMessageSerializer.serialize(message))
+    }
+
+    /**
+     * Sets the video enabled state for the call.
+     * Sends a MediaState message to the widget to enable or disable video.
+     */
+    fun setVideoEnabled(enabled: Boolean, widgetId: String, messageInterceptor: WidgetMessageInterceptor) {
+        val mediaStateData = MediaStateData(videoEnabled = enabled)
+        val message = WidgetMessage(
+            direction = WidgetMessage.Direction.ToWidget,
+            widgetId = widgetId,
+            requestId = "widgetapi-${clock.epochMillis()}",
+            action = WidgetMessage.Action.MediaState,
+            data = Json.encodeToJsonElement(mediaStateData),
+        )
+        messageInterceptor.sendMessage(widgetMessageSerializer.serialize(message))
+        Timber.d("Sent setVideoEnabled($enabled) message to widget")
     }
 
     private fun CoroutineScope.close(widgetDriver: MatrixWidgetDriver?, navigator: CallScreenNavigator) = launch(dispatchers.io) {

@@ -278,7 +278,7 @@ class DefaultPushHandler(
     private suspend fun handleRingingCallEvent(notifiableEvent: NotifiableRingingCallEvent) {
         Timber.i("## handleInternal() : Incoming call.")
         elementCallEntryPoint.handleIncomingCall(
-            callType = CallType.RoomCall(notifiableEvent.sessionId, notifiableEvent.roomId),
+            callType = CallType.RoomCall(notifiableEvent.sessionId, notifiableEvent.roomId, true),
             eventId = notifiableEvent.eventId,
             senderId = notifiableEvent.senderId,
             roomName = notifiableEvent.roomName,

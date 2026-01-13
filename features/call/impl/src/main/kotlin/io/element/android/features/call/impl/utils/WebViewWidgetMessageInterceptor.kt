@@ -167,6 +167,10 @@ class WebViewWidgetMessageInterceptor(
         webView.evaluateJavascript("postMessage($message, '*')", null)
     }
 
+    override fun evaluateJavaScript(script: String) {
+        webView.evaluateJavascript(script, null)
+    }
+
     private fun onMessageReceived(json: String?) {
         // Here is where we would handle the messages from the WebView, passing them to the Rust SDK
         json?.let { interceptedMessages.tryEmit(it) }
