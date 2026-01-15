@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.libraries.designsystem.components.async.AsyncActionView
 import io.element.android.libraries.designsystem.components.async.AsyncActionViewDefaults
+import io.element.android.libraries.designsystem.components.avatar.AvatarData
 import io.element.android.libraries.designsystem.components.avatar.AvatarSize
 import io.element.android.libraries.designsystem.components.avatar.AvatarType
 import io.element.android.libraries.designsystem.modifiers.clearFocusOnTap
@@ -49,7 +50,8 @@ import io.element.android.libraries.designsystem.theme.components.Scaffold
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.ui.components.AvatarActionBottomSheet
-import io.element.android.libraries.matrix.ui.components.EditableAvatarView
+import io.element.android.libraries.matrix.ui.components.AvatarPickerState
+import io.element.android.libraries.matrix.ui.components.AvatarPickerView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.common.ui.ZeroPrimaryButton
@@ -116,14 +118,23 @@ fun CompleteProfileView(
                 )
 
                 Spacer(modifier = Modifier.height(SPACING_10X.dp))
-                EditableAvatarView(
-                    matrixId = "",
-                    displayName = state.displayName,
-                    avatarUrl = state.userAvatarUrl?.toString(),
-                    avatarSize = AvatarSize.CompleteProfileScreen,
-                    onAvatarClick = { onAvatarClick() },
+                val avatarPickerState = remember(state.userAvatarUrl) {
+                    val size = AvatarSize.EditProfileDetails
+                    val type = AvatarType.User
+                    AvatarPickerState.Selected(
+                        avatarData = AvatarData(
+                            id = "",
+                            name = state.displayName,
+                            size = size,
+                            url = state.userAvatarUrl?.toString())
+                        ,
+                        type = type
+                    )
+                }
+                AvatarPickerView(
+                    state = avatarPickerState,
+                    onClick = ::onAvatarClick,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    avatarType = AvatarType.User
                 )
 
                 Spacer(modifier = Modifier.height(SPACING_10X.dp))

@@ -253,6 +253,7 @@ class RustMatrixClient(
         roomMembershipObserver = roomMembershipObserver,
         sessionCoroutineScope = sessionCoroutineScope,
         sessionDispatcher = sessionDispatcher,
+        analyticsService = analyticsService,
     )
 
     override val sessionVerificationService = RustSessionVerificationService(
@@ -452,6 +453,7 @@ class RustMatrixClient(
                 joinRuleOverride = createRoomParams.joinRuleOverride?.map(),
                 historyVisibilityOverride = createRoomParams.historyVisibilityOverride?.map(),
                 canonicalAlias = createRoomParams.roomAliasName.getOrNull(),
+                isSpace = createRoomParams.isSpace,
             )
             val roomId = RoomId(innerClient.createRoom(rustParams))
             // Wait to receive the room back from the sync but do not returns failure if it fails.

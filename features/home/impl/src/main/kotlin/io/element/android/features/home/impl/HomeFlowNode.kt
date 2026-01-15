@@ -247,6 +247,7 @@ class HomeFlowNode(
                 onPublicRoomClick = callback::navigateToPublicRoom,
                 onSettingsClick = callback::navigateToSettings,
                 onCreateRoomClick = callback::navigateToCreateRoom,
+//                onCreateSpaceClick = callback::navigateToCreateSpace,
                 onSetUpRecoveryClick = callback::navigateToSetUpRecovery,
                 onConfirmRecoveryKeyClick = callback::navigateToEnterRecoveryKey,
                 onRoomSettingsClick = callback::navigateToRoomSettings,

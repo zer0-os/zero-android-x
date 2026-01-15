@@ -30,6 +30,7 @@ interface HomeEntryPoint : FeatureEntryPoint {
 
         fun navigateToPublicRoom(roomDescription: RoomDescription)
         fun navigateToCreateRoom()
+        fun navigateToCreateSpace()
         fun navigateToSettings()
         fun navigateToSetUpRecovery()
         fun navigateToEnterRecoveryKey()

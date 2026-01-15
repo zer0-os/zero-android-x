@@ -28,9 +28,6 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
-import io.element.android.libraries.matrix.api.core.EventId
-import io.element.android.libraries.matrix.api.timeline.item.event.toEventOrTransactionId
-import io.element.android.libraries.textcomposer.model.MessageComposerMode
 
 /**
  * Send button for the message composer.
@@ -38,31 +35,24 @@ import io.element.android.libraries.textcomposer.model.MessageComposerMode
  * Temporary Figma : https://www.figma.com/design/Ni6Ii8YKtmXCKYNE90cC67/Timeline-(new)?node-id=2274-39944&m=dev
  */
 @Composable
-internal fun SendButton(
+internal fun SendButtonIcon(
     canSendMessage: Boolean,
-    onClick: () -> Unit,
-    composerMode: MessageComposerMode,
+    isEditing: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    IconButton(
+    val iconVector = when {
+        isEditing -> CompoundIcons.Check()
+        else -> CompoundIcons.SendSolid()
+    }
+    val iconStartPadding = when {
+        isEditing -> 0.dp
+        else -> 2.dp
+    }
+    Box(
         modifier = modifier
-            .size(48.dp),
-        onClick = onClick,
-        enabled = canSendMessage,
-    ) {
-        val iconVector = when {
-            composerMode.isEditing -> CompoundIcons.Check()
-            else -> CompoundIcons.SendSolid()
-        }
-        val iconStartPadding = when {
-            composerMode.isEditing -> 0.dp
-            else -> 2.dp
-        }
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(36.dp)
-                .background(
+            .clip(CircleShape)
+            .size(36.dp)
+            .background(
                     if (canSendMessage)
                         ElementTheme.colors.zeroBrandColorAlpha15
                     else
@@ -78,20 +68,25 @@ internal fun SendButton(
                 contentDescription = null,
                 // Exception here, we use Color.White instead of ElementTheme.colors.iconOnSolidPrimary
                 tint = if (canSendMessage) ElementTheme.colors.zeroBrandColor else ElementTheme.colors.iconDisabled
-            )
-        }
+        )
     }
 }
 
 @PreviewsDayNight
 @Composable
-internal fun SendButtonPreview() = ElementPreview {
-    val normalMode = MessageComposerMode.Normal
-    val editMode = MessageComposerMode.Edit(EventId("\$id").toEventOrTransactionId(), "")
+internal fun SendButtonIconPreview() = ElementPreview {
     Row {
-        SendButton(canSendMessage = true, onClick = {}, composerMode = normalMode)
-        SendButton(canSendMessage = false, onClick = {}, composerMode = normalMode)
-        SendButton(canSendMessage = true, onClick = {}, composerMode = editMode)
-        SendButton(canSendMessage = false, onClick = {}, composerMode = editMode)
+        IconButton(onClick = {}) {
+            SendButtonIcon(canSendMessage = true, isEditing = false)
+        }
+        IconButton(onClick = {}) {
+            SendButtonIcon(canSendMessage = false, isEditing = false)
+        }
+        IconButton(onClick = {}) {
+            SendButtonIcon(canSendMessage = true, isEditing = true)
+        }
+        IconButton(onClick = {}) {
+            SendButtonIcon(canSendMessage = false, isEditing = true)
+        }
     }
 }
