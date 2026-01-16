@@ -26,6 +26,7 @@ import io.element.android.features.messages.impl.actionlist.model.TimelineItemAc
 import io.element.android.features.messages.impl.crypto.sendfailure.VerifiedUserSendFailure
 import io.element.android.features.messages.impl.crypto.sendfailure.VerifiedUserSendFailureFactory
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
+import io.element.android.features.messages.impl.timeline.model.TimelineItemThreadInfo
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemEventContent
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemEventContentWithAttachment
 import io.element.android.features.messages.impl.timeline.model.event.TimelineItemLegacyCallInviteContent
@@ -191,7 +192,7 @@ class DefaultActionListPresenter(
         }
         return buildSet {
             if (timelineItem.canBeRepliedTo && usersEventPermissions.canSendMessage && !isAGiphy) {
-                /*if (isThreadsEnabled && timelineMode !is Timeline.Mode.Thread && timelineItem.isRemote) {
+                if (isThreadsEnabled && timelineMode !is Timeline.Mode.Thread && timelineItem.isRemote) {
                     // If threads are enabled, we can reply in thread if the item is remote
                     add(TimelineItemAction.ReplyInThread)
                     add(TimelineItemAction.Reply)
@@ -204,10 +205,6 @@ class DefaultActionListPresenter(
                         add(TimelineItemAction.Reply)
                     }
                 }
-                } else {
-                    add(TimelineItemAction.Reply)
-                }*/
-                add(TimelineItemAction.Reply)
             }
             if (timelineItem.isRemote && timelineItem.content.canBeForwarded() && !isAGiphy) {
                 add(TimelineItemAction.Forward)

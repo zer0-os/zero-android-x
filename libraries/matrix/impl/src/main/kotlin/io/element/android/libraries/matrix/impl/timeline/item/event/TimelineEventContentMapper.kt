@@ -134,8 +134,8 @@ class TimelineEventContentMapper(
                 val inReplyTo = it.content.inReplyTo
                 eventMessageMapper.map(
                     message = kind,
-                        inReplyTo = inReplyTo,
-                            threadInfo = extractThreadInfo(it.content)
+                    inReplyTo = inReplyTo,
+                    threadInfo = extractThreadInfo(it.content)
                 )
             }
             is MsgLikeKind.Redacted -> {
@@ -151,13 +151,14 @@ class TimelineEventContentMapper(
                         vote.value.map { userId -> UserId(userId) }.toImmutableList()
                     }.toImmutableMap(),
                     endTime = kind.endTime,
-                    isEdited = kind.hasBeenEdited,threadInfo = extractThreadInfo(it.content),
+                    isEdited = kind.hasBeenEdited,
+                    threadInfo = extractThreadInfo(it.content),
                 )
             }
             is MsgLikeKind.UnableToDecrypt -> {
                 UnableToDecryptContent(
                     data = kind.msg.map(),
-                                threadInfo = extractThreadInfo(it.content),
+                    threadInfo = extractThreadInfo(it.content),
                 )
             }
             is MsgLikeKind.Sticker -> {
