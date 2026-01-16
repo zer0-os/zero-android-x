@@ -35,6 +35,7 @@ import io.element.android.features.login.impl.accountprovider.AccountProviderDat
 import io.element.android.features.login.impl.login.LoginHelper
 import io.element.android.features.login.impl.login.SocialAuthHelper
 import io.element.android.features.login.impl.login.SocialAuthResultHandler
+import io.element.android.features.login.impl.screens.onboarding.classic.LoginWithClassicState
 import io.element.android.features.login.impl.walletconnect.WalletConnectDelegate
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.libraries.architecture.Presenter
@@ -56,6 +57,7 @@ class OnBoardingPresenter(
     private val onBoardingLogoResIdProvider: OnBoardingLogoResIdProvider,
     private val sessionStore: SessionStore,
     private val accountProviderDataSource: AccountProviderDataSource,
+    private val loginWithClassicPresenter: Presenter<LoginWithClassicState>,
     private val socialAuthHelper: SocialAuthHelper,
 ) : Presenter<OnBoardingState> {
     @AssistedFactory
@@ -113,6 +115,8 @@ class OnBoardingPresenter(
 //        }
 
         val loginMode by loginHelper.collectLoginMode()
+
+        val loginWithClassicState = loginWithClassicPresenter.present()
 
         val sheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
@@ -194,6 +198,7 @@ class OnBoardingPresenter(
             loginMode = loginMode,
             version = buildMeta.versionName,
             onBoardingLogoResId = onBoardingLogoResId,
+            loginWithClassicState = loginWithClassicState,
             showWeb3Modal = showWeb3Modal.value,
             eventSink = ::handleEvent,
         )

@@ -38,6 +38,7 @@ import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.login.impl.R
 import io.element.android.features.login.impl.login.LoginModeView
+import io.element.android.features.login.impl.screens.onboarding.classic.LoginWithClassicEvent
 import io.element.android.libraries.architecture.AsyncData
 import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtom
 import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtomSize
@@ -246,6 +247,18 @@ private fun OnBoardingButtons(
             R.string.screen_onboarding_sign_in_manually
         } else {
             CommonStrings.action_continue
+        }
+        if (state.loginWithClassicState.canLoginWithClassic) {
+            Button(
+                text = "Sign in with Element Classic",
+                leadingIcon = IconSource.Vector(CompoundIcons.Mobile()),
+                onClick = {
+                    state.loginWithClassicState.eventSink(
+                        LoginWithClassicEvent.StartLoginWithClassic
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
         if (state.canLoginWithQrCode) {
             Button(
