@@ -128,6 +128,14 @@ class ConfigureRoomPresenter(
         val localCoroutineScope = rememberCoroutineScope()
         val createRoomAction: MutableState<AsyncAction<RoomId>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
+        val availableVisibilityOptions = remember(isSpace, isKnockFeatureEnabled) {
+            listOfNotNull(
+                RoomVisibilityItem.Public,
+                RoomVisibilityItem.AskToJoin.takeIf { !isSpace && isKnockFeatureEnabled },
+                RoomVisibilityItem.Private,
+            ).toImmutableList()
+        }
+
         fun createRoom(config: CreateRoomConfig, isVisibleInPublicRooms: Boolean) {
             createRoomAction.value = AsyncAction.Uninitialized
             localCoroutineScope.createRoom(config, isVisibleInPublicRooms, createRoomAction)
@@ -160,13 +168,13 @@ class ConfigureRoomPresenter(
         }
 
         return ConfigureRoomState(
-            isKnockFeatureEnabled = isKnockFeatureEnabled,
             config = createRoomConfig,
             avatarActions = avatarActions,
             createRoomAction = createRoomAction.value,
             cameraPermissionState = cameraPermissionState,
             homeserverName = homeserverName,
             roomAddressValidity = roomAddressValidity.value,
+            availableVisibilityOptions = availableVisibilityOptions,
             visibleInPublicRooms = isVisibleInPublicRooms.value,
             eventSink = ::handleEvent,
         )

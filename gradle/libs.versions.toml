@@ -47,7 +47,7 @@ coil = "3.3.0"
 showkase = "1.0.5"
 appyx = "1.7.1"
 sqldelight = "2.2.1"
-wysiwyg = "2.41.0"
+wysiwyg = "2.41.1"
 telephoto = "0.18.0"
 haze = "1.7.1"
 
@@ -278,7 +278,7 @@ metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = "org.jlleitschuh.gradle.ktlint:14.0.1"
 dependencygraph = "com.savvasdalkitsis.module-dependency-graph:0.12"
-dependencycheck = "org.owasp.dependencycheck:12.1.9"
+dependencycheck = "org.owasp.dependencycheck:12.2.0"
 dependencyanalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysis" }
 paparazzi = "app.cash.paparazzi:2.0.0-alpha02"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }

@@ -63,6 +63,8 @@ import io.element.android.libraries.matrix.ui.components.AvatarPickerState
 import io.element.android.libraries.matrix.ui.components.AvatarPickerView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.ImmutableList
+import kotlin.jvm.optionals.getOrNull
 
 @Composable
 fun ConfigureRoomView(
@@ -117,6 +119,7 @@ fun ConfigureRoomView(
             )*/
 
             RoomVisibilityAndAccessOptions(
+                options = state.availableVisibilityOptions,
                 selected = when (state.config.roomVisibility) {
                     is RoomVisibilityState.Private -> RoomVisibilityItem.Private
                     is RoomVisibilityState.Public -> when (state.config.roomVisibility.roomAccess) {
@@ -124,7 +127,6 @@ fun ConfigureRoomView(
                         RoomAccess.Anyone -> RoomVisibilityItem.Public
                     }
                 },
-                isKnockingEnabled = state.isKnockFeatureEnabled,
                 onOptionClick = {
                     focusManager.clearFocus()
                     state.eventSink(ConfigureRoomEvents.RoomVisibilityChanged(it))
@@ -288,8 +290,8 @@ private fun ConfigureRoomOptions(
 
 @Composable
 private fun RoomVisibilityAndAccessOptions(
+    options: ImmutableList<RoomVisibilityItem>,
     selected: RoomVisibilityItem,
-    isKnockingEnabled: Boolean,
     onOptionClick: (RoomVisibilityItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -298,11 +300,7 @@ private fun RoomVisibilityAndAccessOptions(
         title = "Group Type",
         modifier = modifier,
     ) {
-        RoomVisibilityItem.entries.reversed().forEach { item ->
-            if (item == RoomVisibilityItem.AskToJoin && !isKnockingEnabled) {
-                return@forEach
-            }
-
+        options.reversed().forEach { item ->
             val isSelected = item == selected
             ListItem(
                 leadingContent = ListItemContent.Custom {
