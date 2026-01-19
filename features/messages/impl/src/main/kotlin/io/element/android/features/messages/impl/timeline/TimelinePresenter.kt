@@ -30,6 +30,7 @@ import io.element.android.features.messages.impl.MessagesNavigator
 import io.element.android.features.messages.impl.UserEventPermissions
 import io.element.android.features.messages.impl.crypto.sendfailure.resolve.ResolveVerifiedUserSendFailureEvents
 import io.element.android.features.messages.impl.crypto.sendfailure.resolve.ResolveVerifiedUserSendFailureState
+import io.element.android.features.messages.impl.timeline.components.MessageShieldData
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactory
 import io.element.android.features.messages.impl.timeline.factories.TimelineItemsFactoryConfig
 import io.element.android.features.messages.impl.timeline.model.NewEventState
@@ -57,7 +58,6 @@ import io.element.android.libraries.matrix.api.room.powerlevels.permissionsAsSta
 import io.element.android.libraries.matrix.api.room.roomMembers
 import io.element.android.libraries.matrix.api.timeline.ReceiptType
 import io.element.android.libraries.matrix.api.timeline.Timeline
-import io.element.android.libraries.matrix.api.timeline.item.event.MessageShield
 import io.element.android.libraries.matrix.api.timeline.item.event.TimelineItemEventOrigin
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
 import io.element.android.libraries.preferences.api.store.SessionPreferencesStore
@@ -140,7 +140,7 @@ class TimelinePresenter(
         val prevMostRecentItemId = rememberSaveable { mutableStateOf<UniqueId?>(null) }
 
         val newEventState = remember { mutableStateOf(NewEventState.None) }
-        val messageShield: MutableState<MessageShield?> = remember { mutableStateOf(null) }
+        val messageShieldDialogData: MutableState<MessageShieldData?> = remember { mutableStateOf(null) }
 
         val resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailurePresenter.present()
         val isSendPublicReadReceiptsEnabled by remember {
@@ -224,8 +224,8 @@ class TimelinePresenter(
                 is TimelineEvents.JumpToLive -> {
                     timelineController.focusOnLive()
                 }
-                TimelineEvents.HideShieldDialog -> messageShield.value = null
-                is TimelineEvents.ShowShieldDialog -> messageShield.value = event.messageShield
+                TimelineEvents.HideShieldDialog -> messageShieldDialogData.value = null
+                is TimelineEvents.ShowShieldDialog -> messageShieldDialogData.value = event.messageShieldData
                 is TimelineEvents.ComputeVerifiedUserSendFailure -> {
                     resolveVerifiedUserSendFailureState.eventSink(ResolveVerifiedUserSendFailureEvents.ComputeForMessage(event.event))
                 }
@@ -326,7 +326,7 @@ class TimelinePresenter(
             newEventState = newEventState.value,
             isLive = isLive,
             focusRequestState = focusRequestState.value,
-            messageShield = messageShield.value,
+            messageShieldDialogData = messageShieldDialogData.value,
             resolveVerifiedUserSendFailureState = resolveVerifiedUserSendFailureState,
             displayThreadSummaries = displayThreadSummaries,
             linkPreviewMap = eventLinkPreviewMap,

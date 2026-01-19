@@ -61,7 +61,9 @@ class EventTimelineItemMapper(
             origin = origin?.map(),
             timelineItemDebugInfoProvider = { debugInfo },
             messageShieldProvider = { strict -> lazyProvider.getShields(strict).map() },
-            sendHandleProvider = { lazyProvider.getSendHandle()?.let(::RustSendHandle) }
+            sendHandleProvider = { lazyProvider.getSendHandle()?.let(::RustSendHandle) },
+            forwarder = forwarder?.let { UserId(it) },
+            forwarderProfile = forwarderProfile?.map(),
         )
     }
 }

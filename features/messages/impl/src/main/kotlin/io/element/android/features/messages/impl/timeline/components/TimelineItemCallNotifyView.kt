@@ -82,7 +82,7 @@ internal fun TimelineItemCallNotifyView(
             ) {
                 Icon(
                     modifier = Modifier.size(20.sp.toDp()),
-                    imageVector = CompoundIcons.VideoCallSolid(),
+                    imageVector = CompoundIcons.VoiceCallSolid(),
                     contentDescription = null,
                     tint = ElementTheme.colors.iconSecondary,
                 )

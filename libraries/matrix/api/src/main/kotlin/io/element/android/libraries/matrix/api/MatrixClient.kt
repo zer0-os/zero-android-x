@@ -256,7 +256,15 @@ interface MatrixClient {
      */
     fun createLinkDesktopHandler(): Result<LinkDesktopHandler>
 
+    /**
+     * Performs a database optimization that should flush cached data and improve performance.
+     */
     suspend fun performDatabaseVacuum(): Result<Unit>
+
+    /**
+     * Resets the cached client `well-known` config by the SDK.
+     */
+    suspend fun resetWellKnownConfig(): Result<Unit>
 
     suspend fun getUserRewards(shouldCheckRewardsIntimation: Boolean = false)
     fun dismissRewardsIntimation()
