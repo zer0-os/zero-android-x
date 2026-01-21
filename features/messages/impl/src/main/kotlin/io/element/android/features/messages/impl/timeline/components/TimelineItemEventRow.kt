@@ -11,6 +11,7 @@ package io.element.android.features.messages.impl.timeline.components
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -97,6 +98,8 @@ import io.element.android.libraries.designsystem.text.toPx
 import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColorAlpha15
+import io.element.android.libraries.designsystem.theme.zero.color.zeroThreadAccentColor
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.core.EventId
 import io.element.android.libraries.matrix.api.core.UserId
@@ -323,6 +326,8 @@ private fun ThreadSummaryView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val threadAccentColor = ElementTheme.colors.zeroThreadAccentColor
+    val bubbleColor = MessageEventBubbleDefaults.backgroundBubbleColor(isOutgoing, isRoomEncrypted)
     BoxWithConstraints(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -331,7 +336,16 @@ private fun ThreadSummaryView(
                     shape = RoundedCornerShape(8.dp)
                     clip = true
                 }
-                .background(MessageEventBubbleDefaults.backgroundBubbleColor(isOutgoing, isRoomEncrypted))
+                .drawWithContent {
+                    drawRect(bubbleColor)
+                    drawContent()
+                    // Draw thread accent border on the left side
+                    drawRect(
+                        color = threadAccentColor,
+                        topLeft = androidx.compose.ui.geometry.Offset.Zero,
+                        size = androidx.compose.ui.geometry.Size(3.dp.toPx(), size.height)
+                    )
+                }
                 .niceClickable(onClick)
                 .padding(horizontal = 12.dp, vertical = 10.dp)
                 .widthIn(max = (maxWidth - 24.dp) * MessageEventBubbleDefaults.BUBBLE_WIDTH_RATIO),
@@ -341,7 +355,7 @@ private fun ThreadSummaryView(
                 modifier = Modifier.size(20.dp),
                 imageVector = CompoundIcons.ThreadsSolid(),
                 contentDescription = null,
-                tint = ElementTheme.colors.iconSecondary,
+                tint = ElementTheme.colors.zeroThreadAccentColor,
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -662,7 +676,12 @@ private fun MessageEventBubbleContent(
         modifier: Modifier = Modifier
     ) {
         Row(
-            modifier = modifier,
+            modifier = modifier
+                .background(
+                    color = ElementTheme.colors.zeroBrandColorAlpha15,
+                    shape = RoundedCornerShape(4.dp)
+                )
+                .padding(horizontal = 6.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -670,12 +689,12 @@ private fun MessageEventBubbleContent(
                 modifier = Modifier.height(14.dp),
                 imageVector = CompoundIcons.Threads(),
                 contentDescription = null,
-                tint = ElementTheme.colors.iconSecondary,
+                tint = ElementTheme.colors.zeroThreadAccentColor,
             )
             Text(
                 text = stringResource(CommonStrings.common_thread),
                 style = ElementTheme.zeroTypography.fontBodyXsRegular,
-                color = ElementTheme.colors.textPrimary,
+                color = ElementTheme.colors.zeroThreadAccentColor,
                 modifier = Modifier.clearAndSetSemantics { }
             )
         }
