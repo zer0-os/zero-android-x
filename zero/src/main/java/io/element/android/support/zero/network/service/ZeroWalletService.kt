@@ -11,6 +11,7 @@ import io.element.android.support.zero.network.model.request.ApproveERC20Request
 import io.element.android.support.zero.network.model.request.TransferWalletTokenRequest
 import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
 import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletNFTs
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipientsResponse
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
@@ -95,4 +96,10 @@ interface ZeroWalletService {
     suspend fun getAvaxTokenPrice(
         @Path("token_address") tokenAddress: String,
     ): ApiAvaxTokenPrice
+
+    @GET(value = "api/wallet/{wallet_address}/nfts")
+    suspend fun getNFTs(
+        @Path("wallet_address") walletAddress: String,
+        @QueryMap nextPageParams: Map<String, @JvmSuppressWildcards Any> = emptyMap()
+    ): ApiWalletNFTs
 }

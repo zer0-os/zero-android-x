@@ -68,6 +68,7 @@ import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.user.nameIsMatrixHex
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFTsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -1308,6 +1309,15 @@ class RustMatrixClient(
         runCatching {
             val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
             walletRepo.getTransactions(walletAddress, paginationParams?.toApi()).toModel()
+        }
+    }
+
+    override suspend fun getWalletNFTs(walletAddress: String,
+                                       paginationParams: ZeroWalletTokensPaginationParams?
+    ): Result<ZeroWalletNFTsResponse> = withContext(sessionDispatcher) {
+        runCatching {
+            val walletRepo = zeroCoreRepository?.wallet ?: return@withContext Result.failure(Throwable("Wallet repository is not initialized yet."))
+            walletRepo.getNFTs(walletAddress, paginationParams?.toApi()).toModel()
         }
     }
 
