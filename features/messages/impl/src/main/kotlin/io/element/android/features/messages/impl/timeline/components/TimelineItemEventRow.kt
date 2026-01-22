@@ -16,7 +16,6 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,17 +37,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -109,7 +110,6 @@ import io.element.android.libraries.matrix.api.timeline.item.event.MessageConten
 import io.element.android.libraries.matrix.api.timeline.item.event.ProfileDetails
 import io.element.android.libraries.matrix.api.timeline.item.event.TextMessageType
 import io.element.android.libraries.matrix.api.timeline.item.event.getAvatarUrl
-import io.element.android.libraries.matrix.api.timeline.item.event.getDisambiguatedDisplayName
 import io.element.android.libraries.matrix.api.timeline.item.event.getDisplayName
 import io.element.android.libraries.matrix.api.user.MatrixUser
 import io.element.android.libraries.matrix.api.zero.metadata.ZeroLinkPreview
@@ -124,6 +124,7 @@ import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonPlurals
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.libraries.ui.utils.time.isTalkbackActive
+import io.element.android.support.zero.R
 import io.element.android.wysiwyg.link.Link
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -323,7 +324,7 @@ private fun ThreadSummaryView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier) {
+    /*BoxWithConstraints(modifier = modifier) {
         Row(
             modifier = Modifier
                 .then(if (!isOutgoing) Modifier.padding(start = 16.dp) else Modifier)
@@ -386,6 +387,72 @@ private fun ThreadSummaryView(
                     )
                 }
             }
+        }
+    }*/
+    Row(
+        modifier = modifier
+            .then(if (!isOutgoing) Modifier.padding(start = 40.dp) else Modifier.padding(end = 8.dp)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (!isOutgoing) {
+            Icon(
+                modifier = Modifier.size(20.dp)
+                    .scale(scaleX = 1f, scaleY = -1f),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_top_right),
+                contentDescription = null,
+                tint = ElementTheme.colors.iconSecondary,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        Row(modifier = Modifier
+            .graphicsLayer {
+                shape = RoundedCornerShape(8.dp)
+                clip = true
+            }
+            .background(ElementTheme.colors.bgCanvasDefaultLevel1)
+            .niceClickable(onClick)
+            .padding(horizontal = 6.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (threadSummary.latestEvent.dataOrNull() != null) {
+                val latestEvent = threadSummary.latestEvent.dataOrNull()!!
+                val avatarData = AvatarData(
+                    id = latestEvent.senderId.value,
+                    name = latestEvent.senderProfile.getDisplayName(),
+                    url = latestEvent.senderProfile.getAvatarUrl(),
+                    size = AvatarSize.TimelineThreadLatestEventSender,
+                )
+                Avatar(
+                    avatarData = avatarData,
+                    avatarType = AvatarType.User,
+                )
+            } else {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = CompoundIcons.ThreadsSolid(),
+                    contentDescription = null,
+                    tint = ElementTheme.colors.iconSecondary,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = pluralStringResource(CommonPlurals.common_replies, threadSummary.numberOfReplies.toInt(), threadSummary.numberOfReplies),
+                style = ElementTheme.typography.fontBodySmMedium,
+                color = ElementTheme.colors.textSecondary,
+            )
+        }
+
+        if (isOutgoing) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                modifier = Modifier.size(20.dp)
+                    .rotate(180f),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_top_right),
+                contentDescription = null,
+                tint = ElementTheme.colors.iconSecondary,
+            )
         }
     }
 }
