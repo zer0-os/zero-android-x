@@ -40,9 +40,6 @@ val SemanticColors.zeroChatBubbleOutgoingSecondaryColor
 val SemanticColors.zeroChatBubbleIncomingColor
     get() = zeroChatBubbleIncoming
 
-val SemanticColors.zeroThreadAccentColor
-    get() = zeroAccentColor
-
 val SemanticColors.zeroMentionPrimaryColor
     get() = zeroAccentColor
 
