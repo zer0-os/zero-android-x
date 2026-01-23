@@ -57,6 +57,7 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
 import io.element.android.libraries.matrix.api.zero.user.ZeroUser
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWallet
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFTsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -528,6 +529,10 @@ class FakeMatrixClient(
     }
 
     override suspend fun getTransactionReceipt(transactionId: String, chainId: Long?): Result<ZeroWalletTransactionReceipt> {
+        return Result.failure(Throwable("fake"))
+    }
+
+    override suspend fun getWalletNFTs(walletAddress: String, paginationParams: ZeroWalletTokensPaginationParams?): Result<ZeroWalletNFTsResponse> {
         return Result.failure(Throwable("fake"))
     }
 

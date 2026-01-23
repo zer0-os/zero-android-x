@@ -18,6 +18,7 @@ open class WalletContentStateProvider : PreviewParameterProvider<WalletContentSt
             aWalletContentState(showWalletBalance = false),
             aWalletContentState(tokensListState = WalletTokensListState.Skeleton(10)),
             aWalletContentState(transactionsListState = WalletTransactionsListState.Skeleton(10)),
+            aWalletContentState(nftsListState = WalletNFTsListState.Skeleton(10)),
         )
 }
 
@@ -25,6 +26,7 @@ internal fun aWalletContentState(
     showWalletBalance: Boolean = true,
     tokensListState: WalletTokensListState = WalletTokensListState.Empty,
     transactionsListState: WalletTransactionsListState = WalletTransactionsListState.Empty,
+    nftsListState: WalletNFTsListState = WalletNFTsListState.Empty,
 ) = WalletContentState(
     genericActionState = AsyncAction.Uninitialized,
     userName = "Jade David",
@@ -36,6 +38,8 @@ internal fun aWalletContentState(
     transactionsListState = transactionsListState,
     tokensPaginationParams = null,
     transactionsPaginationParams = null,
+    nftsListState = nftsListState,
+    nftsPaginationParams = null,
     meowPrice = null,
     stakePools = emptyList(),
     selectedPool = null,

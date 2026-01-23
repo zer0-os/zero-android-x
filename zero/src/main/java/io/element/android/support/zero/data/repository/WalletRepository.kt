@@ -9,6 +9,7 @@ package io.element.android.support.zero.data.repository
 
 import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
 import io.element.android.support.zero.network.model.response.wallet.ApiTransactionPerformed
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletNFTs
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletStakingApprovalResponse
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
@@ -43,4 +44,6 @@ interface WalletRepository {
     suspend fun verifyERC20Approval(userAddress: String, poolAddress: String, tokenAddress: String, chainId: Long): ApiWalletStakingApprovalResponse
 
     suspend fun getAvaxTokenPrice(tokenAddress: String): ApiAvaxTokenPrice
+
+    suspend fun getNFTs(walletAddress: String, nextPageParams: NextPageParams?): ApiWalletNFTs
 }

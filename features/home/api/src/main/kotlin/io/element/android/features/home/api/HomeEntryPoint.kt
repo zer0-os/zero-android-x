@@ -17,6 +17,7 @@ import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 
 interface HomeEntryPoint : FeatureEntryPoint {
     fun createNode(
@@ -43,5 +44,6 @@ interface HomeEntryPoint : FeatureEntryPoint {
         fun onFeedUserClick(profile: FeedUserProfileView)
         fun onUserProfileClick()
         fun onSendWalletToken()
+        fun onNFTClick(nft: ZeroWalletNFT)
     }
 }

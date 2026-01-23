@@ -8,6 +8,10 @@
 package io.element.android.support.zero.data.conversion
 
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroAvaxTokenPrice
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroNFTAttribute
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroNFTMetadata
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFTsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletRecipient
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
@@ -21,6 +25,7 @@ import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransactionsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletUtil
 import io.element.android.support.zero.network.model.response.wallet.ApiAvaxTokenPrice
+import io.element.android.support.zero.network.model.response.wallet.ApiWalletNFTs
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletRecipient
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenBalance
 import io.element.android.support.zero.network.model.response.wallet.ApiWalletTokenInfo
@@ -44,6 +49,39 @@ fun ApiWalletTokens.toModel(): ZeroWalletTokensResponse {
                 token.chainId,
                 token.percentChange,
                 token.price
+            )
+        },
+        paginationParams = nextPageParams?.let { nextPageParams ->
+            ZeroWalletTokensPaginationParams(
+                nextPageParams.itemsCount,
+                nextPageParams.tokenName,
+                nextPageParams.tokenType,
+                nextPageParams.value
+            )
+        }
+    )
+}
+
+fun ApiWalletNFTs.toModel(): ZeroWalletNFTsResponse {
+    return ZeroWalletNFTsResponse(
+        nfts = nfts.map { nft ->
+            ZeroWalletNFT(
+                animationUrl = nft.animationUrl,
+                collectionAddress = nft.collectionAddress,
+                collectionName = nft.collectionName,
+                id = nft.id,
+                imageUrl = nft.imageUrl,
+                tokenType = nft.tokenType,
+                quantity = nft.quantity,
+                metadata = nft.metadata?.let { metadata ->
+                    ZeroNFTMetadata(
+                        attributes = metadata.attributes?.map { nFTAttribute ->
+                            ZeroNFTAttribute(traitType = nFTAttribute.traitType, value = nFTAttribute.value)
+                        },
+                        name = metadata.name,
+                        description = metadata.description,
+                    )
+                }
             )
         },
         paginationParams = nextPageParams?.let { nextPageParams ->

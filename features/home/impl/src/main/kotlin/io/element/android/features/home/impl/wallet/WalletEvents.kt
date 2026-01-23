@@ -8,12 +8,14 @@
 package io.element.android.features.home.impl.wallet
 
 import io.element.android.features.home.impl.model.HomeStakePool
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
 
 sealed interface WalletEvents {
     data class LoadMoreTokens(val currentTokens: List<ZeroWalletToken>) : WalletEvents
     data class LoadMoreTransactions(val currentTransactions: List<ZeroWalletTransaction>) : WalletEvents
+    data class LoadMoreNFTs(val currentNFTs: List<ZeroWalletNFT>) : WalletEvents
     data class ViewWalletTransaction(val transactionId: String, val chainId: Long? = null) : WalletEvents
     data object OnWalletTransactionViewed : WalletEvents
     data object ToggleWalletBalance : WalletEvents
