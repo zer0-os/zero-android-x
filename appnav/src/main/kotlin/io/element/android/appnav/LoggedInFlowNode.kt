@@ -47,8 +47,8 @@ import io.element.android.appnav.room.RoomFlowNode
 import io.element.android.appnav.room.RoomNavigationTarget
 import io.element.android.appnav.room.joined.JoinedRoomLoadedFlowNode
 import io.element.android.compound.colors.SemanticColorsLightDark
-import io.element.android.features.createroom.api.CreateRoomEntryPoint
 import io.element.android.features.createfeed.api.CreateFeedEntryPoint
+import io.element.android.features.createroom.api.CreateRoomEntryPoint
 import io.element.android.features.enterprise.api.EnterpriseService
 import io.element.android.features.enterprise.api.SessionEnterpriseService
 import io.element.android.features.feeddetails.api.FeedDetailsEntryPoint
@@ -70,6 +70,7 @@ import io.element.android.features.startchat.api.StartChatEntryPoint
 import io.element.android.features.userprofile.api.SearchUserEntryPoint
 import io.element.android.features.userprofile.api.UserProfileEntryPoint
 import io.element.android.features.verifysession.api.IncomingVerificationEntryPoint
+import io.element.android.features.wallet.api.WalletNFTDetailsEntryPoint
 import io.element.android.features.wallettransactions.api.WalletTransactionsEntryPoint
 import io.element.android.libraries.architecture.BackstackView
 import io.element.android.libraries.architecture.BaseFlowNode
@@ -98,6 +99,7 @@ import io.element.android.libraries.matrix.api.verification.SessionVerificationS
 import io.element.android.libraries.matrix.api.verification.VerificationRequest
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.libraries.mediaviewer.api.MediaViewerEntryPoint
 import io.element.android.libraries.preferences.api.store.AppPreferencesStore
 import io.element.android.libraries.push.api.notifications.conversations.NotificationConversationService
@@ -164,6 +166,7 @@ class LoggedInFlowNode(
     private val analyticsService: AnalyticsService,
     private val analyticsRoomListStateWatcher: AnalyticsRoomListStateWatcher,
     private val createRoomEntryPoint: CreateRoomEntryPoint,
+    private val nftDetailsEntryPoint: WalletNFTDetailsEntryPoint
 ) : BaseFlowNode<LoggedInFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = NavTarget.Placeholder,
@@ -357,6 +360,11 @@ class LoggedInFlowNode(
 
         @Parcelize
         data object SearchUser : NavTarget
+
+        @Parcelize
+        data class NFTDetails(
+            val nft: ZeroWalletNFT,
+        ) : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -441,6 +449,10 @@ class LoggedInFlowNode(
 
                     override fun onSendWalletToken() {
                         backstack.push(NavTarget.SendWalletToken)
+                    }
+
+                    override fun onNFTClick(nft: ZeroWalletNFT) {
+                        backstack.push(NavTarget.NFTDetails(nft))
                     }
                 }
                 homeEntryPoint.createNode(
@@ -740,6 +752,11 @@ class LoggedInFlowNode(
                 }
                 searchUserEntryPoint.nodeBuilder(this, buildContext)
                     .callback(callback)
+                    .build()
+            }
+            is NavTarget.NFTDetails -> {
+                nftDetailsEntryPoint.nodeBuilder(this, buildContext)
+                    .params(WalletNFTDetailsEntryPoint.Params(navTarget.nft))
                     .build()
             }
         }

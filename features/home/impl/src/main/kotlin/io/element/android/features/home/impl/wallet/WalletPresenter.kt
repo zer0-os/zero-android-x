@@ -323,11 +323,15 @@ class WalletPresenter(
         }
         (results[3] as? Result<ZeroWalletNFTsResponse>)?.let {
             it.onSuccess { result ->
-                walletNFTsListState.value = WalletNFTsListState.NFTs(
-                    result.nfts
-                        .distinctBy { nft -> nft.id }
-                        .toPersistentList()
-                )
+                if (result.nfts.isEmpty()) {
+                    walletNFTsListState.value = WalletNFTsListState.Empty
+                } else {
+                    walletNFTsListState.value = WalletNFTsListState.NFTs(
+                        result.nfts
+                            .distinctBy { nft -> nft.id }
+                            .toPersistentList()
+                    )
+                }
                 nftPaginationParams.value = result.paginationParams
             }.onFailure {
                 walletNFTsListState.value = WalletNFTsListState.Empty

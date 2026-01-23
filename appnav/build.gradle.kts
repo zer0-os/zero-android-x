@@ -43,6 +43,7 @@ dependencies {
     implementation(projects.libraries.uiCommon)
     implementation(projects.libraries.uiStrings)
     implementation(projects.features.login.api)
+    implementation(projects.features.wallet.api)
     implementation(projects.libraries.mediaviewer.api)
 
     implementation(libs.coil)

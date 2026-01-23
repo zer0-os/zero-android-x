@@ -76,6 +76,7 @@ import io.element.android.libraries.designsystem.utils.snackbar.rememberSnackbar
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.libraries.ui.strings.CommonStrings
 import io.element.android.support.zero.common.extension.getActivity
 import io.element.android.support.zero.common.extension.openExternalUri
@@ -101,6 +102,7 @@ fun HomeView(
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     onSendWalletToken: () -> Unit,
+    onNFTClick: (ZeroWalletNFT) -> Unit = {},
     modifier: Modifier = Modifier,
     acceptDeclineInviteView: @Composable () -> Unit,
 ) {
@@ -177,6 +179,7 @@ fun HomeView(
                 onUserProfileClick = onUserProfileClick,
                 onCreateFeedClick = onCreateFeedClick,
                 onSendWalletToken = onSendWalletToken,
+                onNFTClick = onNFTClick,
                 onHomeNavTabSelected = {
                     // clear room filters just to clean content
                     homeState.roomListState.filtersState.clearFilters()
@@ -239,6 +242,7 @@ private fun HomeScaffold(
     onUserProfileClick: () -> Unit,
     onCreateFeedClick: () -> Unit,
     onSendWalletToken: () -> Unit,
+    onNFTClick: (ZeroWalletNFT) -> Unit = {},
     onHomeNavTabSelected: (HomeScreenTab) -> Unit,
     onChannelsContentTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier = Modifier,
@@ -311,6 +315,7 @@ private fun HomeScaffold(
                     onReceiveWalletToken = {
                         showWalletReceiveTokenSheet.value = true
                     },
+                    onNFTClick = onNFTClick,
                     onChannelsContentTabSelected = onChannelsContentTabSelected,
                     modifier = Modifier
                         .padding(padding)
@@ -426,6 +431,7 @@ internal fun HomeScreenContent(
     onFeedUserClick: (FeedUserProfileView) -> Unit,
     onSendWalletToken: () -> Unit = {},
     onReceiveWalletToken: () -> Unit = {},
+    onNFTClick: (ZeroWalletNFT) -> Unit = {},
     onChannelsContentTabSelected: (ChannelsScreenTab) -> Unit,
     modifier: Modifier,
 ) {
@@ -490,7 +496,8 @@ internal fun HomeScreenContent(
                 modifier = modifier,
                 state = state.walletContentState,
                 onSendWalletToken = onSendWalletToken,
-                onReceiveWalletToken = onReceiveWalletToken
+                onReceiveWalletToken = onReceiveWalletToken,
+                onNFTClick = onNFTClick
             )
         }
     }

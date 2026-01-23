@@ -58,6 +58,7 @@ import io.element.android.libraries.matrix.api.MatrixClient
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.zero.feed.FeedUserProfileView
 import io.element.android.libraries.matrix.api.zero.feed.ZeroFeed
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.services.analytics.api.AnalyticsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -169,6 +170,10 @@ class HomeFlowNode(
         callback.onSendWalletToken()
     }
 
+    private fun onNFTClick(nft: ZeroWalletNFT) {
+        callback.onNFTClick(nft)
+    }
+
     private fun onMenuActionClick(activity: Activity, roomListMenuAction: RoomListMenuAction) {
         when (roomListMenuAction) {
             RoomListMenuAction.InviteFriends -> {
@@ -260,6 +265,7 @@ class HomeFlowNode(
                 onUserProfileClick = this::onUserProfileClick,
                 onCreateFeedClick = this::onCreateFeedClick,
                 onSendWalletToken = this::onSendWalletToken,
+                onNFTClick = this::onNFTClick,
                 modifier = modifier,
                 acceptDeclineInviteView = {
                     acceptDeclineInviteView.Render(
