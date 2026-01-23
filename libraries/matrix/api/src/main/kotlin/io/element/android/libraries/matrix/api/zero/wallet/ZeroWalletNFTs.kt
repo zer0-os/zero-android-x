@@ -23,15 +23,14 @@ data class ZeroWalletNFT(
     val collectionName: String?,
     val id: String,
     val imageUrl: String?,
-    val isUnique: Boolean,
     val tokenType: String?,
     val quantity: Int?,
-    val metadata: ZeroNFTMetadata,
+    val metadata: ZeroNFTMetadata?,
 ) : Parcelable
 
 @Parcelize
 data class ZeroNFTMetadata(
-    val attributes: List<ZeroNFTAttribute>,
+    val attributes: List<ZeroNFTAttribute>?,
     val name: String?,
     val description: String?
 ) : Parcelable
@@ -41,3 +40,11 @@ data class ZeroNFTAttribute(
     val traitType: String,
     val value: String
 ) : Parcelable
+
+val ZeroWalletNFT.tokenUrl: String
+    get() = buildString {
+        append("https://zscan.live/token/")
+        append(this@tokenUrl.collectionAddress)
+        append("/instance/")
+        append(this@tokenUrl.id)
+    }

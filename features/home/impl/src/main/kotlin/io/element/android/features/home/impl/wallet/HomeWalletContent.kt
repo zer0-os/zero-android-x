@@ -47,9 +47,9 @@ import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.home.impl.model.WalletContentTab
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Icon
-import io.element.android.libraries.designsystem.theme.components.IconButton
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.color.zeroBrandColor
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.support.zero.R
 import io.element.android.support.zero.common.ui.theme.SPACING_2X
 import io.element.android.support.zero.common.ui.theme.SPACING_3X
@@ -61,6 +61,7 @@ fun HomeWalletContent(
     state: WalletContentState,
     onSendWalletToken: () -> Unit = {},
     onReceiveWalletToken: () -> Unit = {},
+    onNFTClick: (ZeroWalletNFT) -> Unit = {}
 ) {
     var selectedWalletTab by rememberSaveable { mutableStateOf(WalletContentTab.TOKENS) }
     Column(
@@ -116,6 +117,7 @@ fun HomeWalletContent(
         ) {
             when (selectedWalletTab) {
                 WalletContentTab.TOKENS -> WalletTokensList(state)
+                WalletContentTab.NFT -> WalletNFTsList(state = state, onNFTClick = onNFTClick)
                 WalletContentTab.STAKING -> WalletStakingList(state)
                 WalletContentTab.TRANSACTIONS -> WalletTransactionsList(state)
             }

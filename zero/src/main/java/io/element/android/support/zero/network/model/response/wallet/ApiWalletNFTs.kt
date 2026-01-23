@@ -22,15 +22,14 @@ data class ApiWalletNFT(
     val collectionName: String?,
     val id: String,
     val imageUrl: String?,
-    val isUnique: Boolean,
     val tokenType: String?,
     val quantity: Int?,
-    val metadata: ApiNFTMetadata,
+    val metadata: ApiNFTMetadata?,
 )
 
 @Serializable
 data class ApiNFTMetadata(
-    val attributes: List<ApiNFTAttribute>,
+    val attributes: List<ApiNFTAttribute>?,
     val name: String?,
     val description: String?
 )

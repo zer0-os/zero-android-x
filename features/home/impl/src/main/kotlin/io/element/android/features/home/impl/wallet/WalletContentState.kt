@@ -13,6 +13,7 @@ import io.element.android.features.home.impl.model.SelectedStakePool
 import io.element.android.libraries.architecture.AsyncAction
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroMeowPrice
 import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokensPaginationParams
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTransaction
@@ -34,6 +35,8 @@ data class WalletContentState(
     val transactionsListState: WalletTransactionsListState,
     val tokensPaginationParams: ZeroWalletTokensPaginationParams?,
     val transactionsPaginationParams: ZeroWalletTransactionsPaginationParams?,
+    val nftsListState: WalletNFTsListState,
+    val nftsPaginationParams: ZeroWalletTokensPaginationParams?,
     val meowPrice: ZeroMeowPrice?,
 
     val stakePools: List<HomeStakePool>,
@@ -65,4 +68,13 @@ sealed interface WalletTransactionsListState {
     data class Transactions(
         val transactions: ImmutableList<ZeroWalletTransaction>
     ) : WalletTransactionsListState
+}
+
+@Immutable
+sealed interface WalletNFTsListState {
+    data class Skeleton(val count: Int) : WalletNFTsListState
+    data object Empty : WalletNFTsListState
+    data class NFTs(
+        val nfts: ImmutableList<ZeroWalletNFT>
+    ) : WalletNFTsListState
 }

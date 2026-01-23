@@ -71,16 +71,17 @@ fun ApiWalletNFTs.toModel(): ZeroWalletNFTsResponse {
                 collectionName = nft.collectionName,
                 id = nft.id,
                 imageUrl = nft.imageUrl,
-                isUnique = nft.isUnique,
                 tokenType = nft.tokenType,
                 quantity = nft.quantity,
-                metadata = ZeroNFTMetadata(
-                    attributes = nft.metadata.attributes.map { nFTAttribute ->
-                        ZeroNFTAttribute(traitType = nFTAttribute.traitType, value = nFTAttribute.value)
-                    },
-                    name = nft.metadata.name,
-                    description = nft.metadata.description,
-                )
+                metadata = nft.metadata?.let { metadata ->
+                    ZeroNFTMetadata(
+                        attributes = metadata.attributes?.map { nFTAttribute ->
+                            ZeroNFTAttribute(traitType = nFTAttribute.traitType, value = nFTAttribute.value)
+                        },
+                        name = metadata.name,
+                        description = metadata.description,
+                    )
+                }
             )
         },
         paginationParams = nextPageParams?.let { nextPageParams ->

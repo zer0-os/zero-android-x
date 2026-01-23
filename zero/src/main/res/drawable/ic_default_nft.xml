@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (c) 2026 Element Creations Ltd.
+  ~
+  ~ SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+  ~ Please see LICENSE files in the repository root for full details.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:autoMirrored="true"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M20.5,7.278L12,12M12,12L3.5,7.278M12,12L12,21.5M14,20.889L12.777,21.568C12.493,21.726 12.352,21.805 12.201,21.836C12.068,21.863 11.932,21.863 11.799,21.836C11.648,21.805 11.507,21.726 11.223,21.568L3.823,17.457C3.523,17.291 3.374,17.208 3.265,17.089C3.168,16.985 3.095,16.861 3.05,16.725C3,16.573 3,16.401 3,16.059V7.941C3,7.599 3,7.427 3.05,7.275C3.095,7.139 3.168,7.015 3.265,6.911C3.374,6.792 3.523,6.709 3.823,6.543L11.223,2.432C11.507,2.274 11.648,2.195 11.799,2.164C11.932,2.137 12.068,2.137 12.201,2.164C12.352,2.195 12.493,2.274 12.777,2.432L20.177,6.543C20.477,6.709 20.626,6.792 20.735,6.911C20.832,7.015 20.905,7.139 20.949,7.275C21,7.427 21,7.599 21,7.941V13M7.5,4.5L16.5,9.5M16,18H22"
+        android:strokeWidth="1"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -31,6 +31,8 @@ import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingConfig
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingStatus
 import io.element.android.libraries.matrix.api.zero.staking.ZeroStakingUserRewardsInfo
 import io.element.android.libraries.matrix.api.zero.staking.ZeroTokenAddress
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFT
+import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletNFTsResponse
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletToken
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenBalance
 import io.element.android.libraries.matrix.api.zero.wallet.ZeroWalletTokenInfo
@@ -85,6 +87,12 @@ class WalletPresenter(
         }
         val walletTransactionsPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?> =
             remember { mutableStateOf(null) }
+        val walletNFTsListState: MutableState<WalletNFTsListState> = remember {
+            mutableStateOf(WalletNFTsListState.Skeleton(10))
+        }
+        val walletNFTsPaginationParams: MutableState<ZeroWalletTokensPaginationParams?> = remember {
+            mutableStateOf(null)
+        }
         val walletStakingContent: MutableState<List<HomeStakePool>> = remember { mutableStateOf(emptyList()) }
         val selectedStakePool: MutableState<SelectedStakePool?> = remember { mutableStateOf(null) }
         val showWalletStakingSheet = remember { mutableStateOf(false) }
@@ -93,8 +101,9 @@ class WalletPresenter(
         val fetchWalletData: (walletAddress: String) -> Unit = { walletAddress ->
             coroutineState.fetchWalletData(
                 meowPrice, walletAddress, userWalletBalance,
-                walletStakingContent, walletTokensListState, walletTransactionsListState,
-                walletTokenPaginationParams, walletTransactionsPaginationParams, true
+                walletStakingContent, walletTokensListState, walletTransactionsListState, walletNFTsListState,
+                walletTokenPaginationParams, walletTransactionsPaginationParams, walletNFTsPaginationParams,
+                true
             )
         }
 
@@ -136,6 +145,16 @@ class WalletPresenter(
                             currentList = event.currentTransactions,
                             walletTransactionsListState = walletTransactionsListState,
                             transactionPaginationParams = walletTransactionsPaginationParams
+                        )
+                    }
+                }
+                is WalletEvents.LoadMoreNFTs -> {
+                    matrixUser.walletAddress?.let { address ->
+                        coroutineState.loadMoreWalletNFTs(
+                            walletAddress = address,
+                            currentList = event.currentNFTs,
+                            walletNFTsListState = walletNFTsListState,
+                            nftPaginationParams = walletNFTsPaginationParams
                         )
                     }
                 }
@@ -225,8 +244,10 @@ class WalletPresenter(
             claimableRewards = ZeroUserRewards.empty(),
             tokensListState = walletTokensListState.value,
             transactionsListState = walletTransactionsListState.value,
+            nftsListState = walletNFTsListState.value,
             tokensPaginationParams = walletTokenPaginationParams.value,
             transactionsPaginationParams = walletTransactionsPaginationParams.value,
+            nftsPaginationParams = walletNFTsPaginationParams.value,
             meowPrice = meowPrice.value,
             stakePools = walletStakingContent.value,
             selectedPool = selectedStakePool.value,
@@ -243,8 +264,10 @@ class WalletPresenter(
         stakePoolsContent: MutableState<List<HomeStakePool>>,
         walletTokensListState: MutableState<WalletTokensListState>,
         walletTransactionsListState: MutableState<WalletTransactionsListState>,
+        walletNFTsListState: MutableState<WalletNFTsListState>,
         tokenPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
         transactionPaginationParams: MutableState<ZeroWalletTransactionsPaginationParams?>,
+        nftPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>,
         forceRefresh: Boolean,
     ) = launch(context = Dispatchers.IO) {
         val results = awaitAll(
@@ -259,6 +282,12 @@ class WalletPresenter(
                 client.getWalletTransactions(
                     walletAddress = walletAddress,
                     paginationParams = if (forceRefresh) null else transactionPaginationParams.value
+                )
+            },
+            async {
+                client.getWalletNFTs(
+                    walletAddress = walletAddress,
+                    paginationParams = if (forceRefresh) null else nftPaginationParams.value
                 )
             },
         )
@@ -290,6 +319,18 @@ class WalletPresenter(
                 transactionPaginationParams.value = result.paginationParams
             }.onFailure {
                 walletTransactionsListState.value = WalletTransactionsListState.Empty
+            }
+        }
+        (results[3] as? Result<ZeroWalletNFTsResponse>)?.let {
+            it.onSuccess { result ->
+                walletNFTsListState.value = WalletNFTsListState.NFTs(
+                    result.nfts
+                        .distinctBy { nft -> nft.id }
+                        .toPersistentList()
+                )
+                nftPaginationParams.value = result.paginationParams
+            }.onFailure {
+                walletNFTsListState.value = WalletNFTsListState.Empty
             }
         }
     }
@@ -338,6 +379,27 @@ class WalletPresenter(
         }.onFailure {
             //Failed to load transactions next page
             walletTransactionsListState.value = WalletTransactionsListState.Transactions(currentList.toPersistentList())
+        }
+    }
+
+    private fun CoroutineScope.loadMoreWalletNFTs(
+        walletAddress: String,
+        currentList: List<ZeroWalletNFT>,
+        walletNFTsListState: MutableState<WalletNFTsListState>,
+        nftPaginationParams: MutableState<ZeroWalletTokensPaginationParams?>
+    ) = launch {
+        client.getWalletNFTs(
+            walletAddress = walletAddress,
+            paginationParams = nftPaginationParams.value
+        ).onSuccess {
+            val newList = mutableListOf<ZeroWalletNFT>().apply {
+                addAll(currentList)
+                addAll(it.nfts)
+            }.distinctBy { nft -> nft.id }
+            walletNFTsListState.value = WalletNFTsListState.NFTs(newList.toPersistentList())
+            nftPaginationParams.value = it.paginationParams
+        }.onFailure {
+            walletNFTsListState.value = WalletNFTsListState.NFTs(currentList.toPersistentList())
         }
     }
 
