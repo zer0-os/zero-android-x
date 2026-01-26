@@ -63,6 +63,6 @@ data class HomeState(
             selectedHomeTab in listOf(HomeScreenTab.CHAT, HomeScreenTab.CHANNEL, HomeScreenTab.FEED)
     }
 
-//    val showNavigationBar = homeSpacesState.spaceRooms.isNotEmpty()
+//    val showNavigationBar = homeSpacesState.canCreateSpaces || homeSpacesState.spaceRooms.isNotEmpty()
     val showNavigationBar = false
 }

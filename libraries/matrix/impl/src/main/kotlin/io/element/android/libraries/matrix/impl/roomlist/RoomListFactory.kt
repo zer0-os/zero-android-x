@@ -39,7 +39,6 @@ private val ROOM_LIST_RUST_FILTERS = listOf(
 
 internal class RoomListFactory(
     private val innerRoomListService: RoomListService,
-    private val sessionCoroutineScope: CoroutineScope,
     private val analyticsService: AnalyticsService,
     private val zeroUserRepository: UserRepository?,
 ) {
@@ -51,7 +50,7 @@ internal class RoomListFactory(
     fun createRoomList(
         pageSize: Int,
         coroutineContext: CoroutineContext,
-        coroutineScope: CoroutineScope = sessionCoroutineScope,
+        coroutineScope: CoroutineScope,
         initialFilter: RoomListFilter = RoomListFilter.all(),
         innerProvider: suspend () -> InnerRoomList
     ): DynamicRoomList {
