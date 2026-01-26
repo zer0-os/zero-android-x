@@ -171,7 +171,7 @@ class StateContentFormatter(
                     null
                 }
                 RenderingMode.Timeline -> {
-                    buildRoomLevelStateEventString(content.users, content.previous)
+                    "RoomPowerLevels"
                 }
             }
             OtherState.RoomServerAcl -> when (renderingMode) {
@@ -211,33 +211,6 @@ class StateContentFormatter(
                 }
             }
         }
-    }
-
-    private fun buildRoomLevelStateEventString(users: Map<String, Long>,
-                                               previousState: Map<String, Long>?): String {
-        val eventStringBuilder = StringBuilder()
-        if (users.isNotEmpty()) {
-            users.forEach { (userId, newLevel) ->
-                if (eventStringBuilder.isNotEmpty()) {
-                    eventStringBuilder.append("\n")
-                }
-                val oldLevel = previousState?.getOrDefault(userId, 0) ?: 0
-                val message = when (Pair(oldLevel.toInt(), newLevel.toInt())) {
-                    Pair(0, 50) -> "$userId was set as moderator"
-                    Pair(0, 100) -> "$userId was set as admin"
-                    Pair(50, 0) -> "$userId was removed as moderator"
-                    Pair(50, 100) -> "$userId was set as admin"
-                    Pair(100, 50) -> "$userId was set as moderator"
-                    Pair(100, 0) -> "$userId was removed as admin"
-                    else -> ""
-                }
-                if (message.isNotEmpty()) {
-                    eventStringBuilder.append(message)
-                    eventStringBuilder.append(" by admin.")
-                }
-            }
-        }
-        return eventStringBuilder.toString().trim()
     }
 
     private fun formatRoomPinnedEvents(
