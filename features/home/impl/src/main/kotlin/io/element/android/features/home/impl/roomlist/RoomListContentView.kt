@@ -64,7 +64,7 @@ fun RoomListContentView(
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     shouldShowInActiveChatsTab: Boolean,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
@@ -159,7 +159,7 @@ fun RoomListSkeletonView(
 @Composable
 private fun EmptyView(
     state: RoomListContentState.Empty,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onCreateRoomClick: () -> Unit,
@@ -184,13 +184,13 @@ private fun EmptyView(
                 SecurityBannerState.SetUpRecovery -> {
                     SetUpRecoveryKeyBanner(
                         onContinueClick = onSetUpRecoveryClick,
-                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
+                        onDismissClick = { eventSink(RoomListEvent.DismissBanner) },
                     )
                 }
                 SecurityBannerState.RecoveryKeyConfirmation -> {
 //                    ConfirmRecoveryKeyBanner(
 //                        onContinueClick = onConfirmRecoveryKeyClick,
-//                        onDismissClick = { eventSink(RoomListEvents.DismissBanner) },
+//                        onDismissClick = { eventSink(RoomListEvent.DismissBanner) },
 //                    )
                     verifyEncryption.invoke()
                 }
@@ -206,7 +206,7 @@ private fun RoomsView(
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     filtersState: RoomListFiltersState,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
@@ -242,7 +242,7 @@ private fun RoomsViewList(
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     isAnyFilterActive: Boolean,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
@@ -261,7 +261,7 @@ private fun RoomsViewList(
     }
     val updatedEventSink by rememberUpdatedState(newValue = eventSink)
     LaunchedEffect(visibleRange) {
-        updatedEventSink(RoomListEvents.UpdateVisibleRange(visibleRange))
+        updatedEventSink(RoomListEvent.UpdateVisibleRange(visibleRange))
     }
     LazyColumn(
         state = lazyListState,
@@ -273,11 +273,17 @@ private fun RoomsViewList(
                 item {
                     SetUpRecoveryKeyBanner(
                         onContinueClick = onSetUpRecoveryClick,
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissBanner) },
+                        onDismissClick = { updatedEventSink(RoomListEvent.DismissBanner) },
                     )
                 }
             }
             SecurityBannerState.RecoveryKeyConfirmation -> {
+                /*item {
+                    ConfirmRecoveryKeyBanner(
+                        onContinueClick = onConfirmRecoveryKeyClick,
+                        onDismissClick = { updatedEventSink(RoomListEvent.DismissBanner) },
+                    )
+                }*/
                 verifyEncryption()
             }
             /*SecurityBannerState.None -> if (state.fullScreenIntentPermissionsState.shouldDisplayBanner) {
@@ -291,7 +297,7 @@ private fun RoomsViewList(
             } else if (state.showNewNotificationSoundBanner) {
                 item {
                     NewNotificationSoundBanner(
-                        onDismissClick = { updatedEventSink(RoomListEvents.DismissNewNotificationSoundBanner) },
+                        onDismissClick = { updatedEventSink(RoomListEvent.DismissNewNotificationSoundBanner) },
                     )
                 }
             }

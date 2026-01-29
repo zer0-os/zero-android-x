@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
-import io.element.android.features.messages.impl.timeline.TimelineEvents
+import io.element.android.features.messages.impl.timeline.TimelineEvent
 import io.element.android.features.messages.impl.timeline.model.TimelineItem
 import io.element.android.features.messages.impl.timeline.model.event.isEdited
 import io.element.android.features.messages.impl.timeline.model.event.isRedacted
@@ -35,13 +35,12 @@ import io.element.android.libraries.designsystem.theme.components.Icon
 import io.element.android.libraries.designsystem.theme.components.Text
 import io.element.android.libraries.designsystem.theme.zero.typography.zeroTypography
 import io.element.android.libraries.matrix.api.timeline.item.event.LocalEventSendState
-import io.element.android.libraries.matrix.api.timeline.item.event.isCritical
 import io.element.android.libraries.ui.strings.CommonStrings
 
 @Composable
 fun TimelineEventTimestampView(
     event: TimelineItem.Event,
-    eventSink: (TimelineEvents.EventFromTimelineItem) -> Unit,
+    eventSink: (TimelineEvent.TimelineItemEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasError = event.failedToSend
@@ -92,7 +91,7 @@ fun TimelineEventTimestampView(
                         enabled = isVerifiedUserSendFailure,
                         onClickLabel = stringResource(CommonStrings.action_open_context_menu),
                     ) {
-                        eventSink(TimelineEvents.ComputeVerifiedUserSendFailure(event))
+                        eventSink(TimelineEvent.ComputeVerifiedUserSendFailure(event))
                     }
             )
         }
@@ -108,7 +107,7 @@ fun TimelineEventTimestampView(
                         .clickable(
                             onClickLabel = stringResource(CommonStrings.a11y_view_details),
                         ) {
-                            eventSink(TimelineEvents.ShowShieldDialog(shield))
+                            eventSink(TimelineEvent.ShowShieldDialog(shield))
                         },
                     tint = shield.toIconColor(),
                 )

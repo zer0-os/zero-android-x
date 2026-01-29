@@ -29,12 +29,12 @@ class RoomListFiltersPresenter(
 
     @Composable
     override fun present(): RoomListFiltersState {
-        fun handleEvent(event: RoomListFiltersEvents) {
+        fun handleEvent(event: RoomListFiltersEvent) {
             when (event) {
-                RoomListFiltersEvents.ClearSelectedFilters -> {
+                RoomListFiltersEvent.ClearSelectedFilters -> {
                     filterSelectionStrategy.clear()
                 }
-                is RoomListFiltersEvents.ToggleFilter -> {
+                is RoomListFiltersEvent.ToggleFilter -> {
                     //Clear previous filter before applying new
                     filterSelectionStrategy.clear()
                     filterSelectionStrategy.toggle(event.filter)

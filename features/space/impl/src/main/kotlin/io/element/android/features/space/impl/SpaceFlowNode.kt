@@ -14,6 +14,7 @@ import android.os.Parcelable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.bumble.appyx.core.lifecycle.subscribe
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -24,6 +25,7 @@ import com.bumble.appyx.navmodel.backstack.operation.push
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedInject
 import io.element.android.annotations.ContributesNode
+import io.element.android.features.createroom.api.CreateRoomEntryPoint
 import io.element.android.features.space.api.SpaceEntryPoint
 import io.element.android.features.space.impl.addroom.AddRoomToSpaceNode
 import io.element.android.features.space.impl.di.SpaceFlowGraph
@@ -39,6 +41,7 @@ import io.element.android.libraries.di.RoomScope
 import io.element.android.libraries.matrix.api.core.RoomId
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.spaces.SpaceService
+import io.element.android.libraries.matrix.api.spaces.loadAllIncrementally
 import kotlinx.parcelize.Parcelize
 
 @ContributesNode(RoomScope::class)
@@ -49,6 +52,7 @@ class SpaceFlowNode(
     room: JoinedRoom,
     spaceService: SpaceService,
     graphFactory: SpaceFlowGraph.Factory,
+    private val createRoomEntryPoint: CreateRoomEntryPoint,
 ) : BaseFlowNode<SpaceFlowNode.NavTarget>(
     backstack = BackStack(
         initialElement = NavTarget.Root,
@@ -72,12 +76,18 @@ class SpaceFlowNode(
         data object Leave : NavTarget
 
         @Parcelize
+        data object CreateRoom : NavTarget
+
+        @Parcelize
         data object AddRoom : NavTarget
     }
 
     override fun onBuilt() {
         super.onBuilt()
         lifecycle.subscribe(
+            onCreate = {
+                spaceRoomList.loadAllIncrementally(lifecycleScope)
+            },
             onDestroy = {
                 spaceRoomList.destroy()
             }
@@ -116,6 +126,10 @@ class SpaceFlowNode(
                         backstack.push(NavTarget.Leave)
                     }
 
+                    override fun onCreateRoom() {
+                        backstack.push(NavTarget.CreateRoom)
+                    }
+
                     override fun navigateToAddRoom() {
                         backstack.push(NavTarget.AddRoom)
                     }
@@ -139,6 +153,21 @@ class SpaceFlowNode(
                     }
                 }
                 createNode<SpaceSettingsFlowNode>(buildContext, listOf(callback))
+            }
+            is NavTarget.CreateRoom -> {
+                val callback = object : CreateRoomEntryPoint.Callback {
+                    override fun onRoomCreated(roomId: RoomId) {
+                        callback.navigateToRoom(roomId, emptyList())
+                    }
+                }
+                createRoomEntryPoint
+                    .builder(
+                        parentNode = this,
+                        buildContext = buildContext,
+                        callback = callback,
+                    )
+                    .setParentSpace(spaceRoomList.spaceId)
+                    .build()
             }
             NavTarget.AddRoom -> {
                 val callback = object : AddRoomToSpaceNode.Callback {

@@ -38,7 +38,7 @@ data class TimelineState(
     val resolveVerifiedUserSendFailureState: ResolveVerifiedUserSendFailureState,
     val displayThreadSummaries: Boolean,
     val linkPreviewMap: Map<UniqueId, ZeroLinkPreview>,
-    val eventSink: (TimelineEvents) -> Unit,
+    val eventSink: (TimelineEvent) -> Unit,
 ) {
     private val lastTimelineEvent = timelineItems.firstOrNull { it is TimelineItem.Event } as? TimelineItem.Event
     val hasAnyEvent = lastTimelineEvent != null

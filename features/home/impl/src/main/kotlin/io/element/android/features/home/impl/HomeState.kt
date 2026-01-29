@@ -49,7 +49,7 @@ data class HomeState(
     val userRewards: ZeroUserRewards = ZeroUserRewards.empty(),
     val showClaimRewardsSheet: Boolean,
     val claimRewardActionState: AsyncAction<String> = AsyncAction.Uninitialized,
-    val eventSink: (HomeEvents) -> Unit,
+    val eventSink: (HomeEvent) -> Unit,
 ) {
     private val displayActions = true
 

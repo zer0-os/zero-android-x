@@ -85,7 +85,7 @@ fun ReactionSummaryView(
     modifier: Modifier = Modifier,
 ) {
     fun onDismiss() {
-        state.eventSink(ReactionSummaryEvents.Clear)
+        state.eventSink(ReactionSummaryEvent.Clear)
     }
 
     if (state.target != null) {

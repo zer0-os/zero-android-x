@@ -57,7 +57,7 @@ internal fun aRoomListState(
     hideInvitesAvatars: Boolean = false,
     canReportRoom: Boolean = true,
     shouldShowInactiveChatsTab: Boolean = true,
-    eventSink: (RoomListEvents) -> Unit = {}
+    eventSink: (RoomListEvent) -> Unit = {}
 ) = RoomListState(
     contextMenu = contextMenu,
     declineInviteMenu = declineInviteMenu,

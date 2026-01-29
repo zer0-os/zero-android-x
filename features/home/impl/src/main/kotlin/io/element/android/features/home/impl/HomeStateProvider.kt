@@ -73,7 +73,7 @@ internal fun aHomeState(
     roomDirectoryState: RoomDirectoryState = aRoomDirectoryState(),
     canReportBug: Boolean = true,
     directLogoutState: DirectLogoutState = aDirectLogoutState(),
-    eventSink: (HomeEvents) -> Unit = {}
+    eventSink: (HomeEvent) -> Unit = {}
 ) = HomeState(
     currentUserAndNeighbors = currentUserAndNeighbors.toImmutableList(),
     matrixUser = matrixUser,

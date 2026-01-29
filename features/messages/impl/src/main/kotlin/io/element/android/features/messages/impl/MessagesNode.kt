@@ -37,7 +37,7 @@ import io.element.android.features.messages.impl.attachments.Attachment
 import io.element.android.features.messages.impl.messagecomposer.MessageComposerEvent
 import io.element.android.features.messages.impl.messagecomposer.MessageComposerPresenter
 import io.element.android.features.messages.impl.timeline.TimelineController
-import io.element.android.features.messages.impl.timeline.TimelineEvents
+import io.element.android.features.messages.impl.timeline.TimelineEvent
 import io.element.android.features.messages.impl.timeline.TimelinePresenter
 import io.element.android.features.messages.impl.timeline.di.LocalTimelineItemPresenterFactories
 import io.element.android.features.messages.impl.timeline.di.TimelineItemPresenterFactories
@@ -153,7 +153,7 @@ class MessagesNode(
         activity: Activity,
         darkTheme: Boolean,
         url: String,
-        eventSink: (TimelineEvents) -> Unit,
+        eventSink: (TimelineEvent) -> Unit,
         customTab: Boolean
     ) {
         when (val permalink = permalinkParser.parse(url)) {
@@ -180,12 +180,12 @@ class MessagesNode(
 
     private fun handleRoomLinkClick(
         roomLink: PermalinkData.RoomLink,
-        eventSink: (TimelineEvents) -> Unit,
+        eventSink: (TimelineEvent) -> Unit,
     ) {
         if (room.matches(roomLink.roomIdOrAlias)) {
             val eventId = roomLink.eventId
             if (eventId != null) {
-                eventSink(TimelineEvents.FocusOnEvent(eventId))
+                eventSink(TimelineEvent.FocusOnEvent(eventId))
             } else {
                 // Click on the same room, ignore
                 displaySameRoomToast()
@@ -245,7 +245,7 @@ class MessagesNode(
             val state = presenter.present()
 
             BackHandler {
-                state.eventSink(MessagesEvents.MarkAsFullyReadAndExit)
+                state.eventSink(MessagesEvent.MarkAsFullyReadAndExit)
             }
 
             OnLifecycleEvent { _, event ->
@@ -256,7 +256,7 @@ class MessagesNode(
             }
             MessagesView(
                 state = state,
-                onBackClick = { state.eventSink(MessagesEvents.MarkAsFullyReadAndExit) },
+                onBackClick = { state.eventSink(MessagesEvent.MarkAsFullyReadAndExit) },
                 onRoomDetailsClick = callback::navigateToRoomDetails,
                 onEventContentClick = { isLive, event ->
                     if (isLive) {
@@ -310,7 +310,7 @@ class MessagesNode(
             }
             LaunchedEffect(focusedEventId) {
                 if (focusedEventId != null) {
-                    state.timelineState.eventSink(TimelineEvents.FocusOnEvent(focusedEventId!!))
+                    state.timelineState.eventSink(TimelineEvent.FocusOnEvent(focusedEventId!!))
                     focusedEventId = null
                 }
             }

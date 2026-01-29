@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -35,7 +36,9 @@ import io.element.android.libraries.matrix.api.createroom.CreateRoomParameters
 import io.element.android.libraries.matrix.api.createroom.RoomPreset
 import io.element.android.libraries.matrix.api.room.alias.RoomAliasHelper
 import io.element.android.libraries.matrix.api.room.history.RoomHistoryVisibility
+import io.element.android.libraries.matrix.api.room.join.JoinRule
 import io.element.android.libraries.matrix.api.roomdirectory.RoomVisibility
+import io.element.android.libraries.matrix.api.spaces.SpaceRoom
 import io.element.android.libraries.matrix.ui.media.AvatarAction
 import io.element.android.libraries.matrix.ui.room.address.RoomAddressValidity
 import io.element.android.libraries.matrix.ui.room.address.RoomAddressValidityEffect
@@ -45,16 +48,23 @@ import io.element.android.libraries.mediaupload.api.MediaPreProcessor
 import io.element.android.libraries.permissions.api.PermissionsEvent
 import io.element.android.libraries.permissions.api.PermissionsPresenter
 import io.element.android.services.analytics.api.AnalyticsService
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.util.Optional
 import kotlin.jvm.optionals.getOrDefault
+import kotlin.jvm.optionals.getOrNull
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
 class ConfigureRoomPresenter(
     @Assisted private val isSpace: Boolean,
+    @Assisted private val initialParentSpaceId: RoomId?,
     private val dataStore: CreateRoomConfigStore,
     private val matrixClient: MatrixClient,
     private val mediaPickerProvider: PickerProvider,
@@ -67,7 +77,7 @@ class ConfigureRoomPresenter(
 ) : Presenter<ConfigureRoomState> {
     @AssistedFactory
     interface Factory {
-        fun create(isSpace: Boolean): ConfigureRoomPresenter
+        fun create(isSpace: Boolean, parentSpaceId: RoomId?): ConfigureRoomPresenter
     }
 
     private val cameraPermissionPresenter: PermissionsPresenter = permissionsPresenterFactory.create(android.Manifest.permission.CAMERA)
@@ -81,6 +91,7 @@ class ConfigureRoomPresenter(
     override fun present(): ConfigureRoomState {
         val matrixUser by matrixClient.userProfile.collectAsState()
 
+        val canAddRoomToSpace by featureFlagService.isFeatureEnabledFlow(FeatureFlags.CreateSpaces).collectAsState(false)
         val cameraPermissionState = cameraPermissionPresenter.present()
         val createRoomConfig by dataStore.getCreateRoomConfigFlow().collectAsState()
         val homeserverName = remember { matrixClient.userIdServerName() }
@@ -109,6 +120,18 @@ class ConfigureRoomPresenter(
             }
         }
 
+        var spaces by remember { mutableStateOf<ImmutableList<SpaceRoom>>(persistentListOf()) }
+        LaunchedEffect(canAddRoomToSpace) {
+            spaces = if (canAddRoomToSpace) {
+                matrixClient.spaceService.editableSpaces().getOrElse { emptyList() }.toImmutableList()
+            } else {
+                persistentListOf()
+            }
+
+            val parentSpace = spaces.find { it.roomId == initialParentSpaceId }
+            parentSpace?.let { dataStore.setParentSpace(it) }
+        }
+
         LaunchedEffect(cameraPermissionState.permissionGranted) {
             if (cameraPermissionState.permissionGranted && pendingPermissionRequest) {
                 pendingPermissionRequest = false
@@ -119,7 +142,7 @@ class ConfigureRoomPresenter(
         RoomAddressValidityEffect(
             client = matrixClient,
             roomAliasHelper = roomAliasHelper,
-            newRoomAddress = createRoomConfig.roomVisibility.roomAddress().getOrDefault(""),
+            newRoomAddress = createRoomConfig.visibilityState.roomAddress().getOrDefault(""),
             knownRoomAddress = null,
         ) { newRoomAddressValidity ->
             roomAddressValidity.value = newRoomAddressValidity
@@ -128,12 +151,25 @@ class ConfigureRoomPresenter(
         val localCoroutineScope = rememberCoroutineScope()
         val createRoomAction: MutableState<AsyncAction<RoomId>> = remember { mutableStateOf(AsyncAction.Uninitialized) }
 
-        val availableVisibilityOptions = remember(isSpace, isKnockFeatureEnabled) {
-            listOfNotNull(
-                RoomVisibilityItem.Public,
-                RoomVisibilityItem.AskToJoin.takeIf { !isSpace && isKnockFeatureEnabled },
-                RoomVisibilityItem.Private,
-            ).toImmutableList()
+        // Calculate available join rules based:
+        // 1. If we are creating a space.
+        // 2. If it has a parent space.
+        // 3. If knocking is enabled.
+        val parentSpace = createRoomConfig.parentSpace
+        val availableJoinRules = remember(createRoomConfig.parentSpace, isSpace, isKnockFeatureEnabled) {
+            when {
+                isSpace && parentSpace != null -> TODO("Adding a space to a parent space is not supported yet! How did you get here?")
+                parentSpace == null || parentSpace.joinRule == JoinRule.Public -> listOfNotNull(
+                    JoinRuleItem.PublicVisibility.Public,
+                    JoinRuleItem.PublicVisibility.AskToJoin.takeIf { !isSpace && isKnockFeatureEnabled },
+                    JoinRuleItem.Private,
+                ).toImmutableList()
+                else -> listOfNotNull(
+                    JoinRuleItem.PublicVisibility.Restricted(parentSpace.roomId),
+                    JoinRuleItem.PublicVisibility.AskToJoinRestricted(parentSpace.roomId).takeIf { !isSpace && isKnockFeatureEnabled },
+                    JoinRuleItem.Private,
+                ).toImmutableList()
+            }
         }
 
         fun createRoom(config: CreateRoomConfig, isVisibleInPublicRooms: Boolean) {
@@ -145,8 +181,7 @@ class ConfigureRoomPresenter(
             when (event) {
                 is ConfigureRoomEvents.RoomNameChanged -> dataStore.setRoomName(event.name)
                 is ConfigureRoomEvents.TopicChanged -> dataStore.setTopic(event.topic)
-                is ConfigureRoomEvents.RoomVisibilityChanged -> dataStore.setRoomVisibility(event.visibilityItem)
-                is ConfigureRoomEvents.RoomAccessChanged -> dataStore.setRoomAccess(event.roomAccess)
+                is ConfigureRoomEvents.JoinRuleChanged -> dataStore.setJoinRule(event.joinRuleItem)
                 is ConfigureRoomEvents.RoomAddressChanged -> dataStore.setRoomAddress(event.roomAddress)
                 is ConfigureRoomEvents.CreateRoom -> createRoom(createRoomConfig, isVisibleInPublicRooms.value)
                 is ConfigureRoomEvents.HandleAvatarAction -> {
@@ -161,9 +196,13 @@ class ConfigureRoomPresenter(
                         AvatarAction.Remove -> dataStore.setAvatarUri(uri = null)
                     }
                 }
+                is ConfigureRoomEvents.SetParentSpace -> {
+                    dataStore.setParentSpace(event.space)
+                }
+                ConfigureRoomEvents.CancelCreateRoom -> {
+                    createRoomAction.value = AsyncAction.Uninitialized
+                }
                 is ConfigureRoomEvents.VisibleInPublicRooms -> isVisibleInPublicRooms.value = event.visible
-
-                ConfigureRoomEvents.CancelCreateRoom -> createRoomAction.value = AsyncAction.Uninitialized
             }
         }
 
@@ -174,7 +213,8 @@ class ConfigureRoomPresenter(
             cameraPermissionState = cameraPermissionState,
             homeserverName = homeserverName,
             roomAddressValidity = roomAddressValidity.value,
-            availableVisibilityOptions = availableVisibilityOptions,
+            availableJoinRules = availableJoinRules,
+            spaces = spaces,
             visibleInPublicRooms = isVisibleInPublicRooms.value,
             eventSink = ::handleEvent,
         )
@@ -187,25 +227,27 @@ class ConfigureRoomPresenter(
     ) = launch {
         suspend {
             val avatarUrl = config.avatarUri?.let { uploadAvatar(it.toUri()) }
-            val params = if (config.roomVisibility is RoomVisibilityState.Public) {
+            val params = if (config.visibilityState is RoomVisibilityState.Public) {
                 CreateRoomParameters(
                     name = config.roomName,
                     topic = config.topic,
                     isEncrypted = false,
                     isDirect = false,
                     visibility = RoomVisibility.Public,
-                    joinRuleOverride = config.roomVisibility.roomAccess.toJoinRule(isVisibleInPublicRooms),
+                    joinRuleOverride = config.visibilityState.joinRuleItem.toJoinRule(isVisibleInPublicRooms)
+                        // No need to specify the public join rule override, since the preset is already PUBLIC_CHAT
+                        .takeIf { it != JoinRule.Public },
                     preset = RoomPreset.PUBLIC_CHAT,
                     invite = config.invites.map { it.userId },
                     avatar = avatarUrl,
-                    roomAliasName = if (isVisibleInPublicRooms) config.roomVisibility.roomAddress() else Optional.empty(),
+                    roomAliasName = if (isVisibleInPublicRooms) config.visibilityState.roomAddress() else Optional.empty(),
                     isSpace = isSpace,
                 )
             } else {
                 CreateRoomParameters(
                     name = config.roomName,
                     topic = config.topic,
-                    isEncrypted = config.roomVisibility is RoomVisibilityState.Private,
+                    isEncrypted = config.visibilityState is RoomVisibilityState.Private,
                     isDirect = false,
                     visibility = RoomVisibility.Private,
                     historyVisibilityOverride = RoomHistoryVisibility.Invited,
@@ -215,7 +257,7 @@ class ConfigureRoomPresenter(
                     isSpace = isSpace,
                 )
             }
-            matrixClient.createRoom(params)
+            val roomId = matrixClient.createRoom(params)
                 .onFailure { failure ->
                     Timber.e(failure, "Failed to create room")
                 }
@@ -224,7 +266,22 @@ class ConfigureRoomPresenter(
                     analyticsService.capture(CreatedRoom(isDM = false))
                 }
                 .getOrThrow()
+
+            // Add the newly created room to the parent space too
+            if (config.parentSpace != null) {
+                Timber.d("Adding room $roomId to parent space ${config.parentSpace.roomId}")
+                // Wait until we receive the power level info for the room, as it's needed to check if it can be added to a space
+                // TODO create some SDK function that does this instead?
+                withTimeoutOrNull(30.seconds) {
+                    matrixClient.getRoomInfoFlow(roomId).first { it.getOrNull()?.roomPowerLevels != null }
+                } ?: error("Did not receive created room power levels for room $roomId, needed for adding it to a space")
+
+                matrixClient.spaceService.addChildToSpace(spaceId = config.parentSpace.roomId, childId = roomId).getOrThrow()
+            }
+
+            roomId
         }.runCatchingUpdatingState(createRoomAction)
+            .onFailure { Timber.e(it, "Could not create room or add it to parent space ${config.parentSpace?.roomId}") }
     }
 
     private suspend fun uploadAvatar(avatarUri: Uri): String {

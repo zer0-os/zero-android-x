@@ -26,7 +26,7 @@ data class RoomMemberListState(
     val isRoomAChannel: Boolean,
     val selectedSection: SelectedSection,
     val moderationState: RoomMemberModerationState,
-    val eventSink: (RoomMemberListEvents) -> Unit,
+    val eventSink: (RoomMemberListEvent) -> Unit,
 ) {
     val showBannedSection: Boolean = moderationState.permissions.canBan && roomMembers.dataOrNull()?.banned?.isNotEmpty() == true
 }

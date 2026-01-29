@@ -58,7 +58,7 @@ fun ReportMessageView(
         progressDialog = {},
         onSuccess = { onBackClick() },
         errorMessage = { stringResource(CommonStrings.error_unknown) },
-        onErrorDismiss = { state.eventSink(ReportMessageEvents.ClearError) }
+        onErrorDismiss = { state.eventSink(ReportMessageEvent.ClearError) }
     )
 
     Scaffold(
@@ -85,7 +85,7 @@ fun ReportMessageView(
 
             TextField(
                 value = state.reason,
-                onValueChange = { state.eventSink(ReportMessageEvents.UpdateReason(it)) },
+                onValueChange = { state.eventSink(ReportMessageEvent.UpdateReason(it)) },
                 placeholder = stringResource(R.string.screen_report_content_hint),
                 minLines = 3,
                 enabled = !isSending,
@@ -114,7 +114,7 @@ fun ReportMessageView(
                 Switch(
                     enabled = !isSending,
                     checked = state.blockUser,
-                    onCheckedChange = { state.eventSink(ReportMessageEvents.ToggleBlockUser) },
+                    onCheckedChange = { state.eventSink(ReportMessageEvent.ToggleBlockUser) },
                 )
             }
 
@@ -126,7 +126,7 @@ fun ReportMessageView(
                 showProgress = isSending,
                 onClick = {
                     focusManager.clearFocus(force = true)
-                    state.eventSink(ReportMessageEvents.Report)
+                    state.eventSink(ReportMessageEvent.Report)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

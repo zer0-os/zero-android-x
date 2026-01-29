@@ -45,7 +45,7 @@ class RoomListViewTest {
     @Config(qualifiers = "h1024dp")
     @Test
     fun `displaying the view automatically sends a couple of UpdateVisibleRangeEvents`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         rule.setRoomListView(
             state = aRoomListState(
                 contentState = aRoomsContentState(securityBannerState = SecurityBannerState.RecoveryKeyConfirmation),
@@ -55,15 +55,15 @@ class RoomListViewTest {
 
         eventsRecorder.assertList(
             listOf(
-                RoomListEvents.UpdateVisibleRange(IntRange.EMPTY),
-                RoomListEvents.UpdateVisibleRange(0..5),
+                RoomListEvent.UpdateVisibleRange(IntRange.EMPTY),
+                RoomListEvent.UpdateVisibleRange(0..5),
             )
         )
     }
 
     @Test
     fun `clicking on close recovery key banner emits the expected Event`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         rule.setRoomListView(
             state = aRoomListState(
                 contentState = aRoomsContentState(securityBannerState = SecurityBannerState.RecoveryKeyConfirmation),
@@ -76,12 +76,12 @@ class RoomListViewTest {
 
         val close = rule.activity.getString(CommonStrings.action_close)
         rule.onNodeWithContentDescription(close).performClick()
-        eventsRecorder.assertSingle(RoomListEvents.DismissBanner)
+        eventsRecorder.assertSingle(RoomListEvent.DismissBanner)
     }
 
     @Test
     fun `clicking on close setup key banner emits the expected Event`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         rule.setRoomListView(
             state = aRoomListState(
                 contentState = aRoomsContentState(securityBannerState = SecurityBannerState.SetUpRecovery),
@@ -94,12 +94,12 @@ class RoomListViewTest {
 
         val close = rule.activity.getString(CommonStrings.action_close)
         rule.onNodeWithContentDescription(close).performClick()
-        eventsRecorder.assertSingle(RoomListEvents.DismissBanner)
+        eventsRecorder.assertSingle(RoomListEvent.DismissBanner)
     }
 
     @Test
     fun `clicking on continue recovery key banner invokes the expected callback`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         ensureCalledOnce { callback ->
             rule.setRoomListView(
                 state = aRoomListState(
@@ -120,7 +120,7 @@ class RoomListViewTest {
 
     @Test
     fun `clicking on continue setup key banner invokes the expected callback`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         ensureCalledOnce { callback ->
             rule.setRoomListView(
                 state = aRoomListState(
@@ -138,7 +138,7 @@ class RoomListViewTest {
 
     @Test
     fun `clicking on start chat when the session has no room invokes the expected callback`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>(expectEvents = false)
+        val eventsRecorder = EventsRecorder<RoomListEvent>(expectEvents = false)
         ensureCalledOnce { callback ->
             rule.setRoomListView(
                 state = aRoomListState(
@@ -153,7 +153,7 @@ class RoomListViewTest {
 
     @Test
     fun `clicking on a room invokes the expected callback`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         val state = aRoomListState(
             eventSink = eventsRecorder,
         )
@@ -177,7 +177,7 @@ class RoomListViewTest {
 
     @Test
     fun `clicking on a room twice invokes the expected callback only once`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         val state = aRoomListState(
             eventSink = eventsRecorder,
         )
@@ -200,7 +200,7 @@ class RoomListViewTest {
 
     @Test
     fun `long clicking on a room emits the expected Event`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         val state = aRoomListState(
             eventSink = eventsRecorder,
         )
@@ -214,12 +214,12 @@ class RoomListViewTest {
         eventsRecorder.clear()
 
         rule.onNodeWithText(room0.latestEvent.content().toString()).performTouchInput { longClick() }
-        eventsRecorder.assertSingle(RoomListEvents.ShowContextMenu(room0))
+        eventsRecorder.assertSingle(RoomListEvent.ShowContextMenu(room0))
     }
 
     @Test
     fun `clicking on a room setting invokes the expected callback and emits expected Event`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         val state = aRoomListState(
             contextMenu = aContextMenuShown(),
             eventSink = eventsRecorder,
@@ -237,12 +237,12 @@ class RoomListViewTest {
             rule.clickOn(CommonStrings.common_settings)
         }
 
-        eventsRecorder.assertSingle(RoomListEvents.HideContextMenu)
+        eventsRecorder.assertSingle(RoomListEvent.HideContextMenu)
     }
 
     @Test
     fun `clicking on accept and decline invite emits the expected Events`() {
-        val eventsRecorder = EventsRecorder<RoomListEvents>()
+        val eventsRecorder = EventsRecorder<RoomListEvent>()
         val state = aRoomListState(
             eventSink = eventsRecorder,
         )
@@ -258,8 +258,8 @@ class RoomListViewTest {
         rule.clickOn(CommonStrings.action_decline)
         eventsRecorder.assertList(
             listOf(
-                RoomListEvents.AcceptInvite(invitedRoom),
-                RoomListEvents.ShowDeclineInviteMenu(invitedRoom),
+                RoomListEvent.AcceptInvite(invitedRoom),
+                RoomListEvent.ShowDeclineInviteMenu(invitedRoom),
             )
         )
     }

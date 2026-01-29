@@ -28,8 +28,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -74,7 +72,7 @@ fun RoomMemberListView(
     modifier: Modifier = Modifier,
 ) {
     fun onSelectUser(roomMember: RoomMember) {
-        state.eventSink(RoomMemberListEvents.RoomMemberSelected(roomMember))
+        state.eventSink(RoomMemberListEvent.RoomMemberSelected(roomMember))
     }
 
     Scaffold(
@@ -106,7 +104,7 @@ fun RoomMemberListView(
                 selectedSection = state.selectedSection,
                 showBannedSection = state.showBannedSection,
                 searchQuery = state.searchQuery.text.toString(),
-                onSelectedSectionChange = { state.eventSink(RoomMemberListEvents.ChangeSelectedSection(it)) },
+                onSelectedSectionChange = { state.eventSink(RoomMemberListEvent.ChangeSelectedSection(it)) },
                 onSelectUser = ::onSelectUser,
             )
         }

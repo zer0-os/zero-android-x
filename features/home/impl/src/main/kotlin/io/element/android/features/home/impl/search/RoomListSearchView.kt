@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,8 +32,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.element.android.compound.tokens.generated.CompoundIcons
@@ -46,10 +43,9 @@ import io.element.android.features.home.impl.model.HomeScreenChannel
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.toRoomSummary
-import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListEvent
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
 import io.element.android.features.roomdirectory.api.RoomDescription
-import io.element.android.features.roomdirectory.impl.root.RoomDirectoryEvents
 import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
 import io.element.android.features.roomdirectory.impl.root.aRoomDirectoryState
 import io.element.android.libraries.designsystem.components.button.BackButton
@@ -72,14 +68,14 @@ internal fun RoomListSearchView(
     hideInvitesAvatars: Boolean,
     selectedHomeNavigationTab: HomeScreenTab,
     selectedChannelContentTab: ChannelsScreenTab,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onRoomClick: (RoomId) -> Unit,
     onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelClick: (HomeScreenChannel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(enabled = state.isSearchActive) {
-        state.eventSink(RoomListSearchEvents.ToggleSearchVisibility)
+        state.eventSink(RoomListSearchEvent.ToggleSearchVisibility)
     }
 
     AnimatedVisibility(
@@ -115,7 +111,7 @@ private fun RoomListSearchContent(
     hideInvitesAvatars: Boolean,
     selectedHomeNavigationTab: HomeScreenTab,
     selectedChannelContentTab: ChannelsScreenTab,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onRoomClick: (RoomId) -> Unit,
     onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelClick: (HomeScreenChannel) -> Unit,
@@ -123,7 +119,7 @@ private fun RoomListSearchContent(
     val borderColor = MaterialTheme.colorScheme.tertiary
     val strokeWidth = 1.dp
     fun onBackButtonClick() {
-        state.eventSink(RoomListSearchEvents.ToggleSearchVisibility)
+        state.eventSink(RoomListSearchEvent.ToggleSearchVisibility)
     }
 
     fun onRoomClick(room: RoomListRoomSummary) {
@@ -177,7 +173,7 @@ private fun RoomListSearchContent(
                         ),
                         trailingIcon = if (state.query.text.isNotEmpty()) {
                             @Composable {
-                                IconButton(onClick = { state.eventSink(RoomListSearchEvents.ClearQuery) }) {
+                                IconButton(onClick = { state.eventSink(RoomListSearchEvent.ClearQuery) }) {
                                     Icon(
                                         imageVector = CompoundIcons.Close(),
                                         contentDescription = stringResource(CommonStrings.action_cancel)
