@@ -32,7 +32,7 @@ import io.element.android.features.home.impl.model.ChannelsScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.features.home.impl.roomlist.RoomListContentState
-import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListEvent
 import io.element.android.features.home.impl.roomlist.RoomListSkeletonView
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.roomlist.RoomSummaryRow
@@ -51,7 +51,7 @@ fun HomeChannelListContentView(
     roomListState: RoomListState,
     roomDirectoryState: RoomDirectoryState,
     eventSink: (ChannelListEvents) -> Unit,
-    roomEventSink: (RoomListEvents) -> Unit,
+    roomEventSink: (RoomListEvent) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onPublicRoomClick: (RoomDescription) -> Unit,
     onChannelTabSelected: (ChannelsScreenTab) -> Unit,
@@ -189,7 +189,7 @@ private fun ChannelTabRoomsViewList(
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     selectedTab: ChannelsScreenTab,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onRoomClick: (RoomListRoomSummary) -> Unit,
     onEmptyList: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -205,7 +205,7 @@ private fun ChannelTabRoomsViewList(
     }
     val updatedEventSink by rememberUpdatedState(newValue = eventSink)
     LaunchedEffect(visibleRange) {
-        updatedEventSink(RoomListEvents.UpdateVisibleRange(visibleRange))
+        updatedEventSink(RoomListEvent.UpdateVisibleRange(visibleRange))
     }
 
     val roomsList = state.summaries

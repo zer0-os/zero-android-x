@@ -40,7 +40,7 @@ sealed interface TimelineEvent {
      */
     data class NavigateToPredecessorOrSuccessorRoom(val roomId: RoomId) : TimelineItemEvent
 
-    data class GetLinkPreviewIfApplicable(val event: TimelineItem.Event) : EventFromTimelineItem
+    data class GetLinkPreviewIfApplicable(val event: TimelineItem.Event) : TimelineItemEvent
 
     /**
      * Events coming from a poll item.

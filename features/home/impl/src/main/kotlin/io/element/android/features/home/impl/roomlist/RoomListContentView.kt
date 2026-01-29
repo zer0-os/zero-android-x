@@ -41,7 +41,7 @@ import io.element.android.features.home.impl.components.SetUpRecoveryKeyBanner
 import io.element.android.features.home.impl.contentType
 import io.element.android.features.home.impl.filters.RoomListFilter
 import io.element.android.features.home.impl.filters.RoomListFiltersEmptyStateMessages
-import io.element.android.features.home.impl.filters.RoomListFiltersEvents
+import io.element.android.features.home.impl.filters.RoomListFiltersEvent
 import io.element.android.features.home.impl.filters.RoomListFiltersState
 import io.element.android.features.home.impl.filters.aRoomListFiltersState
 import io.element.android.features.home.impl.filters.selection.FilterSelectionState
@@ -110,9 +110,9 @@ fun RoomListContentView(
                         selectedChatTab.value = tab
                         when (tab) {
                             ChatScreenTab.ALL -> filtersState.clearFilters()
-                            ChatScreenTab.UNREAD -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Rooms))
-                            ChatScreenTab.FAVORITE -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Favourites))
-                            ChatScreenTab.INACTIVE -> filtersState.eventSink(RoomListFiltersEvents.ToggleFilter(RoomListFilter.Inactive))
+                            ChatScreenTab.UNREAD -> filtersState.eventSink(RoomListFiltersEvent.ToggleFilter(RoomListFilter.Rooms))
+                            ChatScreenTab.FAVORITE -> filtersState.eventSink(RoomListFiltersEvent.ToggleFilter(RoomListFilter.Favourites))
+                            ChatScreenTab.INACTIVE -> filtersState.eventSink(RoomListFiltersEvent.ToggleFilter(RoomListFilter.Inactive))
                         }
                     }
                 )

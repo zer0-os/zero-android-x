@@ -414,11 +414,7 @@ private fun HistoryVisibilitySection(
 ) {
     SecurityAndPrivacySection(
         title = stringResource(R.string.screen_security_and_privacy_room_history_section_header),
-        subtitle = stringWithLink(
-            textRes = R.string.screen_security_and_privacy_room_history_section_footer,
-            url = LearnMoreConfig.HISTORY_VISIBLE_URL,
-            onLinkClick = onLinkClick,
-        ),
+        subtitle = null,
         modifier = modifier,
     ) {
         for (availableOption in availableOptions) {

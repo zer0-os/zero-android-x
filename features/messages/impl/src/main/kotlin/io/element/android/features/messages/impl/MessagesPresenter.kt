@@ -27,6 +27,7 @@ import dev.zacsweers.metro.AssistedInject
 import im.vector.app.features.analytics.plan.PinUnpinAction
 import io.element.android.appconfig.MessageComposerConfig
 import io.element.android.features.messages.api.timeline.HtmlConverterProvider
+import io.element.android.features.messages.impl.actionlist.ActionListEvent
 import io.element.android.features.messages.impl.actionlist.ActionListState
 import io.element.android.features.messages.impl.actionlist.model.TimelineItemAction
 import io.element.android.features.messages.impl.crypto.identity.IdentityChangeState
@@ -73,8 +74,8 @@ import io.element.android.libraries.matrix.api.permalink.PermalinkParser
 import io.element.android.libraries.matrix.api.room.JoinedRoom
 import io.element.android.libraries.matrix.api.room.RoomInfo
 import io.element.android.libraries.matrix.api.room.RoomMembersState
-import io.element.android.libraries.matrix.api.room.history.RoomHistoryVisibility
 import io.element.android.libraries.matrix.api.room.getDeadRoomUserId
+import io.element.android.libraries.matrix.api.room.history.RoomHistoryVisibility
 import io.element.android.libraries.matrix.api.room.isDeadRoom
 import io.element.android.libraries.matrix.api.room.isDm
 import io.element.android.libraries.matrix.api.room.powerlevels.permissionsAsState
@@ -266,7 +267,7 @@ class MessagesPresenter(
                 /*is MessagesEvent.OnUserClicked -> {
                     roomMemberModerationState.eventSink(RoomMemberModerationEvents.ShowActionsForUser(event.user))
                 }*/
-                is MessagesEvent.Dismiss -> actionListState.eventSink(ActionListEvents.Clear)
+                is MessagesEvent.Dismiss -> actionListState.eventSink(ActionListEvent.Clear)
                 is MessagesEvent.MarkAsFullyReadAndExit -> coroutineScope.launch {
                     if (!markingAsReadAndExiting.getAndSet(true)) {
                         val latestEventId = room.liveTimeline.getLatestEventId().getOrElse {

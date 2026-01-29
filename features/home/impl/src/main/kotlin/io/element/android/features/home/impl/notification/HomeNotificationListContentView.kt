@@ -33,18 +33,17 @@ import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
 import io.element.android.features.home.impl.roomlist.RoomListContentState
 import io.element.android.features.home.impl.roomlist.RoomListContentStateProvider
-import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListEvent
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.HorizontalDivider
-import io.element.android.libraries.matrix.api.room.RoomNotificationMode
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun HomeNotificationListContentView(
     contentState: RoomListContentState,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onNotificationClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -114,7 +113,7 @@ private fun SkeletonView(count: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun NotificationsViewList(
     items: ImmutableList<RoomListRoomSummary>,
-    eventSink: (RoomListEvents) -> Unit,
+    eventSink: (RoomListEvent) -> Unit,
     onNotificationClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -129,7 +128,7 @@ private fun NotificationsViewList(
     }
     val updatedEventSink by rememberUpdatedState(newValue = eventSink)
     LaunchedEffect(visibleRange) {
-        updatedEventSink(RoomListEvents.UpdateVisibleRange(visibleRange))
+        updatedEventSink(RoomListEvent.UpdateVisibleRange(visibleRange))
     }
     LazyColumn(
         state = lazyListState,

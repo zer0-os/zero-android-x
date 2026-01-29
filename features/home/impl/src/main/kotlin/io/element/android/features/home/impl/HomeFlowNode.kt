@@ -33,7 +33,6 @@ import im.vector.app.features.analytics.plan.MobileScreen
 import io.element.android.annotations.ContributesNode
 import io.element.android.features.home.api.HomeEntryPoint
 import io.element.android.features.home.impl.model.RoomListRoomSummary
-import io.element.android.features.home.impl.roomlist.RoomListEvents
 import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListEvent
 import io.element.android.features.invite.api.InviteData

@@ -55,7 +55,7 @@ import io.element.android.features.home.impl.notification.HomeNotificationListCo
 import io.element.android.features.home.impl.roomlist.RoomListContentView
 import io.element.android.features.home.impl.roomlist.RoomListContextMenu
 import io.element.android.features.home.impl.roomlist.RoomListDeclineInviteMenu
-import io.element.android.features.home.impl.roomlist.RoomListEvents
+import io.element.android.features.home.impl.roomlist.RoomListEvent
 import io.element.android.features.home.impl.roomlist.RoomListMenuAction
 import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.search.RoomListSearchView
@@ -216,7 +216,7 @@ fun HomeView(
             if (homeState.genericActionState is AsyncAction.Failure) {
                 ErrorDialog(
                     content = homeState.genericActionState.errorOrNull()?.message ?: stringResource(CommonStrings.error_unknown),
-                    onSubmit = { homeState.eventSink(HomeEvents.HideError) }
+                    onSubmit = { homeState.eventSink(HomeEvent.HideError) }
                 )
             }
         }
@@ -280,7 +280,7 @@ private fun HomeScaffold(
                                 onSearchUserClick()
                             }
                             else -> {
-                                roomListState.eventSink(RoomListEvents.ToggleSearchResults)
+                                roomListState.eventSink(RoomListEvent.ToggleSearchResults)
                             }
                         }
                     },
@@ -295,7 +295,7 @@ private fun HomeScaffold(
                     shouldShowNewRewardsIntimation = state.shouldShowNewRewardsIntimation,
                     userRewards = state.userRewards,
                     onDismissRewardsTooltip = { immediate ->
-                        state.eventSink(HomeEvents.DismissRewardsIntimation(immediate))
+                        state.eventSink(HomeEvent.DismissRewardsIntimation(immediate))
                     }
                 )
             },
@@ -376,7 +376,7 @@ private fun HomeScaffold(
                         state.walletContentState.eventSink(WalletEvents.ViewWalletTransaction(transaction))
                     },
                     onClaimRewards = {
-                        state.eventSink(HomeEvents.ClaimRewards)
+                        state.eventSink(HomeEvent.ClaimRewards)
                     },
                     onRewardsClaimed = {
                         state.walletContentState.eventSink(WalletEvents.RefreshWalletBalance)

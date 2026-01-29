@@ -34,7 +34,7 @@ sealed interface JoinRuleItem {
     /**
      * Transforms a [JoinRuleItem] option into a [JoinRule].
      */
-    fun toJoinRule(): JoinRule = when (this) {
+    fun toJoinRule(isVisibleInPublicRooms: Boolean): JoinRule = when (this) {
         Private -> JoinRule.Private
         PublicVisibility.Public -> JoinRule.Public
         PublicVisibility.AskToJoin -> JoinRule.Knock

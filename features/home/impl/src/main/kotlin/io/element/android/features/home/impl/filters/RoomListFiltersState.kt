@@ -26,6 +26,6 @@ data class RoomListFiltersState(
     }
 
     fun clearFilters() {
-        eventSink(RoomListFiltersEvents.ClearSelectedFilters)
+        eventSink(RoomListFiltersEvent.ClearSelectedFilters)
     }
 }

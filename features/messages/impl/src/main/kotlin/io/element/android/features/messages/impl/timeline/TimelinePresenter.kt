@@ -240,7 +240,7 @@ class TimelinePresenter(
                         focusedEventId = event.focusedEvent,
                     )
                 }
-                is TimelineEvents.GetLinkPreviewIfApplicable -> {
+                is TimelineEvent.GetLinkPreviewIfApplicable -> {
                     localScope.getLinkPreviewIfRequired(event.event, eventLinkPreviewMap)
                 }
             }

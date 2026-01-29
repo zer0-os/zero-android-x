@@ -49,7 +49,7 @@ fun TimelineEventTimestampView(
     //Automatically calling resolve and resend method
     LaunchedEffect(event.localSendState) {
         if (hasError && isVerifiedUserSendFailure) {
-            eventSink(TimelineEvents.ComputeVerifiedUserSendFailure(event))
+            eventSink(TimelineEvent.ComputeVerifiedUserSendFailure(event))
         }
     }
 

@@ -50,7 +50,7 @@ private const val versionMinor = 22
 private const val versionPatch = 8
 
 object Versions {
-    const val VERSION_CODE = 128
+    const val VERSION_CODE = 129
     const val VERSION_NAME = "$versionMajor.$versionMinor.$versionPatch"
     const val COMPILE_SDK = 36
     const val TARGET_SDK = 36
