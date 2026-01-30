@@ -5,6 +5,7 @@ enum class UserState {
 	ACCESS_TOKEN_EXPIRED,
 	UNAUTHORIZED,
 	UNIDENTIFIED,
+    SESSION_EXPIRED
 }
 
 val UserState.isAuthorized

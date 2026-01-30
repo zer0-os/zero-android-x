@@ -145,11 +145,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -171,6 +174,7 @@ import org.matrix.rustcomponents.sdk.use
 import timber.log.Timber
 import java.io.File
 import java.util.Optional
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -297,6 +301,9 @@ class RustMatrixClient(
 
     private var clientDelegateTaskHandle: TaskHandle? = innerClient.setDelegate(sessionDelegate)
 
+    // Used to ensure only one logout is triggered when sync error occurs
+    private val isLoggingOutFromSyncError = AtomicBoolean(false)
+
     private val _userProfile: MutableStateFlow<MatrixUser> = MutableStateFlow(
         MatrixUser(
             userId = sessionId,
@@ -349,6 +356,32 @@ class RustMatrixClient(
             // Force a refresh of the profile
             getUserProfile(forceRefresh = true)
         }
+
+        // Observe sync and room list errors to logout when server errors (like 503) occur
+        // Only logout if the network is connected - this distinguishes server errors from
+        // local connectivity issues. When the network is online but sync fails, it indicates
+        // a server-side problem (e.g., 503 Service Unavailable from sliding sync server)
+        combine(
+            syncService.syncState,
+            roomListService.state,
+            networkMonitor.connectivity,
+        ) { syncState, roomListState, networkStatus ->
+            Triple(syncState, roomListState, networkStatus)
+        }
+            .onEach { (syncState, roomListState, networkStatus) ->
+                val isNetworkConnected = networkStatus == NetworkStatus.Connected
+                val hasSyncError = syncState == SyncState.Error
+                val hasRoomListError = roomListState == RoomListService.State.Error
+
+                if (isNetworkConnected && (hasSyncError || hasRoomListError)) {
+                    Timber.w("Sync error while network is connected - likely server error (503). " +
+                        "SyncState=$syncState, RoomListState=$roomListState, logging out user")
+                    if (isLoggingOutFromSyncError.getAndSet(true).not()) {
+                        StateBus.onUserStateChanged(UserState.SESSION_EXPIRED)
+                    }
+                }
+            }
+            .launchIn(sessionCoroutineScope)
 
         // Schedule regular database vacuuming to ensure DB performance remains optimal
         scheduleDatabaseVacuum()

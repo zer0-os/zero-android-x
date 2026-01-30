@@ -31,6 +31,7 @@ import io.element.android.features.home.impl.roomlist.RoomListState
 import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.home.impl.wallet.WalletEvents
+import io.element.android.features.logout.api.direct.DirectLogoutEvents
 import io.element.android.features.logout.api.direct.DirectLogoutState
 import io.element.android.features.rageshake.api.RageshakeFeatureAvailability
 import io.element.android.features.roomdirectory.impl.root.RoomDirectoryState
@@ -47,9 +48,11 @@ import io.element.android.libraries.matrix.api.zero.rewards.ZeroUserRewards
 import io.element.android.libraries.sessionstorage.api.SessionStore
 import io.element.android.support.zero.common.extension.safeAsync
 import io.element.android.support.zero.common.state.StateBus
+import io.element.android.support.zero.common.util.UserState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -121,6 +124,10 @@ class HomePresenter(
             }
         }
 
+        // Avatar indicator
+        val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()
+        val directLogoutState = logoutPresenter.present()
+
         // Keep base in sync with derived automatically
         LaunchedEffect(derivedBaseState) {
             baseGenericActionState.value = derivedBaseState
@@ -130,11 +137,12 @@ class HomePresenter(
             client.getUserProfile(true)
             // Fetch initial zero data
             fetchInitialData()
+            StateBus.userStateObservable.collectLatest {
+                if (it == UserState.SESSION_EXPIRED) {
+                    directLogoutState.eventSink(DirectLogoutEvents.Logout(ignoreSdkError = true))
+                }
+            }
         }
-
-        // Avatar indicator
-        val showAvatarIndicator by indicatorService.showRoomListTopBarIndicator()
-        val directLogoutState = logoutPresenter.present()
 
         fun handleEvent(event: HomeEvent) {
             when (event) {

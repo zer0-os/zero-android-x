@@ -137,10 +137,10 @@ fun HomeView(
         }
     }
 
-    ConnectivityIndicatorContainer(
-        modifier = modifier,
-        isOnline = homeState.hasNetworkConnection,
-    ) { contentModifier ->
+//    ConnectivityIndicatorContainer(
+//        modifier = modifier,
+//        isOnline = homeState.hasNetworkConnection,
+//    ) { contentModifier ->
         Box {
             if (roomListState.contextMenu is RoomListState.ContextMenu.Shown) {
                 RoomListContextMenu(
@@ -187,7 +187,6 @@ fun HomeView(
                     selectedHomeNavigationTab.value = it
                 },
                 onChannelsContentTabSelected = { selectedChannelsTab.value = it },
-                modifier = contentModifier,
             )
             // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
@@ -202,7 +201,7 @@ fun HomeView(
                 onRoomClick = { if (firstThrottler.canHandle()) onRoomClick(it) },
                 onPublicRoomClick = { if (firstThrottler.canHandle()) onPublicRoomClick(it) },
                 onChannelClick = { homeState.channelListState.eventSink(ChannelListEvents.OpenChannel(it)) },
-                modifier = contentModifier
+                modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxSize()
                     .background(ElementTheme.colors.bgCanvasDefault)
@@ -220,7 +219,7 @@ fun HomeView(
                 )
             }
         }
-    }
+//    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
