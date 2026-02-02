@@ -65,7 +65,7 @@ object RepositoryModule {
         metaDataRepository: MetaDataRepository,
         walletRepository: WalletRepository,
         stakeRepository: StakeRepository,
-    ): ZeroCoreRepository = ZeroCoreRepository(
+    ): ZeroCoreRepository? = ZeroCoreRepository(
         auth = authRepository,
         account = accountRepository,
         channel = channelRepository,

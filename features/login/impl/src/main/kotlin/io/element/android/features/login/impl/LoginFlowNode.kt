@@ -213,7 +213,12 @@ class LoginFlowNode(
                 createNode<ChooseAccountProviderNode>(buildContext, listOf(callback))
             }
             NavTarget.QrCode -> {
-                createNode<QrCodeLoginFlowNode>(buildContext)
+                val callback = object : QrCodeLoginFlowNode.Callback {
+                    override fun navigateBack() {
+                        backstack.pop()
+                    }
+                }
+                createNode<QrCodeLoginFlowNode>(buildContext, listOf(callback))
             }
             is NavTarget.ConfirmAccountProvider -> {
                 val inputs = ConfirmAccountProviderNode.Inputs(
