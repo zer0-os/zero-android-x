@@ -167,6 +167,27 @@ fun SecureBackupRootView(
                         }
                     },
                 )
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = "Cannot setup your recovery key?",
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = "Reset your identity and create a new recovery key in case you are having trouble setting up your recovery key.",
+                        )
+                    },
+                    alwaysClickable = true,
+                    onClick = {
+                        if (state.isKeyStorageEnabled) {
+                            onResetRecoveryKeyClick()
+                        } else {
+                            state.eventSink.invoke(SecureBackupRootEvents.DisplayKeyStorageDisabledError)
+                        }
+                    },
+                )
             }
             RecoveryState.ENABLED -> {
                 ListItem(
