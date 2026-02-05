@@ -12,17 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import dev.zacsweers.metro.Inject
+import io.element.android.features.home.impl.datasource.RoomListDataSource
 import io.element.android.features.home.impl.filters.selection.FilterSelectionStrategy
 import io.element.android.libraries.architecture.Presenter
 import io.element.android.libraries.matrix.api.roomlist.RoomListService
 import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import io.element.android.libraries.matrix.api.roomlist.RoomListFilter as MatrixRoomListFilter
 
 @Inject
 class RoomListFiltersPresenter(
-    private val roomListService: RoomListService,
+    private val roomListDataSource: RoomListDataSource,
     private val filterSelectionStrategy: FilterSelectionStrategy,
 ) : Presenter<RoomListFiltersState> {
     private val initialFilters = filterSelectionStrategy.filterSelectionStates.value.toImmutableList()
@@ -62,9 +64,9 @@ class RoomListFiltersPresenter(
                         }
                     }
                 }
-                .collect { filters ->
+                .collectLatest { filters ->
                     val result = MatrixRoomListFilter.All(filters)
-                    roomListService.allRooms.updateFilter(result)
+                    roomListDataSource.updateFilter(result)
                 }
         }
 

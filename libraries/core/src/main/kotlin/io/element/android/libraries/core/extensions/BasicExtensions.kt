@@ -87,11 +87,6 @@ fun String.safeCapitalize(): String {
     }
 }
 
-fun String.withoutAccents(): String {
-    return Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{Mn}+".toRegex(), "")
-}
-
 private const val RTL_OVERRIDE_CHAR = '\u202E'
 private const val LTR_OVERRIDE_CHAR = '\u202D'
 

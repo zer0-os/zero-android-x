@@ -121,7 +121,7 @@ fun aMessagesState(
     pinnedMessagesBannerState: PinnedMessagesBannerState = aLoadedPinnedMessagesBannerState(),
     dmUserVerificationState: IdentityState? = null,
     roomMemberModerationState: RoomMemberModerationState = aRoomMemberModerationState(),
-    showSharedHistoryIcon: Boolean = false,
+    topBarSharedHistoryIcon: SharedHistoryIcon = SharedHistoryIcon.NONE,
     successorRoom: SuccessorRoom? = null,
     eventSink: (MessagesEvent) -> Unit = {},
 ) = MessagesState(
@@ -150,7 +150,7 @@ fun aMessagesState(
     pinnedMessagesBannerState = pinnedMessagesBannerState,
     dmUserVerificationState = dmUserVerificationState,
     roomMemberModerationState = roomMemberModerationState,
-    showSharedHistoryIcon = showSharedHistoryIcon,
+    topBarSharedHistoryIcon = topBarSharedHistoryIcon,
     successorRoom = successorRoom,
     showZeroProBadge = false,
     eventSink = eventSink,
