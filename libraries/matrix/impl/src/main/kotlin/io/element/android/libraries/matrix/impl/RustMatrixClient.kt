@@ -98,7 +98,7 @@ import io.element.android.libraries.matrix.impl.room.RoomContentForwarder
 import io.element.android.libraries.matrix.impl.room.RoomInfoMapper
 import io.element.android.libraries.matrix.impl.room.RoomSyncSubscriber
 import io.element.android.libraries.matrix.impl.room.RustRoomFactory
-import io.element.android.libraries.matrix.impl.room.TimelineEventTypeFilterFactory
+import io.element.android.libraries.matrix.impl.room.TimelineEventFilterFactory
 import io.element.android.libraries.matrix.impl.room.history.map
 import io.element.android.libraries.matrix.impl.room.join.map
 import io.element.android.libraries.matrix.impl.room.preview.RoomPreviewInfoMapper
@@ -193,7 +193,7 @@ class RustMatrixClient(
     dispatchers: CoroutineDispatchers,
     baseCacheDirectory: File,
     clock: SystemClock,
-    timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
+    timelineEventFilterFactory: TimelineEventFilterFactory,
     private val featureFlagService: FeatureFlagService,
     private val analyticsService: AnalyticsService,
     private val workManagerScheduler: WorkManagerScheduler,
@@ -280,7 +280,7 @@ class RustMatrixClient(
         systemClock = clock,
         roomContentForwarder = RoomContentForwarder(innerRoomListService),
         roomSyncSubscriber = roomSyncSubscriber,
-        timelineEventTypeFilterFactory = timelineEventTypeFilterFactory,
+        timelineEventFilterFactory = timelineEventFilterFactory,
         roomMembershipObserver = roomMembershipObserver,
         roomInfoMapper = roomInfoMapper,
         featureFlagService = featureFlagService,

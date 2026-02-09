@@ -58,7 +58,7 @@ class RustRoomFactory(
     private val roomListService: RoomListService,
     private val innerRoomListService: InnerRoomListService,
     private val roomSyncSubscriber: RoomSyncSubscriber,
-    private val timelineEventTypeFilterFactory: TimelineEventTypeFilterFactory,
+    private val timelineEventFilterFactory: TimelineEventFilterFactory,
     private val featureFlagService: FeatureFlagService,
     private val roomMembershipObserver: RoomMembershipObserver,
     private val roomInfoMapper: RoomInfoMapper,
@@ -72,7 +72,7 @@ class RustRoomFactory(
     private val eventFilters = TimelineConfig.excludedEvents
         .takeIf { it.isNotEmpty() }
         ?.let { listStateEventType ->
-            timelineEventTypeFilterFactory.create(listStateEventType)
+            timelineEventFilterFactory.create(listStateEventType)
         }
 
     suspend fun destroy() {
@@ -137,7 +137,7 @@ class RustRoomFactory(
                             sdkRoom.timelineWithConfiguration(
                                 TimelineConfiguration(
                                     focus = TimelineFocus.Live(hideThreadedEvents = hideThreadedEvents),
-                                    filter = eventFilters?.let(TimelineFilter::EventTypeFilter) ?: TimelineFilter.All,
+                                    filter = eventFilters?.let(TimelineFilter::EventFilter) ?: TimelineFilter.All,
                                     internalIdPrefix = "live",
                                     dateDividerMode = DateDividerMode.DAILY,
                                     trackReadReceipts = TimelineReadReceiptTracking.ALL_EVENTS,

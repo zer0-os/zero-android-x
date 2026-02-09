@@ -452,7 +452,8 @@ internal fun HomeScreenContent(
                 onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                 onRoomClick = onRoomClick,
                 onCreateRoomClick = onCreateRoomClick,
-                contentPadding = PaddingValues(0.dp)
+                contentPadding = PaddingValues(0.dp),
+                spaceFiltersState = state.roomListState.spaceFiltersState,
             )
         }
         HomeScreenTab.CHANNEL -> {

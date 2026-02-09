@@ -44,6 +44,8 @@ import io.element.android.features.home.impl.filters.selection.FilterSelectionSt
 import io.element.android.features.home.impl.model.ChatScreenTab
 import io.element.android.features.home.impl.model.RoomListRoomSummary
 import io.element.android.features.home.impl.model.RoomSummaryDisplayType
+import io.element.android.features.home.impl.spacefilters.SpaceFiltersState
+import io.element.android.features.home.impl.spacefilters.anUnselectedSpaceFiltersState
 import io.element.android.libraries.designsystem.preview.ElementPreview
 import io.element.android.libraries.designsystem.preview.PreviewsDayNight
 import io.element.android.libraries.designsystem.theme.components.Button
@@ -59,6 +61,7 @@ fun RoomListContentView(
     contentState: RoomListContentState,
     filtersState: RoomListFiltersState,
     roomMappedUserProStatus: Map<String, Boolean>,
+    spaceFiltersState: SpaceFiltersState,
     hideInvitesAvatars: Boolean,
     shouldShowInActiveChatsTab: Boolean,
     eventSink: (RoomListEvent) -> Unit,
@@ -119,7 +122,7 @@ fun RoomListContentView(
                         roomMappedUserProStatus = roomMappedUserProStatus,
                         hideInvitesAvatars = hideInvitesAvatars,
                         filtersState = filtersState,
-                        eventSink = eventSink,
+                        spaceFiltersState = spaceFiltersState,eventSink = eventSink,
                         onSetUpRecoveryClick = onSetUpRecoveryClick,
                         onConfirmRecoveryKeyClick = onConfirmRecoveryKeyClick,
                         onRoomClick = onRoomClick,
@@ -203,6 +206,7 @@ private fun RoomsView(
     roomMappedUserProStatus: Map<String, Boolean>,
     hideInvitesAvatars: Boolean,
     filtersState: RoomListFiltersState,
+    spaceFiltersState: SpaceFiltersState,
     eventSink: (RoomListEvent) -> Unit,
     onSetUpRecoveryClick: () -> Unit,
     onConfirmRecoveryKeyClick: () -> Unit,
@@ -211,9 +215,12 @@ private fun RoomsView(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    if (state.summaries.isEmpty() && filtersState.hasAnyFilterSelected) {
+    val isSpaceFilterSelected = spaceFiltersState is SpaceFiltersState.Selected
+    val hasAnyFilterSelected = filtersState.hasAnyFilterSelected || isSpaceFilterSelected
+    if (state.summaries.isEmpty() && hasAnyFilterSelected) {
         EmptyViewForFilterStates(
             selectedFilters = filtersState.selectedFilters(),
+            isSpaceFilterSelected = isSpaceFilterSelected,
             modifier = modifier.fillMaxSize()
         )
     } else {
@@ -326,6 +333,7 @@ private fun RoomsViewList(
 @Composable
 private fun EmptyViewForFilterStates(
     selectedFilters: ImmutableList<RoomListFilter>,
+    isSpaceFilterSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val emptyStateResources = RoomListFiltersEmptyStateMessages.fromSelectedFilters(selectedFilters) ?: return
@@ -349,6 +357,7 @@ internal fun RoomListContentViewPreview(@PreviewParameter(RoomListContentStatePr
             }
         ),
         roomMappedUserProStatus = emptyMap(),
+        spaceFiltersState = anUnselectedSpaceFiltersState(),
         hideInvitesAvatars = false,
         shouldShowInActiveChatsTab = false,
         eventSink = {},

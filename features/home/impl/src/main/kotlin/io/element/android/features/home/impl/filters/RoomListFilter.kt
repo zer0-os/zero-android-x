@@ -9,6 +9,8 @@
 package io.element.android.features.home.impl.filters
 
 import io.element.android.features.home.impl.R
+import io.element.android.support.zero.common.ZERO_CHANNEL_PREFIX
+import io.element.android.libraries.matrix.api.roomlist.RoomListFilter as MatrixRoomListFilter
 
 /**
  * Enum class representing the different filters that can be applied to the room list.
@@ -33,4 +35,16 @@ enum class RoomListFilter(val stringResource: Int) {
             Invites -> setOf(Rooms, Channels, Favourites)
             Inactive -> setOf(Rooms, Channels, Favourites)
         }
+}
+
+fun RoomListFilter.into(): MatrixRoomListFilter {
+    return when (this) {
+        RoomListFilter.Rooms -> MatrixRoomListFilter.Category.Group
+        RoomListFilter.Channels -> MatrixRoomListFilter.NormalizedMatchRoomName(ZERO_CHANNEL_PREFIX)
+        RoomListFilter.Inactive -> MatrixRoomListFilter.NormalizedMatchRoomName("Empty Room (was")
+//        RoomListFilter.People -> MatrixRoomListFilter.Category.People
+//        RoomListFilter.Unread -> MatrixRoomListFilter.Unread
+        RoomListFilter.Favourites -> MatrixRoomListFilter.Favorite
+        RoomListFilter.Invites -> MatrixRoomListFilter.Invite
+    }
 }

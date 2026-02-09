@@ -12,6 +12,7 @@ import io.element.android.features.home.impl.channel.ChannelListState
 import io.element.android.features.home.impl.feed.FeedListState
 import io.element.android.features.home.impl.model.HomeScreenTab
 import io.element.android.features.home.impl.roomlist.RoomListState
+import io.element.android.features.home.impl.spacefilters.SpaceFiltersState
 import io.element.android.features.home.impl.spaces.HomeSpacesState
 import io.element.android.features.home.impl.wallet.WalletContentState
 import io.element.android.features.logout.api.direct.DirectLogoutState
@@ -51,6 +52,8 @@ data class HomeState(
     val claimRewardActionState: AsyncAction<String> = AsyncAction.Uninitialized,
     val eventSink: (HomeEvent) -> Unit,
 ) {
+    val isBackHandlerEnabled = currentHomeNavigationBarItem != HomeNavigationBarItem.Chats || roomListState.spaceFiltersState is SpaceFiltersState.Selected
+
     private val displayActions = true
 
     fun shouldDisplayActions(selectedHomeTab: HomeScreenTab): Boolean {

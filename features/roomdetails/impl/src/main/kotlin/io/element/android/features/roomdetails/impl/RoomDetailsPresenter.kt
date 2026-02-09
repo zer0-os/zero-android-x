@@ -179,6 +179,8 @@ class RoomDetailsPresenter(
 
         val canReportRoom by produceState(false) { value = client.canReportRoom() }
 
+        val enableKeyShareOnInvite by featureFlagService.isFeatureEnabledFlow(FeatureFlags.EnableKeyShareOnInvite).collectAsState(initial = false)
+
         return RoomDetailsState(
             roomId = room.roomId,
             roomName = roomName,
@@ -213,6 +215,8 @@ class RoomDetailsPresenter(
             isDeadRoom = roomInfo.isDeadRoom,
             loggedInUser = client.sessionId,
             roomVersion = roomInfo.roomVersion,
+            enableKeyShareOnInvite = enableKeyShareOnInvite,
+            roomHistoryVisibility = roomInfo.historyVisibility,
             eventSink = ::handleEvent,
         )
     }
